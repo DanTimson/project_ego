@@ -11,3 +11,4 @@ tools/var/var
 var.zip
 .venv
 docs/ARCHITECTURE.md
+docs/RUNNING.md

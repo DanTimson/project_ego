@@ -159,6 +159,29 @@ class Combatant:
     # additive bonuses applied AFTER the multipliers (see PIPELINE NOTE below)
     conditional_bonus: int = 0
     flags: set = field(default_factory=set)
+    subtypes: set = field(default_factory=set)
+
+    # --- resources and per-round state -------------------------------------
+    ammo: int = 0
+    ## Set when an action that consumes the activation has been used this round.
+    ## Movement is tracked separately, since a unit may move, yield, and return.
+    action_spent: bool = False
+    ## Cumulative path length this round — NOT displacement. Feeds Атака с
+    ## разгона; its `> 0` test is the stamina -2/-1 discriminator.
+    steps_this_round: int = 0
+
+    def has_flag(self, f: str) -> bool:
+        return f in self.flags
+
+    def has_subtype(self, s: str) -> bool:
+        return s in self.subtypes
+
+    def moved_this_round(self) -> bool:
+        return self.steps_this_round > 0
+
+    def reset_round(self) -> None:
+        self.action_spent = False
+        self.steps_this_round = 0
 
     def base_attack_for(self, kind: AttackKind) -> int:
         return {

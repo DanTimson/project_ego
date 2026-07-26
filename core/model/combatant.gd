@@ -39,6 +39,13 @@ var conditional_bonus: int = 0
 ## Ability names, e.g. &"Неутомимый". Membership only.
 var flags: Dictionary = {}
 
+## Unit subtypes, e.g. &"Крысолюд", &"Нежить". Membership only. Drives both
+## action-cost exemptions and target exclusions.
+var subtypes: Dictionary = {}
+
+## Ammunition. Spent by ranged attacks and by several activated abilities.
+var ammo: int = 0
+
 # ---------------------------------------------------------------- per-round state
 #
 # There is no per-unit turn boundary: activation is free and re-entrant, so a
@@ -51,11 +58,21 @@ var flags: Dictionary = {}
 ## the stamina -2/-1 discriminator.
 var steps_this_round: int = 0
 
+## Set when an action consuming the activation has been used this round.
+## Movement is tracked separately: a unit may move, yield, and be reselected.
+var action_spent: bool = false
+
 func has_flag(f: StringName) -> bool:
 	return flags.has(f)
 
 func set_flag(f: StringName) -> void:
 	flags[f] = true
+
+func has_subtype(s: StringName) -> bool:
+	return subtypes.has(s)
+
+func add_subtype(s: StringName) -> void:
+	subtypes[s] = true
 
 func moved_this_round() -> bool:
 	return steps_this_round > 0
@@ -72,3 +89,4 @@ func base_defence_for(kind: AttackKind) -> int:
 
 func reset_round() -> void:
 	steps_this_round = 0
+	action_spent = false
