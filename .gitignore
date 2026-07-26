@@ -5,3 +5,5 @@
 data
 cache
 data_old
+tools/out
+tools/var
