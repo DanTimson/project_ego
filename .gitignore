@@ -5,6 +5,7 @@
 data
 cache
 data_old
+docs/hooks
 tools/var/out
 tools/var/var
 var.zip
