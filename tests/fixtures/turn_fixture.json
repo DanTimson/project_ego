@@ -347,5 +347,277 @@
    "a_attacker": false,
    "expected": 1
   }
+ ],
+ "extra_turns": [
+  {
+   "label": "plain extra turn restores movement and action",
+   "setup": {
+    "speed": 3,
+    "stamina": 10,
+    "stamina_base": 10,
+    "flags": []
+   },
+   "steps": [
+    [
+     "move",
+     3
+    ],
+    [
+     "attack",
+     0
+    ],
+    [
+     "extra",
+     0
+    ]
+   ],
+   "granted": [
+    true
+   ],
+   "after": {
+    "stamina": 8,
+    "movement_remaining": 3,
+    "steps_this_round": 3,
+    "action_spent": false,
+    "forced_rest": false,
+    "resting": false
+   }
+  },
+  {
+   "label": "steps survive the extra turn",
+   "setup": {
+    "speed": 3,
+    "stamina": 10,
+    "stamina_base": 10,
+    "flags": []
+   },
+   "steps": [
+    [
+     "move",
+     2
+    ],
+    [
+     "extra",
+     0
+    ],
+    [
+     "attack",
+     0
+    ]
+   ],
+   "granted": [
+    true
+   ],
+   "after": {
+    "stamina": 8,
+    "movement_remaining": 3,
+    "steps_this_round": 2,
+    "action_spent": true,
+    "forced_rest": false,
+    "resting": false
+   }
+  },
+  {
+   "label": "resting persists through an extra turn",
+   "setup": {
+    "stamina": 4,
+    "stamina_recovery": 1,
+    "speed": 3,
+    "stamina_base": 10,
+    "flags": []
+   },
+   "steps": [
+    [
+     "rest",
+     0
+    ],
+    [
+     "extra",
+     0
+    ]
+   ],
+   "granted": [
+    true
+   ],
+   "after": {
+    "stamina": 7,
+    "movement_remaining": 3,
+    "steps_this_round": 0,
+    "action_spent": false,
+    "forced_rest": false,
+    "resting": true
+   }
+  },
+  {
+   "label": "once-per-round source fires only once",
+   "setup": {
+    "speed": 3,
+    "stamina": 10,
+    "stamina_base": 10,
+    "flags": []
+   },
+   "steps": [
+    [
+     "extra_once",
+     "Кровавое безумие"
+    ],
+    [
+     "attack",
+     0
+    ],
+    [
+     "extra_once",
+     "Кровавое безумие"
+    ]
+   ],
+   "granted": [
+    true,
+    false
+   ],
+   "after": {
+    "stamina": 9,
+    "movement_remaining": 3,
+    "steps_this_round": 0,
+    "action_spent": true,
+    "forced_rest": false,
+    "resting": false
+   }
+  },
+  {
+   "label": "a different source is tracked separately",
+   "setup": {
+    "speed": 3,
+    "stamina": 10,
+    "stamina_base": 10,
+    "flags": []
+   },
+   "steps": [
+    [
+     "extra_once",
+     "Кровавое безумие"
+    ],
+    [
+     "extra_once",
+     "Азарт Охотника"
+    ]
+   ],
+   "granted": [
+    true,
+    true
+   ],
+   "after": {
+    "stamina": 10,
+    "movement_remaining": 3,
+    "steps_this_round": 0,
+    "action_spent": false,
+    "forced_rest": false,
+    "resting": false
+   }
+  },
+  {
+   "label": "limiter clears only at a true round start",
+   "setup": {
+    "speed": 3,
+    "stamina": 10,
+    "stamina_base": 10,
+    "flags": []
+   },
+   "steps": [
+    [
+     "extra_once",
+     "Кровавое безумие"
+    ],
+    [
+     "new_round",
+     0
+    ],
+    [
+     "extra_once",
+     "Кровавое безумие"
+    ]
+   ],
+   "granted": [
+    true,
+    true
+   ],
+   "after": {
+    "stamina": 10,
+    "movement_remaining": 3,
+    "steps_this_round": 0,
+    "action_spent": false,
+    "forced_rest": false,
+    "resting": false
+   }
+  },
+  {
+   "label": "resources-only grant leaves the forced rest pending",
+   "setup": {
+    "stamina": 2,
+    "stamina_recovery": 1,
+    "speed": 3,
+    "stamina_base": 10,
+    "flags": []
+   },
+   "steps": [
+    [
+     "move",
+     1
+    ],
+    [
+     "attack",
+     0
+    ],
+    [
+     "extra",
+     0
+    ]
+   ],
+   "granted": [
+    true
+   ],
+   "after": {
+    "stamina": 0,
+    "movement_remaining": 1,
+    "steps_this_round": 1,
+    "action_spent": false,
+    "forced_rest": true,
+    "resting": false
+   }
+  },
+  {
+   "label": "round-start grant serves the forced rest",
+   "setup": {
+    "stamina": 2,
+    "stamina_recovery": 1,
+    "speed": 3,
+    "stamina_base": 10,
+    "flags": []
+   },
+   "steps": [
+    [
+     "move",
+     1
+    ],
+    [
+     "attack",
+     0
+    ],
+    [
+     "extra_rs",
+     0
+    ]
+   ],
+   "granted": [
+    true
+   ],
+   "after": {
+    "stamina": 3,
+    "movement_remaining": 0,
+    "steps_this_round": 1,
+    "action_spent": true,
+    "forced_rest": false,
+    "resting": true
+   }
+  }
  ]
 }

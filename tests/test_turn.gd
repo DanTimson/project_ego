@@ -138,5 +138,78 @@ func _init() -> void:
 				all_reset = false
 	_check(all_reset, "movement restored and steps reset — once per round only")
 
+	print("\n[5] extra turns — spells and on-kill abilities")
+	for case in fx["extra_turns"]:
+		var u := _unit(case["setup"])
+		var granted: Array = []
+		for pair in case["steps"]:
+			match String(pair[0]):
+				"move": ActionPoints.spend_move(u, int(pair[1]))
+				"attack": ActionPoints.spend_attack(u)
+				"rest": ActionPoints.rest(u)
+				"new_round": ActionPoints.begin_round(u)
+				"extra":
+					granted.append(bool(ActionPoints.grant_extra_turn(u)[0]))
+				"extra_rs":
+					granted.append(bool(ActionPoints.grant_extra_turn(u, &"", false, true)[0]))
+				"extra_once":
+					granted.append(bool(ActionPoints.grant_extra_turn(
+						u, StringName(pair[1]), true)[0]))
+		var w: Dictionary = case["after"]
+		var want_granted: Array = case["granted"]
+		var ok_g := granted.size() == want_granted.size()
+		if ok_g:
+			for i in granted.size():
+				if bool(granted[i]) != bool(want_granted[i]):
+					ok_g = false
+		var ok: bool = ok_g and (u.stamina == int(w["stamina"])
+			and u.movement_remaining == int(w["movement_remaining"])
+			and u.steps_this_round == int(w["steps_this_round"])
+			and u.action_spent == bool(w["action_spent"])
+			and u.forced_rest == bool(w["forced_rest"])
+			and u.resting == bool(w["resting"]))
+		_check(ok, String(case["label"]),
+			"granted %s/%s, stamina %d/%d, move %d/%d, steps %d/%d" % [
+				str(granted), str(want_granted),
+				u.stamina, int(w["stamina"]),
+				u.movement_remaining, int(w["movement_remaining"]),
+				u.steps_this_round, int(w["steps_this_round"])])
+
+	print("\n[6] group grants — filters and exclusions")
+	var caster := _unit({})
+	var d1 := _unit({})
+	var d2 := _unit({})
+	var un := _unit({})
+	var servant := _unit({})
+	d1.add_subtype(&"Демон")
+	d2.add_subtype(&"Демон")
+	un.add_subtype(&"Нежить")
+	servant.add_subtype(&"Нежить")
+	servant.add_subtype(&"Слуга Смерти")
+	var everyone: Array = [d1, d2, un, servant, caster]
+	for u in everyone:
+		ActionPoints.spend_move(u, u.movement_remaining)
+		ActionPoints.spend_attack(u)
+
+	var t1: Array = ActionPoints.grant_extra_turn_to(everyone, [], &"Демон")
+	_check(t1.size() == 2, "Искажение Хаоса reaches both demons only", "%d" % t1.size())
+	_check(ActionPoints.has_resources(d1) and not ActionPoints.has_resources(caster),
+		"and leaves everyone else spent")
+
+	for u in everyone:
+		u.action_spent = true
+		u.movement_remaining = 0
+	var t2: Array = ActionPoints.grant_extra_turn_to(everyone, [servant], &"Нежить")
+	_check(t2.size() == 1, "Клич некроманта skips слуги Смерти", "%d" % t2.size())
+	_check(ActionPoints.has_resources(un) and not ActionPoints.has_resources(servant),
+		"the excluded servant stays spent")
+
+	for u in everyone:
+		u.action_spent = true
+		u.movement_remaining = 0
+	var t3: Array = ActionPoints.grant_extra_turn_to(everyone, [caster])
+	_check(t3.size() == 4 and not ActionPoints.has_resources(caster),
+		"excluding the caster works the same way", "%d" % t3.size())
+
 	print("\n%s" % ("ALL PASS" if failures == 0 else "%d FAILURES" % failures))
 	quit(1 if failures > 0 else 0)

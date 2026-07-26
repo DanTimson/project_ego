@@ -176,6 +176,10 @@ class Combatant:
     ## Восстановление сил, added to the base +2 on rest.
     stamina_recovery: int = 0
     alive: bool = True
+    ## Sources that have fired their «только один раз за ход» effect this round.
+    ## Cleared by begin_round and by NOTHING else — an extra turn must not
+    ## refill it, or Кровавое безумие would chain without bound.
+    once_per_round: set = field(default_factory=set)
     ## Cumulative path length this round — NOT displacement. Feeds Атака с
     ## разгона; its `> 0` test is the stamina -2/-1 discriminator.
     steps_this_round: int = 0

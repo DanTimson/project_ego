@@ -77,6 +77,11 @@ var stamina_recovery: int = 0
 
 var alive: bool = true
 
+## Sources that have fired their «только один раз за ход» effect this round.
+## Cleared by ActionPoints.begin_round and by NOTHING else — an extra turn must
+## not refill it, or Кровавое безумие would chain without bound.
+var once_per_round: Dictionary = {}
+
 func has_flag(f: StringName) -> bool:
 	return flags.has(f)
 

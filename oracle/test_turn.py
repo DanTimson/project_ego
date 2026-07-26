@@ -175,6 +175,108 @@ def test_round_loop() -> None:
           "and steps reset — once per round, at ROUND_START")
 
 
+def test_extra_turns() -> None:
+    print("\n[9] extra turns — spells and on-kill abilities")
+    # Рывок: plain second turn, no round-start effects.
+    u = unit(speed=3)
+    turn.spend_move(u, 3)
+    turn.spend_attack(u)
+    check(not turn.has_resources(u), "spent unit has nothing left")
+    granted, _ = turn.grant_extra_turn(u)
+    check(granted and turn.has_resources(u), "Рывок hands back movement and action")
+    check(u.movement_remaining == 3, "full movement restored",
+          "%d" % u.movement_remaining)
+    check(u.steps_this_round == 3,
+          "steps do NOT reset — charge keeps accumulating across both turns",
+          "steps %d" % u.steps_this_round)
+    turn.spend_attack(u)
+    check(u.stamina == 10 - 2 - 2, "and the attack still costs 2, having moved",
+          "stamina %d" % u.stamina)
+
+    # A rest already taken is not undone by being handed another turn.
+    v = unit(stamina=4, stamina_recovery=1)
+    turn.rest(v)
+    turn.grant_extra_turn(v)
+    check(v.resting, "resting persists through an extra turn — counterattacks stay forfeit")
+
+    # The limiter: Кровавое безумие is «только один раз за ход».
+    w = unit()
+    ok1, _ = turn.grant_extra_turn(w, source="Кровавое безумие", once_per_round=True)
+    turn.spend_attack(w)
+    ok2, _ = turn.grant_extra_turn(w, source="Кровавое безумие", once_per_round=True)
+    check(ok1 and not ok2,
+          "Кровавое безумие fires once per round, not once per turn")
+    check(w.action_spent, "so the chain stops — the action is not handed back again")
+    ok3, _ = turn.grant_extra_turn(w, source="Азарт Охотника", once_per_round=True)
+    check(ok3, "a different source is tracked separately")
+
+    # And the limiter survives the extra turn it granted — otherwise infinite chain.
+    x = unit()
+    turn.grant_extra_turn(x, source="Кровавое безумие", once_per_round=True)
+    check(not turn.may_trigger_once(x, "Кровавое безумие"),
+          "the limiter is NOT cleared by the refresh it caused")
+    turn.begin_round(x)
+    check(turn.may_trigger_once(x, "Кровавое безумие"),
+          "only a true round start clears it")
+
+    # fire_round_start distinguishes the two spell shapes.
+    y = unit(stamina=2, stamina_recovery=1)
+    turn.spend_move(y, 1)
+    turn.spend_attack(y)                       # -> 0 stamina, forced_rest
+    check(y.forced_rest, "exhausted, forced rest pending")
+    turn.grant_extra_turn(y, fire_round_start=False)
+    check(y.forced_rest and turn.has_resources(y),
+          "a resources-only grant lets an exhausted unit act, rest still pending")
+    z = unit(stamina=2, stamina_recovery=1)
+    turn.spend_move(z, 1)
+    turn.spend_attack(z)
+    turn.grant_extra_turn(z, fire_round_start=True)
+    check(not z.forced_rest and z.stamina == 3,
+          "a round-start grant serves the forced rest instead", "stamina %d" % z.stamina)
+
+
+def test_group_grants() -> None:
+    print("\n[10] group grants with filters and exclusions")
+    caster = unit("caster")
+    demons = [unit("d1"), unit("d2")]
+    undead = [unit("u1")]
+    for d in demons:
+        d.subtypes = {"Демон"}
+    undead[0].subtypes = {"Нежить"}
+    servant = unit("servant")
+    servant.subtypes = {"Нежить", "Слуга Смерти"}
+    everyone = demons + undead + [servant, caster]
+    for u in everyone:
+        turn.spend_move(u, u.movement_remaining)
+        turn.spend_attack(u)
+
+    # Искажение Хаоса — all friendly demons.
+    traces = turn.grant_extra_turn_to(
+        everyone, predicate=lambda u: "Демон" in u.subtypes)
+    check(len(traces) == 2, "Искажение Хаоса reaches both demons only",
+          "%d" % len(traces))
+    check(all(turn.has_resources(d) for d in demons), "and they can act again")
+    check(not turn.has_resources(caster), "the caster is untouched by the filter")
+
+    # Клич некроманта — all friendly undead EXCEPT слуги Смерти.
+    for u in everyone:
+        u.action_spent = True
+        u.movement_remaining = 0
+    traces = turn.grant_extra_turn_to(
+        everyone, exclude=(servant,), predicate=lambda u: "Нежить" in u.subtypes)
+    check(len(traces) == 1, "Клич некроманта skips слуги Смерти", "%d" % len(traces))
+    check(turn.has_resources(undead[0]) and not turn.has_resources(servant),
+          "the excluded servant stays spent")
+
+    # The caster-excluded pattern.
+    for u in everyone:
+        u.action_spent = True
+        u.movement_remaining = 0
+    traces = turn.grant_extra_turn_to(everyone, exclude=(caster,))
+    check(len(traces) == len(everyone) - 1 and not turn.has_resources(caster),
+          "excluding the caster works the same way", "%d" % len(traces))
+
+
 if __name__ == "__main__":
     test_effective_speed()
     test_attack_cost()
@@ -184,6 +286,8 @@ if __name__ == "__main__":
     test_rest()
     test_initiative()
     test_round_loop()
+    test_extra_turns()
+    test_group_grants()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
                     % (len(FAILS), ", ".join(FAILS))))
     sys.exit(1 if FAILS else 0)

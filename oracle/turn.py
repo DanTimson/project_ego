@@ -67,11 +67,40 @@ def effective_speed(u: Combatant) -> tuple[int, Trace]:
     return value, t
 
 
-def begin_round(u: Combatant) -> None:
-    """Reset per-round state. The ONLY place these are cleared."""
+# ---------------------------------------------------------------------------
+# Round start vs. extra turns
+#
+# Eleven documented effects grant a unit a SECOND TURN inside the same round:
+#
+#   single target   Рывок, Всплеск Хаоса (demon), Стрекало (animal),
+#                   Руна обновления (mechanism)
+#   filtered group  Искажение Хаоса (all friendly demons),
+#                   Клич некроманта (all friendly undead, EXCEPT слуги Смерти),
+#                   Стимул (several kobold slaves, +1 speed until end of turn)
+#   with a rider    Слово вождя (5 damage to the target, then a second turn),
+#                   Ментальный резонанс (magic boost, then a second turn)
+#   self, on kill   Кровавое безумие (melee kill: -2 stamina, act again),
+#                   Азарт Охотника (ranged kill: act again)
+#
+# So refreshing a unit and starting a round are DIFFERENT operations, and both
+# are needed. `begin_round` is the true round boundary. `refresh_for_extra_turn`
+# hands back resources without it.
+#
+# THE LIMITER MATTERS MOST. Кровавое безумие and Азарт Охотника are both
+# «только один раз за ход». If an extra turn reset that counter, they would
+# chain without bound: kill -> extra action -> kill -> extra action. So
+# `once_per_round` is cleared by begin_round and by NOTHING else.
+# ---------------------------------------------------------------------------
+
+def begin_round(u: Combatant) -> Trace:
+    """True round boundary. The ONLY place once-per-round limiters are cleared."""
+    t = Trace(f"{u.name}.begin_round")
     u.movement_remaining = effective_speed(u)[0]
     u.steps_this_round = 0
     u.action_spent = False
+    u.resting = False
+    u.once_per_round.clear()
+    t.step("refresh", 0, u.movement_remaining, "movement, steps, action, limiters")
     # «в свой следующий ход принудительно выполняет команду Отдых» — a unit that
     # ended the previous round at zero stamina spends this one resting.
     if u.forced_rest:
@@ -79,6 +108,90 @@ def begin_round(u: Combatant) -> None:
         u.forced_rest = False
         u.movement_remaining = 0
         u.action_spent = True
+        t.step("forced rest", 0, u.stamina, "round consumed")
+    t.result = u.movement_remaining
+    return t
+
+
+def refresh_for_extra_turn(u: Combatant, *, fire_round_start: bool = False,
+                           reset_steps: bool = False) -> Trace:
+    """Hand a unit its movement and action back inside the current round.
+
+    `fire_round_start` — whether the grant also triggers "в начале хода"
+    effects. Both variants exist among the spells, so it is a parameter rather
+    than a decision. When True this also serves a pending forced rest, which
+    means such a spell can rescue an exhausted unit.
+
+    `reset_steps` — UNKNOWN (OPEN_QUESTIONS item 17). Left False so that
+    `Атака с разгона` keeps accumulating across both turns of the same round,
+    consistent with charge counting cumulative movement rather than
+    displacement. Resetting would silently nerf cavalry given an extra turn.
+
+    Never clears `once_per_round`, and never clears `resting`: a rest already
+    taken is not undone by being handed another turn.
+    """
+    t = Trace(f"{u.name}.extra_turn")
+    t.base = u.movement_remaining
+    u.movement_remaining = effective_speed(u)[0]
+    u.action_spent = False
+    if reset_steps:
+        t.step("steps reset", u.steps_this_round, 0)
+        u.steps_this_round = 0
+    t.step("refresh", t.base, u.movement_remaining,
+           "movement and action only" if not fire_round_start else "with round-start effects")
+    if fire_round_start and u.forced_rest:
+        rest(u)
+        u.forced_rest = False
+        u.movement_remaining = 0
+        u.action_spent = True
+        t.step("forced rest served", 0, u.stamina, "round-start effects fired")
+    t.result = u.movement_remaining
+    return t
+
+
+def may_trigger_once(u: Combatant, source: str) -> bool:
+    """For «только один раз за ход» effects. Survives extra turns by design."""
+    return source not in u.once_per_round
+
+
+def mark_triggered(u: Combatant, source: str) -> None:
+    u.once_per_round.add(source)
+
+
+def grant_extra_turn(u: Combatant, *, source: str = "", once_per_round: bool = False,
+                     fire_round_start: bool = False,
+                     reset_steps: bool = False) -> tuple[bool, Trace]:
+    """Returns (granted, trace). Refused if the unit is dead or the source has
+    already fired this round."""
+    if not u.alive:
+        return False, Trace(f"{u.name}.extra_turn refused: dead")
+    if once_per_round and not may_trigger_once(u, source):
+        t = Trace(f"{u.name}.extra_turn")
+        t.step("refused", 0, 0, f"{source} already triggered this round")
+        return False, t
+    if once_per_round:
+        mark_triggered(u, source)
+    return True, refresh_for_extra_turn(u, fire_round_start=fire_round_start,
+                                        reset_steps=reset_steps)
+
+
+def grant_extra_turn_to(units, *, exclude=(), predicate=None, **kw) -> list:
+    """Group grants: Искажение Хаоса (all friendly demons), Клич некроманта
+    (all friendly undead EXCEPT слуги Смерти), Стимул (several kobold slaves).
+
+    `exclude` covers both the documented content exclusion and the common
+    caster-excluded pattern; `predicate` covers the subtype filter. Rider
+    effects (Стимул's +1 speed, Слово вождя's 5 damage) are applied by the
+    CALLER — they belong to the spell, not to the turn system.
+    """
+    traces = []
+    for u in units:
+        if u in exclude or (predicate is not None and not predicate(u)):
+            continue
+        granted, t = grant_extra_turn(u, **kw)
+        if granted:
+            traces.append(t)
+    return traces
 
 
 def can_move(u: Combatant, tiles: int = 1) -> Refusal:
@@ -224,7 +337,6 @@ def begin_new_round(state: BattleState) -> None:
         for u in s.units:
             if u.alive:
                 begin_round(u)
-                u.resting = False
     state.active_side = first_side(state.sides)
     state.log.append(f"round {state.round_number} begins, side {state.active_side} first")
 

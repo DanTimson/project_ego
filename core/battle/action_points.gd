@@ -33,18 +33,131 @@ static func effective_speed(u: Combatant) -> Array:
 	return [value, t]
 
 
-## Reset per-round state. THE ONLY place these are cleared.
-static func begin_round(u: Combatant) -> void:
+# ---------------------------------------------------------------------------
+# Round start vs. extra turns
+#
+# Eleven documented effects grant a unit a SECOND TURN inside the same round:
+#
+#   single target   Рывок, Всплеск Хаоса (demon), Стрекало (animal),
+#                   Руна обновления (mechanism)
+#   filtered group  Искажение Хаоса (all friendly demons),
+#                   Клич некроманта (all friendly undead EXCEPT слуги Смерти),
+#                   Стимул (several kobold slaves, +1 speed until end of turn)
+#   with a rider    Слово вождя (5 damage, then a second turn),
+#                   Ментальный резонанс (magic boost, then a second turn)
+#   self, on kill   Кровавое безумие (melee kill: -2 stamina, act again),
+#                   Азарт Охотника (ranged kill: act again)
+#
+# So refreshing a unit and starting a round are DIFFERENT operations, and both
+# are needed. begin_round is the true round boundary; refresh_for_extra_turn
+# hands back resources without it.
+#
+# THE LIMITER MATTERS MOST. Кровавое безумие and Азарт Охотника are both
+# «только один раз за ход». If an extra turn reset that counter they would chain
+# without bound: kill -> extra action -> kill -> extra action. So once_per_round
+# is cleared by begin_round and by NOTHING else.
+# ---------------------------------------------------------------------------
+
+## True round boundary. THE ONLY place once-per-round limiters are cleared.
+static func begin_round(u: Combatant) -> Trace:
+	var t := Trace.new("%s.begin_round" % u.name)
 	u.movement_remaining = effective_speed(u)[0]
 	u.steps_this_round = 0
 	u.action_spent = false
 	u.resting = false
+	u.once_per_round.clear()
+	t.step("refresh", 0.0, float(u.movement_remaining),
+		"movement, steps, action, limiters")
 	# «в свой следующий ход принудительно выполняет команду Отдых»
 	if u.forced_rest:
 		rest(u)
 		u.forced_rest = false
 		u.movement_remaining = 0
 		u.action_spent = true
+		t.step("forced rest", 0.0, float(u.stamina), "round consumed")
+	t.result = float(u.movement_remaining)
+	return t
+
+
+## Hand a unit its movement and action back inside the current round.
+##
+## `fire_round_start` — whether the grant also triggers "в начале хода" effects.
+## Both variants exist among the spells, so it is a parameter rather than a
+## decision. When true this also serves a pending forced rest, so such a spell
+## can rescue an exhausted unit.
+##
+## `reset_steps` — UNKNOWN (OPEN_QUESTIONS item 17). Left false so that
+## Атака с разгона keeps accumulating across both turns of the same round,
+## consistent with charge counting cumulative movement rather than displacement.
+## Resetting would silently nerf cavalry that is given an extra turn.
+##
+## Never clears once_per_round, and never clears `resting`: a rest already taken
+## is not undone by being handed another turn.
+static func refresh_for_extra_turn(u: Combatant, fire_round_start: bool = false,
+		reset_steps: bool = false) -> Trace:
+	var t := Trace.new("%s.extra_turn" % u.name)
+	t.base = float(u.movement_remaining)
+	u.movement_remaining = effective_speed(u)[0]
+	u.action_spent = false
+	if reset_steps:
+		t.step("steps reset", float(u.steps_this_round), 0.0)
+		u.steps_this_round = 0
+	t.step("refresh", t.base, float(u.movement_remaining),
+		"with round-start effects" if fire_round_start else "movement and action only")
+	if fire_round_start and u.forced_rest:
+		rest(u)
+		u.forced_rest = false
+		u.movement_remaining = 0
+		u.action_spent = true
+		t.step("forced rest served", 0.0, float(u.stamina), "round-start effects fired")
+	t.result = float(u.movement_remaining)
+	return t
+
+
+## For «только один раз за ход» effects. Survives extra turns by design.
+static func may_trigger_once(u: Combatant, source: StringName) -> bool:
+	return not u.once_per_round.has(source)
+
+
+static func mark_triggered(u: Combatant, source: StringName) -> void:
+	u.once_per_round[source] = true
+
+
+## Returns [granted: bool, trace: Trace].
+static func grant_extra_turn(u: Combatant, source: StringName = &"",
+		once_per_round: bool = false, fire_round_start: bool = false,
+		reset_steps: bool = false) -> Array:
+	if not u.alive:
+		return [false, Trace.new("%s.extra_turn refused: dead" % u.name)]
+	if once_per_round and not may_trigger_once(u, source):
+		var t := Trace.new("%s.extra_turn" % u.name)
+		t.step("refused", 0.0, 0.0, "%s already triggered this round" % source)
+		return [false, t]
+	if once_per_round:
+		mark_triggered(u, source)
+	return [true, refresh_for_extra_turn(u, fire_round_start, reset_steps)]
+
+
+## Group grants: Искажение Хаоса (all friendly demons), Клич некроманта (all
+## friendly undead EXCEPT слуги Смерти), Стимул (several kobold slaves).
+##
+## `exclude` covers both the documented content exclusion and the common
+## caster-excluded pattern; `subtype` covers the filter. Rider effects — Стимул's
+## +1 speed, Слово вождя's 5 damage — are applied by the CALLER. They belong to
+## the spell, not to the turn system.
+static func grant_extra_turn_to(units: Array, exclude: Array = [],
+		subtype: StringName = &"", source: StringName = &"",
+		once_per_round: bool = false, fire_round_start: bool = false) -> Array:
+	var traces: Array[Trace] = []
+	for u in units:
+		if exclude.has(u):
+			continue
+		if subtype != &"" and not u.has_subtype(subtype):
+			continue
+		var r: Array = grant_extra_turn(u, source, once_per_round, fire_round_start)
+		if r[0]:
+			traces.append(r[1])
+	return traces
 
 
 static func can_move(u: Combatant, tiles: int = 1) -> Refusal:

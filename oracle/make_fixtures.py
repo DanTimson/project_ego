@@ -241,6 +241,66 @@ def turn_fixture() -> dict:
     seq("tireless pays nothing", [("move", 2), ("attack", 0)], stamina=1,
         flags=["Неутомимый"])
 
+    # extra turns
+    fx["extra_turns"] = []
+
+    def extra(label, steps, **kw):
+        kw.setdefault("speed", 3)
+        kw.setdefault("stamina", 10)
+        kw.setdefault("stamina_base", 10)
+        u = Combatant(name="u")
+        flags = kw.pop("flags", [])
+        for k, v in kw.items():
+            setattr(u, k, v)
+        u.flags = set(flags)
+        turn.begin_round(u)
+        granted = []
+        for op, arg in steps:
+            if op == "move":
+                turn.spend_move(u, arg)
+            elif op == "attack":
+                turn.spend_attack(u)
+            elif op == "rest":
+                turn.rest(u)
+            elif op == "new_round":
+                turn.begin_round(u)
+            elif op == "extra":
+                g, _ = turn.grant_extra_turn(u)
+                granted.append(g)
+            elif op == "extra_rs":
+                g, _ = turn.grant_extra_turn(u, fire_round_start=True)
+                granted.append(g)
+            elif op == "extra_once":
+                g, _ = turn.grant_extra_turn(u, source=arg, once_per_round=True)
+                granted.append(g)
+        fx["extra_turns"].append({
+            "label": label, "setup": dict(kw, flags=flags), "steps": steps,
+            "granted": granted,
+            "after": {"stamina": u.stamina, "movement_remaining": u.movement_remaining,
+                      "steps_this_round": u.steps_this_round,
+                      "action_spent": u.action_spent, "forced_rest": u.forced_rest,
+                      "resting": u.resting},
+        })
+
+    extra("plain extra turn restores movement and action",
+          [("move", 3), ("attack", 0), ("extra", 0)])
+    extra("steps survive the extra turn",
+          [("move", 2), ("extra", 0), ("attack", 0)])
+    extra("resting persists through an extra turn",
+          [("rest", 0), ("extra", 0)], stamina=4, stamina_recovery=1)
+    extra("once-per-round source fires only once",
+          [("extra_once", "Кровавое безумие"), ("attack", 0),
+           ("extra_once", "Кровавое безумие")])
+    extra("a different source is tracked separately",
+          [("extra_once", "Кровавое безумие"), ("extra_once", "Азарт Охотника")])
+    extra("limiter clears only at a true round start",
+          [("extra_once", "Кровавое безумие"), ("new_round", 0),
+           ("extra_once", "Кровавое безумие")])
+    extra("resources-only grant leaves the forced rest pending",
+          [("move", 1), ("attack", 0), ("extra", 0)], stamina=2, stamina_recovery=1)
+    extra("round-start grant serves the forced rest",
+          [("move", 1), ("attack", 0), ("extra_rs", 0)], stamina=2, stamina_recovery=1)
+
     for a_init, b_init, a_attacker, want in ((3, 5, True, 1), (5, 3, True, 0),
                                              (3, 3, True, 0), (3, 3, False, 1)):
         fx["initiative"].append({"a": a_init, "b": b_init, "a_attacker": a_attacker,
