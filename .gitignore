@@ -5,6 +5,7 @@
 data
 cache
 data_old
-tools/out
-tools/var
+tools/var/out
+tools/var/var
 var.zip
+.venv
