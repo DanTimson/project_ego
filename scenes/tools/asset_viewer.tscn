@@ -1,0 +1,71 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8a5vq13ujbhv"]
+
+[ext_resource type="Script" path="res://scenes/tools/asset_viewer.gd" id="1_paah2"]
+
+[node name="AssetViewer" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_paah2")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Top" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="LoadBtn" type="Button" parent="VBox/Top"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "Load Assets"
+
+[node name="Split" type="HSplitContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Left" type="VBoxContainer" parent="VBox/Split"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="Assets" type="ItemList" parent="VBox/Split/Left"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+
+[node name="Right" type="VBoxContainer" parent="VBox/Split"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="VBox/Split/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Image" type="TextureRect" parent="VBox/Split/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+stretch_mode = 5
+
+[node name="AudioRow" type="HBoxContainer" parent="VBox/Split/Right"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Play" type="Button" parent="VBox/Split/Right/AudioRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Play"
+
+[node name="Stop" type="Button" parent="VBox/Split/Right/AudioRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Stop"
+
+[node name="Log" type="RichTextLabel" parent="VBox/Split/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+fit_content = true
+
+[node name="Audio" type="AudioStreamPlayer2D" parent="."]
+unique_name_in_owner = true
