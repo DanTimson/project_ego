@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://c8a5vq13ujbhv"]
 
-[ext_resource type="Script" path="res://scenes/tools/asset_viewer.gd" id="1_paah2"]
+[ext_resource type="Script" path="res://game/devtools/asset_viewer.gd" id="1_paah2"]
 
 [node name="AssetViewer" type="Control"]
 layout_mode = 3

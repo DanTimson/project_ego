@@ -41,16 +41,43 @@ from enum import Enum
 
 class Rng:
     """Integer rolls only. `roll(x)` returns a uniform integer in [0, x-1],
-    matching the Eadoropedia's `Random(x)` convention exactly."""
+    matching the Eadoropedia's `Random(x)` convention exactly.
+
+    PORTABILITY IS THE POINT. Stream seeding uses FNV-1a over the UTF-8 bytes
+    of the stream name, NOT the host language's `hash()`. Python randomises
+    string hashing per process (PYTHONHASHSEED), so an earlier version of this
+    class produced a different sequence on every run — which silently defeats
+    fixtures, replays, and any differential test against the original. The
+    algorithm below is fully specified so the GDScript port produces bit-identical
+    streams; see tests/test_rng.gd.
+
+        FNV-1a 32-bit:  h = 2166136261;  for each byte: h ^= b; h *= 16777619
+        stream seed  :  fnv1a(name) XOR (seed * 2654435761), forced odd-nonzero
+        step         :  s = (1103515245 * s + 12345) mod 2^31
+    """
+
+    FNV_OFFSET = 2166136261
+    FNV_PRIME = 16777619
+    MASK32 = 0xFFFFFFFF
+    MASK31 = 0x7FFFFFFF
 
     def __init__(self, seed: int):
-        self._seed = seed
+        self._seed = seed & self.MASK32
         self._streams: dict[str, int] = {}
         self.calls: dict[str, int] = {}
 
+    @classmethod
+    def fnv1a(cls, text: str) -> int:
+        h = cls.FNV_OFFSET
+        for b in text.encode("utf-8"):
+            h = ((h ^ b) * cls.FNV_PRIME) & cls.MASK32
+        return h
+
     def _state(self, stream: str) -> int:
         if stream not in self._streams:
-            self._streams[stream] = (hash((self._seed, stream)) & 0x7FFFFFFF) or 1
+            mixed = (self._seed * 2654435761) & self.MASK32
+            s = (self.fnv1a(stream) ^ mixed) & self.MASK31
+            self._streams[stream] = s or 1
             self.calls[stream] = 0
         return self._streams[stream]
 
@@ -59,7 +86,7 @@ class Rng:
         if x <= 1:
             return 0
         s = self._state(stream)
-        s = (1103515245 * s + 12345) & 0x7FFFFFFF
+        s = (1103515245 * s + 12345) & self.MASK31
         self._streams[stream] = s
         self.calls[stream] += 1
         return s % x
