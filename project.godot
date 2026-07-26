@@ -11,15 +11,15 @@ config_version=5
 [application]
 
 config/name="ProjectEGO"
-run/main_scene="res://scenes/tools/asset_viewer.tscn"
+run/main_scene="res:///game/devtools/asset_viewer.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-ContentDb="*res://autoload/content_db.gd"
-Logger="*res://autoload/logger.gd"
-VFS="*res://autoload/vfs.gd"
+App="*res://game/autoload/app.gd"
+Logger="*res://game/autoload/logger.gd"
+VFS="*res://game/autoload/vfs.gd"
 
 [rendering]
 
