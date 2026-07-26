@@ -1,0 +1,189 @@
+"""
+test_turn.py — action points and the round loop.
+
+The tests that matter here are the RE-ENTRY ones. A model that resets state per
+activation instead of per round passes every naive test and is farmable: yield
+and reselect to collect a start-of-turn bonus twice, or to launder away the
+"moved this round" penalty. Those cases are sections 3 and 4.
+
+Run: python3 test_turn.py
+"""
+
+from __future__ import annotations
+
+import sys
+
+from combat import Combatant
+import turn
+from turn import BattleState, Refusal, Side
+
+FAILS: list[str] = []
+
+
+def check(ok: bool, what: str, detail: str = "") -> None:
+    print("  %s  %s%s" % ("PASS" if ok else "FAIL", what,
+                          ("  — " + detail) if detail else ""))
+    if not ok:
+        FAILS.append(what)
+
+
+def unit(name="u", **kw) -> Combatant:
+    kw.setdefault("speed", 2)
+    kw.setdefault("stamina", 10)
+    kw.setdefault("stamina_base", 10)
+    c = Combatant(name=name)
+    for k, v in kw.items():
+        if k == "flags":
+            c.flags = set(v)
+        else:
+            setattr(c, k, v)
+    turn.begin_round(c)
+    return c
+
+
+def test_effective_speed() -> None:
+    print("\n[1] effective speed — documented stamina penalty, floor 1")
+    for stamina, want in ((10, 3), (5, 3), (4, 2), (3, 2), (2, 1), (1, 1), (0, 1)):
+        u = Combatant(speed=3, stamina=stamina, stamina_base=10)
+        got = turn.effective_speed(u)[0]
+        check(got == want, "speed 3 at stamina %d -> %d" % (stamina, want), "got %d" % got)
+    u = Combatant(speed=1, stamina=0, stamina_base=10)
+    check(turn.effective_speed(u)[0] == 1, "speed floors at 1, never 0 or negative")
+    u = Combatant(speed=3, stamina=0, flags={"Неутомимый"})
+    check(turn.effective_speed(u)[0] == 3, "Неутомимый keeps full speed at 0 stamina")
+
+
+def test_attack_cost() -> None:
+    print("\n[2] attack stamina: -2 having moved, -1 in place")
+    u = unit()
+    turn.spend_attack(u)
+    check(u.stamina == 9, "attacked without moving costs 1", "stamina %d" % u.stamina)
+    u = unit()
+    turn.spend_move(u, 1)
+    turn.spend_attack(u)
+    check(u.stamina == 8, "attacked after moving costs 2", "stamina %d" % u.stamina)
+
+
+def test_reentry() -> None:
+    print("\n[3] re-entry — a unit may be left and reselected in the same round")
+    u = unit(speed=3)
+    turn.spend_move(u, 1)
+    check(turn.has_resources(u), "still selectable after partial movement")
+    check(u.movement_remaining == 2, "movement carries across the yield",
+          "remaining %d" % u.movement_remaining)
+    turn.spend_move(u, 1)
+    turn.spend_attack(u)
+    check(not u.action_spent is False, "action spent after attacking")
+    check(turn.has_resources(u), "still selectable: 1 movement left after acting")
+    turn.spend_move(u, 1)
+    check(not turn.has_resources(u), "exhausted once movement and action are gone")
+
+
+def test_round_trip_still_counts() -> None:
+    print("\n[4] a round trip is still movement — the farming cases")
+    u = unit(speed=4)
+    turn.spend_move(u, 2)          # out
+    turn.spend_move(u, 2)          # back to the starting tile
+    check(u.steps_this_round == 4,
+          "steps accumulate as PATH LENGTH, not displacement",
+          "steps %d" % u.steps_this_round)
+    check(u.moved_this_round(),
+          "ending where it started still counts as having moved")
+    turn.spend_attack(u)
+    check(u.stamina == 8, "so the attack costs 2, not 1", "stamina %d" % u.stamina)
+
+    # The farming case: yielding and reselecting must not reset the counter.
+    v = unit(speed=4)
+    turn.spend_move(v, 1)
+    steps_after_first = v.steps_this_round
+    # ... another unit acts, control returns ...
+    turn.spend_move(v, 1)
+    check(v.steps_this_round == steps_after_first + 1,
+          "steps survive the yield — no per-activation reset",
+          "steps %d" % v.steps_this_round)
+
+
+def test_forced_rest() -> None:
+    print("\n[5] zero stamina forces the next round to be spent resting")
+    u = unit(stamina=2, stamina_recovery=1)
+    turn.spend_move(u, 1)
+    turn.spend_attack(u)           # -2, floors at 0
+    check(u.stamina == 0 and u.forced_rest,
+          "hitting 0 stamina sets forced_rest", "stamina %d" % u.stamina)
+    turn.begin_round(u)
+    check(u.stamina == 3, "next round rests: +2 base +1 recovery", "stamina %d" % u.stamina)
+    check(u.movement_remaining == 0 and u.action_spent,
+          "and the round is consumed entirely")
+    check(not u.forced_rest, "the flag clears after being served")
+
+
+def test_rest() -> None:
+    print("\n[6] rest and its exceptions")
+    u = unit(stamina=4, stamina_recovery=2)
+    turn.rest(u)
+    check(u.stamina == 8, "+2 base +2 recovery", "stamina %d" % u.stamina)
+    check(u.resting and u.action_spent and u.movement_remaining == 0,
+          "resting consumes the round and forgoes counterattacks")
+    u = unit(stamina=9, stamina_recovery=5)
+    turn.rest(u)
+    check(u.stamina == 10, "capped at base stamina", "stamina %d" % u.stamina)
+    u = unit(stamina=4, stamina_recovery=3, flags={"Зуд"})
+    turn.rest(u)
+    check(u.stamina == 6, "Зуд suppresses the recovery bonus, leaving +2",
+          "stamina %d" % u.stamina)
+
+
+def test_initiative() -> None:
+    print("\n[7] initiative — army level, ties to the attacker")
+    a = Side(id=0, name="A", leader_initiative=3, is_attacker=True)
+    b = Side(id=1, name="B", leader_initiative=5)
+    check(turn.first_side([a, b]) == 1, "higher leader initiative moves first")
+    b.leader_initiative = 3
+    check(turn.first_side([a, b]) == 0, "tie goes to the attacker")
+    a.is_attacker = False
+    b.is_attacker = True
+    check(turn.first_side([a, b]) == 1, "tie goes to whichever side is attacking")
+
+
+def test_round_loop() -> None:
+    print("\n[8] round loop")
+    a = Side(id=0, name="A", leader_initiative=5, is_attacker=True,
+             units=[unit("a1"), unit("a2")])
+    b = Side(id=1, name="B", leader_initiative=2, units=[unit("b1")])
+    st = BattleState(sides=[a, b])
+    turn.begin_battle(st)
+    check(st.round_number == 1, "battle starts at round 1")
+    check(st.active_side == 0, "higher initiative side is active first")
+    check(len(turn.activatable(st, 0)) == 2, "both A units are selectable")
+
+    for u in a.units:
+        turn.spend_move(u, u.movement_remaining)
+        turn.spend_attack(u)
+    check(turn.phase_done(st, 0), "A's phase ends when nothing is selectable")
+
+    started_new = turn.end_phase(st)
+    check(not started_new and st.active_side == 1, "control passes to B")
+
+    turn.spend_move(b.units[0], b.units[0].movement_remaining)
+    turn.spend_attack(b.units[0])
+    started_new = turn.end_phase(st)
+    check(started_new and st.round_number == 2,
+          "a new round begins when neither side can act", "round %d" % st.round_number)
+    check(all(u.movement_remaining > 0 for u in a.units + b.units),
+          "and every unit's movement is restored")
+    check(all(u.steps_this_round == 0 for u in a.units + b.units),
+          "and steps reset — once per round, at ROUND_START")
+
+
+if __name__ == "__main__":
+    test_effective_speed()
+    test_attack_cost()
+    test_reentry()
+    test_round_trip_still_counts()
+    test_forced_rest()
+    test_rest()
+    test_initiative()
+    test_round_loop()
+    print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
+                    % (len(FAILS), ", ".join(FAILS))))
+    sys.exit(1 if FAILS else 0)

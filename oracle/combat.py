@@ -166,6 +166,16 @@ class Combatant:
     ## Set when an action that consumes the activation has been used this round.
     ## Movement is tracked separately, since a unit may move, yield, and return.
     action_spent: bool = False
+    ## Tiles still spendable this round. Reset at ROUND_START from effective
+    ## speed, which already includes the stamina penalty.
+    movement_remaining: int = 0
+    ## Set when the unit hits 0 stamina; consumes the next round entirely.
+    forced_rest: bool = False
+    ## Rested this round, so it forgoes counterattacks.
+    resting: bool = False
+    ## Восстановление сил, added to the base +2 on rest.
+    stamina_recovery: int = 0
+    alive: bool = True
     ## Cumulative path length this round — NOT displacement. Feeds Атака с
     ## разгона; its `> 0` test is the stamina -2/-1 discriminator.
     steps_this_round: int = 0

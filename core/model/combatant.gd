@@ -62,6 +62,21 @@ var steps_this_round: int = 0
 ## Movement is tracked separately: a unit may move, yield, and be reselected.
 var action_spent: bool = false
 
+## Tiles still spendable this round. Reset at ROUND_START from effective speed,
+## which already includes the stamina penalty.
+var movement_remaining: int = 0
+
+## Set on reaching 0 stamina; consumes the whole of the next round.
+var forced_rest: bool = false
+
+## Rested this round, so it forgoes counterattacks.
+var resting: bool = false
+
+## Восстановление сил, added to the base +2 on rest.
+var stamina_recovery: int = 0
+
+var alive: bool = true
+
 func has_flag(f: StringName) -> bool:
 	return flags.has(f)
 
