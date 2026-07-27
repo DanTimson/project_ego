@@ -294,6 +294,12 @@ class Side:
     units: list = field(default_factory=list)
     leader_initiative: int = 0
     is_attacker: bool = False
+    ## The side has declared itself finished for this round. Needed because a
+    ## phase does NOT end when resources run out: with free re-entry a unit
+    ## almost always has leftover movement, so without a voluntary "done" the
+    ## two sides hand control back and forth forever and no round ever ends.
+    ## This is the model's equivalent of clicking End Turn.
+    passed: bool = False
 
     def living(self) -> list:
         return [u for u in self.units if u.alive]
@@ -334,6 +340,7 @@ def begin_battle(state: BattleState) -> None:
 def begin_new_round(state: BattleState) -> None:
     state.round_number += 1
     for s in state.sides:
+        s.passed = False
         for u in s.units:
             if u.alive:
                 begin_round(u)
@@ -353,12 +360,20 @@ def phase_done(state: BattleState, side_id: int) -> bool:
 
 
 def end_phase(state: BattleState) -> bool:
-    """Hand control to the other side. Returns True if a new round started.
+    """The active side declares itself finished. Returns True if a new round
+    started.
 
-    ASSUMPTION: whole-phase alternation, not unit-by-unit. See module docstring.
+    A new round begins once BOTH sides are finished — each having either passed
+    voluntarily or run out of resources. Waiting for resources alone would never
+    trigger: with free re-entry a unit almost always has leftover movement, so
+    the sides would trade control indefinitely.
+
+    Whole-phase alternation, not unit-by-unit (user-confirmed).
     """
+    current = state.side(state.active_side)
+    current.passed = True
     other = state.other(state.active_side)
-    if phase_done(state, other.id):
+    if other.passed or phase_done(state, other.id):
         begin_new_round(state)
         return True
     state.active_side = other.id

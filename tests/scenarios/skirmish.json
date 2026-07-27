@@ -1,0 +1,54 @@
+{
+ "name": "swordsman and archer versus militia",
+ "seed": 20260726,
+ "battlefield": {
+  "width": 5,
+  "height": 3,
+  "tiles": [
+   {"col": 2, "row": 0, "bf_object": 2, "move_cost": 2, "stam_cost": 1},
+   {"col": 2, "row": 2, "bf_object": 6, "move_cost": 0}
+  ]
+ },
+ "sides": [
+  {
+   "id": 0, "name": "attackers", "leader_initiative": 3, "is_attacker": true,
+   "units": [
+    {"name": "Мечник", "at": [1, 1], "attack": 8, "counter_attack": 8,
+     "defence": 3, "ranged_defence": 5, "life": 17, "speed": 2,
+     "stamina": 10, "morale": 10},
+    {"name": "Лучник", "at": [0, 2], "ranged_attack": 6, "attack": 3,
+     "defence": 1, "ranged_defence": 2, "life": 12, "speed": 2,
+     "stamina": 10, "morale": 10, "ammo": 6, "shooting_range": 4}
+   ]
+  },
+  {
+   "id": 1, "name": "defenders", "leader_initiative": 5,
+   "units": [
+    {"name": "Ополченец", "at": [3, 1], "attack": 5, "counter_attack": 4,
+     "defence": 2, "ranged_defence": 3, "life": 12, "speed": 2,
+     "stamina": 10, "morale": 10},
+    {"name": "Копейщик", "at": [4, 0], "attack": 6, "counter_attack": 6,
+     "defence": 4, "ranged_defence": 4, "life": 14, "speed": 2,
+     "stamina": 10, "morale": 10}
+   ]
+  }
+ ],
+ "commands": [
+  {"op": "attack", "unit": "Ополченец", "target": "Мечник"},
+  {"op": "move", "unit": "Копейщик", "to": [3, 0]},
+  {"op": "end_phase"},
+  {"op": "attack", "unit": "Мечник", "target": "Ополченец"},
+  {"op": "shoot", "unit": "Лучник", "target": "Ополченец"},
+  {"op": "end_phase"},
+  {"op": "rest", "unit": "Копейщик"},
+  {"op": "end_phase"},
+  {"op": "attack", "unit": "Мечник", "target": "Ополченец"},
+  {"op": "shoot", "unit": "Лучник", "target": "Копейщик"},
+  {"op": "end_phase"},
+  {"op": "attack", "unit": "Ополченец", "target": "Мечник"},
+  {"op": "attack", "unit": "Копейщик", "target": "Мечник"},
+  {"op": "end_phase"},
+  {"op": "attack", "unit": "Мечник", "target": "Ополченец"},
+  {"op": "shoot", "unit": "Лучник", "target": "Ополченец"}
+ ]
+}

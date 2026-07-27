@@ -142,6 +142,7 @@ class Combatant:
     attack: int = 0
     counter_attack: int = 0
     ranged_attack: int = 0
+    shooting_range: int = 0
     defence: int = 0
     ranged_defence: int = 0
     resist: int = 0

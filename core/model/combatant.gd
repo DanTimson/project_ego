@@ -15,6 +15,7 @@ var name: String = "unit"
 var attack: int = 0
 var counter_attack: int = 0
 var ranged_attack: int = 0
+var shooting_range: int = 0
 var defence: int = 0
 var ranged_defence: int = 0
 var resist: int = 0

@@ -15,6 +15,12 @@ class Side extends RefCounted:
 	var units: Array[Combatant] = []
 	var leader_initiative: int = 0
 	var is_attacker: bool = false
+	## The side has declared itself finished for this round. Needed because a
+	## phase does NOT end when resources run out: with free re-entry a unit
+	## almost always has leftover movement, so without a voluntary "done" the
+	## two sides hand control back and forth forever and no round ever ends.
+	## This is the model's equivalent of clicking End Turn.
+	var passed: bool = false
 
 	func living() -> Array[Combatant]:
 		var out: Array[Combatant] = []
@@ -63,6 +69,7 @@ static func begin_battle(state: BattleState) -> void:
 static func begin_new_round(state: BattleState) -> void:
 	state.round_number += 1
 	for s in state.sides:
+		s.passed = false
 		for u in s.units:
 			if u.alive:
 				ActionPoints.begin_round(u)
@@ -85,10 +92,17 @@ static func phase_done(state: BattleState, side_id: int) -> bool:
 	return activatable(state, side_id).is_empty()
 
 
-## Hand control to the other side. Returns true if a new round started.
+## The active side declares itself finished. Returns true if a new round started.
+##
+## A new round begins once BOTH sides are finished — each having either passed
+## voluntarily or run out of resources. Waiting for resources alone would never
+## trigger: with free re-entry a unit almost always has leftover movement, so the
+## sides would trade control indefinitely.
 static func end_phase(state: BattleState) -> bool:
+	var current: Side = state.side(state.active_side)
+	current.passed = true
 	var other: Side = state.other(state.active_side)
-	if phase_done(state, other.id):
+	if other.passed or phase_done(state, other.id):
 		begin_new_round(state)
 		return true
 	state.active_side = other.id
