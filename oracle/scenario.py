@@ -33,6 +33,7 @@ import json
 
 import battlefield as bfmod
 import combat
+import counterattack as ca
 import turn
 from battlefield import Battlefield
 from combat import AttackKind, Combatant, Rng
@@ -164,19 +165,42 @@ class Scenario:
         self.emit("%s closes to %s (%d steps)" % (unit.name, self._at(unit), len(path)))
         return True
 
-    def _strike(self, unit: Combatant, target: Combatant, kind: AttackKind) -> None:
-        damage, traces = combat.resolve_attack(unit, target, kind, self.rng)
-        target.life -= damage
+    def _fell(self, unit: Combatant) -> None:
+        h = self.field.find(unit)
+        if h is not None:
+            self.field.remove(h)
+        self.emit("%s falls" % unit.name)
+
+    def _strike(self, unit: Combatant, target: Combatant, kind: AttackKind,
+                action=None) -> None:
+        """One exchange: the attack and any retaliation, in the right order.
+
+        Melee is answered; a shot is not. `Первый удар` moves the retaliation
+        ahead of the blow that caused it, so a defender can kill an attacker
+        before the attack lands.
+        """
+        ex = ca.resolve(unit, target, self.rng, kind, action)
         turn.spend_attack(unit)
-        self.emit("%s hits %s for %d (%s at %d/%d, stamina %d)"
-                  % (unit.name, target.name, damage, target.name,
-                     max(0, target.life), target.life_base, unit.stamina))
-        if target.life <= 0 and target.alive:
-            target.alive = False
-            h = self.field.find(target)
-            if h is not None:
-                self.field.remove(h)
-            self.emit("%s falls" % target.name)
+
+        for what, damage in ex.order:
+            if what == "attack":
+                self.emit("%s hits %s for %d (%s at %d/%d, stamina %d)"
+                          % (unit.name, target.name, damage, target.name,
+                             max(0, target.life), target.life_base, unit.stamina))
+            else:
+                self.emit("%s counters%s for %d (%s at %d/%d)"
+                          % (target.name,
+                             " first" if ex.counter_first else "",
+                             damage, unit.name,
+                             max(0, unit.life), unit.life_base))
+        if ex.defender_died:
+            self._fell(target)
+        if ex.attacker_died:
+            self._fell(unit)
+        if not ex.countered and ex.reason not in (ca.NoCounter.RANGED,
+                                                  ca.NoCounter.DEAD):
+            self.emit("  (%s does not counter: %s)"
+                      % (target.name, ex.reason.value))
 
     def cmd_attack(self, unit: Combatant, target: Combatant) -> None:
         if not target.alive:

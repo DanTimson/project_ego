@@ -1,0 +1,119 @@
+{
+ "name": "pikeman first strike versus a charging swordsman",
+ "seed": 7,
+ "battlefield": {
+  "width": 5,
+  "height": 3
+ },
+ "sides": [
+  {
+   "id": 0,
+   "name": "attackers",
+   "leader_initiative": 9,
+   "is_attacker": true,
+   "units": [
+    {
+     "name": "Мечник",
+     "at": [
+      1,
+      1
+     ],
+     "attack": 9,
+     "counter_attack": 8,
+     "defence": 3,
+     "life": 17,
+     "speed": 3,
+     "stamina": 10,
+     "morale": 10
+    },
+    {
+     "name": "Ловкач",
+     "at": [
+      1,
+      0
+     ],
+     "attack": 7,
+     "counter_attack": 5,
+     "defence": 2,
+     "life": 14,
+     "speed": 3,
+     "stamina": 10,
+     "morale": 10,
+     "flags": [
+      "Ловкость"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "name": "defenders",
+   "leader_initiative": 2,
+   "units": [
+    {
+     "name": "Копейщик",
+     "at": [
+      3,
+      1
+     ],
+     "attack": 6,
+     "counter_attack": 7,
+     "defence": 4,
+     "life": 14,
+     "speed": 2,
+     "stamina": 10,
+     "morale": 10,
+     "flags": [
+      "Первый удар"
+     ]
+    },
+    {
+     "name": "Отдыхающий",
+     "at": [
+      3,
+      0
+     ],
+     "attack": 5,
+     "counter_attack": 5,
+     "defence": 2,
+     "life": 12,
+     "speed": 2,
+     "stamina": 10,
+     "morale": 10
+    }
+   ]
+  }
+ ],
+ "commands": [
+  {
+   "op": "attack",
+   "unit": "Мечник",
+   "target": "Копейщик"
+  },
+  {
+   "op": "attack",
+   "unit": "Ловкач",
+   "target": "Отдыхающий"
+  },
+  {
+   "op": "end_phase"
+  },
+  {
+   "op": "rest",
+   "unit": "Отдыхающий"
+  },
+  {
+   "op": "end_phase"
+  },
+  {
+   "op": "attack",
+   "unit": "Ловкач",
+   "target": "Отдыхающий"
+  },
+  {
+   "op": "attack",
+   "unit": "Мечник",
+   "target": "Копейщик"
+  }
+ ]
+}

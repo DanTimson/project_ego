@@ -1,0 +1,187 @@
+"""
+counterattack.py — melee retaliation.
+
+Twenty-three abilities in the documentation touch this, and between them they
+pin the rules down further than any single one does:
+
+    Контратака            «сколько повреждений воин наносит атаковавшему его
+                          противнику во время ответного удара» — a separate
+                          stat, not a copy of Attack
+    Первый удар           «наносит ответный удар ПРЕЖДЕ, чем его ударит
+                          противник ... не действует, если противник тоже
+                          обладает первым ударом»
+    Ловкость              «атаковать противника врукопашную, ИЗБЕГАЯ ответных
+                          ударов» — attacker-side suppression
+    Не сражается          «не может атаковать и контратаковать»
+    Касание вампира       «не получать контратаки»
+    Удар щитом            suppresses it from the action side
+    Смертельное касание   «не действует при контратаках» — some on-hit riders
+                          are suppressed during a counter
+    Парализующее касание  «атаки, контратаки и выстрелы» — and some are not
+    Жажда крови           killing by counterattack gives HALF the morale a
+                          melee kill would
+    Повреждение оружия    melee attackers lose 1 attack AND 1 counterattack
+
+RANGED ATTACKS DO NOT PROVOKE. Every rule above says «врукопашную». A shot is
+answered by nothing, which is most of why archers are worth their cost.
+
+FIRST STRIKE IS A REORDERING, NOT AN EXTRA BLOW. `Первый удар` moves the
+defender's retaliation ahead of the attack that caused it, so a defender can
+kill an attacker before the attack lands. It does not grant a second
+retaliation, and two units that both have it cancel out to the normal order.
+"""
+
+from __future__ import annotations
+
+from enum import Enum
+
+import combat
+from combat import AttackKind, Combatant, Trace
+
+
+class NoCounter(Enum):
+    """Why a counterattack did not happen. Distinct values because the combat
+    log should say which, and the AI needs to know whether it can be arranged
+    again next round."""
+    NONE = "counterattacked"
+    DEAD = "defender is down"
+    RANGED = "ranged attacks are not answered"
+    NO_STAT = "no counterattack value"
+    EXHAUSTED = "at 0 stamina a unit does not counterattack"
+    RESTING = "resting forgoes counterattacks"
+    CANNOT_FIGHT = "Не сражается"
+    EVADED = "the attacker avoided it"
+    SUPPRESSED = "suppressed by the attacker's action"
+
+
+## Attacker-side abilities that avoid retaliation entirely.
+EVASIVE = ("Ловкость", "Касание вампира")
+
+
+def why_no_counter(defender: Combatant, attacker: Combatant,
+                   kind: AttackKind, action=None) -> NoCounter:
+    """Decidable before any dice are rolled."""
+    if kind is not AttackKind.MELEE:
+        return NoCounter.RANGED
+    if not defender.alive or defender.life <= 0:
+        return NoCounter.DEAD
+    if defender.has_flag("Не сражается"):
+        return NoCounter.CANNOT_FIGHT
+    if defender.counter_attack <= 0:
+        return NoCounter.NO_STAT
+    # «его Защита и Защита от выстрела уменьшаются в 2 раза ... не контратакует»
+    if defender.stamina <= 0 and not defender.has_flag("Неутомимый"):
+        return NoCounter.EXHAUSTED
+    if defender.resting:
+        return NoCounter.RESTING
+    if any(attacker.has_flag(f) for f in EVASIVE):
+        return NoCounter.EVADED
+    if action is not None and getattr(action, "suppresses_counterattack", False):
+        return NoCounter.SUPPRESSED
+    return NoCounter.NONE
+
+
+def will_counter(defender: Combatant, attacker: Combatant,
+                 kind: AttackKind, action=None) -> bool:
+    return why_no_counter(defender, attacker, kind, action) is NoCounter.NONE
+
+
+def strikes_first(defender: Combatant, attacker: Combatant) -> bool:
+    """«Это правило не действует, если противник тоже обладает первым ударом.»
+
+    Both having it is not a race — it cancels to the normal order.
+    """
+    return (defender.has_flag("Первый удар")
+            and not attacker.has_flag("Первый удар"))
+
+
+class Exchange:
+    """One melee exchange: the attack, the retaliation, and their order.
+
+    Returned rather than applied so the caller decides what to do with the
+    numbers — the scenario runner logs them, the AI evaluates them without
+    committing.
+    """
+
+    def __init__(self):
+        self.attack_damage = 0
+        self.counter_damage = 0
+        self.countered = False
+        self.counter_first = False
+        self.reason = NoCounter.NONE
+        self.attacker_died = False
+        self.defender_died = False
+        self.traces: list = []
+        self.order: list = []      # ("attack"|"counter", damage)
+
+
+def resolve(attacker: Combatant, defender: Combatant, rng,
+            kind: AttackKind = AttackKind.MELEE, action=None) -> Exchange:
+    """Resolve an attack and any retaliation, in the correct order.
+
+    ASSUMPTION (OPEN_QUESTIONS item 18): if a first-strike retaliation kills the
+    attacker, the attack does NOT land. «Прежде, чем его ударит противник» says
+    the retaliation precedes the blow, and a dead unit swinging seems the less
+    likely reading — but the documentation does not settle it, and the
+    difference is visible only in the exact case where the counter is lethal.
+    """
+    ex = Exchange()
+    ex.reason = why_no_counter(defender, attacker, kind, action)
+    ex.countered = ex.reason is NoCounter.NONE
+    ex.counter_first = ex.countered and strikes_first(defender, attacker)
+
+    def do_attack() -> None:
+        damage, traces = combat.resolve_attack(attacker, defender, kind, rng)
+        ex.attack_damage = damage
+        ex.traces.extend(traces)
+        ex.order.append(("attack", damage))
+        defender.life -= damage
+        if defender.life <= 0 and defender.alive:
+            defender.alive = False
+            ex.defender_died = True
+
+    def do_counter() -> None:
+        damage, traces = combat.resolve_attack(
+            defender, attacker, AttackKind.COUNTER, rng)
+        ex.counter_damage = damage
+        ex.traces.extend(traces)
+        ex.order.append(("counter", damage))
+        attacker.life -= damage
+        if attacker.life <= 0 and attacker.alive:
+            attacker.alive = False
+            ex.attacker_died = True
+
+    if ex.counter_first:
+        do_counter()
+        if not ex.attacker_died:
+            do_attack()
+    else:
+        do_attack()
+        # A defender killed by the blow does not answer it.
+        if ex.countered and defender.alive:
+            do_counter()
+        elif ex.countered:
+            ex.countered = False
+            ex.reason = NoCounter.DEAD
+
+    return ex
+
+
+## «При убийстве противника контратакой или выстрелом воин дополнительно
+## получит только половину этого значения.» Killing by counter or by shot is
+## worth half the morale a melee kill is.
+def morale_kill_share(kind: AttackKind) -> float:
+    return 1.0 if kind is AttackKind.MELEE else 0.5
+
+
+## «Не действует при контратаках» (Смертельное касание) versus «атаки,
+## контратаки и выстрелы» (Парализующее касание): whether an on-hit rider fires
+## during a counter is per-ability, so it is a property of the rider rather than
+## a blanket rule.
+COUNTER_SUPPRESSED_RIDERS = ("Смертельное касание",)
+
+
+def rider_fires(ability_name: str, kind: AttackKind) -> bool:
+    if kind is AttackKind.COUNTER and ability_name in COUNTER_SUPPRESSED_RIDERS:
+        return False
+    return True

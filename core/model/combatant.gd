@@ -83,6 +83,10 @@ var alive: bool = true
 ## not refill it, or Кровавое безумие would chain without bound.
 var once_per_round: Dictionary = {}
 
+## Timed effects. They contribute Modifiers through the same pipeline as
+## everything else, so a status never computes a number itself.
+var statuses: Array = []
+
 func has_flag(f: StringName) -> bool:
 	return flags.has(f)
 

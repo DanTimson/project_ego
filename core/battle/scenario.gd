@@ -173,20 +173,41 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	return true
 
 
-func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind) -> void:
-	var result: Array = Damage.resolve_attack(unit, target, kind, rng)
-	var damage: int = result[0]
-	target.life -= damage
+func _fell(unit: Combatant) -> void:
+	var h := field.find_unit(unit)
+	if field.contains(h):
+		field.remove_occupant(h)
+	emit("%s falls" % unit.name)
+
+
+## One exchange: the attack and any retaliation, in the right order.
+##
+## Melee is answered; a shot is not. Первый удар moves the retaliation ahead of
+## the blow that caused it, so a defender can kill an attacker before the attack
+## lands.
+func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
+		action: Variant = null) -> void:
+	var ex := Counterattack.resolve(unit, target, rng, kind, action)
 	ActionPoints.spend_attack(unit)
-	emit("%s hits %s for %d (%s at %d/%d, stamina %d)"
-		% [unit.name, target.name, damage, target.name,
-			maxi(0, target.life), target.life_base, unit.stamina])
-	if target.life <= 0 and target.alive:
-		target.alive = false
-		var h := field.find_unit(target)
-		if field.contains(h):
-			field.remove_occupant(h)
-		emit("%s falls" % target.name)
+
+	for entry in ex.order:
+		if String(entry[0]) == "attack":
+			emit("%s hits %s for %d (%s at %d/%d, stamina %d)"
+				% [unit.name, target.name, int(entry[1]), target.name,
+					maxi(0, target.life), target.life_base, unit.stamina])
+		else:
+			emit("%s counters%s for %d (%s at %d/%d)"
+				% [target.name, " first" if ex.counter_first else "",
+					int(entry[1]), unit.name,
+					maxi(0, unit.life), unit.life_base])
+	if ex.defender_died:
+		_fell(target)
+	if ex.attacker_died:
+		_fell(unit)
+	if not ex.countered and ex.reason != Counterattack.NoCounter.RANGED \
+			and ex.reason != Counterattack.NoCounter.DEAD:
+		emit("  (%s does not counter: %s)"
+			% [target.name, Counterattack.REASON_TEXT[ex.reason]])
 
 
 func cmd_attack(unit: Combatant, target: Combatant) -> void:

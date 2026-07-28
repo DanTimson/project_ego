@@ -159,6 +159,17 @@ class Combatant:
     defence_bonus: int = 0
     # additive bonuses applied AFTER the multipliers (see PIPELINE NOTE below)
     conditional_bonus: int = 0
+
+    ## Every Modifier on this unit: innate abilities, level-up perks, item
+    ## enchants, spell buffs, terrain, medals, auras. `attack_bonus` and
+    ## `defence_bonus` above remain as a shorthand for tests and simple
+    ## scenarios; anything content-driven arrives here instead.
+    modifiers: list = field(default_factory=list)
+
+    ## Timed effects. They contribute Modifiers through the same pipeline as
+    ## everything else, so a status never computes a number itself.
+    statuses: list = field(default_factory=list)
+
     flags: set = field(default_factory=set)
     subtypes: set = field(default_factory=set)
 
@@ -271,6 +282,25 @@ def morale_mod(u: Combatant) -> tuple[float, str]:
 # Attack value
 # ---------------------------------------------------------------------------
 
+# Set by rules.bind_pipeline(). None means "no content loaded" — the scalar
+# attack_bonus/defence_bonus path still works, which is what keeps every
+# pre-existing test and scenario valid.
+_PIPELINE = None
+_CONTEXT_EXTRA = {}
+
+
+def bind_pipeline(pipeline) -> None:
+    """Install the modifier pipeline. Called once, after content loads."""
+    global _PIPELINE
+    _PIPELINE = pipeline
+
+
+def _run_hook(base, u, hook, ctx, label):
+    if _PIPELINE is None or not u.modifiers:
+        return base, None
+    return _PIPELINE.resolve(base, u.modifiers, hook, ctx, label)
+
+
 def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
     """(base + additive) * StaminaMod * MoraleMod * WoundMod.
 
@@ -287,6 +317,16 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
         t.step("additive bonuses", value, nv)
         value = nv
 
+    # STAT_PASSIVE sits INSIDE the multiplier chain: additive before
+    # multiplicative is documented and not negotiable.
+    from modifier import Hook
+    ctx = {"stat": _STAT_FOR_KIND[kind], "unit": u, "kind": kind}
+    nv, sub = _run_hook(value, u, Hook.STAT_PASSIVE, ctx, "modifiers")
+    if sub is not None and nv != value:
+        for step in sub.steps:
+            t.steps.append(step)
+        value = nv
+
     for label, fn in (("StaminaMod", stamina_mod),
                       ("MoraleMod", morale_mod),
                       ("WoundMod", wound_mod)):
@@ -298,6 +338,13 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
 
     t.result = value
     return value, t
+
+
+_STAT_FOR_KIND = {
+    AttackKind.MELEE: "attack",
+    AttackKind.COUNTER: "counter_attack",
+    AttackKind.RANGED: "ranged_attack",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -399,6 +446,15 @@ def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
     if u.defence_bonus:
         nv = value + u.defence_bonus
         t.step("additive bonuses", value, nv)
+        value = nv
+
+    from modifier import Hook
+    ctx = {"stat": "ranged_defence" if kind is AttackKind.RANGED else "defence",
+           "unit": u, "kind": kind}
+    nv, sub = _run_hook(value, u, Hook.STAT_PASSIVE, ctx, "modifiers")
+    if sub is not None and nv != value:
+        for step in sub.steps:
+            t.steps.append(step)
         value = nv
 
     if u.stamina <= 0 and "Неутомимый" not in u.flags:
