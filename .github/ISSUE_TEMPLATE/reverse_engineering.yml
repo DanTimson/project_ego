@@ -1,0 +1,59 @@
+name: Reverse-engineering claim
+description: Record a binary-derived claim or correction
+title: "[RE] "
+labels: ["status:needs-review"]
+body:
+  - type: input
+    id: address
+    attributes:
+      label: Address
+      description: Primary address, such as 004DCD90
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: Binary SHA-256
+      value: "443329dde09a80be9a71f86cd193c9b2c156cb203ae26a2cf6bea5fface5a1c0"
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Evidence source ID
+      description: From docs/EVIDENCE_SOURCES.csv
+    validations:
+      required: true
+  - type: dropdown
+    id: confidence
+    attributes:
+      label: Confidence
+      options:
+        - proven
+        - strong inference
+        - candidate
+        - open
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: Claim
+      description: State the exact behaviour, ABI or layout claim.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Assembly/data flow, callers, data records and offsets.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative interpretations
+  - type: textarea
+    id: impact
+    attributes:
+      label: Implementation and test impact

@@ -1,0 +1,39 @@
+name: Parity mismatch
+description: Report a difference between original game, oracle and GDScript
+title: "[PARITY] "
+labels: ["compatibility:blocker"]
+body:
+  - type: textarea
+    id: setup
+    attributes:
+      label: Reproduction state
+      description: Units, stats, positions, content pack, seed and action sequence.
+    validations:
+      required: true
+  - type: textarea
+    id: original
+    attributes:
+      label: Original-game result
+    validations:
+      required: true
+  - type: textarea
+    id: oracle
+    attributes:
+      label: Python oracle result
+    validations:
+      required: true
+  - type: textarea
+    id: core
+    attributes:
+      label: GDScript core result
+    validations:
+      required: true
+  - type: textarea
+    id: trace
+    attributes:
+      label: First trace divergence
+      description: Include ordered events and random calls.
+  - type: input
+    id: evidence
+    attributes:
+      label: Related claim/test/open-question IDs

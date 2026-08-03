@@ -1,0 +1,46 @@
+effect_type_id_dec,effect_type_id_hex,data_labels,source_spell_count,source_spells_ru,recovered_mechanics,mechanics_confidence,encoded_unit_definition_id_if_gt_1000,notes
+0,0x0,Effect,1,spell.var/0 Пусто,,data only,,
+1,0x1,Damage|FlagEffect|Heal|Poison|Regen|Resurrect,24,spell.var/1 Магическая искра | spell.var/4 Магическая стрела | spell.var/12 Лечение | spell.var/22 Молния | spell.var/23 Огненный шар | spell.var/26 Сон | spell.var/30 Болезнь | spell.var/32 Каменный дождь | spell.var/37 Исцеление | spell.var/38 Экзорцизм,,data only,,Source list truncated
+2,0x2,Attack,12,spell.var/6 Волшебное оружие | spell.var/10 Проклятие | spell.var/11 Благословение | spell.var/24 Огненный клинок | spell.var/25 Фантомная форма | spell.var/30 Болезнь | spell.var/36 Слепота | spell.var/39 Слово Жизни | spell.var/54 Общая атака | spell.var/56 Общее проклятие,,data only,,Source list truncated
+3,0x3,CounterAttack,12,spell.var/6 Волшебное оружие | spell.var/10 Проклятие | spell.var/11 Благословение | spell.var/24 Огненный клинок | spell.var/25 Фантомная форма | spell.var/30 Болезнь | spell.var/36 Слепота | spell.var/39 Слово Жизни | spell.var/54 Общая атака | spell.var/56 Общее проклятие,,data only,,Source list truncated
+4,0x4,Defence|Defense,12,spell.var/5 Волшебная броня | spell.var/10 Проклятие | spell.var/11 Благословение | spell.var/21 Уязвимость | spell.var/25 Фантомная форма | spell.var/33 Камнекожа | spell.var/40 Слово Льда | spell.var/41 Кислота | spell.var/50 Общая защита | spell.var/56 Общее проклятие,,data only,,Source list truncated
+5,0x5,RangedDefence|RangedDefense|Ranged_defence,13,spell.var/5 Волшебная броня | spell.var/9 Воздушный щит | spell.var/10 Проклятие | spell.var/11 Благословение | spell.var/21 Уязвимость | spell.var/25 Фантомная форма | spell.var/33 Камнекожа | spell.var/40 Слово Льда | spell.var/41 Кислота | spell.var/50 Общая защита,,data only,,Source list truncated
+6,0x6,Resist|Resistance,11,spell.var/9 Воздушный щит | spell.var/10 Проклятие | spell.var/11 Благословение | spell.var/17 Астральная энергия | spell.var/21 Уязвимость | spell.var/33 Камнекожа | spell.var/47 Антимагия | spell.var/50 Общая защита | spell.var/56 Общее проклятие | spell.var/60 Неуязвимость,,data only,,Source list truncated
+7,0x7,Speed,7,spell.var/7 Замедление | spell.var/8 Ускорение | spell.var/30 Болезнь | spell.var/39 Слово Жизни | spell.var/42 Общее замедление | spell.var/53 Общее ускорение | spell.var/62 Общая болезнь,,data only,,
+8,0x8,RangedAttack,12,spell.var/6 Волшебное оружие | spell.var/10 Проклятие | spell.var/11 Благословение | spell.var/24 Огненный клинок | spell.var/25 Фантомная форма | spell.var/27 Галлюцинации | spell.var/30 Болезнь | spell.var/36 Слепота | spell.var/54 Общая атака | spell.var/56 Общее проклятие,,data only,,Source list truncated
+10,0xA,Ammo,2,spell.var/6 Волшебное оружие | spell.var/20 Сжечь снаряды,,data only,,
+11,0xB,Stamina,9,spell.var/2 Усталость | spell.var/3 Воодушевление | spell.var/7 Замедление | spell.var/8 Ускорение | spell.var/17 Астральная энергия | spell.var/30 Болезнь | spell.var/39 Слово Жизни | spell.var/62 Общая болезнь | spell.var/69 Порча,,data only,,
+12,0xC,Morale,4,spell.var/3 Воодушевление | spell.var/13 Страх | spell.var/63 Облако ужаса | spell.var/69 Порча,,data only,,
+27,0x1B,MagicStrike,1,spell.var/24 Огненный клинок,,data only,,
+28,0x1C,MagicShoot,1,spell.var/24 Огненный клинок,,data only,,
+30,0x1E,SpellImmunity,1,spell.var/47 Антимагия,,data only,,
+31,0x1F,Dispel,3,spell.var/16 Снять чары | spell.var/37 Исцеление | spell.var/48 Общее снятие чар,,data only,,
+36,0x24,DontMove|Immobile,3,spell.var/26 Сон | spell.var/40 Слово Льда | spell.var/75 Общий сон,,data only,,
+38,0x26,DontFight,3,spell.var/26 Сон | spell.var/40 Слово Льда | spell.var/75 Общий сон,,data only,,
+47,0x2F,Web,1,spell.var/18 Паутина,,data only,,
+68,0x44,DrainLife,1,spell.var/29 Вампиризм,,data only,,
+70,0x46,Sleep,2,spell.var/26 Сон | spell.var/75 Общий сон,,data only,,
+71,0x47,Drain,1,spell.var/57 Похищение жизни,,data only,,
+72,0x48,HealAlly,1,spell.var/58 Белая магия,,data only,,
+73,0x49,MindControl,2,spell.var/52 Слово Власти | spell.var/74 Ментальный раб,"mind-control/side-transfer path, linked to opposite-side tactical record transfer",strong inference,,
+74,0x4A,Reincarnation,1,spell.var/59 Реинкарнация,reincarnation/full-revival path,strong inference,,
+75,0x4B,AddTurn,2,spell.var/17 Астральная энергия | spell.var/70 Остановка времени,,data only,,
+89,0x59,Replacement,1,spell.var/46 Телепорт,,data only,,
+91,0x5B,DarkPact,1,spell.var/43 Тёмный Пакт,dark-pact/death-replacement path,strong inference,,
+92,0x5C,Damage,1,spell.var/73 Массовый суицид,self-damage/sacrifice branch; doubles melee self-damage and uses special damage accounting,proven,,
+93,0x5D,Antidote,1,spell.var/37 Исцеление,,data only,,
+1013,0x3F5,Damage,1,spell.var/72 Полиморф,encodes unit-definition ID 13 in transformation/summon-style action data,strong inference,13,
+1019,0x3FB,Summon,1,spell.var/14 Поднять скелета,encodes unit-definition ID 19 in transformation/summon-style action data,strong inference,19,
+1020,0x3FC,Summon,1,spell.var/15 Поднять зомби,encodes unit-definition ID 20 in transformation/summon-style action data,strong inference,20,
+1021,0x3FD,Summon,1,spell.var/19 Вызвать беса,encodes unit-definition ID 21 in transformation/summon-style action data,strong inference,21,
+1036,0x40C,Summon,1,spell.var/28 Поднять упыря,encodes unit-definition ID 36 in transformation/summon-style action data,strong inference,36,
+1037,0x40D,Summon,1,spell.var/34 Вызвать чёрта,encodes unit-definition ID 37 in transformation/summon-style action data,strong inference,37,
+1038,0x40E,Summon,1,spell.var/35 Вызвать гончую,encodes unit-definition ID 38 in transformation/summon-style action data,strong inference,38,
+1039,0x40F,Summon,1,spell.var/31 Создать горгулью,encodes unit-definition ID 39 in transformation/summon-style action data,strong inference,39,
+1055,0x41F,Summon,1,spell.var/55 Поднять призрака,encodes unit-definition ID 55 in transformation/summon-style action data,strong inference,55,
+1056,0x420,Summon,1,spell.var/45 Вызвать демона,encodes unit-definition ID 56 in transformation/summon-style action data,strong inference,56,
+1060,0x424,Damage,1,spell.var/71 Форма Дракона,encodes unit-definition ID 60 in transformation/summon-style action data,strong inference,60,
+1064,0x428,Summon,1,spell.var/61 Поднять вампира,encodes unit-definition ID 64 in transformation/summon-style action data,strong inference,64,
+1065,0x429,Summon,1,spell.var/67 Вызвать дьявола,encodes unit-definition ID 65 in transformation/summon-style action data,strong inference,65,
+1070,0x42E,Summon,1,spell.var/77 Призвать феникса,encodes unit-definition ID 70 in transformation/summon-style action data,strong inference,70,
+1071,0x42F,Summon,1,spell.var/76 Создать голема,encodes unit-definition ID 71 in transformation/summon-style action data,strong inference,71,

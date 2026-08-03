@@ -1,0 +1,36 @@
+name: Open-question investigation
+description: Plan or report work on docs/OPEN_QUESTIONS.md
+title: "[OPEN] "
+labels: ["status:needs-evidence"]
+body:
+  - type: input
+    id: question
+    attributes:
+      label: Open-question ID
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current competing hypotheses
+    validations:
+      required: true
+  - type: textarea
+    id: closure
+    attributes:
+      label: Evidence required to close
+    validations:
+      required: true
+  - type: checkboxes
+    id: sources
+    attributes:
+      label: Evidence route
+      options:
+        - label: Ghidra/static analysis
+        - label: .var/localization data
+        - label: controlled play observation
+        - label: compatibility test vector
+  - type: textarea
+    id: result
+    attributes:
+      label: Result and remaining uncertainty
