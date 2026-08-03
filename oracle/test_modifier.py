@@ -214,6 +214,101 @@ def test_spell_grants() -> None:
     check(v == 9, "and granting a spell changes no number", str(v))
 
 
+def test_derived_flags() -> None:
+    """A flag is derived from the modifier list, not stored on the unit.
+
+    This is what makes a temporary flag work at all. The alternative — having
+    the roster run grant_flag at build time and mutate `flags` — is correct for
+    innate abilities and silently wrong for every buff, which is the worse
+    failure: it looks right in tests built from unit.var and breaks the first
+    time a spell is cast.
+    """
+    print("\n[10] flags derive from modifiers and statuses")
+    import statuses as st
+
+    u = Combatant(name="u", life_base=20, life=5, stamina=10, stamina_base=10,
+                  morale=10, morale_base=10)
+    check(not u.has_flag("Не чувствует боли"), "a bare unit has no flags")
+    check(abs(combat.wound_mod(u)[0] - 0.75) < 1e-9,
+          "and takes the wound penalty", str(combat.wound_mod(u)[0]))
+
+    innate = Modifier(ability=13, handler="grant_flag", hook=Hook.STAT_PASSIVE,
+                      params={"flag": "Не чувствует боли"},
+                      source="Не чувствует боли")
+    u.modifiers.append(innate)
+    check(u.has_flag("Не чувствует боли"), "an ability grants it")
+    check(combat.wound_mod(u)[0] == 1.0,
+          "and the EXISTING wound rule honours it, unchanged",
+          str(combat.wound_mod(u)[0]))
+    check(u.all_flags() == {"Не чувствует боли"}, "all_flags collects it")
+
+    # the case the design exists for
+    v = Combatant(name="v", life_base=20, life=5, stamina=10, stamina_base=10,
+                  morale=10, morale_base=10)
+    v.statuses.append(st.StatusEffect(
+        id="rage", name="Боевое безумие", duration=2,
+        modifiers=[Modifier(ability=25, handler="grant_flag",
+                            hook=Hook.STAT_PASSIVE,
+                            params={"flag": "Не чувствует боли"},
+                            source="Боевое безумие")]))
+    check(v.has_flag("Не чувствует боли"), "a status grants it too")
+    check(combat.wound_mod(v)[0] == 1.0, "with the same effect")
+    for _ in range(2):
+        st.tick_round(v)
+    check(not v.has_flag("Не чувствует боли"), "and it vanishes when the status expires")
+    check(abs(combat.wound_mod(v)[0] - 0.75) < 1e-9,
+          "restoring the penalty with no separate bookkeeping")
+
+    # grant_flag itself must not mutate — that was the whole point
+    reg = registry()
+    p = Pipeline(reg)
+    w = Combatant(name="w")
+    p.resolve(0, [innate], Hook.STAT_PASSIVE, {"unit": w, "stat": "attack"})
+    check(w.flags == set(), "grant_flag is a no-op: it never writes to `flags`")
+
+
+def test_new_handler_families() -> None:
+    print("\n[11] the handler families that closed the blockers")
+    p = pipeline()
+
+    # terrain knowledge: «каждый пункт знания выше первого увеличивает защиту
+    # и контратаку на 1» — rank 1 gives movement relief only
+    for rank, expect in ((1, 5), (2, 6), (3, 7)):
+        m = Modifier(ability=32, handler="terrain_knowledge",
+                     hook=Hook.STAT_PASSIVE, power=rank,
+                     params={"terrain": "forest"}, source="Знание леса")
+        got, _ = p.resolve(5, [m], Hook.STAT_PASSIVE, {"stat": "defence"})
+        check(got == expect, "Знание леса rank %d -> defence %d" % (rank, expect),
+              str(got))
+    m = Modifier(ability=32, handler="terrain_knowledge", hook=Hook.STAT_PASSIVE,
+                 power=3, params={"terrain": "forest"}, source="Знание леса")
+    got, _ = p.resolve(9, [m], Hook.STAT_PASSIVE, {"stat": "attack"})
+    check(got == 9, "and it does not touch Attack", str(got))
+    check(handlers.knows_terrain([m], "forest") == 3, "rank is queryable")
+    check(handlers.knows_terrain([m], "swamp") == 0, "for the right terrain only")
+
+    # damage typing: «спасает не защита, а сопротивление»
+    magic = Modifier(ability=27, handler="damage_type", hook=Hook.DAMAGE_BASE,
+                     params={"type": "magic", "applies_to": "melee"},
+                     source="Магический удар")
+    check(handlers.defence_stat_for([magic], False) == "resist",
+          "a magical melee attack resolves against Resist")
+    check(handlers.defence_stat_for([magic], True) == "ranged_defence",
+          "but its RANGED attack still uses ranged defence")
+    check(handlers.defence_stat_for([], False) == "defence",
+          "and an ordinary attacker uses Defence")
+
+    # strategic-only: bound to an explicit no-op rather than left unbound
+    siege = Modifier(ability=55, handler="strategic_only", hook=Hook.STAT_PASSIVE,
+                     power=3, source="Осада")
+    got, _ = p.resolve(10, [siege], Hook.STAT_PASSIVE, {"stat": "attack"})
+    check(got == 10, "Осада changes nothing in a battle", str(got))
+
+    regen = [Modifier(ability=48, handler="regeneration", hook=Hook.STAT_PASSIVE,
+                      power=2, source="Регенерация")]
+    check(handlers.regeneration_rate(regen) == 2, "regeneration rate is queryable")
+
+
 if __name__ == "__main__":
     test_hook_order()
     test_stat_guard()
@@ -224,6 +319,8 @@ if __name__ == "__main__":
     test_additive_before_multiplicative()
     test_real_pack_binding()
     test_spell_grants()
+    test_derived_flags()
+    test_new_handler_families()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
                     % (len(FAILS), ", ".join(FAILS))))
     sys.exit(1 if FAILS else 0)

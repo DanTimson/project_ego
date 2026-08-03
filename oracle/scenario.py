@@ -1,3 +1,4 @@
+# oracle/scenario.py
 """
 scenario.py — deterministic battles as data.
 
@@ -32,10 +33,15 @@ from __future__ import annotations
 import json
 
 import battlefield as bfmod
+import auras
 import combat
+import content
+import handlers
 import counterattack as ca
+import statuses as st
 import turn
 from battlefield import Battlefield
+from modifier import Hook, Modifier, Pipeline
 from combat import AttackKind, Combatant, Rng
 
 
@@ -50,6 +56,9 @@ class Scenario:
         self.units: dict[str, Combatant] = {}
         self.sides = self._build_sides(spec.get("sides", []))
         self.state = turn.BattleState(sides=self.sides)
+        ## unit -> its projected auras. Passive, so it is built once; which units
+        ## an aura REACHES is recomputed on every query.
+        self.auras_by_source = self._build_auras(spec.get("sides", []))
 
     # -- construction -------------------------------------------------------
 
@@ -79,11 +88,24 @@ class Scenario:
             for u in s.get("units", []):
                 unit = Combatant(name=u["name"])
                 for key, value in u.items():
-                    if key in ("name", "at", "flags", "subtypes"):
+                    if key in ("name", "at", "flags", "subtypes",
+                               "modifiers", "auras"):
                         continue
                     setattr(unit, key, value)
                 unit.flags = set(u.get("flags", []))
+                for m in u.get("modifiers", []) or []:
+                    unit.modifiers.append(Modifier(
+                        ability=int(m.get("ability", 0)), handler=m["handler"],
+                        hook=getattr(Hook, m.get("hook", "STAT_PASSIVE")),
+                        power=int(m.get("power", 0)),
+                        params=m.get("params", {}),
+                        source=m.get("source", m["handler"])))
                 unit.subtypes = set(u.get("subtypes", []))
+                # Base values default to the CURRENT value, because the .var
+                # tables carry only one figure per stat. A unit declared with
+                # `stamina: 4` therefore has a CAP of 4 and cannot be restored
+                # above it — describing a tired unit needs both `stamina` and
+                # `stamina_base`. Easy to trip over, so stated here.
                 unit.life_base = u.get("life_base", unit.life)
                 unit.stamina_base = u.get("stamina_base", unit.stamina)
                 unit.morale_base = u.get("morale_base", unit.morale)
@@ -96,6 +118,46 @@ class Scenario:
                 side.units.append(unit)
             sides.append(side)
         return sides
+
+    def _build_auras(self, specs: list) -> dict:
+        out = {}
+        for side_spec in specs:
+            for u in side_spec.get("units", []):
+                declared = u.get("auras") or []
+                if not declared:
+                    continue
+                unit = self.units[u["name"]]
+                built = []
+                for a in declared:
+                    aura = auras.Aura(
+                        id=a["id"], name=a.get("name", a["id"]),
+                        scope=auras.Scope[a.get("scope", "ADJACENT")],
+                        affects=auras.Side[a.get("affects", "ALLY")],
+                        stacking=auras.Stacking[a.get("stacking", "MAXIMUM")],
+                        power=int(a.get("power", 0)),
+                        tick=a.get("tick", {}),
+                        only_subtypes=tuple(a.get("only_subtypes", [])),
+                        except_subtypes=tuple(a.get("except_subtypes", [])),
+                        source=unit)
+                    for m in a.get("modifiers", []):
+                        aura.modifiers.append(Modifier(
+                            ability=int(m.get("ability", 0)),
+                            handler=m["handler"],
+                            hook=getattr(Hook, m.get("hook", "STAT_PASSIVE")),
+                            power=int(m.get("power", a.get("power", 0))),
+                            params=m.get("params", {}),
+                            source=aura.name))
+                    built.append(aura)
+                out[unit] = built
+        return out
+
+    def side_of(self, unit):
+        return self._side_of(unit)
+
+    def environment(self, unit) -> list:
+        """Modifiers from the unit's surroundings — the auras reaching it now."""
+        return auras.modifiers_for(unit, self.auras_by_source, self.field,
+                                   self.side_of)
 
     # -- helpers ------------------------------------------------------------
 
@@ -246,17 +308,69 @@ class Scenario:
                   % (unit.name, "receives" if granted else "is refused",
                      unit.movement_remaining, unit.steps_this_round))
 
+    def _round_upkeep(self) -> None:
+        """Statuses and auras, at the top of each round.
+
+        ORDER: auras first, then statuses. An aura is a continuous drain from a
+        living source; a status is a stored effect that ages. Ticking statuses
+        first would let an effect expire before an aura that might have killed
+        its source resolves. Nothing documents the order, so it is recorded here
+        rather than left implicit — OPEN_QUESTIONS item 20.
+        """
+        for side in self.sides:
+            for unit in list(side.units):
+                if not unit.alive:
+                    continue
+                totals, _ = auras.tick_for(unit, self.auras_by_source,
+                                           self.field, self.side_of)
+                if totals:
+                    before = unit.life
+                    auras.apply_tick(unit, totals)
+                    parts = ", ".join("%s %+d" % (k, v)
+                                      for k, v in sorted(totals.items()))
+                    self.emit("  %s: auras (%s)" % (unit.name, parts))
+                    if not unit.alive:
+                        self._fell(unit)
+                        continue
+                if unit.statuses:
+                    names = [e.describe() for e in unit.statuses]
+                    st.tick_round(unit)
+                    self.emit("  %s: %s" % (unit.name, ", ".join(names)))
+                    if not unit.alive:
+                        self._fell(unit)
+
     def cmd_end_phase(self) -> None:
         new_round = turn.end_phase(self.state)
         if new_round:
             self.emit("-- round %d, side %d first --"
                       % (self.state.round_number, self.state.active_side))
+            self._round_upkeep()
         else:
             self.emit("-- side %d --" % self.state.active_side)
 
     # -- run ----------------------------------------------------------------
 
     def run(self) -> dict:
+        """Install the pipeline AND the environment, then run.
+
+        Both are needed and forgetting either is silent. Without a pipeline,
+        combat._run_hook returns immediately and NO modifier applies — innate
+        abilities, statuses and auras alike. Without an environment, auras alone
+        vanish. The first version of this method bound only the environment,
+        which meant a scenario ran with every modifier inert while looking
+        entirely healthy.
+        """
+        registry = content.AbilityRegistry()
+        handlers.register_all(registry)
+        combat.bind_pipeline(Pipeline(registry))
+        combat.bind_environment(self.environment)
+        try:
+            return self._run()
+        finally:
+            combat.bind_environment(None)
+            combat.bind_pipeline(None)
+
+    def _run(self) -> dict:
         turn.begin_battle(self.state)
         self.emit("== %s (seed %d) ==" % (self.name, self.seed))
         self.emit("-- round %d, side %d first --"

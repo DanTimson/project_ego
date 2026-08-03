@@ -1,3 +1,4 @@
+# core/rules/damage.gd
 class_name Damage
 extends RefCounted
 
@@ -8,6 +9,71 @@ extends RefCounted
 ##     ТекущаяАтака = (База + ПлюсуемыеБонусы) * StaminaMod * MoraleMod * WoundMod
 ##
 ## Additive before multiplicative is documented and not negotiable.
+
+# ---------------------------------------------------------------------------
+# Pipeline wiring
+#
+# Set by Scenario.run() or by whatever owns the battle. `null` means "no content
+# loaded" — the scalar attack_bonus/defence_bonus path still works, which keeps
+# the pre-pipeline tests and scenarios valid.
+# ---------------------------------------------------------------------------
+
+static var _pipeline: Pipeline = null
+
+## Supplies modifiers that come from the unit's SURROUNDINGS rather than from the
+## unit — auras today, terrain later. Injected rather than imported, because those
+## need the battlefield and the side layout, and the rules must not depend on
+## either.
+static var _environment: Callable = Callable()
+
+
+static func bind_pipeline(p: Pipeline) -> void:
+	_pipeline = p
+
+
+## `provider(unit) -> Array[Modifier]`. Pass an empty Callable to detach.
+static func bind_environment(provider: Callable) -> void:
+	_environment = provider
+
+
+## EVERY modifier acting on this unit, from every source.
+##
+## There are three, and forgetting one is invisible until something is cast:
+##
+##   u.modifiers              innate abilities, from unit.var via the roster
+##   u.statuses[].modifiers   timed effects — buffs, curses, enchantments
+##   _environment(u)          auras, and terrain when it lands
+##
+## This exists because the damage path used only the first. Statuses passed every
+## test in isolation while a Благословение granting +2 attack did nothing, because
+## nothing merged the sources. has_flag walked all three already, so FLAGS from
+## statuses worked and NUMBERS did not — the most confusing possible failure shape.
+static func effective_modifiers(u: Combatant) -> Array:
+	var out: Array = u.modifiers.duplicate()
+	for effect in u.statuses:
+		out.append_array(effect.modifiers)
+	if _environment.is_valid():
+		out.append_array(_environment.call(u))
+	return out
+
+
+## Returns [value, trace] or [base, null] when nothing applies.
+static func _run_hook(base: Variant, u: Combatant, hook: int, ctx: Dictionary,
+		label: String) -> Array:
+	if _pipeline == null:
+		return [base, null]
+	var mods: Array = effective_modifiers(u)
+	if mods.is_empty():
+		return [base, null]
+	return _pipeline.resolve(base, mods, hook, ctx, label)
+
+
+const _STAT_FOR_KIND: Dictionary = {
+	Combatant.AttackKind.MELEE: "attack",
+	Combatant.AttackKind.COUNTER: "counter_attack",
+	Combatant.AttackKind.RANGED: "ranged_attack",
+}
+
 
 ## Returns [value: float, trace: Trace].
 static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
@@ -20,6 +86,15 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 		var nv: float = value + float(u.attack_bonus)
 		t.step("additive bonuses", value, nv)
 		value = nv
+
+	# STAT_PASSIVE sits INSIDE the multiplier chain: additive before
+	# multiplicative is documented and not negotiable.
+	var passive: Array = _run_hook(value, u, Modifier.Hook.STAT_PASSIVE,
+		{"stat": _STAT_FOR_KIND[kind], "unit": u, "kind": kind}, "modifiers")
+	if passive[1] != null and float(passive[0]) != value:
+		for step in (passive[1] as Trace).steps:
+			t.steps.append(step)
+		value = float(passive[0])
 
 	for entry in [
 		["StaminaMod", Stamina.modifier(u)],
@@ -51,6 +126,15 @@ static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
 		var nv: float = value + float(u.defence_bonus)
 		t.step("additive bonuses", value, nv)
 		value = nv
+
+	var stat: String = "ranged_defence" if kind == Combatant.AttackKind.RANGED \
+		else "defence"
+	var passive: Array = _run_hook(value, u, Modifier.Hook.STAT_PASSIVE,
+		{"stat": stat, "unit": u, "kind": kind}, "modifiers")
+	if passive[1] != null and float(passive[0]) != value:
+		for step in (passive[1] as Trace).steps:
+			t.steps.append(step)
+		value = float(passive[0])
 
 	if Stamina.is_exhausted(u):
 		var nv: float = value * 0.5

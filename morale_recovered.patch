@@ -1,0 +1,313 @@
+diff --git a/core/rules/morale.gd b/core/rules/morale.gd
+index bc7691c..c7d954d 100644
+--- a/core/rules/morale.gd
++++ b/core/rules/morale.gd
+@@ -1,30 +1,38 @@
+ class_name Morale
+ extends RefCounted
+ 
+-## «Боевой дух» — Eadoropedia, Игровая механика.
++## «Боевой дух» — Eadoropedia, «Игровая механика» (NH 26.0620.f01).
+ ##
+-## OPEN. The mechanism is documented; the numbers are deliberately withheld:
+-## «точные цифры не разглашаются». The table below is a PLACEHOLDER shaped like
+-## the other two multipliers (linear, 1.0 at base morale) and is almost
+-## certainly wrong in detail.
++## RECOVERED. The current wiki publishes the full piecewise table; the earlier
++## «точные цифры не разглашаются» reading came from the older 25.0101.f03 build.
+ ##
+-## Closing it needs no combat: the map panel shows attack WITHOUT morale, the
+-## battle panel WITH it, so the ratio between the two screens is the multiplier.
+-## Fix a unit, vary morale, read both. See OPEN_QUESTIONS item 1.
+-
+-## delta from base morale -> multiplier. Fill from observation; entries here
+-## take precedence over the linear placeholder.
+-const TABLE: Dictionary = {}
+-
+-const PER_POINT: float = 0.05
++## Keyed on ABSOLUTE morale — morale_base does NOT enter the attack multiplier.
++## Applies to the three attack values only, never to defence (defence is touched
++## only by the stamina-0 halving, in stamina.gd):
++##
++##   morale <= 5    : 0.4 + 0.1*morale   (0 -> 0.4, and the unit PANICS at 0)
++##   6..15          : 1.0                 (neutral band)
++##   morale >= 16   : +5% per band, bands widening by one point each:
++##                    16-17=1.05  18-20=1.10  21-24=1.15  25-29=1.20
++##                    30-35=1.25  36-42=1.30  43-50=1.35  … («и так далее»)
++##                    band n starts at 15 + n*(n+1)/2; multiplier = 1.0 + 0.05*n.
++##
++## VERIFIED for NH 26.0620.f01. NOT yet confirmed for the local var build or for
++## Genesis — see OPEN_QUESTIONS item 1. The widening beyond 50 is the wiki's
++## stated continuation, computed here rather than tabulated.
+ 
+ ## Returns [multiplier: float, note: String].
+ static func modifier(u: Combatant) -> Array:
+ 	if u.has_flag(&"Боевое безумие"):
+ 		return [1.0, "morale effects suppressed"]
+-	var delta: int = u.morale - u.morale_base
+-	if TABLE.has(delta):
+-		return [float(TABLE[delta]), "morale %d (table)" % u.morale]
+-	if delta == 0:
++	var m: int = u.morale
++	if m <= 5:
++		# m == 0 -> 0.4 (Panic floor); negative morale is unobserved.
++		return [0.4 + 0.1 * float(max(m, 0)), "morale %d" % m]
++	if m <= 15:
+ 		return [1.0, ""]
+-	return [1.0 + PER_POINT * float(delta), "morale %d (PLACEHOLDER)" % u.morale]
++	# m >= 16: integer band index, iterative for bit-exact parity with the oracle.
++	var n: int = 1
++	while 15 + (n + 1) * (n + 2) / 2 <= m:
++		n += 1
++	return [1.0 + 0.05 * float(n), "morale %d" % m]
+diff --git a/docs/FORMULAS.md b/docs/FORMULAS.md
+index 6e00115..d5fe5b9 100644
+--- a/docs/FORMULAS.md
++++ b/docs/FORMULAS.md
+@@ -102,14 +102,25 @@ never loses stamina for any action at all.
+ 
+ ### 1.4 MoraleMod
+ 
+-`[GM] Боевой дух` · **OPEN**
++`[GM] Боевой дух` · **VERIFIED** against the published table (NH 26.0620.f01)
+ 
+-The mechanism is documented; the numbers are deliberately withheld —
+-*«точные цифры не разглашаются»*. `combat.py` carries a linear placeholder.
++Keyed on **absolute** morale — `morale_base` does not enter the multiplier — and
++applied to the three attack values only, never to defence.
+ 
+-Cheap to close and it does **not** require combat: the map panel shows attack
+-*without* morale, the battle panel *with* it, so the ratio between the two
+-screens is the multiplier. Fix a unit, vary morale, read both. ~1 hour.
++```
++morale <= 5     0.4 + 0.1*morale     0 -> 0.4  (and the unit PANICS at 0)
++6 .. 15         1.0
++morale >= 16    +5% per band, bands widening by one point each:
++                16-17=1.05  18-20=1.10  21-24=1.15  25-29=1.20
++                30-35=1.25  36-42=1.30  43-50=1.35  … («и так далее»)
++                band n starts at 15 + n*(n+1)/2;  multiplier = 1.0 + 0.05*n
++```
++
++The withheld-numbers reading (*«точные цифры не разглашаются»*) came from the
++older 25.0101.f03 build. Implemented in `combat.py` / `morale.gd`. Still
++**unconfirmed for the local var build and for Genesis**: the map panel shows
++attack without morale, the battle panel with it, so their ratio checks this
++table against the target binary (~1h, no combat) — `OPEN_QUESTIONS` item 1.
+ 
+ ---
+ 
+diff --git a/docs/OPEN_QUESTIONS.md b/docs/OPEN_QUESTIONS.md
+index 93296e5..2331abd 100644
+--- a/docs/OPEN_QUESTIONS.md
++++ b/docs/OPEN_QUESTIONS.md
+@@ -8,7 +8,7 @@ obvious.
+ 
+ | # | Question | How to close it | Cost |
+ |---|---|---|---|
+-| 1 | **MoraleMod values.** The Eadoropedia states the mechanism but withholds numbers (*«точные цифры не разглашаются»*). | The map panel shows attack *without* morale, the battle panel *with* it. Fix a unit, vary only morale, read the ratio between the two screens. No combat needed. | ~1 hour |
++| 1 | ~~**MoraleMod values.**~~ **RECOVERED (NH 26.0620.f01).** The current wiki publishes the full piecewise table (absolute-morale keyed); the *«точные цифры не разглашаются»* reading was from the older 25.0101.f03 build. Implemented in `combat.py` / `morale.gd` / fixtures. | No longer blocking. Remaining: confirm the **local var build** and **Genesis** use the same table — map panel (no morale) vs battle panel (with morale) ratio, no combat. | impl done; ~1h to verify |
+ | 2 | **Grid geometry.** Hex or square, dimensions, adjacency. Not in any `.var`. | Screenshot + count. Confirm whether `Гигант` occupies more than one tile. | ~30 min |
+ | 3 | ~~**Initiative.**~~ **CLOSED.** `ability_num` opcode 999, `unit_upg` /818, and `Initiative` fields in `defender.var` / `guard.var` / `item_set.var`. Army-level: the side whose **leader** has higher initiative moves first; ties go to the attacker. | — | done |
+ | 3b | ~~**Within-side activation order.**~~ **CLOSED.** Free player/AI selection with partial action-point spending and re-entry: a unit may spend some movement, yield control, and be re-selected later in the same round to finish acting. No HoMM-style initiative queue. | — | done |
+diff --git a/oracle/combat.py b/oracle/combat.py
+index 6be7bfb..f753eab 100644
+--- a/oracle/combat.py
++++ b/oracle/combat.py
+@@ -253,29 +253,37 @@ def stamina_mod(u: Combatant) -> tuple[float, str]:
+ 
+ # --- MoraleMod ------------------------------------------------------------
+ #
+-# OPEN QUESTION. The Eadoropedia states the mechanism but withholds the
+-# numbers: «* - точные цифры не разглашаются». This table is a PLACEHOLDER
+-# shaped to match the other two multipliers (linear, centred on 1.0 at base
+-# morale). It is almost certainly wrong in detail.
++# RECOVERED from the Eadoropedia (NH 26.0620.f01, «Игровая механика»). The
++# earlier «точные цифры не разглашаются» reading came from the older 25.0101.f03
++# build; the current wiki publishes the full piecewise table.
+ #
+-# Recovering it is a sampling exercise: fix a unit, vary only its morale, and
+-# read the displayed attack value off the unit panel — the wiki notes the map
+-# panel shows attack WITHOUT morale and the battle panel WITH it, so the ratio
+-# between the two screens is the multiplier, no combat required.
++# Keyed on ABSOLUTE morale, not delta from base — morale_base does not enter the
++# attack multiplier. Applies to the three attack values only, never to defence.
++#   morale <= 5    : 0.4 + 0.1*morale   (0 -> 0.4, and the unit PANICS at 0)
++#   6..15          : 1.0                 (neutral band)
++#   morale >= 16   : +5% per band, bands widening by one point each —
++#                    16-17=1.05 18-20=1.10 21-24=1.15 25-29=1.20 30-35=1.25
++#                    36-42=1.30 43-50=1.35 … («и так далее»). Band n starts at
++#                    15 + n*(n+1)/2; multiplier = 1.0 + 0.05*n.
+ #
+-MORALE_MOD_TABLE: dict[int, float] = {}   # morale delta from base -> multiplier
+-MORALE_MOD_PER_POINT = 0.05               # placeholder slope
++# VERIFIED for NH 26.0620.f01. NOT yet confirmed for the local var build or for
++# Genesis — see OPEN_QUESTIONS item 1. The band index is computed iteratively
++# (not via float sqrt) to stay bit-identical with the GDScript port.
+ 
+ 
+ def morale_mod(u: Combatant) -> tuple[float, str]:
+     if "Боевое безумие" in u.flags:
+         return 1.0, "morale effects suppressed"
+-    delta = u.morale - u.morale_base
+-    if delta in MORALE_MOD_TABLE:
+-        return MORALE_MOD_TABLE[delta], f"morale {u.morale} (table)"
+-    if delta == 0:
++    m = u.morale
++    if m <= 5:
++        # m == 0 -> 0.4 (Panic floor); negative morale is unobserved.
++        return 0.4 + 0.1 * max(m, 0), f"morale {m}"
++    if m <= 15:
+         return 1.0, ""
+-    return 1.0 + MORALE_MOD_PER_POINT * delta, f"morale {u.morale} (PLACEHOLDER)"
++    n = 1
++    while 15 + (n + 1) * (n + 2) // 2 <= m:
++        n += 1
++    return 1.0 + 0.05 * n, f"morale {m}"
+ 
+ 
+ # ---------------------------------------------------------------------------
+diff --git a/oracle/make_fixtures.py b/oracle/make_fixtures.py
+index fa99985..acb2b38 100644
+--- a/oracle/make_fixtures.py
++++ b/oracle/make_fixtures.py
+@@ -78,7 +78,7 @@ out = {
+     "note": "generated by oracle/make_fixtures.py — do not hand-edit",
+     "attack_value": [],
+     "defence_value": [],
+-    "multipliers": {"wound": [], "stamina": []},
++    "multipliers": {"wound": [], "stamina": [], "morale": []},
+     "roll_attack": [],
+     "resolve": [],
+ }
+@@ -105,6 +105,12 @@ for st in (10, 6, 5, 4, 3, 2, 1, 0):
+     c = make(stamina=st)
+     out["multipliers"]["stamina"].append({"stamina": st,
+                                           "expected": round(combat.stamina_mod(c)[0], 6)})
++# Morale is keyed on ABSOLUTE value; morale_base is held at 10 to prove it is
++# ignored (morale != morale_base cases would have moved under the old placeholder).
++for mo in (0, 1, 3, 5, 6, 10, 15, 16, 17, 18, 20, 21, 24, 25, 29, 30, 35, 36, 43, 50, 51, 60):
++    c = make(morale=mo, morale_base=10)
++    out["multipliers"]["morale"].append({"morale": mo,
++                                         "expected": round(combat.morale_mod(c)[0], 6)})
+ 
+ # RNG-dependent: exact sequences given a fixed seed
+ for attack in (1, 3, 5, 8, 13, 37):
+diff --git a/tests/fixtures/pipeline_fixture.json b/tests/fixtures/pipeline_fixture.json
+index bd2e0fd..e795da3 100644
+--- a/tests/fixtures/pipeline_fixture.json
++++ b/tests/fixtures/pipeline_fixture.json
+@@ -298,6 +298,96 @@
+     "stamina": 0,
+     "expected": 0.4
+    }
++  ],
++  "morale": [
++   {
++    "morale": 0,
++    "expected": 0.4
++   },
++   {
++    "morale": 1,
++    "expected": 0.5
++   },
++   {
++    "morale": 3,
++    "expected": 0.7
++   },
++   {
++    "morale": 5,
++    "expected": 0.9
++   },
++   {
++    "morale": 6,
++    "expected": 1.0
++   },
++   {
++    "morale": 10,
++    "expected": 1.0
++   },
++   {
++    "morale": 15,
++    "expected": 1.0
++   },
++   {
++    "morale": 16,
++    "expected": 1.05
++   },
++   {
++    "morale": 17,
++    "expected": 1.05
++   },
++   {
++    "morale": 18,
++    "expected": 1.1
++   },
++   {
++    "morale": 20,
++    "expected": 1.1
++   },
++   {
++    "morale": 21,
++    "expected": 1.15
++   },
++   {
++    "morale": 24,
++    "expected": 1.15
++   },
++   {
++    "morale": 25,
++    "expected": 1.2
++   },
++   {
++    "morale": 29,
++    "expected": 1.2
++   },
++   {
++    "morale": 30,
++    "expected": 1.25
++   },
++   {
++    "morale": 35,
++    "expected": 1.25
++   },
++   {
++    "morale": 36,
++    "expected": 1.3
++   },
++   {
++    "morale": 43,
++    "expected": 1.35
++   },
++   {
++    "morale": 50,
++    "expected": 1.35
++   },
++   {
++    "morale": 51,
++    "expected": 1.4
++   },
++   {
++    "morale": 60,
++    "expected": 1.45
++   }
+   ]
+  },
+  "roll_attack": [
+diff --git a/tests/test_damage.gd b/tests/test_damage.gd
+index d546ea5..bcc34e7 100644
+--- a/tests/test_damage.gd
++++ b/tests/test_damage.gd
+@@ -67,6 +67,13 @@ func _init() -> void:
+ 		var got: float = Stamina.modifier(u)[0]
+ 		_check(absf(got - float(case["expected"])) < EPS,
+ 			"stamina: %d" % int(case["stamina"]), "got %.4f" % got)
++	for case in fx["multipliers"]["morale"]:
++		var u := Combatant.new()
++		u.morale = int(case["morale"])
++		u.morale_base = 10  # ignored by the multiplier; set for parity with the fixture
++		var got: float = Morale.modifier(u)[0]
++		_check(absf(got - float(case["expected"])) < EPS,
++			"morale: %d" % int(case["morale"]), "got %.4f" % got)
+ 
+ 	print("\n[4] attack roll sequences (requires test_rng.gd to pass first)")
+ 	for case in fx["roll_attack"]:

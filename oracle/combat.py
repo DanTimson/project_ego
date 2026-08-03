@@ -1,3 +1,4 @@
+# oracle/combat.py
 """
 combat.py — executable reference implementation of the Eador attack pipeline.
 
@@ -135,7 +136,11 @@ class AttackKind(Enum):
     RANGED = "ranged"
 
 
-@dataclass
+# eq=False gives Combatant IDENTITY semantics: two units with identical stats are
+# not the same unit, and `==` should say so. It also makes instances hashable,
+# which auras need — an aura is keyed by the unit projecting it, and a dataclass
+# with the default eq=True sets __hash__ to None.
+@dataclass(eq=False)
 class Combatant:
     name: str = "unit"
     # base (unmodified) stats
@@ -197,7 +202,45 @@ class Combatant:
     steps_this_round: int = 0
 
     def has_flag(self, f: str) -> bool:
-        return f in self.flags
+        """A flag is DERIVED, not stored.
+
+        `self.flags` holds flags set directly — by a scenario, a test, or a
+        rule. But a flag can also come from an ability, and abilities live in
+        the modifier list; and a modifier can come from a status effect, which
+        expires.
+
+        Checking all three sources here means a spell granting Неутомимый for
+        three rounds works with no extra machinery: the modifier appears when
+        the status is applied and vanishes when it expires, and every existing
+        `has_flag` call site — wounds, stamina, counterattack — follows along
+        without knowing statuses exist.
+
+        The alternative was to have the roster run grant_flag at build time and
+        mutate `flags`. That works for innate abilities and silently fails for
+        every temporary one.
+        """
+        if f in self.flags:
+            return True
+        for m in self.modifiers:
+            if m.handler == "grant_flag" and m.params.get("flag") == f:
+                return True
+        for effect in self.statuses:
+            for m in effect.modifiers:
+                if m.handler == "grant_flag" and m.params.get("flag") == f:
+                    return True
+        return False
+
+    def all_flags(self) -> set:
+        """Every flag from every source. For display and for the AI."""
+        out = set(self.flags)
+        for m in self.modifiers:
+            if m.handler == "grant_flag" and m.params.get("flag"):
+                out.add(m.params["flag"])
+        for effect in self.statuses:
+            for m in effect.modifiers:
+                if m.handler == "grant_flag" and m.params.get("flag"):
+                    out.add(m.params["flag"])
+        return out
 
     def has_subtype(self, s: str) -> bool:
         return s in self.subtypes
@@ -230,7 +273,7 @@ def wound_mod(u: Combatant) -> tuple[float, str]:
     Exceptions are documented explicitly: «Не чувствует боли» and the
     «Боевое безумие» effect both suppress the penalty entirely.
     """
-    if "Не чувствует боли" in u.flags or "Боевое безумие" in u.flags:
+    if u.has_flag("Не чувствует боли") or u.has_flag("Боевое безумие"):
         return 1.0, "immune to wound penalty"
     if u.life >= u.life_base * 0.5:
         return 1.0, ""
@@ -244,7 +287,7 @@ def stamina_mod(u: Combatant) -> tuple[float, str]:
     penalty band; the check is on the flag rather than on the value so that a
     debuff which sets stamina directly still cannot penalise them.
     """
-    if "Неутомимый" in u.flags:
+    if u.has_flag("Неутомимый"):
         return 1.0, "tireless"
     if u.stamina > 5:
         return 1.0, ""
@@ -268,7 +311,7 @@ MORALE_MOD_PER_POINT = 0.05               # placeholder slope
 
 
 def morale_mod(u: Combatant) -> tuple[float, str]:
-    if "Боевое безумие" in u.flags:
+    if u.has_flag("Боевое безумие"):
         return 1.0, "morale effects suppressed"
     delta = u.morale - u.morale_base
     if delta in MORALE_MOD_TABLE:
@@ -295,10 +338,51 @@ def bind_pipeline(pipeline) -> None:
     _PIPELINE = pipeline
 
 
+## Supplies modifiers that come from the unit's SURROUNDINGS rather than from the
+## unit — auras today, terrain later. Injected rather than imported, because those
+## need the battlefield and the side layout, and combat must not depend on either.
+_ENVIRONMENT = None
+
+
+def bind_environment(provider) -> None:
+    """`provider(unit) -> list[Modifier]`. Pass None to detach."""
+    global _ENVIRONMENT
+    _ENVIRONMENT = provider
+
+
+def effective_modifiers(u) -> list:
+    """EVERY modifier acting on this unit, from every source.
+
+    There are three, and forgetting one is invisible until something is cast:
+
+        u.modifiers              innate abilities, from unit.var via the roster
+        u.statuses[].modifiers   timed effects — buffs, curses, enchantments
+        _ENVIRONMENT(u)          auras, and terrain when it lands
+
+    This function exists because the damage path used only the first. Statuses
+    passed every test in isolation while a Благословение granting +2 attack did
+    nothing, because nothing merged the sources. `has_flag` walked all three
+    already, so FLAGS from statuses worked and NUMBERS did not — the most
+    confusing possible failure shape.
+
+    Statuses are read by duck-typing rather than importing the module, since
+    statuses.py imports Trace from here.
+    """
+    out = list(u.modifiers)
+    for effect in u.statuses:
+        out.extend(effect.modifiers)
+    if _ENVIRONMENT is not None:
+        out.extend(_ENVIRONMENT(u))
+    return out
+
+
 def _run_hook(base, u, hook, ctx, label):
-    if _PIPELINE is None or not u.modifiers:
+    if _PIPELINE is None:
         return base, None
-    return _PIPELINE.resolve(base, u.modifiers, hook, ctx, label)
+    mods = effective_modifiers(u)
+    if not mods:
+        return base, None
+    return _PIPELINE.resolve(base, mods, hook, ctx, label)
 
 
 def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
@@ -408,7 +492,7 @@ def resolve_attack(attacker: Combatant, defender: Combatant,
         atk_trace.result = nv
 
     attack_int = int(math.floor(atk_value))
-    if "Не сражается" in attacker.flags:
+    if attacker.has_flag("Не сражается"):
         return 0, [atk_trace]
 
     rolled, roll_note = roll_attack(attack_int, rng)
@@ -457,7 +541,7 @@ def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
             t.steps.append(step)
         value = nv
 
-    if u.stamina <= 0 and "Неутомимый" not in u.flags:
+    if u.stamina <= 0 and not u.has_flag("Неутомимый"):
         nv = value * 0.5
         t.step("exhausted x0.50", value, nv, "stamina 0")
         value = nv

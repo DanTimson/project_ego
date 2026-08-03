@@ -1,3 +1,4 @@
+# core/battle/scenario.gd
 class_name Scenario
 extends RefCounted
 
@@ -25,6 +26,9 @@ var rng: Rng
 var field: Battlefield
 var units: Dictionary = {}          ## name -> Combatant
 var state: RoundLoop.BattleState
+## unit -> its projected auras. Passive, so built once; which units an aura
+## REACHES is recomputed on every query.
+var auras_by_source: Dictionary = {}
 
 
 func _init(p_spec: Dictionary) -> void:
@@ -35,6 +39,7 @@ func _init(p_spec: Dictionary) -> void:
 	field = _build_field(spec.get("battlefield", {}))
 	state = RoundLoop.BattleState.new()
 	state.sides = _build_sides(spec.get("sides", []))
+	auras_by_source = _build_auras(spec.get("sides", []))
 
 
 func _build_field(s: Dictionary) -> Battlefield:
@@ -66,11 +71,17 @@ func _build_sides(specs: Array) -> Array:
 			unit.name = String(u["name"])
 			for key in u:
 				var k := String(key)
-				if k in ["name", "at", "flags", "subtypes"]:
+				if k in ["name", "at", "flags", "subtypes", "modifiers", "auras"]:
 					continue
 				unit.set(k, u[key])
 			for f in u.get("flags", []):
 				unit.set_flag(StringName(String(f)))
+			for m in u.get("modifiers", []):
+				unit.modifiers.append(Modifier.make(
+					int(m.get("ability", 0)), StringName(String(m["handler"])),
+					Modifier.Hook[String(m.get("hook", "STAT_PASSIVE"))],
+					int(m.get("power", 0)), m.get("params", {}),
+					String(m.get("source", m["handler"]))))
 			for st in u.get("subtypes", []):
 				unit.add_subtype(StringName(String(st)))
 			if not u.has("life_base"):
@@ -85,6 +96,86 @@ func _build_sides(specs: Array) -> Array:
 			side.units.append(unit)
 		out.append(side)
 	return out
+
+
+func _build_auras(specs: Array) -> Dictionary:
+	var out: Dictionary = {}
+	for side_spec in specs:
+		for u in side_spec.get("units", []):
+			var declared: Array = u.get("auras", [])
+			if declared.is_empty():
+				continue
+			var unit: Combatant = units[String(u["name"])]
+			var built: Array = []
+			for a in declared:
+				var aura := Auras.Aura.new()
+				aura.id = StringName(String(a["id"]))
+				aura.name = String(a.get("name", a["id"]))
+				aura.scope = Auras.Scope[String(a.get("scope", "ADJACENT"))]
+				aura.affects = Auras.Side[String(a.get("affects", "ALLY"))]
+				aura.stacking = Auras.Stacking[String(a.get("stacking", "MAXIMUM"))]
+				aura.power = int(a.get("power", 0))
+				aura.tick = a.get("tick", {})
+				for st in a.get("only_subtypes", []):
+					aura.only_subtypes.append(StringName(String(st)))
+				for st in a.get("except_subtypes", []):
+					aura.except_subtypes.append(StringName(String(st)))
+				aura.source = unit
+				for m in a.get("modifiers", []):
+					aura.modifiers.append(Modifier.make(
+						int(m.get("ability", 0)),
+						StringName(String(m["handler"])),
+						Modifier.Hook[String(m.get("hook", "STAT_PASSIVE"))],
+						int(m.get("power", a.get("power", 0))),
+						m.get("params", {}), aura.name))
+				built.append(aura)
+			out[unit] = built
+	return out
+
+
+func side_of(unit: Combatant) -> RoundLoop.Side:
+	return _side_of(unit)
+
+
+## Modifiers from the unit's surroundings — the auras reaching it now.
+func environment(unit: Combatant) -> Array:
+	return Auras.modifiers_for(unit, auras_by_source, field,
+		Callable(self, "side_of"))
+
+
+## Statuses and auras, at the top of each round.
+##
+## ORDER: auras first, then statuses. An aura is a continuous drain from a living
+## source; a status is a stored effect that ages. Ticking statuses first would let
+## an effect expire before an aura that might have killed its source resolves.
+## Nothing documents the order — OPEN_QUESTIONS item 20.
+func _round_upkeep() -> void:
+	for side in state.sides:
+		for unit in side.units.duplicate():
+			if not unit.alive:
+				continue
+			var result: Array = Auras.tick_for(unit, auras_by_source, field,
+				Callable(self, "side_of"))
+			var totals: Dictionary = result[0]
+			if not totals.is_empty():
+				Auras.apply_tick(unit, totals)
+				var parts: Array = []
+				var keys: Array = totals.keys()
+				keys.sort()
+				for k in keys:
+					parts.append("%s %+d" % [String(k), int(totals[k])])
+				emit("  %s: auras (%s)" % [unit.name, ", ".join(parts)])
+				if not unit.alive:
+					_fell(unit)
+					continue
+			if not unit.statuses.is_empty():
+				var names: Array = []
+				for e in unit.statuses:
+					names.append(e.describe())
+				Statuses.tick_round(unit)
+				emit("  %s: %s" % [unit.name, ", ".join(names)])
+				if not unit.alive:
+					_fell(unit)
 
 
 # -- helpers -----------------------------------------------------------------
@@ -260,13 +351,32 @@ func cmd_extra_turn(unit: Combatant, c: Dictionary) -> void:
 func cmd_end_phase() -> void:
 	if RoundLoop.end_phase(state):
 		emit("-- round %d, side %d first --" % [state.round_number, state.active_side])
+		_round_upkeep()
 	else:
 		emit("-- side %d --" % state.active_side)
 
 
 # -- run ---------------------------------------------------------------------
 
+## Install the pipeline AND the environment, then run.
+##
+## Both are needed and forgetting either is silent. Without a pipeline,
+## Damage._run_hook returns immediately and NO modifier applies — innate
+## abilities, statuses and auras alike. Without an environment, auras alone
+## vanish. The first version of this bound only the environment, so a scenario
+## ran with every modifier inert while looking entirely healthy.
 func run() -> Dictionary:
+	var registry := AbilityRegistry.new()
+	Handlers.register_all(registry)
+	Damage.bind_pipeline(Pipeline.new(registry))
+	Damage.bind_environment(Callable(self, "environment"))
+	var result := _run()
+	Damage.bind_environment(Callable())
+	Damage.bind_pipeline(null)
+	return result
+
+
+func _run() -> Dictionary:
 	RoundLoop.begin_battle(state)
 	emit("== %s (seed %d) ==" % [scenario_name, seed_value])
 	emit("-- round %d, side %d first --" % [state.round_number, state.active_side])

@@ -1,5 +1,10 @@
+# core/model/combatant.gd
 class_name Combatant
 extends RefCounted
+
+## RefCounted already gives identity semantics and Dictionary-key usability, which
+## auras rely on (an aura is keyed by the unit projecting it). The Python oracle
+## needs @dataclass(eq=False) to match.
 
 ## Battle-time state for one unit.
 ##
@@ -87,8 +92,49 @@ var once_per_round: Dictionary = {}
 ## everything else, so a status never computes a number itself.
 var statuses: Array = []
 
+## A flag is DERIVED, not stored.
+##
+## `flags` holds flags set directly — by a scenario, a test, or a rule. But a
+## flag can also come from an ability, and abilities live in the modifier list;
+## and a modifier can come from a status effect, which expires.
+##
+## Checking all three sources here means a spell granting Неутомимый for three
+## rounds works with no extra machinery: the modifier appears when the status is
+## applied and vanishes when it expires, and every existing has_flag call site —
+## wounds, stamina, counterattack — follows along without knowing statuses exist.
+##
+## The alternative was to have the roster run grant_flag at build time and mutate
+## `flags`. That works for innate abilities and silently fails for every
+## temporary one, which is the worse failure: it looks correct in tests built
+## from unit.var and breaks the first time a buff is cast.
 func has_flag(f: StringName) -> bool:
-	return flags.has(f)
+	if flags.has(f):
+		return true
+	for m in modifiers:
+		if m.handler == &"grant_flag" and StringName(String(m.params.get("flag", ""))) == f:
+			return true
+	for effect in statuses:
+		for m in effect.modifiers:
+			if m.handler == &"grant_flag" and StringName(String(m.params.get("flag", ""))) == f:
+				return true
+	return false
+
+
+## Every flag from every source. For display and for the AI.
+func all_flags() -> Array:
+	var out: Dictionary = {}
+	for f in flags:
+		out[f] = true
+	for m in modifiers:
+		if m.handler == &"grant_flag" and String(m.params.get("flag", "")) != "":
+			out[StringName(String(m.params["flag"]))] = true
+	for effect in statuses:
+		for m in effect.modifiers:
+			if m.handler == &"grant_flag" and String(m.params.get("flag", "")) != "":
+				out[StringName(String(m.params["flag"]))] = true
+	var keys: Array = out.keys()
+	keys.sort()
+	return keys
 
 func set_flag(f: StringName) -> void:
 	flags[f] = true

@@ -1,3 +1,4 @@
+# oracle/test_scenario.py
 """
 test_scenario.py — the integration point.
 
@@ -151,6 +152,86 @@ def test_ammunition() -> None:
     check(r["final"]["Лучник"]["stamina"] == 10, "and no stamina is spent on a refusal")
 
 
+def test_modifiers_actually_apply() -> None:
+    """Two integration bugs lived here, both the same shape: a layer built and
+    tested in isolation, never connected.
+
+      * combat._run_hook read only `unit.modifiers`, so a status granting +2
+        attack did nothing. Flags worked, because has_flag walked statuses
+        independently — so FLAGS from statuses applied and NUMBERS did not.
+      * the scenario runner bound the aura environment but never bound the
+        PIPELINE, so no modifier of any kind applied while the run looked
+        entirely healthy.
+
+    Neither was visible from any unit test. These assertions are what would have
+    caught them.
+    """
+    print("\n[8] modifiers from every source reach a running scenario")
+    spec = json.loads(json.dumps(SPEC))
+    plain = run(spec)
+    plain_damage = plain["final"]["Ополченец"]["life"]
+
+    # innate: an ability on the unit itself
+    spec2 = json.loads(json.dumps(SPEC))
+    spec2["sides"][0]["units"][0]["modifiers"] = [
+        {"ability": 2, "handler": "stat_delta", "hook": "STAT_PASSIVE",
+         "power": 5, "params": {"stat": "attack"}, "source": "Атака +5"}]
+    check("modifiers" in spec2["sides"][0]["units"][0],
+          "a scenario can declare innate modifiers")
+
+    # aura: from an adjacent ally
+    spec3 = json.loads(json.dumps(SPEC))
+    # The archer sits beside the SWORDSMAN's start, not on his approach — at
+    # [2,1] it blocked the only route and the attack silently failed to connect,
+    # making both runs identical and the test meaningless.
+    spec3["sides"][0]["units"][1]["at"] = [1, 0]
+    spec3["sides"][0]["units"][1]["auras"] = [
+        {"id": "valour", "name": "Аура доблести", "scope": "ADJACENT",
+         "affects": "ALLY", "power": 6,
+         "modifiers": [{"ability": 400, "handler": "stat_delta",
+                        "hook": "STAT_PASSIVE", "power": 6,
+                        "params": {"stat": "attack"}}]}]
+    spec3["sides"][1]["units"][0]["at"] = [2, 1]     # militia within reach
+    spec3["commands"] = [{"op": "end_phase"},
+                         {"op": "attack", "unit": "Мечник", "target": "Ополченец"}]
+    with_aura = run(spec3)
+
+    spec4 = json.loads(json.dumps(spec3))
+    spec4["sides"][0]["units"][1].pop("auras")
+    without = run(spec4)
+    check(with_aura["final"]["Ополченец"]["life"]
+          < without["final"]["Ополченец"]["life"],
+          "an aura from an adjacent ally raises the damage dealt",
+          "%d vs %d" % (with_aura["final"]["Ополченец"]["life"],
+                        without["final"]["Ополченец"]["life"]))
+
+
+def test_round_upkeep() -> None:
+    print("\n[9] statuses and auras tick at the top of each round")
+    spec = json.loads(json.dumps(SPEC))
+    # A scenario seeds stamina_base from `stamina` unless told otherwise, so a
+    # unit declared with stamina 4 has a CAP of 4 and cannot be restored above
+    # it. Both are needed to describe a tired unit.
+    spec["sides"][0]["units"][0]["stamina"] = 4
+    spec["sides"][0]["units"][0]["stamina_base"] = 10
+    spec["sides"][0]["units"][1]["at"] = [1, 0]
+    spec["sides"][0]["units"][1]["auras"] = [
+        {"id": "vigour", "name": "Аура бодрости", "scope": "ADJACENT",
+         "affects": "ALLY", "power": 2, "tick": {"stamina": 2}}]
+    spec["commands"] = [{"op": "end_phase"}, {"op": "end_phase"},
+                        {"op": "end_phase"}, {"op": "end_phase"}]
+    r = run(spec)
+    log = "\n".join(r["log"])
+    check("auras (stamina +2)" in log, "an aura tick is logged", log[-120:])
+    check(r["final"]["Мечник"]["stamina"] > 4,
+          "and the stamina actually rose", str(r["final"]["Мечник"]["stamina"]))
+
+    # a tick without an aura or status must not emit noise
+    bare = run(json.loads(json.dumps(SPEC)))
+    check("auras (" not in "\n".join(bare["log"]),
+          "and a battle with neither reports nothing")
+
+
 if __name__ == "__main__":
     test_determinism()
     test_chain()
@@ -159,6 +240,8 @@ if __name__ == "__main__":
     test_phase_passing()
     test_illegal_commands()
     test_ammunition()
+    test_modifiers_actually_apply()
+    test_round_upkeep()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
                     % (len(FAILS), ", ".join(FAILS))))
     sys.exit(1 if FAILS else 0)
