@@ -11,7 +11,8 @@ status. This is the reference; `oracle/combat.py` is the executable form and
 | `[GM]` | Eadoropedia, *Игровая механика* — named section given |
 | `[AB]` | Eadoropedia, *Способности* — the game's own tooltip templates (still carry `%d`/`%s`) |
 | `[VAR]` | Derived from the `.var` data directly |
-| `[OBS]` | Established by play observation |
+| `[OBS]` | Established by controlled play observation |
+| `[BIN]` | Recovered from the inspected 32-bit executable |
 | `[ASSUMED]` | Our reading, not confirmed — see `OPEN_QUESTIONS.md` |
 
 **Verification status**
@@ -20,7 +21,8 @@ status. This is the reference; `oracle/combat.py` is the executable form and
 |---|---|
 | `VERIFIED` | Implemented and checked against a published table by `test_combat.py` |
 | `STATED` | Documented but with no table to check against |
-| `OPEN` | Value or behaviour still unknown |
+| `RECOVERED` | Implementable binary behaviour; version-specific until tested |
+| `OPEN` | Value or behaviour still unknown or contradictory |
 
 > **Version caution.** The Eadoropedia build (NH 25.0101.f03) does **not** match
 > our local `.var` set — same abilities and ordering, different numbers. Use the
@@ -102,20 +104,27 @@ never loses stamina for any action at all.
 
 ### 1.4 MoraleMod
 
-`[GM] Боевой дух` · **OPEN**
+`[BIN]` effective attack/counterattack/ranged-attack functions ·
+**RECOVERED, PARTIAL**
 
-The mechanism is documented; the numbers are deliberately withheld —
-*«точные цифры не разглашаются»*. `combat.py` carries a linear placeholder.
+The binary closes the low and neutral ranges:
 
-Cheap to close and it does **not** require combat: the map panel shows attack
-*without* morale, the battle panel *with* it, so the ratio between the two
-screens is the multiplier. Fix a unit, vary morale, read both. ~1 hour.
+```text
+morale < 6   -> −10% attack per missing point
+6..15        -> no morale multiplier
+morale > 15  -> positive bonuses in 5% steps
+```
+
+The high-morale branch uses a nonlinear threshold progression. Its exact
+breakpoints and integer ordering still need to be normalized into a complete
+table; see `OPEN_QUESTIONS` item 1. The current linear placeholder must not be
+described as exact compatibility.
 
 ---
 
 ## 2. Attack randomisation
 
-`[GM] Расчёт урона при атаках` · **VERIFIED**
+`[GM][BIN:004CEC40] Расчёт урона при атаках` · **VERIFIED / RECOVERED**
 
 ```
 Атака >= 5:  ИтоговаяАтака = Атака + Атака/5 - Random(2 * (Атака/5) + 1)
@@ -157,7 +166,7 @@ exactly where it is most noticeable. Use the exact form.
 
 ## 3. Damage
 
-`[GM] Расчёт урона при атаках` · **VERIFIED**
+`[GM][BIN:004CEC40] Расчёт урона при атаках` · **VERIFIED / RECOVERED**
 
 ```
 Урон = ИтоговаяАтака - Защита
@@ -214,9 +223,14 @@ regardless of its value.
 
 `Летающий` and `Низколетающий` pay no stamina for hills, forest or swamp.
 
-**The "moved" discriminator is `steps_this_round > 0`, not a position
-comparison.** `[OBS]` Starting and ending the round on the same hex still
-counts as having moved.
+`[OBS]` Starting and ending the round on the same hex still counts as having
+moved in the observed build.
+
+`[BIN:004D7050]` The ranged executor selects the base attack stamina cost from
+whether current action/movement capacity is already below its effective
+maximum: no prior expenditure costs 1; prior expenditure costs 2. This is not
+yet proven equivalent to `steps_this_round > 0` across re-entry, restoration or
+non-movement spending. See `OPEN_QUESTIONS` item 12.
 
 ---
 
@@ -254,20 +268,26 @@ Activation is free and re-entrant: a unit may spend part of its movement, yield
 control, and be reselected later in the same round to finish acting. There is
 no initiative queue within a side.
 
-Consequences for state:
-- `steps_this_round` is **cumulative path length**, not displacement. A
-  4-movement cavalry pacing back and forth between two hexes accrues 4.
-- `Атака с разгона` reads that counter directly (`+N damage per tile`).
-- The stamina −2/−1 discriminator reads `steps_this_round > 0`.
-- `Удар и возврат` returns to the tile where **the attack command was issued**,
-  not the round-start tile. Move 2, then command an attack 2 tiles further: the
-  unit paths out, strikes, and lands on the middle tile. The anchor belongs on
-  the command, not on the unit.
-- "В начале хода" effects fire once per **round**, not per activation —
-  otherwise a player could farm them by yielding and reselecting.
+Current Project EGO state:
 
-Charge is therefore farmable by shuffling in place. That is original behaviour;
-whether to preserve it is a design call, `OPEN_QUESTIONS` item 14.
+- `steps_this_round` is cumulative path length, not displacement.
+- the stamina model currently uses prior movement/action state;
+- the observed `Удар и возврат` anchor is the tile where the attack command was
+  issued;
+- start-of-turn effects currently fire once per round.
+
+Binary compatibility warning:
+
+`[BIN:004DCD90]` Modifier `0x25`, the charge/distance-damage candidate, computes
+
+```text
+max(abs(attacker_x - target_x) + abs(attacker_y - target_y) - 2, 0)
+```
+
+before the movement helper is called. That is not the same as reading cumulative
+`steps_this_round`. The observation, current implementation and inspected
+binary must be reconciled before either rule is called canonical. See
+`OPEN_QUESTIONS` items 10, 12 and 14.
 
 ---
 
@@ -347,3 +367,212 @@ for the unit's action and need an `Action` type, not a `Modifier`. Across the
 documented set: 16 mention a stamina cost, 26 an ammo cost, 25 carry per-turn or
 decaying state, 26 are area/adjacency scoped, 33 have explicit exclusion
 clauses, and 8 state stacking rules outright.
+
+---
+
+## 10. Legacy bounded random and weighted selection
+
+`[BIN:00454C70,00454E80]` · **RECOVERED**
+
+The bounded helper receives the exclusive upper bound in `EBX` and returns the
+result in `EAX`.
+
+```text
+bound == 0 -> 0
+ordinary bound -> CRT rand() % bound
+large bound -> append rand()%10 decimal digits, then modulo original bound
+```
+
+The modulo bias is original behaviour.
+
+The global weighted roller:
+
+1. sums weights;
+2. rolls in `[0, total-1]`;
+3. walks cumulative weights;
+4. returns the selected value;
+5. optionally zeroes every weight whose associated value equals that value.
+
+Removal is by value, not by entry index. The underlying CRT generator and seed
+lifecycle remain open.
+
+---
+
+## 11. Unit progression
+
+`[BIN:00432660,00432B60,00433130]` · **RECOVERED**
+
+Ordinary unit level is capped at 30. The live unit stores 30 selected upgrade
+IDs, while static unit definitions supply six fresh candidates for only the
+first 20 levels.
+
+For coefficient 100, the level thresholds begin:
+
+```text
+level 1: 20
+level 2: 50
+level 3: 90
+level 4: 140
+level 5: 200
+```
+
+The level calculator is equivalent to testing the cumulative threshold
+
+```text
+experience_coefficient * (5 * n * (n + 3)) / 100
+```
+
+with legacy integer arithmetic. Related display/threshold helpers divide during
+individual summation steps and can differ by rounding; do not merge them without
+vectors.
+
+Ordinary upgrade application preserves absolute missing life:
+
+```text
+old_max = max_life(unit)
+store selected upgrade at current level
+level += 1
+new_max = max_life(unit)
+current_life += new_max - old_max
+```
+
+When the first modifier is ID `0x3E`, its magnitude is a replacement unit
+definition. The unit's experience is halved, its definition changes, level is
+recalculated and upgrade entries from that level through 29 are cleared.
+
+---
+
+## 12. Tactical execution and damage accounting
+
+`[BIN:004D7050,004DCD90,004D61E0]` · **RECOVERED**
+
+### Melee exchange
+
+```text
+optional approach movement
+possible defender first strike
+attacker primary attack
+possible defender retaliation
+```
+
+For each melee/counterattack hit:
+
+```text
+calculate and clamp damage
+record dealt damage
+process melee secondary effects
+record received damage channel 0
+remove remove-on-damage statuses
+subtract life
+resolve death or large-hit morale
+```
+
+Secondary effects run before the primary life loss is committed.
+
+### Ranged attack
+
+```text
+determine shot count and cap by ammunition
+calculate and clamp ranged damage
+record ranged dealt damage
+consume ammunition
+apply ranged on-hit effects
+apply central damage
+record ranged kill
+spend stamina and end activation
+```
+
+### Received-damage channels
+
+```text
+0 -> melee or counterattack
+1 -> ordinary ranged
+2 -> ranged when attacker modifier 0x1C is active
+3 -> special/action damage; skips ordinary large-hit morale reaction
+```
+
+The large-hit morale test is reached when damage is at least one quarter of
+effective maximum life or exceeds 9, except on channel 3.
+
+---
+
+## 13. Runtime effects and death
+
+`[BIN:004CEC00,004D1D30,004D1BF0]` · **RECOVERED**
+
+A runtime modifier node stores:
+
+```text
+modifier ID
+magnitude
+duration/stack value
+visible-in-status-UI flag
+remove-on-damage flag
+next/previous pointers
+source action
+source upgrade
+```
+
+Nodes are inserted at the head of a doubly linked list.
+
+Established death-time special effects:
+
+```text
+0x4A -> full revival
+0x5A -> revert temporary battle transformation
+0x5B -> replace dead unit with a tier-dependent persistent unit
+0x49 -> transfer/return through an opposite-side tactical slot
+```
+
+These are mechanical descriptions, not confirmed localized names.
+
+---
+
+## 14. Tactical grid
+
+`[BIN:004CE9E0]` · **RECOVERED**
+
+The inspected battle field uses an 8×8 odd-row offset hex grid. For offset
+coordinate `(x, y)` and `p = y & 1`, the six neighbours are:
+
+```text
+(x + p - 1, y - 1)
+(x + p,     y - 1)
+(x + 1,     y)
+(x + p,     y + 1)
+(x + p - 1, y + 1)
+(x - 1,     y)
+```
+
+Each side owns 37 tactical unit slots. Slot count is not the number of map
+cells.
+
+---
+
+## 15. Recovered economy fragments
+
+`[BIN]` · **RECOVERED, PARTIAL**
+
+Gold upkeep:
+
+```text
+base gold upkeep
++ three attachment upkeep deltas
++ percentage modifier 0x55
+- flat modifier 0x36
+clamp to zero
+```
+
+Gold and gem recruitment costs follow parallel pipelines:
+
+```text
+base price
+-> ruler modifier
+-> strategic-resource surcharge
+-> route/distance class
+-> +10% per distance step beyond the first
+```
+
+Province gold and gem income include population/development tier, active site
+modifiers, ruler structure modifiers and stationed-army provider modifier
+`0x3A`. Exact normalized formulas and golden vectors are still required.

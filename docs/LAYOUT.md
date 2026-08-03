@@ -1,190 +1,167 @@
-# Repository layout — project_ego
+# Repository layout — Project EGO
 
-## The one rule everything else serves
+## Invariant
 
-**`core/` may never reference `game/`.** Not a class, not a signal, not a
-`preload`. The dependency runs one way only.
+**`core/` may never reference `game/`.**
 
-That single constraint is what keeps the headless harness possible, which is
-what keeps differential testing against the original possible, which is the
-only way to know the remake is correct. Everything below is arranged to make
-violating it obvious.
+The rules must remain usable without a scene tree. This is what permits the
+Python/GDScript differential harness, deterministic scenarios, AI simulation
+and future tooling.
 
-Enforce it in CI with a grep, not with discipline:
+A CI check should enforce the boundary:
 
 ```sh
 ! grep -rn --include='*.gd' -E '(res://game/|\bgame\.)' core/ \
   || { echo "core/ references game/ — dependency inversion"; exit 1; }
 ```
 
----
+## Current high-level layout
 
-## Layout
-
-```
+```text
 project_ego/
-├── project.godot                 # Godot project root == repo root
-├── .gdignore-note                # see "Godot specifics" below
+├── README.md
+├── AGENTS.md
+├── project.godot
+├── eador_runtime.h               # schema-14 Ghidra import/evidence header
 │
-├── core/                         # PURE LOGIC. No Node. No scene tree. Headless.
-│   ├── ids.gd                    # AbilityId / UpgradeId / UnitId wrappers
-│   ├── rng.gd                    # named streams; swap point for the real PRNG
-│   ├── trace.gd                  # self-explaining values
-│   │
+├── core/                         # pure GDScript model and rules
+│   ├── ids.gd
+│   ├── rng.gd
+│   ├── trace.gd
 │   ├── content/
-│   │   ├── content_db.gd         # constructed instance, never an autoload
-│   │   ├── content_pack.gd       # tables + bindings; fails loudly on unbound
-│   │   ├── ability_registry.gd   # handler NAME -> implementation
-│   │   └── loader.gd             # reads the converted JSON
-│   │
 │   ├── model/
-│   │   ├── combatant.gd          # base stats + modifiers + per-round state
-│   │   ├── modifier.gd           # the atomic value type
-│   │   ├── action.gd             # ACTIVATED abilities — cost, targeting, legality
-│   │   ├── status.gd             # timed effects with expiry
-│   │   ├── option.gd             # level-up options + availability schedules
-│   │   └── battlefield.gd        # grid, tiles, adjacency
-│   │
 │   ├── rules/
-│   │   ├── hooks.gd              # the Hook enum — THE resolution order
-│   │   ├── pipeline.gd           # resolve(base, mods, hook, ctx) -> [value, trace]
-│   │   ├── damage.gd             # verified against the published tables
-│   │   ├── stamina.gd
-│   │   ├── morale.gd
-│   │   ├── wounds.gd
-│   │   ├── spells.gd             # PowerMod / DurationMod / resist model
-│   │   └── handlers/             # one file per hook family, ~10 files
-│   │       ├── stat_passive.gd
-│   │       ├── defence_apply.gd
-│   │       ├── on_hit.gd
-│   │       ├── counterattack.gd
-│   │       └── ...
-│   │
-│   ├── battle/
-│   │   ├── battle_state.gd
-│   │   ├── round_loop.gd         # round -> side phase -> free interleaved activation
-│   │   ├── action_points.gd      # movement points, attack availability, per-round flags
-│   │   └── ai/
-│   │       ├── evaluator.gd
-│   │       └── policy.gd
-│   │
-│   └── strategic/                # later: province layer, economy, karma
+│   └── battle/
 │
-├── packs/                        # OUR files only. Original data is NOT committed.
-│   ├── genesis/
-│   │   ├── pack.toml             # id, display name, expected source fingerprint
-│   │   ├── bindings.toml         # opcode number -> handler name
-│   │   └── overrides/            # our corrections and additions
-│   └── new_horizons/
-│       ├── pack.toml
-│       └── bindings.toml
+├── oracle/                       # Python reference implementation and tests
+├── tests/                        # independently runnable headless GDScript tests
+├── tools/                        # offline extraction/conversion/analysis
+├── packs/                        # Project-owned bindings and overrides
+├── scenarios/                    # deterministic scenario inputs
+├── game/                         # Godot presentation and devtools
 │
-├── game/                         # GODOT PRESENTATION. Depends on core. Never reverse.
-│   ├── autoload/
-│   │   ├── vfs.gd                # existing — manifest-driven asset access
-│   │   ├── logger.gd
-│   │   └── app.gd                # holds the ACTIVE ContentDb for the UI only
-│   ├── battle/
-│   │   ├── battle_view.tscn
-│   │   ├── unit_sprite.gd
-│   │   └── trace_replay.gd       # plays back a trace file — no rules here
-│   ├── ui/
-│   ├── theme/
-│   └── devtools/
-│       └── asset_viewer.tscn     # moved from scenes/tools/
-│
-├── tools/                        # OFFLINE. Python. Never ships.
-│   ├── var/
-│   │   ├── eador_var.py          # parser, schema inference, xref, selftest
-│   │   ├── options.py            # unit-major -> option-major transposition
-│   │   ├── hooks.py              # hook taxonomy + opcode classifier
-│   │   └── doc_merge.py          # Eadoropedia join
-│   ├── extract/
-│   │   └── build_pack.py         # local install -> packs/<id>/data/ (gitignored)
-│   └── reference/
-│       └── abil_doc.json         # extracted ability documentation
-│
-├── oracle/                       # Python reference implementation. CI only.
-│   ├── combat.py                 # the verified pipeline
-│   ├── test_combat.py            # checks against published tables
-│   └── fixtures/                 # expected traces the GDScript port must match
-│
-├── tests/                        # GDScript. Run headless.
-│   ├── test_damage.gd
-│   ├── test_pipeline.gd
-│   ├── test_options.gd
-│   └── scenarios/
-│       └── *.json                # deterministic battles: seed + actions + expected
-│
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── FORMULAS.md               # every formula with its source citation
-│   ├── OPEN_QUESTIONS.md
-│   └── LAYOUT.md                 # this file
-│
-└── .github/workflows/ci.yml      # dependency grep, oracle tests, headless GDScript tests
+└── docs/
+    ├── ARCHITECTURE.md
+    ├── STATUS.md
+    ├── FORMULAS.md
+    ├── OPEN_QUESTIONS.md
+    ├── REVERSE_ENGINEERING.md
+    ├── FUNCTION_MAP.csv
+    └── LAYOUT.md
 ```
 
----
+This diagram is intentionally high-level. The filesystem is the authoritative
+list of current modules; this document defines boundaries and ownership.
 
-## Why the unusual bits
+## Directory ownership
 
-**`packs/` holds only our bindings.** The `.var` data belongs to Bokulev and
-Jazz. `tools/extract/build_pack.py` reads a local install and writes
-`packs/<id>/data/`, which is gitignored. The repo ships the opcode-to-handler
-mapping — which is our work — and nothing else. This also removes the current
-`var.zip`, which is Jazz's content sitting in a public repo.
+### `core/`
 
-**`oracle/` is separate from `tools/`** because they have different lifetimes.
-Tools run once at authoring time and their output is committed. The oracle runs
-on every CI pass forever, because it is what the GDScript port is diffed
-against. Mixing them invites someone to "clean up" the oracle as dead code.
+Pure, headless GDScript.
 
-**`core/battle/ai/` sits inside core, not in game.** The AI evaluates rules, so
-it needs the headless simulation. Putting it in `game/` would force the rules to
-depend on presentation to think.
+Current major areas:
 
-**`handlers/` is a directory, not a file.** ~10 hook families, each with its own
-file. The alternative — one giant match statement — is the thing we are
-replacing.
+- `content/` — content database, pack bindings and handler registry;
+- `model/` — combatants, modifiers, actions, options, battlefield and status
+  model;
+- `rules/` — formulas, resolution hooks and handlers;
+- `battle/` — state, action points, rounds, scenarios and AI scaffolding.
 
----
+`core/model/status.gd` currently exists as an empty placeholder. Do not describe
+timed statuses as ported until that file and its tests reproduce runtime-node
+semantics.
 
-## Godot specifics
+### `oracle/`
 
-- **Repo root is the Godot project root.** Nesting the Godot project one level
-  down would keep `tools/` and `oracle/` outside the import scanner, but breaks
-  every convention and confuses tooling. Keep it flat.
-- **Use `class_name` on every core class** so they resolve globally without
-  `preload` chains. Core has no scenes, so path coupling would be pure cost.
-- **Drop a `.gdignore` in `tools/`, `oracle/`, and `docs/`.** Godot skips `.py`
-  and `.md` anyway, but `.gdignore` stops it walking those trees at all, which
-  matters once the JSON fixtures get large.
-- **`core/` contains no `.tscn`.** If a scene file appears there, the dependency
-  rule has already been broken.
+Python reference rules, scenario machinery and tests. It is a permanent
+compatibility layer, not disposable tooling.
 
----
+### `tests/`
 
-## Migration from the current repo
+Headless GDScript tests. Each `test_*.gd` script is runnable independently with:
 
-| now | goes to | note |
-|---|---|---|
-| `autoload/vfs.gd` | `game/autoload/vfs.gd` | keep as-is, it's sound |
-| `autoload/logger.gd` | `game/autoload/logger.gd` | still a stub |
-| `autoload/content_db.gd` | `core/content/content_db.gd` | **stop being an autoload** — becomes a constructed instance; `game/autoload/app.gd` holds the active one for the UI |
-| `scenes/tools/asset_viewer.*` | `game/devtools/` | also delete the `ass*.tmp` files |
-| `tools/import_vars_full.py` | delete | superseded by `tools/var/eador_var.py` |
-| `var.zip` | delete | not ours to redistribute |
-| `node_2d.tscn` | delete or rename | placeholder main scene |
+```sh
+godot --headless --script tests/test_damage.gd
+```
 
----
+Fixtures and scenarios should compare ordered traces whenever ordering or RNG
+consumption matters.
 
-## Build order
+### `tools/`
 
-1. `core/rules/` — port `oracle/combat.py`, diff against its fixtures.
-2. `core/model/` — `Combatant`, `Modifier`, per-round state.
-3. `core/battle/action_points.gd` + `round_loop.gd` — the interleaved activation model.
-4. `core/model/action.gd` — activated abilities. Largest known gap.
-5. `core/content/` — pack loading, unbound-opcode report as the progress meter.
-6. `tests/scenarios/` — first deterministic battle.
-7. Only then `game/battle/` — and via `trace_replay.gd`, not by computing anything.
+Offline Python utilities for:
+
+- `.var` parsing and conversion;
+- pack construction from a local installation;
+- schema and cross-reference analysis;
+- documentation generation.
+
+Nothing under `tools/` is required by the shipped runtime.
+
+### `packs/`
+
+Only Project EGO material:
+
+- pack metadata;
+- bindings from numeric opcode to stable handler;
+- overrides and corrections;
+- locally generated, ignored data.
+
+Original game assets and tables are not committed.
+
+### `game/`
+
+Presentation and developer UI. It may depend on `core/`; the reverse dependency
+is forbidden. The current main scene is the asset viewer, not a finished game
+shell.
+
+### `docs/`
+
+- `ARCHITECTURE.md` — dependency and evidence architecture.
+- `STATUS.md` — coverage matrix and compatibility boundary.
+- `FORMULAS.md` — quantitative and ordering reference.
+- `OPEN_QUESTIONS.md` — unresolved facts and contradictions.
+- `REVERSE_ENGINEERING.md` — consolidated binary-derived checkpoint.
+- `FUNCTION_MAP.csv` — address-indexed recovered-function map.
+- `LAYOUT.md` — this file.
+
+### Root reverse-engineering header
+
+`eador_runtime.h` is the stable Ghidra import target. Its type names remain
+unversioned while `EADOR_RUNTIME_SCHEMA_VERSION` records the layout checkpoint.
+It is evidence/documentation, not production runtime code.
+
+## Godot-specific rules
+
+- Repository root is the Godot project root.
+- Core types use `class_name` and do not require scene preloads.
+- `core/` contains no `.tscn`.
+- `.gdignore` belongs in non-Godot trees such as `docs/`, `oracle/` and
+  `tools/`.
+- Autoloads may coordinate presentation but may not become implicit
+  dependencies of the core simulation.
+
+## Where new work goes
+
+| work | destination |
+|---|---|
+| new formula or mechanic | `oracle/`, `core/rules/`, tests, `FORMULAS.md` |
+| activated ability | pack binding + `Action`/handler + tests |
+| timed effect | status model/handler + trace events + expiry tests |
+| extracted original data | local ignored pack data, never Git |
+| recovered executable behaviour | `REVERSE_ENGINEERING.md`, function map, tests |
+| unresolved conflict | `OPEN_QUESTIONS.md` |
+| strategic province/economy work | new `core/strategic/` modules after oracle spec |
+| UI/animation | `game/`, consuming core results or traces |
+
+## Near-term integration order
+
+1. Commit the documentation/evidence checkpoint.
+2. Resolve charge and RNG compatibility conflicts.
+3. Implement GDScript runtime statuses.
+4. Classify battle-action effect types and modifier IDs.
+5. Add binary-derived golden tests for progression and combat lifecycle.
+6. Extract `.var` schemas.
+7. Normalize strategic economy.
+8. Consolidate tactical AI.
+9. Expand presentation only after the relevant rules are trace-stable.
