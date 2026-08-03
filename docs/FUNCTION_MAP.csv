@@ -1,0 +1,48 @@
+address,working_name,subsystem,confidence,summary
+00432480,calculate_unit_experience_threshold_by_definition_candidate,unit progression,strong inference,Cumulative XP threshold; explicit definition ID
+00432570,calculate_unit_experience_threshold_candidate,unit progression,strong inference,Instance-based threshold variant; rounding may differ
+00432660,calculate_unit_level_from_experience_candidate,unit progression,proven,"Returns XP-derived level, capped at 30"
+004328F0,sum_unit_intrinsic_modifiers_candidate,modifiers,proven,Intrinsic UnitDef modifier aggregation
+00432950,sum_unit_instance_modifiers_candidate,modifiers,proven,"Selected upgrades, attachments and hero context"
+00432B60,choose_unit_level_upgrade_candidate,unit progression,proven,Weighted upgrade candidate selection
+00432E60,calculate_unit_gold_upkeep_candidate,economy,proven,"Base, attachment deltas, percent and flat modifiers"
+00433130,apply_unit_level_upgrade_candidate,unit progression,proven,Ordinary upgrade or modifier-0x3E transformation
+004331F0,construct_unit_instance_candidate,unit progression,proven,Initializes 0xA4 persistent unit instance
+00454C70,random_below_ebx_candidate,rng,proven,Exclusive bound in EBX; CRT rand and modulo
+00454DC0,weighted_roll_alternate_rng_candidate,rng,candidate,Alternate weighted roller; helper ABI incomplete
+00454E80,weighted_roll_candidate,rng,proven,Weighted selection; optional removal by selected value
+00455630,sum_active_province_site_modifiers_candidate,economy,strong inference,Active/development-qualified site modifier aggregation
+00455C20,get_province_population_tier_candidate,economy,strong inference,Maps population-like value to tier 1..11
+00456AF0,calculate_province_gem_income_candidate,economy,strong inference,Province gem-income pipeline
+00458980,sum_army_province_income_modifier_candidate,economy,strong inference,Stationed army modifier 0x3A
+00458A90,calculate_province_gold_income_candidate,economy,strong inference,Province gold-income pipeline
+0045EC10,open_var_stream_candidate,parser,strong inference,Opens parser stream
+0045ED30,advance_to_var_delimiter_candidate,parser,candidate,Consumes until # or EOF
+0045ED70,parse_var_string_candidate,parser,strong inference,Allocates and returns parsed string
+0045EE00,read_var_token_to_eax_candidate,parser,strong inference,Reads token until : or ;
+0045EE70,parse_var_integer_candidate,parser,proven,Signed decimal parser
+00469D20,sum_ruler_structure_modifiers_candidate,economy,strong inference,Ruler-wide structure modifier aggregation
+0046B1D0,calculate_unit_gem_recruitment_cost_candidate,economy,strong inference,Gem recruitment price pipeline
+0046B2A0,calculate_unit_gold_recruitment_cost_candidate,economy,strong inference,Gold recruitment price pipeline
+004A1F90,sum_hero_context_modifiers_candidate,modifiers,strong inference,Hero personal modifier channel
+004A2690,sum_commander_aura_modifiers_candidate,modifiers,strong inference,Commander aura channel
+004CE9E0,collect_adjacent_battle_units_candidate,battlefield,proven,Odd-row six-neighbour collector
+004CEB40,sum_runtime_battle_modifiers_candidate,runtime effects,proven,Runtime-node-only modifier sum
+004CEC00,initialize_runtime_modifier_node_candidate,runtime effects,proven,Initializes and head-inserts 0x20 node
+004CEC40,resolve_attack_against_defence_candidate,damage,proven,Randomized power versus defence and chip rule
+004D01C0,get_effective_battle_modifier_candidate,modifiers,proven,"Runtime, persistent, intrinsic and aura resolution"
+004D0980,get_effective_battle_max_life_candidate,stats,proven,Persistent max life plus side multiplier
+004D0A70,adjust_battle_unit_morale_candidate,morale,proven,Morale delta and break accumulation
+004D0B40,refresh_battle_unit_status_ui_candidate,presentation,proven,UI refresh only
+004D11C0,apply_attacker_on_hit_modifiers_candidate,combat lifecycle,strong inference,Narrow on-hit debuff stage
+004D1BF0,transfer_battle_unit_to_opposite_side_slot_candidate,combat lifecycle,proven,Copies tactical record to opposite-side slot
+004D1D30,resolve_battle_unit_death_candidate,combat lifecycle,proven,"Death, revival, replacement, corpse and cleanup"
+004D2DA0,calculate_ranged_attack_damage_candidate,damage,proven,Ranged attack versus ranged defence/resistance
+004D2E60,calculate_melee_or_counterattack_damage_candidate,damage,proven,Attack/counterattack versus defence/resistance
+004D61E0,apply_damage_to_battle_unit_candidate,damage,proven,"Channel accounting, status removal, life, death, morale"
+004D7050,execute_ranged_attack_candidate,combat lifecycle,proven,Ordinary ranged attack executor
+004D7A20,apply_battle_action_to_unit_candidate,battle actions,strong inference,Eight-clause target action dispatcher; approximate entry
+004D9800,process_melee_or_counterattack_secondary_effects_candidate,combat lifecycle,strong inference,"Drains, statuses, cleave, triggers and healing"
+004DCD90,execute_melee_attack_exchange_candidate,combat lifecycle,proven,"Movement, first strike, primary attack and retaliation"
+004E4660,initialize_army_battle_formation_candidate,battlefield,strong inference,Persistent formation placement and side mirroring
+004F4970,score_battle_action_against_target_candidate,tactical AI,strong inference,AI utility score for action-target pair
