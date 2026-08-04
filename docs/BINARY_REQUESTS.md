@@ -8,12 +8,28 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
+**Current active request:** R2. R1 was closed on 2026-08-04 by `EXP-R1-001`.
+
 ---
 
-## R1 — High-morale branch: confirm or break a pre-registered prediction
+## R1 — CLOSED: high-morale branch confirmed the preregistered prediction
 
 **Closes:** `OPEN_QUESTIONS` item 1 · `COMPATIBILITY_TEST_MATRIX` STATS-MORALE-002
 **Ledger:** MORALE-001 (`004D0A70`) and the effective-attack stat functions
+
+**Result (2026-08-04).** `EXP-R1-001` confirms the prediction in all three
+offensive-stat functions (`004D1890`, `004D1660`, `004D14A0`):
+
+- first boundaries: `16`, `18`, `21`;
+- continuation: `25`, `30`, `36`, `43`, `51`, `60`, ...;
+- increment: exactly five percentage points per band;
+- attack, counterattack and ranged attack use the same loop;
+- arithmetic is integer: the internal ×100 value is truncated back to an
+  integer before the morale bonus is applied.
+
+The result independently agrees with `DOC-NH-MORALE`. Rejected alternatives:
+fixed five-point bands, fixed two-point bands, and float application through the
+complete pipeline. Matrix implementation remains with the engine side.
 
 **Question.** Above morale 15, what are the exact band boundaries and multipliers
 in the effective attack / counterattack / ranged-attack path?

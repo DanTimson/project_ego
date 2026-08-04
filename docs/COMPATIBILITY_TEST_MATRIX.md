@@ -25,8 +25,8 @@ Status values:
 | DAMAGE-BASE-001 | damage | raw power 1..20 versus defence gaps 0..11 | `004CEC40` | spread, clamp, exact/one/zero damage branches | READY except PRNG sequence |
 | STATS-WOUND-001 | stats | life below half maximum | effective stat functions | 50% offensive penalty unless exempting modifier applies | READY |
 | STATS-STAMINA-001 | stats | stamina 0..6 | effective stat functions | −10% per missing point below 6 | READY |
-| STATS-MORALE-001 | stats | morale 0..15 | `004D0A70` effective stat functions + published table | multiplier `0.4 + 0.1*morale` for 0..5, exactly `1.0` for 6..15; both sources agree at every point | READY |
-| STATS-MORALE-002 | stats | high-morale breakpoints | published table; binary confirms 5% step size only | band `n` starts at `15 + n(n+1)/2`, multiplier `1.0 + 0.05n` (16-17 → 1.05 … 43-50 → 1.35) | NEEDS VECTOR for the Genesis build |
+| STATS-MORALE-001 | stats | morale 0..15 | effective attack stat functions + `DOC-NH-MORALE` | multiplier `0.4 + 0.1*morale` for 0..5, exactly `1.0` for 6..15; both sources agree at every point | READY |
+| STATS-MORALE-002 | stats | high-morale breakpoints and integer application | `EXP-R1-001`; `DOC-NH-MORALE` | band `n` starts at `15 + n(n+1)/2`; +5 percentage points per band; first boundaries 16/18/21; truncate the pre-morale stat before applying the bonus | READY |
 | MELEE-ORDER-001 | combat | ordinary attack without retaliation | `004DCD90` | secondary effects before channel accounting and life subtraction | READY |
 | MELEE-FIRST-001 | combat | defender modifier `0x10` | `004DCD90` | defender attacks first when all gating conditions pass | READY |
 | MELEE-NORETAL-001 | combat | attacker modifier `0x1A` | `004DCD90` | suppresses both first-strike and ordinary retaliation paths | READY |

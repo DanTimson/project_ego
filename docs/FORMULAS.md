@@ -126,15 +126,32 @@ morale 0 → 0.40, 3 → 0.70, 5 → 0.90, 6..15 → 1.00. The agreement holds a
 two different builds (Genesis 1.05.2 binary, NH 26.0620.f01 documentation),
 which is also weak evidence that New Horizons did not alter this curve.
 
-**High band (≥16) — STRONG INFERENCE for Genesis.** The 5% step size is
-corroborated by both sources. The *band boundaries* come only from the NH
-published table; the Genesis high-morale branch has not been read. Do not claim
-exact Genesis compatibility above morale 15 until it is. See `OPEN_QUESTIONS`
-item 1 and `COMPATIBILITY_TEST_MATRIX` STATS-MORALE-002.
+**High band (≥16) — RECOVERED and independently corroborated.** The Genesis
+functions for attack (`004D1890`), counterattack (`004D1660`) and ranged attack
+(`004D14A0`) contain the same loop. It subtracts successively wider band widths
+`1, 2, 3, ...` from `morale - 15`, adding five percentage points for each band.
+The boundaries are therefore:
 
-The continuation beyond band 43-50 is the wiki's stated widening rule, computed
-rather than tabulated. Compute the band index iteratively rather than by float
-`sqrt`, so the oracle and the GDScript port stay bit-exact.
+```text
+16, 18, 21, 25, 30, 36, 43, 51, 60, ...
+```
+
+This exactly matches the preregistered NH 26.0620.f01 table. Rejected
+alternatives are fixed five-point bands (`16/21/26/...`) and fixed two-point
+bands (`16/18/20/...`).
+
+The binary does not multiply by a float. After the earlier wound and stamina
+steps it first converts the internal ×100 value back to an integer, then applies
+the morale percentage:
+
+```text
+pre_morale = scaled_attack / 100
+result = pre_morale + bonus_percent * pre_morale / 100
+```
+
+For positive offensive stats, division truncates downward. Thus base 19 at
+morale 16 still returns 19, while base 20 returns 21. Preserve this truncation
+point. Implementation and executable fixtures are maintained by the engine side.
 
 Carve-out: morale multiplies only direct attack bonuses, not conditional damage
 such as «Сокрушение зла» — see §1.1.

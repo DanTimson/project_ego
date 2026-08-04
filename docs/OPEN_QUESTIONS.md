@@ -11,7 +11,6 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 
 | ID | Question | Current evidence | How to close |
 |---|---|---|---|
-| 1 | **High-morale band boundaries in the Genesis build.** | Narrowed. Morale 0..15 is settled: the binary's −10%-per-missing-point rule and the published table's `0.4 + 0.1*morale` are the same function at every point, across two builds — see `FORMULAS` §1.4. Above 15 both sources agree the step is 5%, but the band widths (`15 + n(n+1)/2`) come only from NH 26.0620.f01 documentation; the Genesis high-morale branch has not been read. | Read the high-morale branch at the effective-attack functions and confirm the first three boundaries (16, 18, 21). If they match, close; if not, Genesis and NH need separate profiles. |
 | 2 | **Large-unit battlefield footprint.** | The tactical grid and six-neighbour geometry are solved. It is still unclear whether `Гигант` or another category occupies more than one tactical cell in the inspected build. | Inspect placement/collision consumers for unit category and validate in-game. |
 | 6 | **Exhausted level-up pools.** | Selection, prerequisite filtering and removal-by-value are recovered. The behaviour when every surviving weight is zero or a unit has fewer than the requested choices remains unclear. | Construct a save/unit that exhausts its pool, or inspect the caller after an all-zero weighted table. |
 
@@ -71,6 +70,7 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 
 | former ID | Result | Evidence |
 |---|---|---|
+| 1 | Genesis uses triangularly widening high-morale offensive bands beginning at 16, 18, 21, 25, 30, 36, 43 and 51, with +5 percentage points per band. Attack, counterattack and ranged attack use the same integer branch. Fixed 5-point and fixed 2-point bands are rejected. | `EXP-R1-001`: `004D1890`, `004D1660`, `004D14A0`; independently agrees with `DOC-NH-MORALE`. Implementation fixture remains owned by the engine side. |
 | 2, partial | Tactical field is an 8×8 odd-row offset hex grid; each side has 37 unit slots; six-neighbour adjacency is recovered. | `004CE9E0`, formation/deployment consumers, `eador_runtime.h`. |
 | 3 | Army-level initiative: higher leader value starts; ties go to attacker. | data/documentation and current tests. |
 | 3b | Within-side unit selection is free and re-entrant. | observation and AI/UI consumers. |
