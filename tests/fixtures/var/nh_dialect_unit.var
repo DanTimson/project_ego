@@ -1,0 +1,65 @@
+Quantity: 2
+
+/0
+Name: Пусто;
+Level: 0
+Life: 0
+Attack: 0
+Stamina: 0
+Morale: 0
+Subtype: (0)
+Analogs: (0)
+UnitClass: 0
+Upgraded: (0, 0)
+Karma: 0
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Ability: 0;
+
+Lvl 01 upgrades: (0, 0)
+Lvl 02 upgrades: (0, 0)
+
+/1
+Name: Образец-Один;
+Level: 1
+Life: 12
+Attack: 4
+Stamina: 10
+Morale: 10
+Subtype: (3)
+Analogs: (7)
+UnitClass: 2
+Upgraded: (1, 2)
+Karma: 1
+Missile: 0
+Resource: (1)
+
+Abilityes:
+ПробнаяСпособность: 2;
+ВтораяСпособность: 3;
+
+Lvl 01 upgrades: (1, 4; 2, 3)
+Lvl 02 upgrades: (2, 4)
+
+/2
+Name: Образец-Один;
+Level: 3
+Life: 30
+Attack: 9
+Stamina: 10
+Morale: 10
+Subtype: (3)
+Analogs: (7)
+UnitClass: 2
+Upgraded: (0, 0)
+Karma: 1
+Missile: 0
+Resource: (1)
+
+Abilityes:
+Ability: 0;
+
+Lvl 01 upgrades: (0, 0)
+Lvl 02 upgrades: (0, 0)

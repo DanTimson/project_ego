@@ -1,0 +1,468 @@
+Quantity: 51
+/0
+Name: Пусто;
+Power: 0
+Karma: 0
+Guard0: 1
+Guard1: 2
+Guard2: 3
+Guard3: 4
+
+/1
+Name: Ополчение;
+Power: 1
+Karma: 0
+Guard0: 1
+Guard1: 2
+Guard2: 3
+Guard3: 4
+
+/2
+Name: Разбойники;
+Power: 1
+Karma: -1
+Guard0: 5
+Guard1: 6
+Guard2: 7
+Guard3: 8
+
+/3
+Name: Варвары;
+Power: 1
+Karma: 0
+Guard0: 9
+Guard1: 10
+Guard2: 11
+Guard3: 12
+
+/4
+Name: Гоблины;
+Power: 1
+Karma: -1
+Guard0: 13
+Guard1: 14
+Guard2: 15
+Guard3: 16
+
+/5
+Name: Нежить;
+Power: 2
+Karma: -2
+Guard0: 17
+Guard1: 18
+Guard2: 19
+Guard3: 20
+
+/6
+Name: Орки;
+Power: 1
+Karma: -1
+Guard0: 21
+Guard1: 22
+Guard2: 23
+Guard3: 24
+
+/7
+Name: Половинчики;
+Power: 2
+Karma: 2
+Guard0: 25
+Guard1: 26
+Guard2: 27
+Guard3: 28
+
+/8
+Name: Эльфы;
+Power: 2
+Karma: 3
+Guard0: 29
+Guard1: 30
+Guard2: 31
+Guard3: 32
+
+/9
+Name: Гномы;
+Power: 2
+Karma: 2
+Guard0: 33
+Guard1: 34
+Guard2: 35
+Guard3: 36
+
+/10
+Name: Дружина;
+Power: 2
+Karma: 0
+Guard0: 37
+Guard1: 38
+Guard2: 39
+Guard3: 40
+
+/11
+Name: Пауки;
+Power: 3
+Karma: 0
+Guard0: 41
+Guard1: 42
+Guard2: 43
+Guard3: 44
+
+/12
+Name: Болотные твари;
+Power: 3
+Karma: 0
+Guard0: 45
+Guard1: 46
+Guard2: 47
+Guard3: 48
+
+/13
+Name: Крылатые твари;
+Power: 3
+Karma: 0
+Guard0: 49
+Guard1: 50
+Guard2: 51
+Guard3: 52
+
+/14
+Name: Демоны;
+Power: 2
+Karma: -3
+Guard0: 53
+Guard1: 54
+Guard2: 55
+Guard3: 56
+
+/15
+Name: Стражи леса;
+Power: 3
+Karma: 3
+Guard0: 57
+Guard1: 58
+Guard2: 59
+Guard3: 60
+
+/16
+Name: Кочевники;
+Power: 3
+Karma: 0
+Guard0: 61
+Guard1: 62
+Guard2: 63
+Guard3: 64
+
+/17
+Name: Кентавры;
+Power: 3
+Karma: 1
+Guard0: 65
+Guard1: 66
+Guard2: 67
+Guard3: 68
+
+/18
+Name: Великаны;
+Power: 6
+Karma: -1
+Guard0: 69
+Guard1: 70
+Guard2: 71
+Guard3: 72
+
+/19
+Name: Чародеи;
+Power: 3
+Karma: 0
+Guard0: 73
+Guard1: 74
+Guard2: 75
+Guard3: 76
+
+/20
+Name: Жрецы;
+Power: 2
+Karma: 2
+Guard0: 77
+Guard1: 78
+Guard2: 79
+Guard3: 80
+
+/21
+Name: Бандиты;
+Power: 3
+Karma: -2
+Guard0: 81
+Guard1: 82
+Guard2: 83
+Guard3: 84
+
+/22
+Name: Армия Хаоса;
+Power: 4
+Karma: -4
+Guard0: 85
+Guard1: 86
+Guard2: 87
+Guard3: 88
+
+/23
+Name: Драконы;
+Power: 8
+Karma: 0
+Guard0: 89
+Guard1: 90
+Guard2: 91
+Guard3: 92
+
+/24
+Name: Минотавры;
+Power: 5
+Karma: 0
+Guard0: 93
+Guard1: 94
+Guard2: 95
+Guard3: 96
+
+/25
+Name: Некроманты;
+Power: 4
+Karma: -3
+Guard0: 97
+Guard1: 98
+Guard2: 99
+Guard3: 100
+
+/26
+Name: Тёмные друиды;
+Power: 4
+Karma: -1
+Guard0: 101
+Guard1: 102
+Guard2: 103
+Guard3: 104
+
+/27
+Name: Авантюристы;
+Power: 2
+Karma: 0
+Guard0: 105
+Guard1: 106
+Guard2: 107
+Guard3: 108
+
+/28
+Name: Рыцарский орден;
+Power: 4
+Karma: 1
+Guard0: 109
+Guard1: 110
+Guard2: 111
+Guard3: 112
+
+/29
+Name: Дикие грифоны;
+Power: 5
+Karma: 0
+Guard0: 113
+Guard1: 114
+Guard2: 115
+Guard3: 116
+
+/30
+Name: Тролли;
+Power: 5
+Karma: -1
+Guard0: 117
+Guard1: 118
+Guard2: 119
+Guard3: 120
+
+/31
+Name: Инквизиторы;
+Power: 4
+Karma: 0
+Guard0: 121
+Guard1: 122
+Guard2: 123
+Guard3: 124
+
+/32
+Name: Дикие пегасы;
+Power: 3
+Karma: 0
+Guard0: 125
+Guard1: 126
+Guard2: 127
+Guard3: 128
+
+/33
+Name: Демонологи;
+Power: 4
+Karma: -3
+Guard0: 129
+Guard1: 130
+Guard2: 131
+Guard3: 132
+
+/34
+Name: Друиды;
+Power: 4
+Karma: 1
+Guard0: 133
+Guard1: 134
+Guard2: 135
+Guard3: 136
+
+/35
+Name: 13 чертей;
+Power: 2
+Karma: -2
+Guard0: 137
+Guard1: 137
+Guard2: 137
+Guard3: 137
+
+/36
+Name: Единорог;
+Power: 2
+Karma: 3
+Guard0: 138
+Guard1: 138
+Guard2: 138
+Guard3: 138
+
+/37
+Name: Тролль;
+Power: 2
+Karma: -1
+Guard0: 139
+Guard1: 139
+Guard2: 139
+Guard3: 139
+
+/38
+Name: Гидра;
+Power: 2
+Karma: 0
+Guard0: 140
+Guard1: 140
+Guard2: 140
+Guard3: 140
+
+/39
+Name: Горгульи;
+Power: 3
+Karma: 0
+Guard0: 141
+Guard1: 142
+Guard2: 143
+Guard3: 144
+
+/40
+Name: Гончие Хаоса;
+Power: 3
+Karma: -3
+Guard0: 145
+Guard1: 145
+Guard2: 145
+Guard3: 145
+
+/41
+Name: Древний дракон;
+Power: 4
+Karma: 0
+Guard0: 146
+Guard1: 146
+Guard2: 146
+Guard3: 146
+
+/42
+Name: Медузы;
+Power: 5
+Karma: 0
+Guard0: 147
+Guard1: 148
+Guard2: 149
+Guard3: 150
+
+/43
+Name: Слизни;
+Power: 3
+Karma: 0
+Guard0: 151
+Guard1: 152
+Guard2: 153
+Guard3: 154
+
+/44
+Name: Людоящеры;
+Power: 2
+Karma: 0
+Guard0: 155
+Guard1: 156
+Guard2: 157
+Guard3: 158
+
+/45
+Name: Культ Гидры;
+Power: 5
+Karma: 0
+Guard0: 159
+Guard1: 159
+Guard2: 159
+Guard3: 159
+
+/46
+Name: Культ Дракона;
+Power: 5
+Karma: 0
+Guard0: 160
+Guard1: 160
+Guard2: 160
+Guard3: 160
+
+/47
+Name: Культ Феникса;
+Power: 5
+Karma: 0
+Guard0: 161
+Guard1: 161
+Guard2: 161
+Guard3: 161
+
+/48
+Name: Культ Титана;
+Power: 5
+Karma: 0
+Guard0: 162
+Guard1: 162
+Guard2: 162
+Guard3: 162
+
+/49
+Name: Феникс;
+Power: 2
+Karma: 0
+Guard0: 163
+Guard1: 163
+Guard2: 163
+Guard3: 163
+
+/50
+Name: Големы;
+Power: 3
+Karma: 0
+Guard0: 164
+Guard1: 164
+Guard2: 164
+Guard3: 164
+
+/51
+Name: Стражи Древних;
+Power: 5
+Karma: 0
+Guard0: 165
+Guard1: 166
+Guard2: 167
+Guard3: 168

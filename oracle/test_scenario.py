@@ -13,6 +13,8 @@ Run: python3 test_scenario.py
 
 from __future__ import annotations
 
+import os
+
 import json
 import sys
 
@@ -26,6 +28,11 @@ def check(ok: bool, what: str, detail: str = "") -> None:
                           ("  — " + detail) if detail else ""))
     if not ok:
         FAILS.append(what)
+        # Under pytest, raise: check() otherwise only RECORDS a failure, so
+        # `pytest oracle/` would report green while assertions fail. The
+        # standalone runner still collects every failure before exiting.
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            raise AssertionError(what)
 
 
 SPEC = json.load(open("scenarios/skirmish.json", encoding="utf-8"))

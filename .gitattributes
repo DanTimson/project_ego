@@ -1,2 +1,7 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
+
+# Synthetic .var fixtures mirror the original files, which are CRLF-terminated
+# CP1251. Normalizing them to LF would silently remove CRLF coverage from the
+# importer dialect tests, which is part of what they exist to check.
+tests/fixtures/var/*.var -text

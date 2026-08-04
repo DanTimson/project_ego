@@ -1,0 +1,391 @@
+Quantity: 17
+
+/0
+Name: Пусто;
+ItemsNum: 3
+Items: 0, 0, 0
+Bonus: 1
+
+Items: 3
+Ability: 0
+Power: 0
+Area: 0;
+
+
+/1
+Name: Командирские регалии;
+ItemsNum: 3
+Items: 88, 101, 123
+Bonus: 1
+
+Items: 3
+Morale: 12
+Power: 2
+Area: 1;
+
+/2
+Name: Одеяние Волшебника;
+ItemsNum: 3
+Items: 83, 93, 118
+Bonus: 1
+
+Items: 3
+Morale: 906
+Power: 1
+Area: 0;
+
+/3
+Name: Одежда Следопыта;
+ItemsNum: 3
+Items: 73, 85, 122
+Bonus: 1
+
+Items: 3
+Explore: 996
+Power: 5
+Area: 0
+
+BowAttack: 993
+Power: 1
+Area: 0;
+
+/4
+Name: Рыцарский доспех;
+ItemsNum: 3
+Items: 45, 79, 91
+Bonus: 1
+
+Items: 3
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+/5
+Name: Облачение Иллюзий;
+ItemsNum: 5
+Items: 238, 265, 285, 305, 355
+Bonus: 2
+
+Items: 3
+RangedDefence: 5
+Power: 4
+Area: 0;
+
+Items: 5
+SpellDuration: 906
+Power: 2
+Area: 0;
+
+/6
+Name: Одеяния Воплощений;
+ItemsNum: 5
+Items: 240, 266, 286, 306, 347
+Bonus: 2
+
+Items: 3
+Life: 1
+Power: 8
+Area: 0
+
+Summon: 907
+Power: 1
+Area: 0;
+
+
+Items: 5
+GemIncome: 82
+Power: 5
+Area: 0
+
+Summon: 907
+Power: 2
+Area: 0;
+
+/7
+Name: Покровы Тайны;
+ItemsNum: 5
+Items: 242, 268, 288, 308, 374
+Bonus: 2
+
+Items: 3
+Resist: 6
+Power: 4
+Area: 0
+
+SpellPower: 905
+Power: 1
+Area: 0;
+
+
+Items: 5
+SpellPenetration: 908
+Power: 2
+Area: 0;
+
+/8
+Name: Доспехи Василиска;
+ItemsNum: 5
+Items: 247, 271, 291, 311, 369
+Bonus: 2
+
+Items: 3
+Regeneration: 48
+Power: 2
+Area: 0;
+
+
+Items: 5
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+PoisonImmunity: 42
+Power: 1
+Area: 0;
+
+
+/9
+Name: Доспех Мантикоры;
+ItemsNum: 5
+Items: 248, 272, 292, 312, 350
+Bonus: 2
+
+Items: 3
+PoisonAttack: 41
+Power: 3
+Area: 0
+
+PoisonShot: 78
+Power: 3
+Area: 0;
+
+
+Items: 5
+Speed: 7
+Power: 2
+Area: 0;
+
+
+/10
+Name: Доспех Единорога;
+ItemsNum: 5
+Items: 249, 273, 293, 313, 363
+Bonus: 2
+
+Items: 3
+Resist: 6
+Power: 3
+Area: 0
+
+Speed: 7
+Power: 1
+Area: 0;
+
+
+Items: 5
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+RangedAttack: 8
+Power: 4
+Area: 0;
+
+
+/11
+Name: Доспех Ветерана;
+ItemsNum: 5
+Items: 252, 275, 295, 316, 356
+Bonus: 2
+
+Items: 3
+ExpGain: 991
+Power: 25
+Area: 0;
+
+
+Items: 5
+ArmyExpGain: 990
+Power: 25
+Area: 0;
+
+
+/12
+Name: Доспех Героя;
+ItemsNum: 5
+Items: 254, 276, 296, 317, 368
+Bonus: 2
+
+Items: 3
+Life: 1
+Power: 3
+Area: 1;
+
+
+Items: 5
+Attack: 2
+Power: 2
+Area: 1;
+
+/13
+Name: Драконьи доспехи;
+ItemsNum: 8
+Items: 227, 256, 278, 298, 319, 351, 362, 373
+Bonus: 4
+
+Items: 2
+Life: 1
+Power: 8
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0;
+
+
+Items: 4
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+
+Items: 6
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0;
+
+Items: 8
+MagicImmunity: 30
+Power: 1
+Area: 0;
+
+
+/14
+Name: Доспех Паладина;
+ItemsNum: 5
+Items: 259, 280, 300, 321, 357
+Bonus: 2
+
+Items: 3
+Resist: 6
+Power: 3
+Area: 0
+
+SmiteEvil: 61
+Power: 2
+Area: 0;
+
+
+Items: 5
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0;
+
+
+/15
+Name: Доспех Доблести;
+ItemsNum: 5
+Items: 261, 281, 301, 322, 348
+Bonus: 2
+
+Items: 3
+Life: 1
+Power: 10
+Area: 0
+
+Morale: 12
+Power: 3
+Area: 1;
+
+
+Items: 5
+Speed: 7
+Power: 1
+Area: 0
+
+Morale: 12
+Power: 10
+Area: 0;
+
+
+/16
+Name: Доспех Величия;
+ItemsNum: 5
+Items: 263, 283, 303, 324, 372
+Bonus: 2
+
+Items: 3
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+
+Items: 5
+Speed: 7
+Power: 1
+Area: 0
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0;
+
+
+/17
+Name: Артефакты Вечности;
+ItemsNum: 4
+Items: 211, 220, 354, 375
+Bonus: 2
+
+Items: 2
+SpellCost: 983
+Power: 10
+Area: 0;
+
+Items: 4
+SpellPower: 905
+Power: 1
+Area: 0
+
+SpellDuration: 906
+Power: 1
+Area: 0
+
+Summon: 907
+Power: 2
+Area: 0
+
+SpellPenetration: 908
+Power: 1
+Area: 0;

@@ -10,6 +10,8 @@ Run: python3 test_combat.py [trials]
 
 from __future__ import annotations
 
+import os
+
 import collections
 import math
 import sys
@@ -26,6 +28,11 @@ def check(ok: bool, what: str, detail: str = "") -> None:
     print(f"  {'PASS' if ok else 'FAIL'}  {what}{('  — ' + detail) if detail else ''}")
     if not ok:
         FAILS.append(what)
+        # Under pytest, raise: check() otherwise only RECORDS a failure, so
+        # `pytest oracle/` would report green while assertions fail. The
+        # standalone runner still collects every failure before exiting.
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            raise AssertionError(what)
 
 
 # --- 0. DETERMINISM ---------------------------------------------------------

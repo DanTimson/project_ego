@@ -33,6 +33,11 @@ def check(ok: bool, label: str, detail: str = "") -> None:
                           "  — %s" % detail if detail else ""))
     if not ok:
         FAILS.append(label)
+        # Under pytest, raise: check() otherwise only RECORDS a failure, so
+        # `pytest oracle/` would report green while assertions fail. The
+        # standalone runner still collects every failure before exiting.
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            raise AssertionError(label)
 
 
 def spec(**overrides) -> dict:

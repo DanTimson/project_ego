@@ -15,6 +15,8 @@ Run: python3 test_battlefield.py
 
 from __future__ import annotations
 
+import os
+
 import sys
 
 from battlefield import (
@@ -29,6 +31,11 @@ def check(ok: bool, what: str, detail: str = "") -> None:
                           ("  — " + detail) if detail else ""))
     if not ok:
         FAILS.append(what)
+        # Under pytest, raise: check() otherwise only RECORDS a failure, so
+        # `pytest oracle/` would report green while assertions fail. The
+        # standalone runner still collects every failure before exiting.
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            raise AssertionError(what)
 
 
 def test_coordinates() -> None:

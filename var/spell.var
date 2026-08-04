@@ -1,0 +1,2827 @@
+Quantity: 77
+
+/0
+Name: Пусто;
+Cost: 0
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 0
+PowerMod: 0
+DurationMod: 0
+Target: 0
+Area: 0
+Radius: 0
+Karma: 0
+Building: 0
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 0
+UnitKind: (0)
+AntiEffect: (0)
+Effects:
+
+Effect: 0
+Power: 0
+Duration: 0;
+
+/1
+Name: Магическая искра;
+Cost: 0
+LifeCost: 0
+StamCost: 1
+ItemLevel: 0
+Level: 0
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 3
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 1
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 4
+Duration: -1;
+
+/2
+Name: Усталость;
+Cost: 0
+LifeCost: 0
+StamCost: 1
+ItemLevel: 0
+Level: 0
+PowerMod: 50
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 3
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 1
+Sound: 2
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Stamina: 11
+Power: 5
+Duration: -1;
+
+/3
+Name: Воодушевление;
+Cost: 0
+LifeCost: 0
+StamCost: 1
+ItemLevel: 0
+Level: 0
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 3
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 1
+Cumulative: 1
+Sound: 3
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Morale: 12
+Power: 4
+Duration: -1
+
+Stamina: 11
+Power: 2
+Duration: -1;
+
+
+/4
+Name: Магическая стрела;
+Cost: 4
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 1
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 19
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 4
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 8
+Duration: -1;
+
+
+/5
+Name: Волшебная броня;
+Cost: 2
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 19
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 5
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Defence: 4
+Power: 3
+Duration: 4
+
+RangedDefence: 5
+Power: 3
+Duration: 4;
+
+
+/6
+Name: Волшебное оружие;
+Cost: 2
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 19
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 1
+Cumulative: 0
+Sound: 6
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Attack: 2
+Power: 2
+Duration: 4
+
+CounterAttack: 3
+Power: 2
+Duration: 4
+
+RangedAttack: 8
+Power: 2
+Duration: 4
+
+Ammo: 10
+Power: 4
+Duration: -1;
+
+/7
+Name: Замедление;
+Cost: 2
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 20
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 7
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Speed: 7
+Power: -2
+Duration: 6
+
+Stamina: 11
+Power: -1
+Duration: 6;
+
+/8
+Name: Ускорение;
+Cost: 2
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 20
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 8
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Speed: 7
+Power: 2
+Duration: 4
+
+Stamina: 11
+Power: 1
+Duration: 4;
+
+/9
+Name: Воздушный щит;
+Cost: 1
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 20
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 1
+Sound: 9
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+RangedDefence: 5
+Power: 4
+Duration: 5
+
+Resist: 6
+Power: 1
+Duration: 5;
+
+/10
+Name: Проклятие;
+Cost: 1
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 21
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 10
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Attack: 2
+Power: -2
+Duration: 6
+
+CounterAttack: 3
+Power: -2
+Duration: 6
+
+Defense: 4
+Power: -1
+Duration: 6
+
+RangedDefense: 5
+Power: -1
+Duration: 6
+
+RangedAttack: 8
+Power: -2
+Duration: 6
+
+Resist: 6
+Power: -1
+Duration: 6;
+
+
+/11
+Name: Благословение;
+Cost: 1
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 21
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 11
+UnitKind: (2, 3)
+AntiEffect: (30)
+
+Effects:
+Attack: 2
+Power: 1
+Duration: 5
+
+CounterAttack: 3
+Power: 1
+Duration: 5
+
+RangedAttack: 8
+Power: 1
+Duration: 5
+
+Defense: 4
+Power: 1
+Duration: 5
+
+RangedDefense: 5
+Power: 1
+Duration: 5
+
+Resist: 6
+Power: 1
+Duration: 5;
+
+/12
+Name: Лечение;
+Cost: 2
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 21
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 1
+Sound: 12
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Heal: 1
+Power: 7
+Duration: -1;
+
+/13
+Name: Страх;
+Cost: 3
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 50
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 22
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 200
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 13
+UnitKind: (0)
+AntiEffect: (19, 30)
+
+Effects:
+Morale: 12
+Power: 8
+Duration: -1;
+
+/14
+Name: Поднять скелета;
+Cost: 4
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 100
+DurationMod: 0
+Target: 4
+Area: 1
+Radius: 0
+Karma: -1
+Building: 22
+Negative: 0
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 14
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1019
+Power: 0
+Duration: -1;
+
+/15
+Name: Поднять зомби;
+Cost: 8
+LifeCost: 0
+StamCost: 2
+ItemLevel: 2
+Level: 1
+PowerMod: 100
+DurationMod: 0
+Target: 4
+Area: 1
+Radius: 0
+Karma: -1
+Building: 22
+Negative: 0
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 15
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1020
+Power: 0
+Duration: -1;
+
+/16
+Name: Снять чары;
+Cost: 1
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 23
+Negative: 0
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 16
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Dispel: 31
+Power: 3
+Duration: -1;
+
+/17
+Name: Астральная энергия;
+Cost: 4
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 23
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 1
+Cumulative: 0
+Sound: 17
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Resist: 6
+Power: 3
+Duration: 3
+
+AddTurn: 75
+Power: 1
+Duration: -1
+
+Stamina: 11
+Power: 7
+Duration: -1;
+
+/18
+Name: Паутина;
+Cost: 3
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 200
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 23
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 18
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Web: 47
+Power: 0
+Duration: 8;
+
+/19
+Name: Вызвать беса;
+Cost: 5
+LifeCost: 3
+StamCost: 1
+ItemLevel: 2
+Level: 1
+PowerMod: 100
+DurationMod: 0
+Target: 5
+Area: 1
+Radius: 0
+Karma: -1
+Building: 24
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 19
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1021
+Power: 0
+Duration: -1;
+
+/20
+Name: Сжечь снаряды;
+Cost: 2
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 24
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 20
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Ammo: 10
+Power: 6
+Duration: -1;
+
+/21
+Name: Уязвимость;
+Cost: 1
+LifeCost: 0
+StamCost: 1
+ItemLevel: 1
+Level: 1
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 24
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 1
+Sound: 21
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Defence: 4
+Power: -3
+Duration: 6
+
+Ranged_defence: 5
+Power: -3
+Duration: 6
+
+Resist: 6
+Power: -3
+Duration: 6;
+
+/22
+Name: Молния;
+Cost: 12
+LifeCost: 0
+StamCost: 3
+ItemLevel: 3
+Level: 2
+PowerMod: 200
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 80
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 22
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 12
+Duration: -1;
+
+/23
+Name: Огненный шар;
+Cost: 13
+LifeCost: 0
+StamCost: 4
+ItemLevel: 3
+Level: 2
+PowerMod: 100
+DurationMod: 0
+Target: 3
+Area: 1
+Radius: 1
+Karma: 0
+Building: 80
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 23
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 7
+Duration: -1;
+
+/24
+Name: Огненный клинок;
+Cost: 4
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 80
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 24
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Attack: 2
+Power: 4
+Duration: 3
+
+CounterAttack: 3
+Power: 4
+Duration: 3
+
+RangedAttack: 8
+Power: 4
+Duration: 3
+
+MagicStrike: 27
+Power: 1
+Duration: 3
+
+MagicShoot: 28
+Power: 1
+Duration: 3;
+
+/25
+Name: Фантомная форма;
+Cost: 4
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 81
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 25
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Attack: 2
+Power: -10
+Duration: 5
+
+CounterAttack: 3
+Power: -10
+Duration: 5
+
+RangedAttack: 8
+Power: -10
+Duration: 5
+
+Defence: 4
+Power: 10
+Duration: 5
+
+RangedDefence: 5
+Power: 10
+Duration: 5;
+
+/26
+Name: Сон;
+Cost: 6
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 81
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 26
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Sleep: 70
+FlagEffect: 1
+FlagEffect: 1
+
+DontMove: 36
+Power: 1
+Duration: 4
+
+DontFight: 38
+Power: 1
+Duration: 4;
+
+/27
+Name: Галлюцинации;
+Cost: 9
+LifeCost: 0
+StamCost: 2
+ItemLevel: 3
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 81
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 27
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+RangedAttack: 8
+Power: -3
+Duration: 5;
+
+/28
+Name: Поднять упыря;
+Cost: 15
+LifeCost: 0
+StamCost: 4
+ItemLevel: 3
+Level: 2
+PowerMod: 100
+DurationMod: 0
+Target: 4
+Area: 1
+Radius: 0
+Karma: -1
+Building: 82
+Negative: 0
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 15
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1036
+Power: 0
+Duration: -1;
+
+/29
+Name: Вампиризм;
+Cost: 8
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: -1
+Building: 82
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 28
+UnitKind: (4)
+AntiEffect: (30)
+
+Effects:
+DrainLife: 68
+Power: 50
+Duration: 3;
+
+/30
+Name: Болезнь;
+Cost: 6
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: -1
+Building: 82
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 29
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Poison: 1
+Power: -3
+Duration: 6
+
+Stamina: 11
+Power: -1
+Duration: 6
+
+Attack: 2
+Power: -3
+Duration: 6
+
+CounterAttack: 3
+Power: -3
+Duration: 6
+
+RangedAttack: 8
+Power: -3
+Duration: 6
+
+Speed: 7
+Power: -1
+Duration: 6;
+
+
+/31
+Name: Создать горгулью;
+Cost: 25
+LifeCost: 0
+StamCost: 3
+ItemLevel: 3
+Level: 2
+PowerMod: 100
+DurationMod: 0
+Target: 5
+Area: 1
+Radius: 0
+Karma: 0
+Building: 83
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 30
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1039
+Power: 0
+Duration: -1;
+
+/32
+Name: Каменный дождь;
+Cost: 15
+LifeCost: 0
+StamCost: 4
+ItemLevel: 3
+Level: 2
+PowerMod: 50
+DurationMod: 0
+Target: 3
+Area: 1
+Radius: 2
+Karma: 0
+Building: 83
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 100
+RestoreOnly: 0
+Cumulative: 0
+Sound: 42
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Damage: 1
+Power: 5
+Duration: -1;
+
+/33
+Name: Камнекожа;
+Cost: 4
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 83
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 31
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Defence: 4
+Power: 5
+Duration: 4
+
+RangedDefence: 5
+Power: 5
+Duration: 4
+
+Resist: 6
+Power: 3
+Duration: 4;
+
+/34
+Name: Вызвать чёрта;
+Cost: 12
+LifeCost: 6
+StamCost: 3
+ItemLevel: 3
+Level: 2
+PowerMod: 100
+DurationMod: 0
+Target: 5
+Area: 1
+Radius: 0
+Karma: -2
+Building: 84
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 19
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1037
+Power: 0
+Duration: -1;
+
+/35
+Name: Вызвать гончую;
+Cost: 13
+LifeCost: 5
+StamCost: 3
+ItemLevel: 3
+Level: 2
+PowerMod: 100
+DurationMod: 0
+Target: 5
+Area: 1
+Radius: 0
+Karma: -2
+Building: 84
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 19
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1038
+Power: 0
+Duration: -1;
+
+/36
+Name: Слепота;
+Cost: 9
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 84
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 43
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Attack: 2
+Power: -100
+Duration: 4
+
+CounterAttack: 3
+Power: -100
+Duration: 4
+
+RangedAttack: 8
+Power: -100
+Duration: 4;
+
+/37
+Name: Исцеление;
+Cost: 8
+LifeCost: 0
+StamCost: 2
+ItemLevel: 2
+Level: 2
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 85
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 1
+Cumulative: 0
+Sound: 44
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Heal: 1
+Power: 12
+Duration: -1
+
+Dispel: 31
+Power: 2
+Duration: -1
+
+Antidote: 93
+Power: 1
+Duration: -1;
+
+/38
+Name: Экзорцизм;
+Cost: 8
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 1
+Building: 85
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 50
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 45
+UnitKind: (1, 4, 5)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 15
+Duration: -1;
+
+/39
+Name: Слово Жизни;
+Cost: 5
+LifeCost: 0
+StamCost: 1
+ItemLevel: 2
+Level: 2
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 85
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 46
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Regen: 1
+Power: 5
+Duration: 4
+
+Stamina: 11
+Power: 2
+Duration: 4
+
+Attack: 2
+Power: 1
+Duration: 4
+
+CounterAttack: 3
+Power: 1
+Duration: 4
+
+Speed: 7
+Power: 1
+Duration: 4;
+
+/40
+Name: Слово Льда;
+Cost: 15
+LifeCost: 0
+StamCost: 2
+ItemLevel: 3
+Level: 3
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 132
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 48
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Immobile: 36
+Power: 1
+Duration: 4
+
+DontFight: 38
+Power: 4
+Duration: 4
+
+Defence: 4
+Power: 2
+Duration: 4
+
+RangedDefence: 5
+Power: 2
+Duration: 4
+
+Damage: 1
+Power: 8
+Duration: -1;
+
+/41
+Name: Кислота;
+Cost: 18
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 3
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 132
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 50
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 1
+Sound: 49
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 15
+Duration: -1
+
+Defence: 4
+Power: -2
+Duration: 3
+
+RangedDefence: 5
+Power: -2
+Duration: 3;
+
+/42
+Name: Общее замедление;
+Cost: 15
+LifeCost: 0
+StamCost: 3
+ItemLevel: 3
+Level: 3
+PowerMod: 0
+DurationMod: 100
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 132
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 50
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Speed: 7
+Power: -2
+Duration: 6;
+
+/43
+Name: Тёмный Пакт;
+Cost: 15
+LifeCost: 0
+StamCost: 4
+ItemLevel: 3
+Level: 3
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: -7
+Building: 133
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 52
+UnitKind: (2, 3, 4, 5)
+AntiEffect: (30)
+
+Effects:
+DarkPact: 91
+Power: 1
+Duration: 6;
+
+/44
+Name: Пламя Хаоса;
+Cost: 25
+LifeCost: 0
+StamCost: 4
+ItemLevel: 4
+Level: 3
+PowerMod: 200
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: -1
+Building: 133
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 300
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 53
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 20
+Duration: -1;
+
+/45
+Name: Вызвать демона;
+Cost: 25
+LifeCost: 0
+StamCost: 4
+ItemLevel: 4
+Level: 3
+PowerMod: 100
+DurationMod: 0
+Target: 5
+Area: 1
+Radius: 0
+Karma: -3
+Building: 133
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 1
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 19
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1056
+Power: 0
+Duration: -1;
+
+/46
+Name: Телепорт;
+Cost: 10
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 3
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 134
+Negative: 0
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 55
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Replacement: 89
+Power: 0
+Duration: 0;
+
+/47
+Name: Антимагия;
+Cost: 10
+LifeCost: 0
+StamCost: 2
+ItemLevel: 3
+Level: 3
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 134
+Negative: 0
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 56
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+SpellImmunity: 30
+Power: 1
+Duration: 5
+
+Resist: 6
+Power: 10
+Duration: 5;
+
+/48
+Name: Общее снятие чар;
+Cost: 15
+LifeCost: 0
+StamCost: 3
+ItemLevel: 3
+Level: 3
+PowerMod: 0
+DurationMod: 0
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 134
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 57
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Dispel: 31
+Power: 3
+Duration: -1;
+
+/49
+Name: Воскрешение;
+Cost: 25
+LifeCost: 0
+StamCost: 4
+ItemLevel: 4
+Level: 3
+PowerMod: 100
+DurationMod: 0
+Target: 4
+Area: 1
+Radius: 0
+Karma: 0
+Building: 135
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 58
+UnitKind: (2, 4)
+AntiEffect: (0)
+
+Effects:
+Resurrect: 1
+Power: 30
+Duration: -1;
+
+/50
+Name: Общая защита;
+Cost: 20
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 3
+PowerMod: 0
+DurationMod: 100
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 135
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 59
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Defence: 4
+Power: 2
+Duration: 3
+
+RangedDefence: 5
+Power: 2
+Duration: 3
+
+Resistance: 6
+Power: 1
+Duration: 3;
+
+/51
+Name: Общее лечение;
+Cost: 20
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 3
+PowerMod: 100
+DurationMod: 0
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 135
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 60
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Heal: 1
+Power: 6
+Duration: -1;
+
+/52
+Name: Слово Власти;
+Cost: 18
+LifeCost: 0
+StamCost: 2
+ItemLevel: 3
+Level: 3
+PowerMod: 50
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 136
+Negative: 0
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 62
+UnitKind: (2, 4, 5)
+AntiEffect: (30, 73)
+
+Effects:
+MindControl: 73
+Power: 3
+Duration: -1;
+
+/53
+Name: Общее ускорение;
+Cost: 20
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 3
+PowerMod: 0
+DurationMod: 100
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 136
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 63
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Speed: 7
+Power: 2
+Duration: 3;
+
+/54
+Name: Общая атака;
+Cost: 20
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 3
+PowerMod: 0
+DurationMod: 100
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 136
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 64
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Attack: 2
+Power: 4
+Duration: 3
+
+CounterAttack: 3
+Power: 4
+Duration: 3
+
+RangedAttack: 8
+Power: 3
+Duration: 3;
+
+/55
+Name: Поднять призрака;
+Cost: 40
+LifeCost: 0
+StamCost: 5
+ItemLevel: 4
+Level: 3
+PowerMod: 100
+DurationMod: 0
+Target: 4
+Area: 1
+Radius: 0
+Karma: -2
+Building: 137
+Negative: 0
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 66
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1055
+Power: 0
+Duration: -1;
+
+/56
+Name: Общее проклятие;
+Cost: 15
+LifeCost: 0
+StamCost: 2
+ItemLevel: 3
+Level: 3
+PowerMod: 0
+DurationMod: 100
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 137
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 67
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Attack: 2
+Power: -2
+Duration: 6
+
+CounterAttack: 3
+Power: -2
+Duration: 6
+
+RangedAttack: 8
+Power: -2
+Duration: 6
+
+Defense: 4
+Power: -1
+Duration: 6
+
+RangedDefense: 5
+Power: -1
+Duration: 6
+
+Resist: 6
+Power: -1
+Duration: 6;
+
+/57
+Name: Похищение жизни;
+Cost: 25
+LifeCost: 0
+StamCost: 4
+ItemLevel: 4
+Level: 3
+PowerMod: 100
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 137
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 68
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Drain: 71
+FlagEffect: 1
+FlagEffect: 1
+
+Damage: 1
+Power: 13
+Duration: -1;
+
+/58
+Name: Белая магия;
+Cost: 80
+LifeCost: 15
+StamCost: 8
+ItemLevel: 5
+Level: 4
+PowerMod: 100
+DurationMod: 0
+Target: 0
+Area: 2
+Radius: 0
+Karma: 1
+Building: 173
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 70
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+HealAlly: 72
+FlagEffect: 1
+FlagEffect: 1
+
+Damage: 1
+Power: 9
+Duration: -1;
+
+/59
+Name: Реинкарнация;
+Cost: 30
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 4
+PowerMod: 0
+DurationMod: 200
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 173
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 71
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Reincarnation: 74
+Power: 1
+Duration: 10;
+
+/60
+Name: Неуязвимость;
+Cost: 25
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 4
+PowerMod: 0
+DurationMod: 50
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 173
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 72
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Defence: 4
+Power: 20
+Duration: 4
+
+RangedDefence: 5
+Power: 20
+Duration: 4
+
+Resistance: 6
+Power: 20
+Duration: 4;
+
+/61
+Name: Поднять вампира;
+Cost: 50
+LifeCost: 0
+StamCost: 5
+ItemLevel: 4
+Level: 4
+PowerMod: 100
+DurationMod: 0
+Target: 4
+Area: 1
+Radius: 0
+Karma: -2
+Building: 174
+Negative: 0
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 66
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1064
+Power: 0
+Duration: -1;
+
+/62
+Name: Общая болезнь;
+Cost: 35
+LifeCost: 0
+StamCost: 5
+ItemLevel: 4
+Level: 4
+PowerMod: 0
+DurationMod: 100
+Target: 0
+Area: 2
+Radius: 0
+Karma: -1
+Building: 174
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 74
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Poison: 1
+Power: -3
+Duration: 6
+
+Stamina: 11
+Power: -1
+Duration: 6
+
+Attack: 2
+Power: -3
+Duration: 6
+
+CounterAttack: 3
+Power: -3
+Duration: 6
+
+RangedAttack: 8
+Power: -3
+Duration: 6
+
+Speed: 7
+Power: -1
+Duration: 6;
+
+/63
+Name: Облако ужаса;
+Cost: 40
+LifeCost: 0
+StamCost: 4
+ItemLevel: 4
+Level: 4
+PowerMod: 100
+DurationMod: 0
+Target: 3
+Area: 1
+Radius: 2
+Karma: 0
+Building: 174
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 75
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Morale: 12
+Power: 10
+Duration: -1;
+
+/64
+Name: Армагеддон;
+Cost: 70
+LifeCost: 0
+StamCost: 7
+ItemLevel: 5
+Level: 4
+PowerMod: 100
+DurationMod: 0
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 175
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 200
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 76
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 15
+Duration: -1;
+
+/65
+Name: Испепеление;
+Cost: 40
+LifeCost: 0
+StamCost: 5
+ItemLevel: 4
+Level: 4
+PowerMod: 300
+DurationMod: 0
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 175
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 200
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 77
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 30
+Duration: -1;
+
+/66
+Name: Огненная буря;
+Cost: 80
+LifeCost: 0
+StamCost: 9
+ItemLevel: 5
+Level: 4
+PowerMod: 200
+DurationMod: 0
+Target: 3
+Area: 1
+Radius: 2
+Karma: 0
+Building: 175
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 150
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 78
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 10
+Duration: -1;
+
+/67
+Name: Вызвать дьявола;
+Cost: 50
+LifeCost: 0
+StamCost: 4
+ItemLevel: 4
+Level: 4
+PowerMod: 100
+DurationMod: 0
+Target: 5
+Area: 1
+Radius: 0
+Karma: -5
+Building: 176
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 1
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 19
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1065
+Power: 0
+Duration: -1;
+
+/68
+Name: Черная магия;
+Cost: 70
+LifeCost: 10
+StamCost: 6
+ItemLevel: 5
+Level: 4
+PowerMod: 100
+DurationMod: 0
+Target: 0
+Area: 2
+Radius: 0
+Karma: -5
+Building: 176
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 1
+ResistPower: 200
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 80
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1
+Power: 13
+Duration: -1;
+
+/69
+Name: Порча;
+Cost: 15
+LifeCost: 0
+StamCost: 2
+ItemLevel: 4
+Level: 4
+PowerMod: 0
+DurationMod: 100
+Target: 3
+Area: 1
+Radius: 1
+Karma: -1
+Building: 176
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 81
+UnitKind: (3)
+AntiEffect: (0)
+
+Effects:
+Attack: 2
+Power: -4
+Duration: 5
+
+CounterAttack: 3
+Power: -4
+Duration: 5
+
+Defence: 4
+Power: -4
+Duration: 5
+
+RangedDefence: 5
+Power: -4
+Duration: 5
+
+Resist: 6
+Power: -4
+Duration: 5
+
+RangedAttack: 8
+Power: -4
+Duration: 5
+
+Stamina: 11
+Power: 4
+Duration: -1
+
+Morale: 12
+Power: 4
+Duration: -1;
+
+/70
+Name: Остановка времени;
+Cost: 50
+LifeCost: 0
+StamCost: 7
+ItemLevel: 5
+Level: 4
+PowerMod: 0
+DurationMod: 0
+Target: 0
+Area: 2
+Radius: 0
+Karma: 0
+Building: 177
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 83
+UnitKind: (5)
+AntiEffect: (0)
+
+Effects:
+AddTurn: 75
+Power: 1
+Duration: -1;
+
+/71
+Name: Форма Дракона;
+Cost: 90
+LifeCost: 0
+StamCost: 7
+ItemLevel: 5
+Level: 4
+PowerMod: 0
+DurationMod: 50
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 177
+Negative: 0
+OnEnemy: 0
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 85
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1060
+Power: 1
+Duration: 3;
+
+/72
+Name: Полиморф;
+Cost: 35
+LifeCost: 0
+StamCost: 4
+ItemLevel: 4
+Level: 4
+PowerMod: 0
+DurationMod: 100
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 177
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 84
+UnitKind: (0)
+AntiEffect: (30)
+
+Effects:
+Damage: 1013
+Power: 1
+Duration: 4;
+
+/73
+Name: Массовый суицид;
+Cost: 50
+LifeCost: 0
+StamCost: 5
+ItemLevel: 4
+Level: 4
+PowerMod: 100
+DurationMod: 0
+Target: 0
+Area: 2
+Radius: 0
+Karma: -1
+Building: 178
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 100
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 87
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Damage: 92
+Power: 4
+Duration: -1;
+
+/74
+Name: Ментальный раб;
+Cost: 40
+LifeCost: 0
+StamCost: 4
+ItemLevel: 4
+Level: 4
+PowerMod: 0
+DurationMod: 50
+Target: 1
+Area: 1
+Radius: 0
+Karma: 0
+Building: 178
+Negative: 1
+OnEnemy: 1
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 88
+UnitKind: (2, 4, 5)
+AntiEffect: (30, 73)
+
+Effects:
+MindControl: 73
+Power: 1
+Duration: 3;
+
+
+/75
+Name: Общий сон;
+Cost: 30
+LifeCost: 0
+StamCost: 3
+ItemLevel: 4
+Level: 4
+PowerMod: 0
+DurationMod: 50
+Target: 3
+Area: 1
+Radius: 1
+Karma: 0
+Building: 178
+Negative: 1
+OnEnemy: 1
+OnAlly: 1
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 100
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 89
+UnitKind: (2, 4)
+AntiEffect: (30)
+
+Effects:
+Sleep: 70
+FlagEffect: 1
+FlagEffect: 1
+
+DontMove: 36
+Power: 1
+Duration: 3
+
+DontFight: 38
+Power: 1
+Duration: 3;
+
+/76
+Name: Создать голема;
+Cost: 50
+LifeCost: 0
+StamCost: 5
+ItemLevel: 4
+Level: 3
+PowerMod: 100
+DurationMod: 0
+Target: 5
+Area: 1
+Radius: 0
+Karma: 0
+Building: 0
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 30
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1071
+Power: 0
+Duration: -1;
+
+/77
+Name: Призвать феникса;
+Cost: 100
+LifeCost: 0
+StamCost: 7
+ItemLevel: 5
+Level: 4
+PowerMod: 100
+DurationMod: 0
+Target: 5
+Area: 1
+Radius: 0
+Karma: 0
+Building: 0
+Negative: 0
+OnEnemy: 0
+OnAlly: 0
+Sacrifice: 0
+ResistPower: 0
+ResistDuration: 0
+DefencePower: 0
+RestoreOnly: 0
+Cumulative: 0
+Sound: 19
+UnitKind: (0)
+AntiEffect: (0)
+
+Effects:
+Summon: 1070
+Power: 0
+Duration: -1;

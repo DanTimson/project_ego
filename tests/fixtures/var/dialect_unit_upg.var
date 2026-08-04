@@ -1,0 +1,32 @@
+Quantity: 3
+
+/0
+Name: Пусто;
+Only Once: 0
+Need: (0)
+Upg Type: 0
+Quantity: 0
+
+/1
+Name: Жизнь +1;
+Only Once: 0
+Need: (0)
+Upg Type: 1
+Quantity: 1
+
+/2
+Name: ПробнаяСпособность;
+Only Once: 1
+Need: (0)
+Upg Type: 53
+Quantity: 2
+
+/3
+Name: СоставнаяСпособность;
+Only Once: 1
+Need: (0)
+Upg Type: 1
+Quantity: 2
+
+Upg Type: 42
+Quantity: 5;

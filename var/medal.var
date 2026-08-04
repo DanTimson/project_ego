@@ -1,0 +1,224 @@
+Quantity: 15
+
+/0
+Name: Пусто;
+GoldSpent: 0
+GemSpent: 0
+Rarity: 0
+Effects:
+
+Effect: 0
+Power: 0;
+
+/1
+Name: Медаль за Отвагу;
+GoldSpent: 3
+GemSpent: 0
+Rarity: 0
+Effects:
+
+Morale: 12
+Power: 4
+
+Attack: 2
+Power: 1;
+
+/2
+Name: Медаль за Стойкость;
+GoldSpent: 4
+GemSpent: 0
+Rarity: 1
+Effects:
+
+Life: 1
+Power: 4
+
+Defence: 4
+Power: 1
+
+CounterAttack: 3
+Power: 1;
+
+/3
+Name: Орден Снайпера;
+GoldSpent: 8
+GemSpent: 0
+Rarity: 1
+Effects:
+
+RangedAttack: 8
+Power: 1
+
+AimedShot: 77
+Power: 1;
+
+/4
+Name: Орден за Волю к Победе;
+GoldSpent: 5
+GemSpent: 0
+Rarity: 1
+Effects:
+
+Attack: 2
+Power: 2
+
+CounterAttack: 3
+Power: 2;
+
+/5
+Name: Медаль за Рвение;
+GoldSpent: 3
+GemSpent: 0
+Rarity: 0
+Effects:
+
+Stamina: 11
+Power: 3
+
+CounterAttack: 3
+Power: 1;
+
+/6
+Name: Знак наёмника;
+GoldSpent: 0
+GemSpent: 0
+Rarity: 0
+Effects:
+
+GoldPayment: 85
+Power: 100;
+
+/7
+Name: Звезда Мага;
+GoldSpent: 5
+GemSpent: 1
+Rarity: 1
+Effects:
+
+Energy: 95
+Power: 1
+
+RangedAttack: 8
+Power: 1;
+
+/8
+Name: Крест Героя;
+GoldSpent: 10
+GemSpent: 0
+Rarity: 2
+Effects:
+
+Attack: 2
+Power: 2
+
+CounterAttack: 3
+Power: 2
+
+Defence: 4
+Power: 1
+
+RangedDefence: 5
+Power: 1
+
+Resist: 6
+Power: 1;
+
+/9
+Name: Медаль Целителя;
+GoldSpent: 3
+GemSpent: 1
+Rarity: 1
+Effects:
+
+Ammo: 10
+Power: 1
+
+Healing: 24
+Power: 2;
+
+/10
+Name: Орден Победителя;
+GoldSpent: 10
+GemSpent: 0
+Rarity: 2
+Effects:
+
+Attack: 2
+Power: 2
+
+CounterAttack: 3
+Power: 1
+
+Morale: 12
+Power: 3
+
+Life: 1
+Power: 5;
+
+/11
+Name: Медаль за Сноровку;
+GoldSpent: 3
+GemSpent: 0
+Rarity: 0
+Effects:
+
+RandedDefence: 5
+Power: 2
+
+Stamina: 11
+Power: 2;
+
+/12
+Name: Орден Защитника;
+GoldSpent: 4
+GemSpent: 0
+Rarity: 0
+Effects:
+
+Defence: 4
+Power: 2
+
+CounterAttack: 3
+Power: 1;
+
+/13
+Name: Медаль за Непоколебимость;
+GoldSpent: 3
+GemSpent: 0
+Rarity: 0
+Effects:
+
+Resist: 6
+Power: 2
+
+Morale: 12
+Power: 2;
+
+/14
+Name: Знак Чародея;
+GoldSpent: 4
+GemSpent: 1
+Rarity: 1
+Effects:
+
+Ammo: 10
+Power: 2
+
+Stamina: 11
+Power: 2;
+
+/15
+Name: Огненный вымпел;
+GoldSpent: 7
+GemSpent: 1
+Rarity: 2
+Effects:
+
+Ammo: 10
+Power: 1
+
+Resist: 6
+Power: 1
+
+Fire_arrows: 60
+Power: 3;

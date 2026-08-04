@@ -1,0 +1,1108 @@
+Quantity: 152
+
+/0
+Name: Пусто;
+Only Once: 0
+Need: (0)
+Upg Type: 0
+Quantity: 0;
+
+/1
+Name: Жизнь +1;
+Only Once: 0
+Need: (0)
+Upg Type: 1
+Quantity: 1;
+
+/2
+Name: Жизнь +2;
+Only Once: 0
+Need: (0)
+Upg Type: 1
+Quantity: 2;
+
+/3
+Name: Жизнь +3;
+Only Once: 0
+Need: (0)
+Upg Type: 1
+Quantity: 3;
+
+/4
+Name: Атака +1;
+Only Once: 0
+Need: (0)
+Upg Type: 2
+Quantity: 1;
+
+/5
+Name: Атака +2;
+Only Once: 0
+Need: (0)
+Upg Type: 2
+Quantity: 2;
+
+/6
+Name: Атака +3;
+Only Once: 0
+Need: (0)
+Upg Type: 2
+Quantity: 3;
+
+/7
+Name: Контратака +1;
+Only Once: 0
+Need: (0)
+Upg Type: 3
+Quantity: 1;
+
+/8
+Name: Контратака +2;
+Only Once: 0
+Need: (0)
+Upg Type: 3
+Quantity: 2;
+
+/9
+Name: Контратака +3;
+Only Once: 0
+Need: (0)
+Upg Type: 3
+Quantity: 3;
+
+/10
+Name: Защита +1;
+Only Once: 0
+Need: (0)
+Upg Type: 4
+Quantity: 1;
+
+/11
+Name: Защита +2;
+Only Once: 0
+Need: (0)
+Upg Type: 4
+Quantity: 2;
+
+/12
+Name: Защита +3;
+Only Once: 0
+Need: (0)
+Upg Type: 4
+Quantity: 3;
+
+/13
+Name: Защита от стрел +1;
+Only Once: 0
+Need: (0)
+Upg Type: 5
+Quantity: 1;
+
+/14
+Name: Защита от стрел +2;
+Only Once: 0
+Need: (0)
+Upg Type: 5
+Quantity: 2;
+
+/15
+Name: Защита от стрел +3;
+Only Once: 0
+Need: (0)
+Upg Type: 5
+Quantity: 3;
+
+/16
+Name: Сопротивление +1;
+Only Once: 0
+Need: (0)
+Upg Type: 6
+Quantity: 1;
+
+/17
+Name: Сопротивление +2;
+Only Once: 0
+Need: (0)
+Upg Type: 6
+Quantity: 2;
+
+/18
+Name: Сопротивление +3;
+Only Once: 0
+Need: (0)
+Upg Type: 6
+Quantity: 3;
+
+/19
+Name: Скорость +1;
+Only Once: 0
+Need: (0)
+Upg Type: 7
+Quantity: 1;
+
+/20
+Name: Сила выстрела +1;
+Only Once: 0
+Need: (0)
+Upg Type: 8
+Quantity: 1;
+
+/21
+Name: Сила выстрела +2;
+Only Once: 0
+Need: (0)
+Upg Type: 8
+Quantity: 2;
+
+/22
+Name: Сила выстрела +3;
+Only Once: 0
+Need: (0)
+Upg Type: 8
+Quantity: 3;
+
+/23
+Name: Дальность +1;
+Only Once: 0
+Need: (0)
+Upg Type: 9
+Quantity: 1;
+
+/24
+Name: Дальность +2;
+Only Once: 0
+Need: (0)
+Upg Type: 9
+Quantity: 2;
+
+/25
+Name: Жизнь +4;
+Only Once: 0
+Need: (0)
+Upg Type: 1
+Quantity: 4;
+
+/26
+Name: Целительство +1;
+Only Once: 0
+Need: (24)
+Upg Type: 24
+Quantity: 1;
+
+/27
+Name: Запас снарядов +1;
+Only Once: 0
+Need: (0)
+Upg Type: 10
+Quantity: 1;
+
+/28
+Name: Запас снарядов +2;
+Only Once: 0
+Need: (0)
+Upg Type: 10
+Quantity: 2;
+
+/29
+Name: Запас снарядов +3;
+Only Once: 0
+Need: (0)
+Upg Type: 10
+Quantity: 3;
+
+/30
+Name: Выносливость +1;
+Only Once: 0
+Need: (0)
+Upg Type: 11
+Quantity: 1;
+
+/31
+Name: Выносливость +2;
+Only Once: 0
+Need: (0)
+Upg Type: 11
+Quantity: 2;
+
+/32
+Name: Выносливость +3;
+Only Once: 0
+Need: (0)
+Upg Type: 11
+Quantity: 3;
+
+/33
+Name: Боевой дух +1;
+Only Once: 0
+Need: (0)
+Upg Type: 12
+Quantity: 1;
+
+/34
+Name: Боевой дух +2;
+Only Once: 0
+Need: (0)
+Upg Type: 12
+Quantity: 2;
+
+/35
+Name: Боевой дух +3;
+Only Once: 0
+Need: (0)
+Upg Type: 12
+Quantity: 3;
+
+/36
+Name: Здоровье +1;
+Only Once: 0
+Need: (0)
+Upg Type: 1
+Quantity: 1
+
+Upg Type: 11
+Quantity: 1;
+
+/37
+Name: Здоровье +2;
+Only Once: 0
+Need: (0)
+Upg Type: 1
+Quantity: 2
+
+Upg Type: 11
+Quantity: 2;
+
+/38
+Name: Сила +1;
+Only Once: 0
+Need: (0)
+Upg Type: 2
+Quantity: 1
+
+Upg Type: 3
+Quantity: 1;
+
+/39
+Name: Сила +2;
+Only Once: 0
+Need: (0)
+Upg Type: 2
+Quantity: 2
+
+Upg Type: 3
+Quantity: 2;
+
+/40
+Name: Броня +1;
+Only Once: 0
+Need: (0)
+Upg Type: 4
+Quantity: 1
+
+Upg Type: 5
+Quantity: 1;
+
+/41
+Name: Броня +2;
+Only Once: 0
+Need: (0)
+Upg Type: 4
+Quantity: 2
+
+Upg Type: 5
+Quantity: 2;
+
+/42
+Name: Сила воли +1;
+Only Once: 0
+Need: (0)
+Upg Type: 6
+Quantity: 1
+
+Upg Type: 12
+Quantity: 1;
+
+/43
+Name: Сила воли +2;
+Only Once: 0
+Need: (0)
+Upg Type: 6
+Quantity: 2
+
+Upg Type: 12
+Quantity: 2;
+
+/44
+Name: Летающий;
+Only Once: 0
+Need: (0)
+Upg Type: 14
+Quantity: 1;
+
+/45
+Name: Низколетающий;
+Only Once: 0
+Need: (0)
+Upg Type: 15
+Quantity: 1;
+
+/46
+Name: Первый удар;
+Only Once: 0
+Need: (0)
+Upg Type: 16
+Quantity: 1;
+
+/47
+Name: Бронебойный выстрел;
+Only Once: 0
+Need: (0)
+Upg Type: 17
+Quantity: 1;
+
+/48
+Name: Неутомимость;
+Only Once: 0
+Need: (0)
+Upg Type: 18
+Quantity: 1;
+
+/49
+Name: Неустрашимость;
+Only Once: 0
+Need: (0)
+Upg Type: 19
+Quantity: 1;
+
+/50
+Name: Двойной выстрел;
+Only Once: 1
+Need: (0)
+Upg Type: 20
+Quantity: 5;
+
+/51
+Name: Восстановление +1;
+Only Once: 0
+Need: (0)
+Upg Type: 21
+Quantity: 1;
+
+/52
+Name: Медитация;
+Only Once: 0
+Need: (0)
+Upg Type: 22
+Quantity: 1;
+
+/53
+Name: Сбор снарядов;
+Only Once: 1
+Need: (0)
+Upg Type: 23
+Quantity: 3;
+
+/54
+Name: Целительство;
+Only Once: 0
+Need: (0)
+Upg Type: 24
+Quantity: 3;
+
+/55
+Name: Берсерк;
+Only Once: 0
+Need: (0)
+Upg Type: 25
+Quantity: 2;
+
+/56
+Name: Ловкость;
+Only Once: 0
+Need: (0)
+Upg Type: 26
+Quantity: 1;
+
+/57
+Name: Магический удар;
+Only Once: 0
+Need: (0)
+Upg Type: 27
+Quantity: 1;
+
+/58
+Name: Магический выстрел;
+Only Once: 0
+Need: (0)
+Upg Type: 28
+Quantity: 1;
+
+/59
+Name: Марш-бросок;
+Only Once: 1
+Need: (0)
+Upg Type: 29
+Quantity: 3;
+
+/60
+Name: Иммунитет к магии;
+Only Once: 0
+Need: (0)
+Upg Type: 30
+Quantity: 1;
+
+/61
+Name: Младшая нежить;
+Only Once: 1
+Need: (0)
+Upg Type: 13
+Quantity: 1
+
+Upg Type: 19
+Quantity: 1
+
+Upg Type: 18
+Quantity: 1
+
+Upg Type: 42
+Quantity: 1;
+
+/62
+Name: Знание леса;
+Only Once: 1
+Need: (0)
+Upg Type: 32
+Quantity: 8;
+
+/63
+Name: Знание холмов;
+Only Once: 1
+Need: (0)
+Upg Type: 33
+Quantity: 8;
+
+/64
+Name: Знание болот;
+Only Once: 1
+Need: (0)
+Upg Type: 34
+Quantity: 8;
+
+/65
+Name: Первая помощь;
+Only Once: 0
+Need: (0)
+Upg Type: 35
+Quantity: 1;
+
+/66
+Name: Целительство;
+Only Once: 1
+Need: (0)
+Upg Type: 24
+Quantity: 4;
+
+/67
+Name: Атака с разгона;
+Only Once: 1
+Need: (0)
+Upg Type: 37
+Quantity: 1;
+
+/68
+Name: Не сражается;
+Only Once: 1
+Need: (0)
+Upg Type: 38
+Quantity: 1;
+
+/69
+Name: Бронебойный удар;
+Only Once: 1
+Need: (0)
+Upg Type: 39
+Quantity: 1;
+
+/70
+Name: Оглушающий удар;
+Only Once: 0
+Need: (0)
+Upg Type: 40
+Quantity: 1;
+
+/71
+Name: Ядовитая атака;
+Only Once: 0
+Need: (0)
+Upg Type: 41
+Quantity: 1;
+
+/72
+Name: Иммунитет к яду;
+Only Once: 1
+Need: (0)
+Upg Type: 42
+Quantity: 1;
+
+/73
+Name: Сглаз;
+Only Once: 1
+Need: (0)
+Upg Type: 43
+Quantity: 4;
+
+/74
+Name: Кража снарядов;
+Only Once: 1
+Need: (0)
+Upg Type: 44
+Quantity: 3;
+
+/75
+Name: Повреждение брони;
+Only Once: 1
+Need: (0)
+Upg Type: 45
+Quantity: 3;
+
+/76
+Name: Окаменение;
+Only Once: 1
+Need: (0)
+Upg Type: 46
+Quantity: 4;
+
+/77
+Name: Паутина;
+Only Once: 1
+Need: (0)
+Upg Type: 47
+Quantity: 6;
+
+/78
+Name: Ядовитый укус;
+Only Once: 1
+Need: (0)
+Upg Type: 41
+Quantity: 2;
+
+/79
+Name: Трупоедство;
+Only Once: 1
+Need: (0)
+Upg Type: 49
+Quantity: 10;
+
+/80
+Name: Устрашение;
+Only Once: 0
+Need: (0)
+Upg Type: 50
+Quantity: 1;
+
+/81
+Name: Калечащий удар;
+Only Once: 1
+Need: (0)
+Upg Type: 51
+Quantity: 1;
+
+/82
+Name: Повреждение оружия;
+Only Once: 1
+Need: (0)
+Upg Type: 52
+Quantity: 3;
+
+/83
+Name: Парирование;
+Only Once: 1
+Need: (0)
+Upg Type: 53
+Quantity: 2;
+
+/84
+Name: Фуражир;
+Only Once: 0
+Need: (0)
+Upg Type: 54
+Quantity: 4;
+
+/85
+Name: Парирование +2;
+Only Once: 0
+Need: (53)
+Upg Type: 53
+Quantity: 2;
+
+/86
+Name: Мародер 10;
+Only Once: 0
+Need: (0)
+Upg Type: 56
+Quantity: 10;
+
+/87
+Name: Мародер 15;
+Only Once: 0
+Need: (0)
+Upg Type: 56
+Quantity: 15;
+
+/88
+Name: Грабитель 10;
+Only Once: 0
+Need: (0)
+Upg Type: 58
+Quantity: 10;
+
+/89
+Name: Сокрушающий удар;
+Only Once: 1
+Need: (0)
+Upg Type: 59
+Quantity: 4;
+
+/90
+Name: Огненные стрелы;
+Only Once: 1
+Need: (0)
+Upg Type: 60
+Quantity: 2;
+
+/91
+Name: Огненные стрелы +1;
+Only Once: 0
+Need: (60)
+Upg Type: 60
+Quantity: 1;
+
+/92
+Name: Стать копейщиком;
+Only Once: 1
+Need: (0)
+Upg Type: 62
+Quantity: 3;
+
+/93
+Name: Берсерк +1;
+Only Once: 0
+Need: (25)
+Upg Type: 25
+Quantity: 1;
+
+/94
+Name: Целительство;
+Only Once: 1
+Need: (0)
+Upg Type: 24
+Quantity: 7;
+
+/95
+Name: Берсерк;
+Only Once: 1
+Need: (0)
+Upg Type: 25
+Quantity: 5;
+
+/96
+Name: Первая помощь;
+Only Once: 0
+Need: (0)
+Upg Type: 35
+Quantity: 3;
+
+/97
+Name: Регенерация;
+Only Once: 1
+Need: (0)
+Upg Type: 48
+Quantity: 3;
+
+/98
+Name: Регенерация +1;
+Only Once: 0
+Need: (0)
+Upg Type: 48
+Quantity: 1;
+
+/99
+Name: Осада;
+Only Once: 1
+Need: (0)
+Upg Type: 55
+Quantity: 2;
+
+/100
+Name: Осада +1;
+Only Once: 0
+Need: (0)
+Upg Type: 55
+Quantity: 1;
+
+/101
+Name: Осада;
+Only Once: 1
+Need: (0)
+Upg Type: 55
+Quantity: 3;
+
+/102
+Name: Похищение души;
+Only Once: 1
+Need: (0)
+Upg Type: 57
+Quantity: 5;
+
+/103
+Name: Сокрушение зла;
+Only Once: 1
+Need: (0)
+Upg Type: 61
+Quantity: 1;
+
+/104
+Name: Затаптывание +2;
+Only Once: 1
+Need: (0)
+Upg Type: 63
+Quantity: 2;
+
+/105
+Name: Затаптывание;
+Only Once: 1
+Need: (0)
+Upg Type: 63
+Quantity: 15;
+
+/106
+Name: Насылает болезнь;
+Only Once: 0
+Need: (0)
+Upg Type: 80
+Quantity: 1;
+
+/107
+Name: Атака всех врагов;
+Only Once: 1
+Need: (0)
+Upg Type: 65
+Quantity: 1;
+
+/108
+Name: Круговая атака;
+Only Once: 1
+Need: (0)
+Upg Type: 66
+Quantity: 4;
+
+/109
+Name: Корни;
+Only Once: 0
+Need: (0)
+Upg Type: 67
+Quantity: 3;
+
+/110
+Name: Первая помощь;
+Only Once: 0
+Need: (0)
+Upg Type: 35
+Quantity: 6;
+
+/111
+Name: Затаптывание;
+Only Once: 1
+Need: (0)
+Upg Type: 63
+Quantity: 10;
+
+/112
+Name: Кровопийца;
+Only Once: 1
+Need: (0)
+Upg Type: 68
+Quantity: 50;
+
+/113
+Name: Устрашение;
+Only Once: 1
+Need: (0)
+Upg Type: 50
+Quantity: 3;
+
+/114
+Name: Тяжелые снаряды;
+Only Once: 1
+Need: (0)
+Upg Type: 69
+Quantity: 3;
+
+/115
+Name: Вызов проклятья;
+Only Once: 1
+Need: (0)
+Upg Type: 2010
+Quantity: 1;
+
+/116
+Name: Вызов уязвимости;
+Only Once: 1
+Need: (0)
+Upg Type: 2021
+Quantity: 1;
+
+/117
+Name: Огненный шар;
+Only Once: 1
+Need: (0)
+Upg Type: 2023
+Quantity: 4;
+
+/118
+Name: Благословение;
+Only Once: 1
+Need: (0)
+Upg Type: 2011
+Quantity: 1;
+
+/119
+Name: Экзорцизм;
+Only Once: 1
+Need: (0)
+Upg Type: 2038
+Quantity: 2;
+
+/120
+Name: Воздушный щит;
+Only Once: 1
+Need: (0)
+Upg Type: 2009
+Quantity: 1;
+
+/121
+Name: Страх;
+Only Once: 1
+Need: (0)
+Upg Type: 2013
+Quantity: 1;
+
+/122
+Name: Подъятие скелета;
+Only Once: 1
+Need: (0)
+Upg Type: 2014
+Quantity: 2;
+
+/123
+Name: Воодушевление;
+Only Once: 1
+Need: (0)
+Upg Type: 2003
+Quantity: 1;
+
+/124
+Name: Вызов беса;
+Only Once: 1
+Need: (0)
+Upg Type: 2019
+Quantity: 1;
+
+/125
+Name: Снятие чар;
+Only Once: 1
+Need: (0)
+Upg Type: 2016
+Quantity: 1;
+
+/126
+Name: Похищение жизни;
+Only Once: 1
+Need: (0)
+Upg Type: 2057
+Quantity: 3;
+
+/127
+Name: Точный удар +1;
+Only Once: 1
+Need: (0)
+Upg Type: 76
+Quantity: 1;
+
+/128
+Name: Точный выстрел +1;
+Only Once: 1
+Need: (0)
+Upg Type: 77
+Quantity: 1;
+
+/129
+Name: Точный удар 2;
+Only Once: 1
+Need: (0)
+Upg Type: 76
+Quantity: 2;
+
+/130
+Name: Точный выстрел 2;
+Only Once: 1
+Need: (0)
+Upg Type: 77
+Quantity: 2;
+
+/131
+Name: Похищение души +1;
+Only Once: 0
+Need: (57)
+Upg Type: 57
+Quantity: 1;
+
+/132
+Name: Ядовитый выстрел +1;
+Only Once: 0
+Need: (0)
+Upg Type: 78
+Quantity: 1;
+
+/133
+Name: Ядовитый удар;
+Only Once: 1
+Need: (0)
+Upg Type: 41
+Quantity: 4;
+
+/134
+Name: Сбор снарядов;
+Only Once: 1
+Need: (0)
+Upg Type: 23
+Quantity: 1;
+
+/135
+Name: Астральная энергия;
+Only Once: 1
+Need: (0)
+Upg Type: 2017
+Quantity: 2;
+
+/136
+Name: Подъятие зомби;
+Only Once: 1
+Need: (0)
+Upg Type: 2015
+Quantity: 2;
+
+/137
+Name: Повелитель нежити;
+Only Once: 1
+Need: (0)
+Upg Type: 64
+Quantity: 1;
+
+/138
+Name: Ускорение;
+Only Once: 1
+Need: (0)
+Upg Type: 2008
+Quantity: 2;
+
+/139
+Name: Замедление;
+Only Once: 1
+Need: (0)
+Upg Type: 2007
+Quantity: 1;
+
+/140
+Name: Яд +1;
+Only Once: 0
+Need: (0)
+Upg Type: 41
+Quantity: 1;
+
+/141
+Name: Исцеление;
+Only Once: 1
+Need: (0)
+Upg Type: 2037
+Quantity: 3;
+
+/142
+Name: Слово Власти;
+Only Once: 1
+Need: (0)
+Upg Type: 2052
+Quantity: 4;
+
+/143
+Name: Воскрешение;
+Only Once: 1
+Need: (0)
+Upg Type: 2049
+Quantity: 4;
+
+/144
+Name: Общее проклятие;
+Only Once: 1
+Need: (0)
+Upg Type: 2056
+Quantity: 4;
+
+/145
+Name: Окаменение;
+Only Once: 1
+Need: (0)
+Upg Type: 46
+Quantity: 6;
+
+/146
+Name: Окаменение +1;
+Only Once: 0
+Need: (0)
+Upg Type: 46
+Quantity: 1
+
+Upg Type: 8
+Quantity: 1;
+
+/147
+Name: Ядовитая плоть;
+Only Once: 1
+Need: (0)
+Upg Type: 96
+Quantity: 2;
+
+/148
+Name: Ядовитая плоть +1;
+Only Once: 0
+Need: (0)
+Upg Type: 96
+Quantity: 1;
+
+/149
+Name: Контроль энергий;
+Only Once: 1
+Need: (0)
+Upg Type: 95
+Quantity: 2;
+
+/150
+Name: Контроль энергий +1;
+Only Once: 0
+Need: (0)
+Upg Type: 95
+Quantity: 1;
+
+/151
+Name: Ядовитый выстрел;
+Only Once: 1
+Need: (0)
+Upg Type: 78
+Quantity: 2;
+
+/152
+Name: Реинкарнация;
+Only Once: 1
+Need: (0)
+Upg Type: 97
+Quantity: 1;

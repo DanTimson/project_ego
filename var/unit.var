@@ -1,0 +1,5644 @@
+Quantity: 71
+
+/0
+Name: Пусто;
+Level: 0
+Life: 0
+Attack: 0
+CounterAttack: 0
+Defence: 0
+RangedDefence: 0
+Resist: 0
+Speed: 0
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 0
+Morale: 0
+Exp: 0
+ExpMod: 0
+GoldPrice: 0
+GemPrice: 0
+GoldPayment: 0
+GemPayment: 0
+Race: 0
+UnitKind: 0
+UnitClass: 0
+Karma: 0
+SoundHit: 0
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 8
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Ability: 0;
+		
+Lvl 01 upgrades: (0, 0)
+Lvl 02 upgrades: (0, 0)
+Lvl 03 upgrades: (0, 0)
+Lvl 04 upgrades: (0, 0)
+Lvl 05 upgrades: (0, 0)
+Lvl 06 upgrades: (0, 0)
+Lvl 07 upgrades: (0, 0)
+Lvl 08 upgrades: (0, 0)
+Lvl 09 upgrades: (0, 0)
+Lvl 10 upgrades: (0, 0)
+Lvl 11 upgrades: (0, 0)
+Lvl 12 upgrades: (0, 0)
+Lvl 13 upgrades: (0, 0)
+Lvl 14 upgrades: (0, 0)
+Lvl 15 upgrades: (0, 0)
+Lvl 16 upgrades: (0, 0)
+Lvl 17 upgrades: (0, 0)
+Lvl 18 upgrades: (0, 0)
+Lvl 19 upgrades: (0, 0)
+Lvl 20 upgrades: (0, 0)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/1
+Name: Ополченец;
+Level: 1
+Life: 17
+Attack: 4
+CounterAttack: 5
+Defence: 0
+RangedDefence: 0
+Resist: 0
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 9
+Exp: 10
+ExpMod: 70
+GoldPrice: 10
+GemPrice: 0
+GoldPayment: 2
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: 0
+SoundHit: 29
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 30
+Missile: 0
+Resource: (0)
+
+Abilityes:
+None: 0;
+		
+Lvl 01 upgrades: (1, 4; 30, 4; 33, 3; 7, 1)
+Lvl 02 upgrades: (1, 4; 16, 3; 7, 2)
+Lvl 03 upgrades: (2, 3; 30, 4; 33, 3; 92, 4)
+Lvl 04 upgrades: (2, 3; 4, 2; 13, 2)
+Lvl 05 upgrades: (36, 2; 10, 2; 51, 4)
+Lvl 06 upgrades: (1, 10; 7, 4)
+Lvl 07 upgrades: (2, 3; 65, 3)
+Lvl 08 upgrades: (59, 4; 51, 4)
+Lvl 09 upgrades: (4, 3; 7, 4)
+Lvl 10 upgrades: (2, 3; 51, 4; 13, 3)
+Lvl 11 upgrades: (36, 4; 16, 3; 70, 2)
+Lvl 12 upgrades: (33, 4; 7, 4; 10, 3)
+Lvl 13 upgrades: (2, 3; 65, 3)
+Lvl 14 upgrades: (4, 3; 51, 4)
+Lvl 15 upgrades: (33, 4; 7, 4)
+Lvl 16 upgrades: (2, 3; 51, 4)
+Lvl 17 upgrades: (36, 4; 65, 3)
+Lvl 18 upgrades: (33, 4; 7, 4)
+Lvl 19 upgrades: (4, 3; 2, 3)
+Lvl 20 upgrades: (3, 9; 17, 9)
+
+Lvl 01 loot: (1, 5; 63, 3; 5, 3)
+Lvl 02 loot: (67, 3; 80, 3)
+Lvl 03 loot: (2, 3)
+Lvl 04 loot: (6, 3; 64, 3)
+Lvl 05 loot: (81, 3)
+Lvl 06 loot: (117, 2; 120, 2)
+Lvl 07 loot: (111, 2; 68, 3)
+Lvl 08 loot: (65, 5; 7, 5)
+Lvl 09 loot: (82,2; 94, 5)
+Lvl 10 loot: (121, 3; 126, 1)
+Lvl 11 loot: (127, 1; 69, 3)
+Lvl 12 loot: (134, 1; 4, 5)
+Lvl 13 loot: (377, 1)
+Lvl 14 loot: (239, 1)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/2
+Name: Пращник;
+Level: 1
+Life: 10
+Attack: 3
+CounterAttack: 3
+Defence: 0
+RangedDefence: 0
+Resist: 1
+Speed: 2
+RangedAttack: 4
+ShootingRange: 4
+Ammo: 8
+Stamina: 10
+Morale: 10
+Exp: 12
+ExpMod: 90
+GoldPrice: 15
+GemPrice: 0
+GoldPayment: 3
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 2
+Karma: 0
+SoundHit: 3
+SoundShoot: 52
+SoundShootHit: 35
+SoundDeath: 20
+Missile: 1
+Resource: (0)
+
+Abilityes:
+Gather_ammo: 53;
+		
+Lvl 01 upgrades: (1, 6; 30, 6; 27, 4; 50, 1; 7, 1)
+Lvl 02 upgrades: (33, 4; 51, 4)
+Lvl 03 upgrades: (1, 4; 20, 2)
+Lvl 04 upgrades: (16, 1; 7, 4; 10, 2)
+Lvl 05 upgrades: (1, 4; 30, 4; 4, 3)
+Lvl 06 upgrades: (33, 4; 13, 3)
+Lvl 07 upgrades: (1, 4; 20, 3)
+Lvl 08 upgrades: (51, 4; 27, 1)
+Lvl 09 upgrades: (1, 4; 30, 4)
+Lvl 10 upgrades: (33, 4; 7, 4)
+Lvl 11 upgrades: (16, 1; 20, 3; 51, 4)
+Lvl 12 upgrades: (2, 4; 4, 3; 23, 1)
+Lvl 13 upgrades: (30, 4; 27, 1)
+Lvl 14 upgrades: (33, 4; 10, 3)
+Lvl 15 upgrades: (2, 4; 13, 3)
+Lvl 16 upgrades: (16, 1; 7, 4)
+Lvl 17 upgrades: (31, 4; 20, 4)
+Lvl 18 upgrades: (2, 4; 34, 4)
+Lvl 19 upgrades: (36, 4)
+Lvl 20 upgrades: (47, 10)
+
+Lvl 01 loot: (1, 5; 63, 5; 80, 3)
+Lvl 02 loot: (5, 3; 67, 3)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (2, 5; 64, 3)
+Lvl 06 loot: (6, 3; 68, 3)
+Lvl 07 loot: (81, 3)
+Lvl 08 loot: (111, 2)
+Lvl 09 loot: (3, 5; 65, 5; 117, 2)
+Lvl 10 loot: (7, 3; 69, 3; 120, 2)
+Lvl 11 loot: (82, 2; 94, 3)
+Lvl 12 loot: (121, 2)
+Lvl 13 loot: (4, 5; 126, 2)
+Lvl 14 loot: (127, 2; 377, 1)
+Lvl 15 loot: (239, 1)
+Lvl 16 loot: (326, 1)
+Lvl 17 loot: (367, 1)
+Lvl 18 loot: (380, 1)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+
+/3
+Name: Копейщик;
+Level: 1
+Life: 17
+Attack: 6
+CounterAttack: 7
+Defence: 1
+RangedDefence: 2
+Resist: 1
+Speed: 2
+RangedAttack: 6
+ShootingRange: 2
+Ammo: 1
+Stamina: 10
+Morale: 10
+Exp: 15
+ExpMod: 90
+GoldPrice: 25
+GemPrice: 0
+GoldPayment: 5
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: 0
+SoundHit: 1
+SoundShoot: 34
+SoundShootHit: 11
+SoundDeath: 38
+Missile: 2
+Resource: (0)
+
+Abilityes:
+Heavy_ammo: 114;
+		
+Lvl 01 upgrades: (1, 4; 33, 4; 20, 1; 7, 1; 30, 1)
+Lvl 02 upgrades: (30, 3; 59, 4; 10, 3)
+Lvl 03 upgrades: (1, 4; 7, 4; 16, 4)
+Lvl 04 upgrades: (30, 4; 33, 4; 4, 4)
+Lvl 05 upgrades: (1, 4; 13, 3; 20, 2)
+Lvl 06 upgrades: (30, 4; 7, 2)
+Lvl 07 upgrades: (2, 4; 33, 4; 10, 3)
+Lvl 08 upgrades: (30, 4; 4, 4; 16, 4)
+Lvl 09 upgrades: (2, 3; 7, 4; 20, 3)
+Lvl 10 upgrades: (31, 3; 34, 4; 27, 4)
+Lvl 11 upgrades: (2, 4; 10, 3; 13, 3)
+Lvl 12 upgrades: (31, 4; 7, 4; 4, 4)
+Lvl 13 upgrades: (2, 4; 34, 4)
+Lvl 14 upgrades: (31, 4; 20, 3)
+Lvl 15 upgrades: (3, 4; 7, 4)
+Lvl 16 upgrades: (36, 3; 42, 4; 4, 4)
+Lvl 17 upgrades: (3, 4; 10, 3; 13, 3)
+Lvl 18 upgrades: (36, 4; 7, 4)
+Lvl 19 upgrades: (3, 4; 43, 5; 20, 3)
+Lvl 20 upgrades: (37, 9; 38, 9)
+
+Lvl 01 loot: (17, 6; 51, 4)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (52, 4)
+Lvl 05 loot: (18, 6)
+Lvl 06 loot: (71, 3; 96, 2)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (53, 4)
+Lvl 09 loot: (19, 6; 113, 2)
+Lvl 10 loot: (72, 3; 97, 2)
+Lvl 11 loot: (86, 3; 161, 1)
+Lvl 12 loot: (54, 4)
+Lvl 13 loot: (73, 2)
+Lvl 14 loot: (163, 1)
+Lvl 15 loot: (291, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/4
+Name: Лучник;
+Level: 1
+Life: 10
+Attack: 3
+CounterAttack: 4
+Defence: 0
+RangedDefence: 0
+Resist: 1
+Speed: 2
+RangedAttack: 5
+ShootingRange: 5
+Ammo: 7
+Stamina: 10
+Morale: 10
+Exp: 18
+ExpMod: 140
+GoldPrice: 60
+GemPrice: 0
+GoldPayment: 12
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 2
+Karma: 0
+SoundHit: 3
+SoundShoot: 5
+SoundShootHit: 23
+SoundDeath: 8
+Missile: 0
+Resource: (2)
+
+Abilityes:
+Ability: 0;
+		
+Lvl 01 upgrades: (1, 4; 33, 3; 84, 2; 27, 2; 30, 1; 20, 2)
+Lvl 02 upgrades: (30, 3; 7, 3)
+Lvl 03 upgrades: (1, 4; 4, 2)
+Lvl 04 upgrades: (30, 4; 20, 4; 33, 3)
+Lvl 05 upgrades: (1, 4; 13, 4; 50, 1)
+Lvl 06 upgrades: (30, 4; 10, 3; 27, 3)
+Lvl 07 upgrades: (1, 4; 20, 4; 33, 3)
+Lvl 08 upgrades: (30, 4; 16, 4; 84, 2)
+Lvl 09 upgrades: (1, 4; 13, 4; 23, 2)
+Lvl 10 upgrades: (30, 4; 7, 3; 33, 3)
+Lvl 11 upgrades: (1, 4; 20, 4; 27, 3)
+Lvl 12 upgrades: (30, 4; 4, 2)
+Lvl 13 upgrades: (1, 4; 16, 4; 33, 3)
+Lvl 14 upgrades: (30, 4; 10, 3)
+Lvl 15 upgrades: (2, 4; 20, 4; 84, 2)
+Lvl 16 upgrades: (31, 4; 16, 4; 33, 3; 27, 3)
+Lvl 17 upgrades: (2, 4; 13, 4)
+Lvl 18 upgrades: (31, 4; 7, 3; 23, 4)
+Lvl 19 upgrades: (3, 4; 21, 4; 33, 3)
+Lvl 20 upgrades: (31, 4; 4, 2)
+
+Lvl 01 loot: (29, 6; 46, 6; 51, 3)
+Lvl 02 loot: (47, 6)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (30, 6; 48, 6)
+Lvl 06 loot: (52, 3; 71, 2)
+Lvl 07 loot: (84, 2; 96, 3)
+Lvl 08 loot: (117, 2)
+Lvl 09 loot: (31, 6; 49, 6)
+Lvl 10 loot: (53, 3; 72, 2)
+Lvl 11 loot: (97, 3; 191, 3)
+Lvl 12 loot: (113, 2; 230, 2)
+Lvl 13 loot: (32, 6; 244, 1; 270, 1)
+Lvl 14 loot: (50, 6; 73, 2; 112, 2)
+Lvl 15 loot: (85, 2; 98, 3; 231, 2)
+Lvl 16 loot: (336, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/5
+Name: Мечник;
+Level: 1
+Life: 17
+Attack: 7
+CounterAttack: 7
+Defence: 3
+RangedDefence: 5
+Resist: 1
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 20
+ExpMod: 100
+GoldPrice: 45
+GemPrice: 0
+GoldPayment: 9
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: 1
+SoundHit: 0
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 8
+Missile: 0
+Resource: (1)
+
+Abilityes:
+Parry: 83;
+		
+Lvl 01 upgrades: (1, 4; 33, 4; 13, 3; 59, 1; 7, 1)
+Lvl 02 upgrades: (30, 4; 7, 3; 85, 4)
+Lvl 03 upgrades: (1, 4; 33, 4; 10, 4)
+Lvl 04 upgrades: (30, 4; 4, 4; 16, 4)
+Lvl 05 upgrades: (2, 4; 33, 4; 85, 4)
+Lvl 06 upgrades: (30, 4; 7, 4; 13, 4)
+Lvl 07 upgrades: (2, 4; 33, 4; 10, 4)
+Lvl 08 upgrades: (31, 4; 4, 4; 16, 4)
+Lvl 09 upgrades: (2, 4; 34, 4; 85, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 13, 4)
+Lvl 11 upgrades: (36, 4; 34, 4; 10, 4)
+Lvl 12 upgrades: (31, 4; 4, 4)
+Lvl 13 upgrades: (3, 4; 34, 4; 85, 4)
+Lvl 14 upgrades: (31, 4; 38, 4; 40, 4)
+Lvl 15 upgrades: (3, 4; 42, 4; 40, 4)
+Lvl 16 upgrades: (32, 4; 8, 4)
+Lvl 17 upgrades: (37, 4; 42, 4; 85, 4)
+Lvl 18 upgrades: (32, 4; 5, 4; 14, 4)
+Lvl 19 upgrades: (37, 4; 35, 4; 11, 4)
+Lvl 20 upgrades: (32, 4; 38, 4)
+
+Lvl 01 loot: (9, 6; 41, 5; 55, 3)
+Lvl 02 loot: (42, 5)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (43, 5; 56, 3)
+Lvl 06 loot: (74, 2; 87, 2)
+Lvl 07 loot: (99, 2; 105, 2)
+Lvl 08 loot: (221, 2)
+Lvl 09 loot: (11, 6; 44, 5; 57, 3)
+Lvl 10 loot: (75, 2; 88, 1)
+Lvl 11 loot: (100, 2; 106, 2)
+Lvl 12 loot: (114, 1; 147, 1)
+Lvl 13 loot: (12, 6; 89, 2; 223, 1)
+Lvl 14 loot: (58, 3; 76, 2; 119, 2)
+Lvl 15 loot: (101, 1; 107, 2; 148, 1)
+Lvl 16 loot: (275, 1)
+Lvl 17 loot: (295, 1)
+Lvl 18 loot: (339, 1)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/6
+Name: Пикинёр;
+Level: 1
+Life: 18
+Attack: 6
+CounterAttack: 8
+Defence: 2
+RangedDefence: 3
+Resist: 1
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 18
+ExpMod: 100
+GoldPrice: 35
+GemPrice: 0
+GoldPayment: 7
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: 1
+SoundHit: 1
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 8
+Missile: 0
+Resource: (1)
+
+Abilityes:
+First_strike: 46;
+		
+Lvl 01 upgrades: (1, 4; 33, 4; 16, 3; 30, 1; 7, 1)
+Lvl 02 upgrades: (30, 4; 7, 3; 10, 4)
+Lvl 03 upgrades: (1, 4; 33, 4; 13, 4)
+Lvl 04 upgrades: (30, 4; 7, 4; 59, 2)
+Lvl 05 upgrades: (1, 4; 33, 4; 16, 3)
+Lvl 06 upgrades: (30, 4; 7, 4; 10, 4)
+Lvl 07 upgrades: (2, 4; 33, 4; 13, 4)
+Lvl 08 upgrades: (31, 4; 4, 3; 69, 1)
+Lvl 09 upgrades: (2, 4; 33, 4; 16, 3)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 11 upgrades: (2, 4; 34, 4; 13, 4)
+Lvl 12 upgrades: (31, 4; 7, 4; 75, 1)
+Lvl 13 upgrades: (3, 4; 34, 4; 16, 3)
+Lvl 14 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 15 upgrades: (3, 4; 34, 4; 13, 4)
+Lvl 16 upgrades: (36, 4; 4, 3; 65, 1)
+Lvl 17 upgrades: (3, 4; 42, 4; 40, 4)
+Lvl 18 upgrades: (32, 4; 8, 4)
+Lvl 19 upgrades: (37, 4; 35, 4)
+Lvl 20 upgrades: (37, 4; 38, 4)
+
+Lvl 01 loot: (17, 6; 55, 3)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (99, 2)
+Lvl 05 loot: (18, 6; 56, 3)
+Lvl 06 loot: (74, 2)
+Lvl 07 loot: (87, 2)
+Lvl 08 loot: (100, 2; 105, 1)
+Lvl 09 loot: (19, 6; 57, 3)
+Lvl 10 loot: (75, 2; 123, 1)
+Lvl 11 loot: (88, 2; 161, 2)
+Lvl 12 loot: (101, 2; 106, 1)
+Lvl 13 loot: (20, 6; 58, 3)
+Lvl 14 loot: (76, 2; 162, 2)
+Lvl 15 loot: (89, 2; 252, 1)
+Lvl 16 loot: (107, 1; 163, 1)
+Lvl 17 loot: (164, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/7
+Name: Арбалетчик;
+Level: 1
+Life: 10
+Attack: 5
+CounterAttack: 5
+Defence: 2
+RangedDefence: 2
+Resist: 1
+Speed: 1
+RangedAttack: 5
+ShootingRange: 4
+Ammo: 6
+Stamina: 10
+Morale: 10
+Exp: 23
+ExpMod: 150
+GoldPrice: 60
+GemPrice: 0
+GoldPayment: 12
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 2
+Karma: 1
+SoundHit: 36
+SoundShoot: 37
+SoundShootHit: 23
+SoundDeath: 38
+Missile: 0
+Resource: (1, 2)
+
+Abilityes:
+Piercing_shot: 47;
+		
+Lvl 01 upgrades: (1, 4; 33, 4; 30, 1; 16, 1; 27, 2)
+Lvl 02 upgrades: (30, 3; 10, 3; 20, 4)
+Lvl 03 upgrades: (1, 4; 33, 4; 7, 4)
+Lvl 04 upgrades: (30, 4; 13, 3; 27, 4)
+Lvl 05 upgrades: (1, 4; 33, 4; 20, 4)
+Lvl 06 upgrades: (30, 4; 16, 3; 4, 3)
+Lvl 07 upgrades: (1, 4; 33, 4; 7, 4)
+Lvl 08 upgrades: (30, 4; 10, 3; 20, 4)
+Lvl 09 upgrades: (1, 4; 33, 4; 27, 4)
+Lvl 10 upgrades: (30, 4; 13, 3; 23, 2)
+Lvl 11 upgrades: (2, 4; 33, 4; 20, 4)
+Lvl 12 upgrades: (30, 4; 16, 3; 4, 3)
+Lvl 13 upgrades: (2, 4; 34, 4; 23, 4)
+Lvl 14 upgrades: (31, 4; 10, 3; 20, 4)
+Lvl 15 upgrades: (2, 4; 34, 4; 7, 4)
+Lvl 16 upgrades: (31, 4; 13, 3; 38, 1)
+Lvl 17 upgrades: (2, 4; 42, 4; 20, 4)
+Lvl 18 upgrades: (36, 4; 16, 3; 27, 4)
+Lvl 19 upgrades: (2, 4; 42, 4; 4, 3)
+Lvl 20 upgrades: (36, 4; 40, 3; 21, 4)
+
+Lvl 01 loot: (33, 6; 46, 3; 55, 2)
+Lvl 02 loot: (47, 3)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (34, 6; 48, 3; 56, 2)
+Lvl 06 loot: (71, 2; 87, 2)
+Lvl 07 loot: (96, 2)
+Lvl 08 loot: (117, 2)
+Lvl 09 loot: (35, 6; 49, 4; 57, 2)
+Lvl 10 loot: (72, 2)
+Lvl 11 loot: (97, 2)
+Lvl 12 loot: (199, 2)
+Lvl 13 loot: (36, 6; 50, 2)
+Lvl 14 loot: (124, 1; 200, 2)
+Lvl 15 loot: (201, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/8
+Name: Лекарь;
+Level: 1
+Life: 10
+Attack: 3
+CounterAttack: 4
+Defence: 0
+RangedDefence: 0
+Resist: 3
+Speed: 2
+RangedAttack: 0
+ShootingRange: 1
+Ammo: 5
+Stamina: 10
+Morale: 10
+Exp: 18
+ExpMod: 90
+GoldPrice: 40
+GemPrice: 5
+GoldPayment: 8
+GemPayment: 1
+Race: 1
+UnitKind: 1
+UnitClass: 4
+Karma: 2
+SoundHit: 3
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 20
+Missile: 0
+Resource: (4)
+
+Abilityes:
+Heal4: 66;
+		
+Lvl 01 upgrades: (1, 4; 33, 4; 16, 1; 52, 1; 65, 1)
+Lvl 02 upgrades: (30, 3; 16, 3; 7, 2)
+Lvl 03 upgrades: (1, 4; 33, 4; 26, 4)
+Lvl 04 upgrades: (30, 4; 13, 2; 65, 4)
+Lvl 05 upgrades: (1, 4; 33, 4; 27, 3)
+Lvl 06 upgrades: (30, 4; 16, 4; 26, 4)
+Lvl 07 upgrades: (1, 4; 33, 4; 4, 2)
+Lvl 08 upgrades: (30, 4; 10, 2; 65, 4)
+Lvl 09 upgrades: (1, 4; 33, 4; 26, 4)
+Lvl 10 upgrades: (30, 4; 16, 4; 27, 3)
+Lvl 11 upgrades: (1, 4; 33, 4; 7, 2)
+Lvl 12 upgrades: (30, 4; 13, 2; 26, 4)
+Lvl 13 upgrades: (2, 4; 34, 4; 65, 4)
+Lvl 14 upgrades: (31, 4; 10, 2; 57, 1)
+Lvl 15 upgrades: (2, 4; 34, 4; 26, 4)
+Lvl 16 upgrades: (31, 4; 16, 4; 27, 3)
+Lvl 17 upgrades: (2, 4; 42, 4; 10, 2)
+Lvl 18 upgrades: (36, 4; 13, 2; 26, 4)
+Lvl 19 upgrades: (2, 4; 42, 4; 7, 2)
+Lvl 20 upgrades: (36, 4; 10, 2; 65, 4)
+
+Lvl 01 loot: (5, 4; 63, 6)
+Lvl 02 loot: (80, 3)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (6, 4; 64, 6)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (111, 3)
+Lvl 09 loot: (7, 4; 65, 3)
+Lvl 10 loot: (82, 3; 94, 2)
+Lvl 11 loot: (126, 1)
+Lvl 12 loot: (115, 1; 139, 2)
+Lvl 13 loot: (66, 4; 124, 1)
+Lvl 14 loot: (95, 3; 116, 1)
+Lvl 15 loot: (112, 3; 125, 1)
+Lvl 16 loot: (130, 1)
+Lvl 17 loot: (327, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/9
+Name: Варвар;
+Level: 1
+Life: 20
+Attack: 9
+CounterAttack: 4
+Defence: 1
+RangedDefence: 2
+Resist: 0
+Speed: 2
+RangedAttack: 5
+ShootingRange: 2
+Ammo: 1
+Stamina: 12
+Morale: 10
+Exp: 25
+ExpMod: 100
+GoldPrice: 30
+GemPrice: 0
+GoldPayment: 6
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: -1
+SoundHit: 53
+SoundShoot: 78
+SoundShootHit: 54
+SoundDeath: 80
+Missile: 3
+Resource: (0)
+
+Abilityes:
+Berserk: 55;
+		
+Lvl 01 upgrades: (1, 4; 33, 4; 93, 4; 30, 1)
+Lvl 02 upgrades: (30, 3; 20, 3; 4, 4)
+Lvl 03 upgrades: (2, 4; 33, 4; 93, 4)
+Lvl 04 upgrades: (30, 4; 10, 3; 7, 3)
+Lvl 05 upgrades: (2, 4; 33, 4; 93, 4; 75, 1)
+Lvl 06 upgrades: (30, 4; 20, 3; 4, 4)
+Lvl 07 upgrades: (2, 4; 33, 4; 93, 4)
+Lvl 08 upgrades: (31, 4; 10, 3; 6, 2)
+Lvl 09 upgrades: (2, 4; 33, 4; 93, 4)
+Lvl 10 upgrades: (31, 4; 20, 3; 4, 4)
+Lvl 11 upgrades: (2, 4; 34, 4; 93, 4)
+Lvl 12 upgrades: (31, 4; 13, 3; 7, 3)
+Lvl 13 upgrades: (3, 4; 34, 4; 93, 4)
+Lvl 14 upgrades: (31, 4; 27, 3; 4, 4)
+Lvl 15 upgrades: (3, 4; 34, 4; 93, 4)
+Lvl 16 upgrades: (36, 4; 10, 3; 38, 4)
+Lvl 17 upgrades: (3, 4; 34, 4; 93, 4)
+Lvl 18 upgrades: (32, 4; 21, 3; 4, 4)
+Lvl 19 upgrades: (37, 4; 35, 4; 93, 4)
+Lvl 20 upgrades: (32, 4; 21, 3; 39, 3)
+
+Lvl 01 loot: (13, 6; 51, 3)
+Lvl 02 loot: (25, 4)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (14, 6; 52, 3)
+Lvl 06 loot: (26, 4; 71, 2)
+Lvl 07 loot: (105, 1)
+Lvl 08 loot: (117, 1)
+Lvl 09 loot: (15, 6; 53, 3)
+Lvl 10 loot: (27, 4, 72, 2)
+Lvl 11 loot: (106, 1; 155, 1)
+Lvl 12 loot: (127, 1; 175, 1)
+Lvl 13 loot: (16, 6; 54, 3; 366, 2)
+Lvl 14 loot: (28, 4; 119, 2)
+Lvl 15 loot: (156, 2)
+Lvl 16 loot: (369, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/10
+Name: Вор;
+Level: 1
+Life: 13
+Attack: 7
+CounterAttack: 4
+Defence: 2
+RangedDefence: 0
+Resist: 0
+Speed: 2
+RangedAttack: 5
+ShootingRange: 2
+Ammo: 3
+Stamina: 10
+Morale: 6
+Exp: 20
+ExpMod: 80
+GoldPrice: 15
+GemPrice: 0
+GoldPayment: 3
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: -2
+SoundHit: 49
+SoundShoot: 50
+SoundShootHit: 51
+SoundDeath: 55
+Missile: 6
+Resource: (0)
+
+Abilityes:
+Agility: 56
+Maradeur15: 87;
+		
+Lvl 01 upgrades: (1, 4; 27, 3; 30, 3; 4, 2; 74, 1)
+Lvl 02 upgrades: (30, 1; 20, 4; 10, 3)
+Lvl 03 upgrades: (1, 4; 7, 3; 71, 2)
+Lvl 04 upgrades: (30, 4; 4, 4; 16, 3)
+Lvl 05 upgrades: (1, 4; 13, 3; 132, 4)
+Lvl 06 upgrades: (30, 4; 20, 4)
+Lvl 07 upgrades: (1, 4; 4, 4; 71, 4)
+Lvl 08 upgrades: (30, 4; 27, 3; 10, 3)
+Lvl 09 upgrades: (1, 4; 13, 3; 132, 4)
+Lvl 10 upgrades: (30, 4; 4, 4; 19, 2)
+Lvl 11 upgrades: (2, 4; 20, 4; 23, 2)
+Lvl 12 upgrades: (30, 4; 7, 3; 16, 3)
+Lvl 13 upgrades: (2, 4; 4, 4; 132, 4)
+Lvl 14 upgrades: (31, 4; 27, 3; 10, 3)
+Lvl 15 upgrades: (2, 4; 20, 4; 71, 4)
+Lvl 16 upgrades: (31, 4; 4, 4)
+Lvl 17 upgrades: (2, 4; 13, 3; 132, 4)
+Lvl 18 upgrades: (31, 4; 7, 3; 16, 3)
+Lvl 19 upgrades: (2, 4; 4, 4; 71, 4)
+Lvl 20 upgrades: (36, 4; 20, 4; 10, 3)
+
+Lvl 01 loot: (1, 6; 51, 2)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (2, 6; 52, 3)
+Lvl 06 loot: (84, 3; 96, 4)
+Lvl 07 loot: (120, 2)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (3, 6; 53, 2)
+Lvl 10 loot: (97, 3; 121, 2)
+Lvl 11 loot: (113, 2; 126, 1; 132, 2)
+Lvl 12 loot: (117, 2; 127, 1; 245, 2)
+Lvl 13 loot: (4, 4; 128, 1; 310, 3)
+Lvl 14 loot: (129, 1; 130, 1)
+Lvl 15 loot: (131, 1)
+Lvl 16 loot: (379, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/11
+Name: Разбойник;
+Level: 1
+Life: 17
+Attack: 8
+CounterAttack: 5
+Defence: 1
+RangedDefence: 2
+Resist: 1
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 8
+Exp: 20
+ExpMod: 90
+GoldPrice: 10
+GemPrice: 0
+GoldPayment: 2
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: -2
+SoundHit: 0
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 56
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Agility: 0
+Maradeur10: 86
+Robber: 88;
+		
+Lvl 01 upgrades: (1, 4; 30, 4; 4, 1; 10, 1)
+Lvl 02 upgrades: (30, 1; 13, 4)
+Lvl 03 upgrades: (1, 4; 7, 4)
+Lvl 04 upgrades: (30, 1; 4, 4)
+Lvl 05 upgrades: (1, 4; 16, 4; 62, 4)
+Lvl 06 upgrades: (30, 1; 33, 3)
+Lvl 07 upgrades: (1, 4; 7, 4)
+Lvl 08 upgrades: (30, 1; 4, 4)
+Lvl 09 upgrades: (2, 4; 10, 4)
+Lvl 10 upgrades: (30, 1; 13, 4; 33, 3)
+Lvl 11 upgrades: (2, 4; 16, 4)
+Lvl 12 upgrades: (31, 4; 4, 4)
+Lvl 13 upgrades: (2, 4; 7, 4; 80, 4)
+Lvl 14 upgrades: (31, 4; 10, 4)
+Lvl 15 upgrades: (2, 4; 13, 4)
+Lvl 16 upgrades: (36, 4; 4, 4)
+Lvl 17 upgrades: (3, 4; 10, 4; 16, 4)
+Lvl 18 upgrades: (36, 4; 7, 4; 33, 3)
+Lvl 19 upgrades: (3, 4; 40, 4)
+Lvl 20 upgrades: (37, 4; 38, 4)
+
+Lvl 01 loot: (9, 6; 41, 2; 51, 2)
+Lvl 02 loot: (42, 2)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (84, 2)
+Lvl 05 loot: (10, 7; 43, 2)
+Lvl 06 loot: (52, 2; 71, 2; 120, 1)
+Lvl 07 loot: (99, 2; 113, 2; 221, 1)
+Lvl 08 loot: (11, 6; 44, 2; 146, 1)
+Lvl 09 loot: (53, 2; 72, 2; 191, 1)
+Lvl 10 loot: (85, 2; 113, 1; 121, 2)
+Lvl 11 loot: (100, 2; 115, 1; 147, 1)
+Lvl 12 loot: (12, 4; 116, 1; 244, 1)
+Lvl 13 loot: (54, 2; 73, 2)
+Lvl 14 loot: (86, 2; 122, 2)
+Lvl 15 loot: (149, 1)
+Lvl 16 loot: (246, 2; 336, 1)
+Lvl 17 loot: (328, 2)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/12
+Name: Шаман;
+Level: 1
+Life: 9
+Attack: 3
+CounterAttack: 4
+Defence: 0
+RangedDefence: 0
+Resist: 3
+Speed: 2
+RangedAttack: 6
+ShootingRange: 4
+Ammo: 4
+Stamina: 10
+Morale: 10
+Exp: 22
+ExpMod: 130
+GoldPrice: 25
+GemPrice: 10
+GoldPayment: 5
+GemPayment: 1
+Race: 1
+UnitKind: 1
+UnitClass: 4
+Karma: -1
+SoundHit: 60
+SoundShoot: 57
+SoundShootHit: 58
+SoundDeath: 59
+Missile: 8
+Resource: (4)
+
+Abilityes:
+Magic_shot: 58
+Cast_Curse: 115;
+		
+Lvl 01 upgrades: (1, 4; 33, 3; 16, 4; 20, 1)
+Lvl 02 upgrades: (30, 4; 7, 3; 57, 2)
+Lvl 03 upgrades: (1, 4; 13, 3; 27, 3)
+Lvl 04 upgrades: (30, 4; 16, 4)
+Lvl 05 upgrades: (1, 4; 33, 3; 20, 4; 73, 4)
+Lvl 06 upgrades: (30, 4; 4, 3; 10, 3)
+Lvl 07 upgrades: (1, 4; 16, 4)
+Lvl 08 upgrades: (30, 4; 7, 4; 27, 3)
+Lvl 09 upgrades: (1, 4; 33, 3; 20, 4)
+Lvl 10 upgrades: (30, 4; 16, 4; 52, 3)
+Lvl 11 upgrades: (1, 4; 4, 3)
+Lvl 12 upgrades: (30, 4; 16, 4; 23, 1)
+Lvl 13 upgrades: (1, 4; 33, 3; 20, 4)
+Lvl 14 upgrades: (30, 4; 7, 4; 13, 3)
+Lvl 15 upgrades: (1, 4; 16, 4; 27, 3)
+Lvl 16 upgrades: (30, 4; 4, 3; 10, 3)
+Lvl 17 upgrades: (2, 4; 33, 3; 20, 4)
+Lvl 18 upgrades: (31, 4; 16, 4)
+Lvl 19 upgrades: (2, 4; 7, 4; 27, 3)
+Lvl 20 upgrades: (36, 4; 42, 4; 21, 4)
+
+Lvl 01 loot: (1, 3; 5, 4; 63, 3)
+Lvl 02 loot: (37, 5; 80, 2)
+Lvl 03 loot: (67, 2)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (2, 3; 6, 4; 64, 3)
+Lvl 06 loot: (38, 10; 81, 2)
+Lvl 07 loot: (93, 2; 68, 2)
+Lvl 08 loot: (212, 1)
+Lvl 09 loot: (7, 4; 65, 3)
+Lvl 10 loot: (39, 3; 82, 2)
+Lvl 11 loot: (94, 2; 69, 2)
+Lvl 12 loot: (118, 2; 133, 1)
+Lvl 13 loot: (66, 3; 124, 1; 213, 1)
+Lvl 14 loot: (83, 2; 205, 1; 214, 1)
+Lvl 15 loot: (95, 2; 70, 2; 125, 1)
+Lvl 16 loot: (215, 1; 237, 1)
+Lvl 17 loot: (265, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/13
+Name: Гоблин;
+Level: 1
+Life: 12
+Attack: 6
+CounterAttack: 5
+Defence: 0
+RangedDefence: 3
+Resist: 0
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 6
+Exp: 11
+ExpMod: 70
+GoldPrice: 5
+GemPrice: 0
+GoldPayment: 1
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 1
+Karma: -2
+SoundHit: 61
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 21
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Swamp_Dweller: 64;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 30, 4)
+Lvl 02 upgrades: (30, 1; 7, 3)
+Lvl 03 upgrades: (1, 4; 10, 3)
+Lvl 04 upgrades: (30, 4; 4, 4)
+Lvl 05 upgrades: (1, 4; 7, 3; 75, 2)
+Lvl 06 upgrades: (30, 4; 13, 3)
+Lvl 07 upgrades: (1, 4; 4, 4)
+Lvl 08 upgrades: (30, 4; 7, 3)
+Lvl 09 upgrades: (1, 4; 10, 3)
+Lvl 10 upgrades: (30, 4; 4, 4; 16, 2; 56, 2)
+Lvl 11 upgrades: (1, 4; 7, 3)
+Lvl 12 upgrades: (30, 4; 13, 3)
+Lvl 13 upgrades: (1, 4; 4, 4)
+Lvl 14 upgrades: (31, 4; 7, 3)
+Lvl 15 upgrades: (2, 4; 10, 3)
+Lvl 16 upgrades: (31, 4; 4, 4)
+Lvl 17 upgrades: (2, 4; 7, 3)
+Lvl 18 upgrades: (36, 4; 13, 3)
+Lvl 19 upgrades: (2, 4; 38, 4)
+Lvl 20 upgrades: (36, 4; 5, 4; 33, 2)
+
+Lvl 01 loot: (1, 5)
+Lvl 02 loot: (9, 3)
+Lvl 03 loot: (80, 2)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (2, 5)
+Lvl 06 loot: (10, 5)
+Lvl 07 loot: (84, 2)
+Lvl 08 loot: (71, 2)
+Lvl 09 loot: (3, 5)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (72, 2)
+Lvl 12 loot: (126, 1)
+Lvl 13 loot: (4, 5; 146, 2)
+Lvl 14 loot: (73, 2; 127, 1)
+Lvl 15 loot: (128, 1; 270, 1)
+Lvl 16 loot: (129, 1; 134, 1)
+Lvl 17 loot: (130, 1; 377, 1)
+Lvl 18 loot: (271, 1; 378, 1)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/14
+Name: Орк;
+Level: 1
+Life: 23
+Attack: 9
+CounterAttack: 7
+Defence: 1
+RangedDefence: 1
+Resist: 0
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 12
+Morale: 8
+Exp: 18
+ExpMod: 90
+GoldPrice: 15
+GemPrice: 0
+GoldPayment: 3
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 1
+Karma: -2
+SoundHit: 2
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 22
+Missile: 0
+Resource: (1)
+
+Abilityes:
+Damages_armor: 75;
+		
+Lvl 01 upgrades: (1, 4; 30, 4; 4, 4; 7, 3)
+Lvl 02 upgrades: (30, 1; 33, 1; 10, 3)
+Lvl 03 upgrades: (1, 4; 2, 10; 13, 3; 59, 3)
+Lvl 04 upgrades: (30, 4; 4, 4)
+Lvl 05 upgrades: (2, 4; 7, 4; 63, 4)
+Lvl 06 upgrades: (30, 4; 16, 1; 10, 3)
+Lvl 07 upgrades: (2, 4; 4, 4; 13, 3)
+Lvl 08 upgrades: (31, 4; 7, 4)
+Lvl 09 upgrades: (2, 4; 33, 2)
+Lvl 10 upgrades: (36, 4; 4, 4; 10, 3; 55, 2)
+Lvl 11 upgrades: (2, 4; 7, 4; 13, 3)
+Lvl 12 upgrades: (31, 4; 16, 1)
+Lvl 13 upgrades: (2, 4; 4, 4)
+Lvl 14 upgrades: (36, 4; 7, 4; 10, 3)
+Lvl 15 upgrades: (3, 4; 33, 3; 13, 3)
+Lvl 16 upgrades: (31, 4; 5, 4)
+Lvl 17 upgrades: (3, 4; 38, 4)
+Lvl 18 upgrades: (32, 4; 16, 2; 10, 3)
+Lvl 19 upgrades: (3, 4; 5, 4; 13, 3)
+Lvl 20 upgrades: (37, 4; 38, 4)
+
+Lvl 01 loot: (21, 6; 41, 2)
+Lvl 02 loot: (42, 2; 55, 2)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (22, 6; 43, 2)
+Lvl 06 loot: (56, 2)
+Lvl 07 loot: (74, 3)
+Lvl 08 loot: (99, 2; 105, 2)
+Lvl 09 loot: (23, 6; 44, 2)
+Lvl 10 loot: (75, 3; 221, 1)
+Lvl 11 loot: (168, 1)
+Lvl 12 loot: (106, 2)
+Lvl 13 loot: (24, 6; 169, 2)
+Lvl 14 loot: (76, 3)
+Lvl 15 loot: (170, 1)
+Lvl 16 loot: (171, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/15
+Name: Эльф;
+Level: 1
+Life: 9
+Attack: 5
+CounterAttack: 6
+Defence: 1
+RangedDefence: 1
+Resist: 3
+Speed: 2
+RangedAttack: 7
+ShootingRange: 5
+Ammo: 6
+Stamina: 10
+Morale: 12
+Exp: 25
+ExpMod: 300
+GoldPrice: 100
+GemPrice: 5
+GoldPayment: 20
+GemPayment: 1
+Race: 2
+UnitKind: 1
+UnitClass: 2
+Karma: 3
+SoundHit: 49
+SoundShoot: 5
+SoundShootHit: 23
+SoundDeath: 79
+Missile: 0
+Resource: (2)
+
+Abilityes:
+Forester: 62
+Marksman: 130;
+		
+Lvl 01 upgrades: (1, 4; 33, 4; 20, 4; 50, 2; 128, 4)
+Lvl 02 upgrades: (30, 4; 16, 4; 27, 4; 4, 4)
+Lvl 03 upgrades: (1, 4; 33, 4; 10, 4; 7, 4)
+Lvl 04 upgrades: (30, 4; 16, 4; 20, 4; 128, 4)
+Lvl 05 upgrades: (1, 4; 33, 4; 13, 4; 90, 4)
+Lvl 06 upgrades: (30, 4; 16, 4; 27, 4; 4, 4)
+Lvl 07 upgrades: (1, 4; 33, 4; 20, 4; 7, 4; 128, 4)
+Lvl 08 upgrades: (30, 4; 16, 4; 10, 4; 65, 4)
+Lvl 09 upgrades: (1, 4; 33, 4; 13, 4; 91, 4)
+Lvl 10 upgrades: (30, 4; 16, 4; 20, 4; 24, 2; 128, 4)
+Lvl 11 upgrades: (1, 4; 33, 4; 27, 4; 4, 4)
+Lvl 12 upgrades: (30, 4; 16, 4; 10, 4; 7, 4)
+Lvl 13 upgrades: (1, 4; 33, 4; 20, 4; 91, 4; 128, 4)
+Lvl 14 upgrades: (30, 4; 17, 4; 13, 4; 65, 4)
+Lvl 15 upgrades: (2, 4; 34, 4; 27, 4; 4, 4)
+Lvl 16 upgrades: (30, 4; 17, 4; 20, 4; 7, 4; 128, 4)
+Lvl 17 upgrades: (2, 4; 42, 4; 10, 4; 91, 4)
+Lvl 18 upgrades: (31, 4; 17, 4; 27, 4; 65, 4)
+Lvl 19 upgrades: (2, 4; 42, 4; 20, 4; 4, 4; 128, 4)
+Lvl 20 upgrades: (31, 4; 43, 4; 40, 2; 7, 4)
+
+Lvl 01 loot: (29, 5; 46, 4)
+Lvl 02 loot: (47, 4)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (120, 2)
+Lvl 05 loot: (30, 5)
+Lvl 06 loot: (48, 4)
+Lvl 07 loot: (96, 2)
+Lvl 08 loot: (121, 3)
+Lvl 09 loot: (31, 5)
+Lvl 10 loot: (49, 4; 230, 2)
+Lvl 11 loot: (69, 3)
+Lvl 12 loot: (98, 2; 122, 2)
+Lvl 13 loot: (32, 5; 253, 2)
+Lvl 14 loot: (50, 4; 232, 3)
+Lvl 15 loot: (70, 3; 193, 3)
+Lvl 16 loot: (313, 1; 398, 2)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/16
+Name: Гном;
+Level: 1
+Life: 21
+Attack: 7
+CounterAttack: 9
+Defence: 4
+RangedDefence: 6
+Resist: 3
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 15
+Morale: 13
+Exp: 25
+ExpMod: 150
+GoldPrice: 80
+GemPrice: 0
+GoldPayment: 17
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 1
+Karma: 2
+SoundHit: 27
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 33
+Missile: 0
+Resource: (1)
+
+Abilityes:
+Hill_Dweller: 63;
+		
+Lvl 01 upgrades: (1, 4; 30, 4; 16, 4; 7, 3; 33, 4)
+Lvl 02 upgrades: (30, 1; 10, 4; 83, 4; 4, 4)
+Lvl 03 upgrades: (1, 4; 13, 4; 33, 4)
+Lvl 04 upgrades: (30, 4; 16, 4; 7, 4)
+Lvl 05 upgrades: (2, 4; 10, 4; 33, 4; 4, 4)
+Lvl 06 upgrades: (30, 4; 13, 4; 85, 4)
+Lvl 07 upgrades: (2, 4; 16, 4; 33, 4; 7, 4)
+Lvl 08 upgrades: (31, 4; 10, 4; 4, 4; 72, 4)
+Lvl 09 upgrades: (2, 4; 13, 4; 85, 4; 59, 4)
+Lvl 10 upgrades: (36, 4; 16, 4; 34, 4; 7, 4)
+Lvl 11 upgrades: (2, 4; 10, 4; 4, 4)
+Lvl 12 upgrades: (31, 4; 13, 4; 85, 4)
+Lvl 13 upgrades: (2, 4; 16, 4; 7, 4)
+Lvl 14 upgrades: (36, 4; 40, 4; 4, 4)
+Lvl 15 upgrades: (3, 4; 42, 4; 85, 4)
+Lvl 16 upgrades: (31, 4; 34, 4; 7, 4)
+Lvl 17 upgrades: (3, 4; 40, 4; 4, 3)
+Lvl 18 upgrades: (32, 4; 42, 4; 85, 4)
+Lvl 19 upgrades: (3, 4; 38, 4)
+Lvl 20 upgrades: (37, 4; 43, 4; 41, 4)
+
+Lvl 01 loot: (13, 6; 41, 3)
+Lvl 02 loot: (59, 4)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (87, 2)
+Lvl 05 loot: (14, 6; 43, 3)
+Lvl 06 loot: (60, 4; 221, 1)
+Lvl 07 loot: (77, 3; 102, 2)
+Lvl 08 loot: (108, 2; 222, 4)
+Lvl 09 loot: (15, 6; 44, 3; 251, 4)
+Lvl 10 loot: (61, 4; 154, 4)
+Lvl 11 loot: (78, 3; 103, 2; 198, 3)
+Lvl 12 loot: (89, 2; 109, 2; 315, 3)
+Lvl 13 loot: (16, 6; 223, 1)
+Lvl 14 loot: (62, 4; 128, 1)
+Lvl 15 loot: (104, 2; 110, 2)
+Lvl 16 loot: (131, 1)
+Lvl 17 loot: (377, 1; 378, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/17
+Name: Фея;
+Level: 1
+Life: 6
+Attack: 1
+CounterAttack: 1
+Defence: 3
+RangedDefence: 6
+Resist: 5
+Speed: 3
+RangedAttack: 4
+ShootingRange: 3
+Ammo: 8
+Stamina: 9
+Morale: 10
+Exp: 17
+ExpMod: 110
+GoldPrice: 20
+GemPrice: 15
+GoldPayment: 4
+GemPayment: 3
+Race: 2
+UnitKind: 1
+UnitClass: 4
+Karma: 2
+SoundHit: 62
+SoundShoot: 63
+SoundShootHit: 64
+SoundDeath: 65
+Missile: 7
+Resource: (4)
+
+Abilityes:
+Float: 45
+Forester: 62
+MagicShot: 58
+Haste: 138;
+		
+Lvl 01 upgrades: (1, 4; 27, 3; 13, 3; 16, 4; 54, 4)
+Lvl 02 upgrades: (33, 4; 20, 4; 10, 4)
+Lvl 03 upgrades: (30, 4; 16, 4; 7, 3)
+Lvl 04 upgrades: (1, 4; 27, 4; 26, 4; 4, 2)
+Lvl 05 upgrades: (30, 4; 19, 4; 16, 4; 13, 4)
+Lvl 06 upgrades: (33, 4; 20, 4; 10, 4)
+Lvl 07 upgrades: (1, 4; 16, 4; 26, 4)
+Lvl 08 upgrades: (30, 4; 27, 4; 7, 3)
+Lvl 09 upgrades: (33, 4; 16, 4; 13, 4)
+Lvl 10 upgrades: (1, 4; 20, 4; 26, 4; 10, 4)
+Lvl 11 upgrades: (30, 4; 23, 4; 16, 4; 4, 2)
+Lvl 12 upgrades: (33, 4; 27, 4; 7, 3)
+Lvl 13 upgrades: (1, 4; 16, 4; 26, 4; 13, 4)
+Lvl 14 upgrades: (30, 4; 20, 4; 10, 4)
+Lvl 15 upgrades: (33, 4; 19, 4; 16, 4)
+Lvl 16 upgrades: (1, 4; 27, 4; 26, 4)
+Lvl 17 upgrades: (30, 4; 16, 4; 13, 4; 7, 3)
+Lvl 18 upgrades: (33, 4; 20, 4; 10, 4; 4, 2)
+Lvl 19 upgrades: (1, 4; 16, 4; 26, 4)
+Lvl 20 upgrades: (34, 4; 27, 4)
+
+Lvl 01 loot: (37, 5)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (126, 1)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (38, 5)
+Lvl 06 loot: (127, 1)
+Lvl 07 loot: (212, 1)
+Lvl 08 loot: (128, 1)
+Lvl 09 loot: (39, 5)
+Lvl 10 loot: (205, 1; 213, 1)
+Lvl 11 loot: (129, 1; 378, 1)
+Lvl 12 loot: (206, 1)
+Lvl 13 loot: (40, 5; 214, 1)
+Lvl 14 loot: (130, 1)
+Lvl 15 loot: (131, 1)
+Lvl 16 loot: (215, 1)
+Lvl 17 loot: (216, 1; 380, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/18
+Name: Половинчик;
+Level: 1
+Life: 8
+Attack: 4
+CounterAttack: 4
+Defence: 2
+RangedDefence: 4
+Resist: 3
+Speed: 2
+RangedAttack: 5
+ShootingRange: 4
+Ammo: 8
+Stamina: 10
+Morale: 10
+Exp: 20
+ExpMod: 100
+GoldPrice: 25
+GemPrice: 0
+GoldPayment: 5
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 2
+Karma: 2
+SoundHit: 3
+SoundShoot: 52
+SoundShootHit: 23
+SoundDeath: 75
+Missile: 1
+Resource: (0)
+
+Abilityes:
+Agility: 56
+Gather_Ammo: 53;
+		
+Lvl 01 upgrades: (33, 4; 30, 4; 20, 1; 128, 2; 51, 1)
+Lvl 02 upgrades: (1, 4; 16, 4; 4, 4)
+Lvl 03 upgrades: (33, 4; 13, 4; 7, 4; 65, 3)
+Lvl 04 upgrades: (1, 4; 30, 4; 10, 4)
+Lvl 05 upgrades: (33, 4; 16, 4; 20, 4; 84, 3)
+Lvl 06 upgrades: (1, 4; 13, 4; 4, 4)
+Lvl 07 upgrades: (33, 4; 30, 4; 7, 4; 128, 4)
+Lvl 08 upgrades: (1, 4; 16, 4; 10, 4; 51, 3)
+Lvl 09 upgrades: (33, 4; 13, 4; 20, 4)
+Lvl 10 upgrades: (1, 4; 30, 4; 4, 4)
+Lvl 11 upgrades: (33, 4; 16, 4; 7, 4)
+Lvl 12 upgrades: (1, 4; 13, 4; 10, 4; 65, 3)
+Lvl 13 upgrades: (33, 4; 30, 4; 20, 4)
+Lvl 14 upgrades: (1, 4; 16, 4; 4, 4; 128, 4)
+Lvl 15 upgrades: (33, 4; 13, 4; 7, 4)
+Lvl 16 upgrades: (1, 4; 30, 4; 10, 4; 51, 3)
+Lvl 17 upgrades: (33, 4; 16, 4; 20, 4)
+Lvl 18 upgrades: (1, 4; 13, 4; 4, 4)
+Lvl 19 upgrades: (33, 4; 30, 4; 7, 4; 65, 3)
+Lvl 20 upgrades: (1, 4; 16, 4; 10, 4; 128, 4)
+
+Lvl 01 loot: (1, 5; 63, 5; 80, 3)
+Lvl 02 loot: (5, 3)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (2, 5; 64, 3)
+Lvl 06 loot: (6, 3)
+Lvl 07 loot: (81, 3)
+Lvl 08 loot: (111, 2)
+Lvl 09 loot: (3, 5; 65, 5; 117, 2)
+Lvl 10 loot: (7, 3; 120, 2)
+Lvl 11 loot: (82, 2; 94, 3)
+Lvl 12 loot: (121, 2; 310, 1)
+Lvl 13 loot: (4, 5; 126, 2)
+Lvl 14 loot: (127, 2; 377, 1)
+Lvl 15 loot: (239, 1)
+Lvl 16 loot: (326, 1)
+Lvl 17 loot: (367, 1)
+Lvl 18 loot: (380, 1)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/19
+Name: Скелет;
+Level: 1
+Life: 9
+Attack: 8
+CounterAttack: 4
+Defence: 2
+RangedDefence: 8
+Resist: 1
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 17
+ExpMod: 80
+GoldPrice: 5
+GemPrice: 0
+GoldPayment: 0
+GemPayment: 1
+Race: 3
+UnitKind: 2
+UnitClass: 1
+Karma: -3
+SoundHit: 0
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 76
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Lesser_Undead: 61;
+		
+Lvl 01 upgrades: (4, 3; 1, 4; 13, 3)
+Lvl 02 upgrades: (1, 4; 16, 4; 10, 4)
+Lvl 03 upgrades: (1, 4; 7, 4)
+Lvl 04 upgrades: (4, 3; 13, 3)
+Lvl 05 upgrades: (1, 4; 10, 3)
+Lvl 06 upgrades: (19, 3; 16, 4)
+Lvl 07 upgrades: (1, 4; 7, 4)
+Lvl 08 upgrades: (2, 4; 5, 4)
+Lvl 09 upgrades: (70, 3; 38, 3)
+Lvl 10 upgrades: (40, 3; 16, 4)
+Lvl 11 upgrades: (1, 4; 4, 4)
+Lvl 12 upgrades: (13, 4; 7, 4)
+Lvl 13 upgrades: (1, 4; 16, 4)
+Lvl 14 upgrades: (13, 4; 4, 4)
+Lvl 15 upgrades: (1, 4; 10, 4)
+Lvl 16 upgrades: (13, 4; 16, 4)
+Lvl 17 upgrades: (1, 4; 4, 4)
+Lvl 18 upgrades: (13, 4; 7, 4)
+Lvl 19 upgrades: (1, 4; 10, 4)
+Lvl 20 upgrades: (13, 4; 4, 4)
+
+Lvl 01 loot: (9, 5; 41, 3)
+Lvl 02 loot: (42, 3)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (10, 5; 43, 3)
+Lvl 06 loot: (74, 2)
+Lvl 07 loot: (221, 1)
+Lvl 08 loot: (146, 2)
+Lvl 09 loot: (11, 5; 44, 3)
+Lvl 10 loot: (75, 2)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (147, 1)
+Lvl 13 loot: (12, 5; 45, 3)
+Lvl 14 loot: (76, 2)
+Lvl 15 loot: (148, 1)
+Lvl 16 loot: (223, 1; 339, 1)
+Lvl 17 loot: (224, 1; 275, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/20
+Name: Зомби;
+Level: 1
+Life: 23
+Attack: 7
+CounterAttack: 7
+Defence: 0
+RangedDefence: 2
+Resist: 1
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 20
+ExpMod: 100
+GoldPrice: 10
+GemPrice: 0
+GoldPayment: 0
+GemPayment: 2
+Race: 3
+UnitKind: 2
+UnitClass: 1
+Karma: -3
+SoundHit: 66
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 67
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Lesser_Undead: 61;
+		
+Lvl 01 upgrades: (2, 5; 4, 4)
+Lvl 02 upgrades: (2, 5; 16, 4)
+Lvl 03 upgrades: (2, 5; 7, 4)
+Lvl 04 upgrades: (2, 5; 10, 3)
+Lvl 05 upgrades: (2, 5; 4, 4)
+Lvl 06 upgrades: (2, 5; 13, 3)
+Lvl 07 upgrades: (2, 5; 7, 4)
+Lvl 08 upgrades: (2, 5; 16, 4)
+Lvl 09 upgrades: (2, 5; 4, 4)
+Lvl 10 upgrades: (2, 5; 80, 3; 106, 4)
+Lvl 11 upgrades: (2, 5; 7, 4)
+Lvl 12 upgrades: (2, 5; 10, 3)
+Lvl 13 upgrades: (3, 5; 4, 4)
+Lvl 14 upgrades: (3, 5; 13, 3)
+Lvl 15 upgrades: (3, 5; 7, 4)
+Lvl 16 upgrades: (3, 5; 16, 3)
+Lvl 17 upgrades: (3, 5; 4, 4)
+Lvl 18 upgrades: (3, 5; 10, 3)
+Lvl 19 upgrades: (3, 5; 7, 4)
+Lvl 20 upgrades: (3, 5; 13, 3)
+
+Lvl 01 loot: (46, 1; 51, 3)
+Lvl 02 loot: (47, 1; 59, 3)
+Lvl 03 loot: (80, 2)
+Lvl 04 loot: (126, 1)
+Lvl 05 loot: (99, 2)
+Lvl 06 loot: (48, 1; 117, 1)
+Lvl 07 loot: (81, 2; 84, 2)
+Lvl 08 loot: (94, 1)
+Lvl 09 loot: (115, 1)
+Lvl 10 loot: (106, 1)
+Lvl 11 loot: (82, 2; 123, 1)
+Lvl 12 loot: (97, 2)
+Lvl 13 loot: (244, 1)
+Lvl 14 loot: (239, 1)
+Lvl 15 loot: (290, 1)
+Lvl 16 loot: (342, 1)
+Lvl 17 loot: (368, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/21
+Name: Бес;
+Level: 1
+Life: 8
+Attack: 7
+CounterAttack: 4
+Defence: 3
+RangedDefence: 4
+Resist: 2
+Speed: 3
+RangedAttack: 7
+ShootingRange: 2
+Ammo: 1
+Stamina: 10
+Morale: 10
+Exp: 16
+ExpMod: 110
+GoldPrice: 25
+GemPrice: 5
+GoldPayment: 0
+GemPayment: 1
+Race: 3
+UnitKind: 3
+UnitClass: 4
+Karma: -3
+SoundHit: 39
+SoundShoot: 40
+SoundShootHit: 41
+SoundDeath: 42
+Missile: 10
+Resource: (0)
+
+Abilityes:
+Float: 45
+Magic_Shot: 58;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 16, 4)
+Lvl 02 upgrades: (30, 4; 13, 4; 7, 4)
+Lvl 03 upgrades: (1, 4; 20, 4; 10, 4)
+Lvl 04 upgrades: (30, 4; 4, 4; 33, 4)
+Lvl 05 upgrades: (1, 4; 13, 4; 16, 4; 27, 4)
+Lvl 06 upgrades: (30, 4; 20, 4; 7, 4)
+Lvl 07 upgrades: (1, 4; 4, 4; 10, 4)
+Lvl 08 upgrades: (30, 4; 13, 4; 33, 4)
+Lvl 09 upgrades: (1, 4; 20, 4; 16, 4)
+Lvl 10 upgrades: (30, 4; 4, 4; 7, 4; 27, 4)
+Lvl 11 upgrades: (1, 4; 13, 4; 10, 4)
+Lvl 12 upgrades: (30, 4; 20, 4; 33, 4)
+Lvl 13 upgrades: (1, 4; 4, 4; 16, 4)
+Lvl 14 upgrades: (30, 4; 13, 4; 7, 4)
+Lvl 15 upgrades: (1, 4; 20, 4; 10, 4; 27, 4)
+Lvl 16 upgrades: (30, 4; 4, 4; 33, 4)
+Lvl 17 upgrades: (1, 4; 13, 4; 16, 4)
+Lvl 18 upgrades: (30, 4; 20, 4; 7, 4)
+Lvl 19 upgrades: (1, 4; 4, 4; 10, 4)
+Lvl 20 upgrades: (30, 4; 13, 4; 33, 4; 24, 4)
+
+Lvl 01 loot: (37, 5)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (126, 1)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (38, 5)
+Lvl 06 loot: (127, 1)
+Lvl 07 loot: (212, 1)
+Lvl 08 loot: (128, 1)
+Lvl 09 loot: (39, 5)
+Lvl 10 loot: (205, 1; 213, 1)
+Lvl 11 loot: (129, 1; 378, 1)
+Lvl 12 loot: (206, 1)
+Lvl 13 loot: (40, 5; 214, 1)
+Lvl 14 loot: (130, 1)
+Lvl 15 loot: (131, 1)
+Lvl 16 loot: (215, 1)
+Lvl 17 loot: (216, 1; 380, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/22
+Name: Монах;
+Level: 2
+Life: 12
+Attack: 6
+CounterAttack: 6
+Defence: 1
+RangedDefence: 1
+Resist: 4
+Speed: 2
+RangedAttack: 5
+ShootingRange: 4
+Ammo: 4
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 140
+GoldPrice: 75
+GemPrice: 10
+GoldPayment: 15
+GemPayment: 2
+Race: 1
+UnitKind: 1
+UnitClass: 4
+Karma: 2
+SoundHit: 60
+SoundShoot: 43
+SoundShootHit: 44
+SoundDeath: 45
+Missile: 9
+Resource: (4)
+
+Abilityes:
+Magic_Shot: 58
+Healing: 66
+Meditation: 52
+Cast_Inspire: 123;
+		
+Lvl 01 upgrades: (1, 4; 16, 4; 33, 4; 26, 4; 7, 4)
+Lvl 02 upgrades: (30, 4; 33, 4; 20, 4; 65, 3)
+Lvl 03 upgrades: (1, 4; 16, 4; 4, 4; 118, 4)
+Lvl 04 upgrades: (30, 4; 26, 4; 10, 4)
+Lvl 05 upgrades: (1, 4; 33, 4; 7, 4; 65, 3)
+Lvl 06 upgrades: (30, 4; 16, 4; 20, 4)
+Lvl 07 upgrades: (1, 4; 26, 4; 4, 4; 141, 4)
+Lvl 08 upgrades: (30, 4; 33, 4; 13, 4)
+Lvl 09 upgrades: (1, 4; 16, 4; 7, 4)
+Lvl 10 upgrades: (30, 4; 26, 4; 20, 4; 65, 3)
+Lvl 11 upgrades: (1, 4; 33, 4; 4, 4)
+Lvl 12 upgrades: (31, 4; 26, 4; 10, 4)
+Lvl 13 upgrades: (2, 4; 16, 4; 7, 4)
+Lvl 14 upgrades: (31, 4; 42, 4; 20, 4)
+Lvl 15 upgrades: (2, 4; 34, 4; 4, 4; 65, 3)
+Lvl 16 upgrades: (31, 4; 26, 4; 13, 4)
+Lvl 17 upgrades: (2, 4; 42, 4; 7, 4)
+Lvl 18 upgrades: (31, 4; 17, 4; 20, 4)
+Lvl 19 upgrades: (2, 4; 26, 4; 38, 4)
+Lvl 20 upgrades: (31, 4; 42, 4; 21, 4; 65, 3)
+
+Lvl 01 loot: (6, 5; 64, 3)
+Lvl 02 loot: (68, 2)
+Lvl 03 loot: (120, 2)
+Lvl 04 loot: (117, 2)
+Lvl 05 loot: (7, 5)
+Lvl 06 loot: (69, 2)
+Lvl 07 loot: (111, 1)
+Lvl 08 loot: (121, 2)
+Lvl 09 loot: (8, 5)
+Lvl 10 loot: (124, 1; 345, 3)
+Lvl 11 loot: (139, 1)
+Lvl 12 loot: (326, 1; 367, 1)
+Lvl 13 loot: (346, 1)
+Lvl 14 loot: (358, 1)
+Lvl 15 loot: (382, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+
+/23
+Name: Гвардеец;
+Level: 2
+Life: 23
+Attack: 9
+CounterAttack: 11
+Defence: 4
+RangedDefence: 9
+Resist: 2
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 12
+Morale: 13
+Exp: 30
+ExpMod: 150
+GoldPrice: 90
+GemPrice: 0
+GoldPayment: 18
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: 1
+SoundHit: 46
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 47
+Missile: 0
+Resource: (1, 1)
+
+Abilityes:
+Piercing_Strike: 69
+Reinvigoration: 51;
+		
+Lvl 01 upgrades: (1, 4; 7, 4; 13, 4; 33, 4)
+Lvl 02 upgrades: (30, 4; 4, 4; 10, 4; 16, 4)
+Lvl 03 upgrades: (1, 4; 7, 4; 13, 4; 33, 4; 59, 4)
+Lvl 04 upgrades: (30, 4; 4, 4; 10, 4; 46, 4)
+Lvl 05 upgrades: (1, 4; 7, 4; 13, 4; 33, 4)
+Lvl 06 upgrades: (31, 4; 4, 4; 10, 4; 16, 4)
+Lvl 07 upgrades: (2, 4; 7, 4; 13, 4; 33, 4)
+Lvl 08 upgrades: (31, 4; 4, 4; 10, 4)
+Lvl 09 upgrades: (2, 4; 7, 4; 13, 4; 33, 4)
+Lvl 10 upgrades: (31, 4; 4, 4; 10, 4; 16, 4)
+Lvl 11 upgrades: (2, 4; 38, 4; 40, 4; 34, 4)
+Lvl 12 upgrades: (36, 4; 8, 4; 14, 4; 103, 4)
+Lvl 13 upgrades: (36, 4; 5, 4; 11, 4; 34, 4)
+Lvl 14 upgrades: (31, 4; 38, 4; 40, 4; 16, 4)
+Lvl 15 upgrades: (2, 4; 8, 4; 14, 4; 34, 4)
+Lvl 16 upgrades: (36, 4; 5, 4; 11, 4)
+Lvl 17 upgrades: (3, 4; 38, 4; 40, 4; 34, 4)
+Lvl 18 upgrades: (36, 4; 8, 4; 14, 4; 17, 4)
+Lvl 19 upgrades: (32, 4; 5, 4; 11, 4; 42, 4)
+Lvl 20 upgrades: (37, 4; 39, 4; 41, 4)
+
+Lvl 01 loot: (18, 6; 60, 4)
+Lvl 02 loot: (77, 2; 90, 2)
+Lvl 03 loot: (102, 2)
+Lvl 04 loot: (108, 1)
+Lvl 05 loot: (19, 6; 61, 4)
+Lvl 06 loot: (78, 2; 91, 2)
+Lvl 07 loot: (103, 2; 161, 1)
+Lvl 08 loot: (190, 1; 162, 3)
+Lvl 09 loot: (20, 6; 62, 4; 258, 3)
+Lvl 10 loot: (79, 2; 92, 2; 182, 1)
+Lvl 11 loot: (104, 2; 119, 1)
+Lvl 12 loot: (110, 1; 183, 1)
+Lvl 13 loot: (163, 1; 321, 1)
+Lvl 14 loot: (164, 1; 300, 1)
+Lvl 15 loot: (184, 1; 259, 1)
+Lvl 16 loot: (301, 1)
+Lvl 17 loot: (322, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/24
+Name: Пегас;
+Level: 2
+Life: 25
+Attack: 10
+CounterAttack: 7
+Defence: 3
+RangedDefence: 0
+Resist: 6
+Speed: 5
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 150
+GoldPrice: 80
+GemPrice: 10
+GoldPayment: 16
+GemPayment: 2
+Race: 1
+UnitKind: 1
+UnitClass: 7
+Karma: 2
+SoundHit: 81
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 16
+Missile: 0
+Resource: (4)
+
+Abilityes:
+Flying: 44
+First_Aid: 65;
+		
+Lvl 01 upgrades: (30, 4; 4, 4; 33, 4; 7, 4; 65, 4)
+Lvl 02 upgrades: (2, 4; 16, 4; 10, 4)
+Lvl 03 upgrades: (30, 4; 33, 4; 65, 4)
+Lvl 04 upgrades: (2, 4; 4, 4; 13, 4; 67, 4)
+Lvl 05 upgrades: (31, 4; 16, 4; 7, 4; 65, 4)
+Lvl 06 upgrades: (2, 4; 33, 4; 10, 4)
+Lvl 07 upgrades: (36, 4; 4, 4; 65, 4)
+Lvl 08 upgrades: (2, 4; 16, 4; 103, 4)
+Lvl 09 upgrades: (31, 4; 34, 4; 7, 4; 65, 4)
+Lvl 10 upgrades: (2, 4; 4, 4; 10, 4)
+Lvl 11 upgrades: (36, 4; 16, 4; 65, 4)
+Lvl 12 upgrades: (2, 4; 34, 4; 13, 4)
+Lvl 13 upgrades: (31, 4; 4, 4; 7, 4; 65, 4)
+Lvl 14 upgrades: (2, 4; 42, 4; 10, 4)
+Lvl 15 upgrades: (36, 4; 34, 4; 65, 4)
+Lvl 16 upgrades: (2, 4; 5, 4)
+Lvl 17 upgrades: (31, 4; 17, 4; 8, 4; 65, 4)
+Lvl 18 upgrades: (2, 4; 42, 4; 10, 4)
+Lvl 19 upgrades: (36, 4; 5, 4; 65, 4)
+Lvl 20 upgrades: (2, 4; 42, 4; 13, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/25
+Name: Всадник;
+Level: 2
+Life: 30
+Attack: 11
+CounterAttack: 7
+Defence: 2
+RangedDefence: 2
+Resist: 1
+Speed: 4
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 35
+ExpMod: 120
+GoldPrice: 75
+GemPrice: 0
+GoldPayment: 15
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 3
+Karma: 0
+SoundHit: 68
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 69
+Missile: 0
+Resource: (3, 1)
+
+Abilityes:
+Charge: 67;
+		
+Lvl 01 upgrades: (30, 4; 4, 4; 7, 4; 33, 4)
+Lvl 02 upgrades: (2, 4; 33, 4; 10, 4)
+Lvl 03 upgrades: (30, 4; 13, 4)
+Lvl 04 upgrades: (2, 4; 4, 4; 16, 4)
+Lvl 05 upgrades: (31, 4; 33, 4; 7, 4)
+Lvl 06 upgrades: (2, 4; 10, 4)
+Lvl 07 upgrades: (36, 4; 4, 4; 13, 4)
+Lvl 08 upgrades: (2, 4; 34, 4; 16, 4)
+Lvl 09 upgrades: (31, 4; 7, 4)
+Lvl 10 upgrades: (2, 4; 4, 4; 10, 4)
+Lvl 11 upgrades: (36, 4; 34, 4; 16, 4)
+Lvl 12 upgrades: (2, 4; 8, 4; 13, 4)
+Lvl 13 upgrades: (31, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (2, 4; 34, 4; 13, 4)
+Lvl 15 upgrades: (36, 4; 42, 4)
+Lvl 16 upgrades: (2, 4; 5, 4; 8, 4)
+Lvl 17 upgrades: (31, 4; 34, 4; 10, 4)
+Lvl 18 upgrades: (2, 4; 13, 4)
+Lvl 19 upgrades: (36, 4; 5, 4; 42, 4)
+Lvl 20 upgrades: (2, 4; 34, 4; 8, 4)
+
+Lvl 01 loot: (10, 6; 52, 3)
+Lvl 02 loot: (71, 2)
+Lvl 03 loot: (96, 2)
+Lvl 04 loot: (146, 3)
+Lvl 05 loot: (11, 6; 53, 3)
+Lvl 06 loot: (72, 2)
+Lvl 07 loot: (97, 2; 113, 1)
+Lvl 08 loot: (147, 1)
+Lvl 09 loot: (12, 6; 54, 3)
+Lvl 10 loot: (86, 2)
+Lvl 11 loot: (244, 1)
+Lvl 12 loot: (149, 1)
+Lvl 13 loot: (246, 1)
+Lvl 14 loot: (311, 1)
+Lvl 15 loot: (359, 1)
+Lvl 16 loot: (312, 1)
+Lvl 17 loot: (371, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/26
+Name: Конный лучник;
+Level: 2
+Life: 25
+Attack: 8
+CounterAttack: 5
+Defence: 1
+RangedDefence: 2
+Resist: 1
+Speed: 4
+RangedAttack: 6
+ShootingRange: 4
+Ammo: 9
+Stamina: 12
+Morale: 10
+Exp: 35
+ExpMod: 130
+GoldPrice: 70
+GemPrice: 0
+GoldPayment: 14
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 2
+Karma: 0
+SoundHit: 68
+SoundShoot: 77
+SoundShootHit: 23
+SoundDeath: 69
+Missile: 0
+Resource: (3, 2)
+
+Abilityes:
+Charge: 67;
+		
+Lvl 01 upgrades: (30, 4; 33, 4; 4, 4; 20, 4)
+Lvl 02 upgrades: (2, 4; 13, 4; 16, 4)
+Lvl 03 upgrades: (30, 4; 7, 4; 33, 4)
+Lvl 04 upgrades: (2, 4; 10, 4; 20, 4)
+Lvl 05 upgrades: (31, 4; 4, 4; 27, 4)
+Lvl 06 upgrades: (2, 4; 13, 4; 33, 4)
+Lvl 07 upgrades: (36, 4; 7, 4; 16, 4)
+Lvl 08 upgrades: (2, 4; 10, 4; 20, 4)
+Lvl 09 upgrades: (31, 4; 4, 4; 33, 4)
+Lvl 10 upgrades: (2, 4; 13, 4; 16, 4; 50, 2)
+Lvl 11 upgrades: (36, 4; 7, 4; 20, 4)
+Lvl 12 upgrades: (2, 4; 10, 4; 34, 4)
+Lvl 13 upgrades: (31, 4; 5, 4; 42, 4)
+Lvl 14 upgrades: (2, 4; 13, 4; 27, 4)
+Lvl 15 upgrades: (36, 4; 38, 4; 34, 4)
+Lvl 16 upgrades: (2, 4; 10, 4; 21, 4)
+Lvl 17 upgrades: (31, 4; 5, 4; 42, 4)
+Lvl 18 upgrades: (2, 4; 13, 4; 34, 4)
+Lvl 19 upgrades: (36, 4; 38, 4; 27, 4)
+Lvl 20 upgrades: (2, 4; 10, 4; 21, 4)
+
+Lvl 01 loot: (30, 6; 52, 2)
+Lvl 02 loot: (48, 3)
+Lvl 03 loot: (96, 2)
+Lvl 04 loot: (190, 3; 229, 3)
+Lvl 05 loot: (31, 6; 53, 3)
+Lvl 06 loot: (49, 3)
+Lvl 07 loot: (82, 3; 97, 2)
+Lvl 08 loot: (113, 2; 191, 1)
+Lvl 09 loot: (32, 6; 54, 2)
+Lvl 10 loot: (50, 3; 192, 1)
+Lvl 11 loot: (98, 3; 230, 1)
+Lvl 12 loot: (231, 1; 244, 1)
+Lvl 13 loot: (194, 1; 245, 1)
+Lvl 14 loot: (233, 1)
+Lvl 15 loot: (292, 1)
+Lvl 16 loot: (370, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/27
+Name: Баллиста;
+Level: 2
+Life: 14
+Attack: 0
+CounterAttack: 0
+Defence: 1
+RangedDefence: 3
+Resist: 0
+Speed: 1
+RangedAttack: 9
+ShootingRange: 5
+Ammo: 4
+Stamina: 8
+Morale: 10
+Exp: 35
+ExpMod: 190
+GoldPrice: 150
+GemPrice: 0
+GoldPayment: 25
+GemPayment: 0
+Race: 1
+UnitKind: 4
+UnitClass: 2
+Karma: 0
+SoundHit: 7
+SoundShoot: 95
+SoundShootHit: 7
+SoundDeath: 17
+Missile: 2
+Resource: (1, 2, 2)
+
+Abilityes:
+Don't fight: 68
+Siege: 99
+Soulless: 49
+Gather Ammo: 134
+PoisonImmunity: 72;
+		
+Lvl 01 upgrades: (30, 4; 1, 4; 20, 4; 13, 4)
+Lvl 02 upgrades: (1, 4; 16, 3)
+Lvl 03 upgrades: (30, 4; 27, 4; 114, 4)
+Lvl 04 upgrades: (1, 4; 20, 4; 100, 4)
+Lvl 05 upgrades: (30, 4; 13, 4; 47, 4)
+Lvl 06 upgrades: (1, 4; 10, 4)
+Lvl 07 upgrades: (31, 4; 20, 4)
+Lvl 08 upgrades: (2, 4; 27, 4; 100, 4)
+Lvl 09 upgrades: (31, 4; 13, 4)
+Lvl 10 upgrades: (2, 4; 20, 4; 23, 4)
+Lvl 11 upgrades: (31, 4; 16, 4)
+Lvl 12 upgrades: (2, 4; 27, 4; 100, 4)
+Lvl 13 upgrades: (31, 4; 21, 4)
+Lvl 14 upgrades: (2, 4; 13, 4)
+Lvl 15 upgrades: (31, 4; 10, 4)
+Lvl 16 upgrades: (2, 4; 21, 4; 100, 4)
+Lvl 17 upgrades: (31, 4; 14, 4)
+Lvl 18 upgrades: (2, 4; 28, 4)
+Lvl 19 upgrades: (31, 4; 21, 4)
+Lvl 20 upgrades: (2, 4; 17, 4; 100, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/28
+Name: Громила;
+Level: 2
+Life: 35
+Attack: 14
+CounterAttack: 9
+Defence: 2
+RangedDefence: 2
+Resist: 1
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 12
+Morale: 9
+Exp: 30
+ExpMod: 110
+GoldPrice: 60
+GemPrice: 0
+GoldPayment: 12
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: -2
+SoundHit: 48
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 31
+Missile: 0
+Resource: (1)
+
+Abilityes:
+Stun: 70;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 7, 4; 10, 3)
+Lvl 02 upgrades: (30, 4; 2, 10)
+Lvl 03 upgrades: (2, 10; 4, 4)
+Lvl 04 upgrades: (31, 10; 7, 4; 13, 3)
+Lvl 05 upgrades: (2, 10; 33, 1; 10, 3)
+Lvl 06 upgrades: (36, 10; 4, 4)
+Lvl 07 upgrades: (2, 10; 7, 4)
+Lvl 08 upgrades: (31, 10; 16, 1; 13, 3)
+Lvl 09 upgrades: (36, 10; 4, 4; 10, 3)
+Lvl 10 upgrades: (31, 10; 7, 4; 89, 4)
+Lvl 11 upgrades: (2, 10; 33, 1)
+Lvl 12 upgrades: (36, 10; 4, 4; 13, 3)
+Lvl 13 upgrades: (2, 10; 38, 4; 10, 3)
+Lvl 14 upgrades: (31, 10; 16, 1)
+Lvl 15 upgrades: (36, 10; 5, 4)
+Lvl 16 upgrades: (32, 10; 38, 4; 13, 3)
+Lvl 17 upgrades: (3, 10; 33, 1; 10, 3)
+Lvl 18 upgrades: (36, 10; 5, 4)
+Lvl 19 upgrades: (3, 10; 38, 4)
+Lvl 20 upgrades: (37, 10; 6, 4; 40, 3)
+
+Lvl 01 loot: (22, 6; 56, 2)
+Lvl 02 loot: (43, 3; 74, 2)
+Lvl 03 loot: (87, 2; 99, 2; 221, 1)
+Lvl 04 loot: (105, 1; 113, 1)
+Lvl 05 loot: (23, 6; 57, 2)
+Lvl 06 loot: (44, 3; 75, 2)
+Lvl 07 loot: (100, 2; 168, 1)
+Lvl 08 loot: (106, 1; 169, 1)
+Lvl 09 loot: (24, 6; 58, 2; 223, 1)
+Lvl 10 loot: (76, 2)
+Lvl 11 loot: (89, 2)
+Lvl 12 loot: (107, 1; 119, 1)
+Lvl 13 loot: (170, 1)
+Lvl 14 loot: (171, 1)
+Lvl 15 loot: (224, 1)
+Lvl 16 loot: (252, 1)
+Lvl 17 loot: (172, 1; 275, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/29
+Name: Колдун;
+Level: 2
+Life: 12
+Attack: 5
+CounterAttack: 6
+Defence: 0
+RangedDefence: 1
+Resist: 5
+Speed: 2
+RangedAttack: 9
+ShootingRange: 4
+Ammo: 5
+Stamina: 10
+Morale: 10
+Exp: 33
+ExpMod: 160
+GoldPrice: 90
+GemPrice: 15
+GoldPayment: 15
+GemPayment: 3
+Race: 1
+UnitKind: 1
+UnitClass: 4
+Karma: -1
+SoundHit: 60
+SoundShoot: 70
+SoundShootHit: 71
+SoundDeath: 72
+Missile: 8
+Resource: (4, 4)
+
+Abilityes:
+Magic_Shot: 58
+Curse: 73
+Cast_Vulnerability: 116;
+		
+Lvl 01 upgrades: (1, 4; 20, 4; 7, 3; 33, 4)
+Lvl 02 upgrades: (30, 4; 16, 4; 10, 3)
+Lvl 03 upgrades: (1, 4; 27, 4; 4, 3; 121, 4)
+Lvl 04 upgrades: (30, 4; 20, 4; 13, 3)
+Lvl 05 upgrades: (1, 4; 16, 4; 7, 3; 33, 4)
+Lvl 06 upgrades: (30, 4; 27, 4; 10, 3; 57, 4)
+Lvl 07 upgrades: (1, 4; 20, 4; 4, 3; 122, 4)
+Lvl 08 upgrades: (30, 4; 16, 4; 13, 3; 150, 4)
+Lvl 09 upgrades: (1, 4; 27, 4; 7, 3; 33, 4)
+Lvl 10 upgrades: (30, 4; 20, 4; 10, 3; 23, 4)
+Lvl 11 upgrades: (1, 4; 16, 4; 4, 3)
+Lvl 12 upgrades: (30, 4; 27, 4; 13, 3)
+Lvl 13 upgrades: (1, 4; 20, 4; 7, 3; 33, 4)
+Lvl 14 upgrades: (31, 4; 16, 4; 10, 3)
+Lvl 15 upgrades: (2, 4; 27, 4; 4, 3; 150, 4)
+Lvl 16 upgrades: (31, 4; 21, 4; 13, 3)
+Lvl 17 upgrades: (2, 4; 17, 4; 7, 3; 33, 4)
+Lvl 18 upgrades: (31, 4; 27, 4; 10, 3)
+Lvl 19 upgrades: (2, 4; 21, 4; 4, 3)
+Lvl 20 upgrades: (31, 4; 17, 4; 13, 3; 150, 4)
+
+Lvl 01 loot: (2, 3; 6, 4; 64, 2)
+Lvl 02 loot: (38, 4; 68, 2)
+Lvl 03 loot: (81, 2; 93, 2; 111, 1)
+Lvl 04 loot: (127, 1; 212, 1)
+Lvl 05 loot: (3, 3; 7, 4; 213, 1)
+Lvl 06 loot: (39, 6; 69, 2; 205, 1)
+Lvl 07 loot: (82, 2; 94, 2; 118, 2)
+Lvl 08 loot: (128, 1; 133, 1; 206, 1)
+Lvl 09 loot: (8, 4; 66, 3; 140, 1; 214, 1)
+Lvl 10 loot: (40, 4; 70, 2; 215, 1; 237, 3)
+Lvl 11 loot: (83, 2; 95, 2; 112, 1; 238, 1; 355, 1)
+Lvl 12 loot: (131, 1; 135, 1; 207, 1)
+Lvl 13 loot: (141, 1; 216, 1)
+Lvl 14 loot: (208, 1; 240, 1; 305, 1)
+Lvl 15 loot: (142, 1; 265, 1)
+Lvl 16 loot: (217, 1; 285, 1)
+Lvl 17 loot: (347, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/30
+Name: Убийца;
+Level: 2
+Life: 20
+Attack: 10
+CounterAttack: 6
+Defence: 4
+RangedDefence: 4
+Resist: 2
+Speed: 2
+RangedAttack: 6
+ShootingRange: 2
+Ammo: 3
+Stamina: 10
+Morale: 9
+Exp: 30
+ExpMod: 120
+GoldPrice: 70
+GemPrice: 0
+GoldPayment: 14
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: -2
+SoundHit: 73
+SoundShoot: 50
+SoundShootHit: 51
+SoundDeath: 74
+Missile: 6
+Resource: (0)
+
+Abilityes:
+Agility: 56
+Poison_Attack: 71
+Aimed_Hit: 129;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 13, 4; 20, 4; 127, 4)
+Lvl 02 upgrades: (30, 4; 7, 4; 16, 4; 132, 4)
+Lvl 03 upgrades: (1, 4; 4, 4; 27, 4; 140, 4)
+Lvl 04 upgrades: (30, 4; 10, 4; 20, 4; 127, 4)
+Lvl 05 upgrades: (1, 4; 4, 4; 13, 4)
+Lvl 06 upgrades: (30, 4; 7, 4; 16, 4; 132, 4)
+Lvl 07 upgrades: (1, 4; 4, 4; 33, 4; 127, 4)
+Lvl 08 upgrades: (31, 4; 10, 4; 20, 4; 140, 4)
+Lvl 09 upgrades: (2, 4; 4, 4; 13, 4; 132, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 16, 4; 69, 4)
+Lvl 11 upgrades: (36, 4; 4, 4; 20, 4; 127, 4)
+Lvl 12 upgrades: (31, 4; 10, 4; 13, 4; 132, 4)
+Lvl 13 upgrades: (2, 4; 4, 4; 16, 4; 140, 4)
+Lvl 14 upgrades: (36, 4; 38, 4; 27, 4; 127, 4)
+Lvl 15 upgrades: (2, 4; 5, 4; 20, 4; 132, 4)
+Lvl 16 upgrades: (31, 4; 10, 4; 13, 4; 140, 4)
+Lvl 17 upgrades: (36, 4; 5, 4; 16, 4; 127, 4)
+Lvl 18 upgrades: (31, 4; 38, 4; 33, 4; 132, 4)
+Lvl 19 upgrades: (2, 4; 5, 4; 20, 4; 140, 4)
+Lvl 20 upgrades: (36, 4; 10, 4; 13, 4; 127, 4)
+
+Lvl 01 loot: (2, 5; 52, 2)
+Lvl 02 loot: (71, 2)
+Lvl 03 loot: (96, 2; 120, 3)
+Lvl 04 loot: (127, 1)
+Lvl 05 loot: (3, 6; 53, 2)
+Lvl 06 loot: (72, 2; 121, 3)
+Lvl 07 loot: (97, 2; 113, 1; 310, 1)
+Lvl 08 loot: (128, 1; 132, 3)
+Lvl 09 loot: (4, 3; 54, 2; 244, 1)
+Lvl 10 loot: (129, 1; 134, 1)
+Lvl 11 loot: (245, 2; 270, 1)
+Lvl 12 loot: (246, 2)
+Lvl 13 loot: (311, 1)
+Lvl 14 loot: (312, 1)
+Lvl 15 loot: (336, 1; 379, 1)
+Lvl 16 loot: (272, 1; 370, 1)
+Lvl 17 loot: (137, 1; 292, 1)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (338, 1)
+
+/31
+Name: Гарпия;
+Level: 2
+Life: 22
+Attack: 11
+CounterAttack: 7
+Defence: 2
+RangedDefence: 1
+Resist: 1
+Speed: 4
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 100
+GoldPrice: 70
+GemPrice: 0
+GoldPayment: 14
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 7
+Karma: -2
+SoundHit: 89
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 90
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Flying: 44
+Steal_Ammo: 74;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 33, 4; 10, 4)
+Lvl 02 upgrades: (30, 4; 7, 4; 16, 4)
+Lvl 03 upgrades: (1, 4; 33, 4; 13, 4)
+Lvl 04 upgrades: (30, 4; 4, 4)
+Lvl 05 upgrades: (1, 4; 7, 4; 10, 4)
+Lvl 06 upgrades: (31, 4; 33, 4; 16, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 13, 4)
+Lvl 08 upgrades: (31, 4; 7, 4; 73, 4)
+Lvl 09 upgrades: (36, 4; 33, 4; 10, 4)
+Lvl 10 upgrades: (31, 4; 4, 4; 16, 4; 56, 4)
+Lvl 11 upgrades: (2, 4; 7, 4; 13, 4)
+Lvl 12 upgrades: (36, 4; 33, 4)
+Lvl 13 upgrades: (2, 4; 4, 4; 10, 4)
+Lvl 14 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 15 upgrades: (36, 4; 34, 3; 13, 4)
+Lvl 16 upgrades: (31, 4; 5, 4)
+Lvl 17 upgrades: (2, 4; 38, 4; 11, 4)
+Lvl 18 upgrades: (36, 4; 34, 4; 17, 4)
+Lvl 19 upgrades: (2, 4; 5, 4; 13, 4)
+Lvl 20 upgrades: (37, 4; 38, 4)
+
+Lvl 01 loot: (114, 2)
+Lvl 02 loot: (115, 4)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (116, 3)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (327, 1)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (328, 1)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/32
+Name: Василиск;
+Level: 2
+Life: 35
+Attack: 12
+CounterAttack: 9
+Defence: 1
+RangedDefence: 3
+Resist: 2
+Speed: 1
+RangedAttack: 3
+ShootingRange: 2
+Ammo: 2
+Stamina: 10
+Morale: 10
+Exp: 33
+ExpMod: 120
+GoldPrice: 75
+GemPrice: 0
+GoldPayment: 15
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: 0
+SoundHit: 91
+SoundShoot: 92
+SoundShootHit: 93
+SoundDeath: 94
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Stoning_eye: 76
+Swamp_Dweller: 64;
+		
+Lvl 01 upgrades: (2, 4; 33, 4; 13, 4)
+Lvl 02 upgrades: (31, 4; 4, 4; 10, 4)
+Lvl 03 upgrades: (2, 4; 7, 4; 16, 4)
+Lvl 04 upgrades: (31, 4; 33, 4; 98, 4; 146, 4)
+Lvl 05 upgrades: (2, 4; 4, 4; 13, 4; 19, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 07 upgrades: (36, 4; 33, 4; 16, 4)
+Lvl 08 upgrades: (31, 4; 4, 4; 98, 4)
+Lvl 09 upgrades: (2, 4; 7, 4; 13, 4)
+Lvl 10 upgrades: (36, 4; 33, 4; 10, 4; 146, 4)
+Lvl 11 upgrades: (2, 4; 4, 4; 16, 4)
+Lvl 12 upgrades: (31, 4; 7, 4; 98, 4)
+Lvl 13 upgrades: (36, 4; 34, 4; 13, 4)
+Lvl 14 upgrades: (31, 4; 5, 4; 10, 4)
+Lvl 15 upgrades: (2, 4; 8, 4; 16, 4; 19, 4)
+Lvl 16 upgrades: (36, 4; 34, 4; 98, 4; 146, 4)
+Lvl 17 upgrades: (3, 4; 5, 4; 14, 4)
+Lvl 18 upgrades: (32, 4; 8, 4; 11, 4)
+Lvl 19 upgrades: (3, 4; 34, 4; 17, 4)
+Lvl 20 upgrades: (37, 4; 38, 4; 98, 4; 146, 4)
+
+Lvl 01 loot: (392, 10)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/33
+Name: Паук;
+Level: 2
+Life: 29
+Attack: 9
+CounterAttack: 8
+Defence: 1
+RangedDefence: 2
+Resist: 1
+Speed: 2
+RangedAttack: 3
+ShootingRange: 2
+Ammo: 3
+Stamina: 10
+Morale: 10
+Exp: 40
+ExpMod: 120
+GoldPrice: 80
+GemPrice: 0
+GoldPayment: 25
+GemPayment: 2
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: 0
+SoundHit: 85
+SoundShoot: 86
+SoundShootHit: 87
+SoundDeath: 88
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Poisonous_bite: 78
+Web: 77
+Forester: 62;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 10, 4)
+Lvl 02 upgrades: (30, 4; 7, 4; 13, 4)
+Lvl 03 upgrades: (2, 4; 33, 4; 16, 4)
+Lvl 04 upgrades: (31, 4; 4, 4; 140, 4)
+Lvl 05 upgrades: (2, 4; 7, 4; 10, 4)
+Lvl 06 upgrades: (31, 4; 33, 4; 13, 4)
+Lvl 07 upgrades: (38, 4; 4, 4; 16, 4)
+Lvl 08 upgrades: (31, 4; 7, 4; 27, 4)
+Lvl 09 upgrades: (2, 4; 33, 4; 10, 4)
+Lvl 10 upgrades: (38, 4; 4, 4; 13, 4)
+Lvl 11 upgrades: (2, 4; 7, 4; 16, 4)
+Lvl 12 upgrades: (31, 4; 34, 4; 140, 4)
+Lvl 13 upgrades: (38, 4; 4, 4; 10, 4)
+Lvl 14 upgrades: (31, 4; 7, 4; 13, 4)
+Lvl 15 upgrades: (2, 4; 34, 4; 16, 4)
+Lvl 16 upgrades: (38, 4; 5, 4; 140, 4)
+Lvl 17 upgrades: (3, 4; 38, 4; 11, 4)
+Lvl 18 upgrades: (32, 4; 34, 4; 14, 4)
+Lvl 19 upgrades: (3, 4; 5, 4; 17, 4)
+Lvl 20 upgrades: (39, 4; 38, 4; 140, 4)
+
+Lvl 01 loot: (391, 10)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/34
+Name: Кентавр;
+Level: 2
+Life: 30
+Attack: 12
+CounterAttack: 8
+Defence: 1
+RangedDefence: 2
+Resist: 2
+Speed: 4
+RangedAttack: 7
+ShootingRange: 4
+Ammo: 6
+Stamina: 12
+Morale: 12
+Exp: 35
+ExpMod: 150
+GoldPrice: 75
+GemPrice: 0
+GoldPayment: 15
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 2
+Karma: 0
+SoundHit: 104
+SoundShoot: 5
+SoundShootHit: 23
+SoundDeath: 105
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Rejuveration: 51
+Forester: 62;
+		
+Lvl 01 upgrades: (30, 4; 33, 4; 4, 4; 20, 4)
+Lvl 02 upgrades: (2, 4; 13, 4; 16, 4)
+Lvl 03 upgrades: (30, 4; 7, 4; 33, 4)
+Lvl 04 upgrades: (2, 4; 10, 4; 20, 4)
+Lvl 05 upgrades: (31, 4; 4, 4; 27, 4)
+Lvl 06 upgrades: (2, 4; 13, 4; 33, 4)
+Lvl 07 upgrades: (36, 4; 7, 4; 16, 4)
+Lvl 08 upgrades: (2, 4; 10, 4; 20, 4)
+Lvl 09 upgrades: (31, 4; 4, 4; 33, 4)
+Lvl 10 upgrades: (2, 4; 13, 4; 16, 4)
+Lvl 11 upgrades: (36, 4; 7, 4; 20, 4)
+Lvl 12 upgrades: (2, 4; 10, 4; 34, 4)
+Lvl 13 upgrades: (31, 4; 5, 4; 42, 4)
+Lvl 14 upgrades: (2, 4; 13, 4; 27, 4)
+Lvl 15 upgrades: (36, 4; 38, 4; 34, 4)
+Lvl 16 upgrades: (2, 4; 10, 4; 21, 4)
+Lvl 17 upgrades: (31, 4; 5, 4; 42, 4)
+Lvl 18 upgrades: (2, 4; 13, 4; 34, 4)
+Lvl 19 upgrades: (36, 4; 38, 4; 27, 4)
+Lvl 20 upgrades: (2, 4; 10, 4; 21, 4)
+
+Lvl 01 loot: (30, 5)
+Lvl 02 loot: (48, 3)
+Lvl 03 loot: (190, 1)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (31, 5)
+Lvl 06 loot: (49, 3)
+Lvl 07 loot: (113, 2)
+Lvl 08 loot: (124, 1; 192, 4)
+Lvl 09 loot: (32, 5; 230, 1)
+Lvl 10 loot: (50, 3; 366, 1)
+Lvl 11 loot: (231, 1)
+Lvl 12 loot: (194, 1)
+Lvl 13 loot: (233, 1)
+Lvl 14 loot: (370, 1)
+Lvl 15 loot: (234, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/35
+Name: Дриада;
+Level: 2
+Life: 24
+Attack: 8
+CounterAttack: 9
+Defence: 3
+RangedDefence: 5
+Resist: 3
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 11
+Exp: 30
+ExpMod: 110
+GoldPrice: 35
+GemPrice: 15
+GoldPayment: 7
+GemPayment: 3
+Race: 2
+UnitKind: 1
+UnitClass: 1
+Karma: 2
+SoundHit: 102
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 103
+Missile: 0
+Resource: (4)
+
+Abilityes:
+Forester: 62
+Magic_strike: 57;
+		
+Lvl 01 upgrades: (1, 4; 30, 4; 16, 4; 7, 3; 33, 4)
+Lvl 02 upgrades: (30, 1; 10, 4; 4, 4)
+Lvl 03 upgrades: (1, 4; 13, 4; 33, 4)
+Lvl 04 upgrades: (30, 4; 16, 4; 7, 4)
+Lvl 05 upgrades: (2, 4; 10, 4; 33, 4; 4, 4)
+Lvl 06 upgrades: (30, 4; 13, 4)
+Lvl 07 upgrades: (2, 4; 16, 4; 33, 4; 7, 4)
+Lvl 08 upgrades: (31, 4; 10, 4; 4, 4; 72, 4)
+Lvl 09 upgrades: (2, 4; 13, 4)
+Lvl 10 upgrades: (36, 4; 16, 4; 34, 4; 7, 4; 109, 4)
+Lvl 11 upgrades: (2, 4; 10, 4; 4, 4)
+Lvl 12 upgrades: (31, 4; 13, 4)
+Lvl 13 upgrades: (2, 4; 16, 4; 7, 4)
+Lvl 14 upgrades: (36, 4; 40, 4; 4, 4)
+Lvl 15 upgrades: (3, 4; 42, 4)
+Lvl 16 upgrades: (31, 4; 34, 4; 7, 4)
+Lvl 17 upgrades: (3, 4; 40, 4; 4, 3)
+Lvl 18 upgrades: (32, 4; 42, 4)
+Lvl 19 upgrades: (3, 4; 38, 4)
+Lvl 20 upgrades: (37, 4; 43, 4; 41, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/36
+Name: Упырь;
+Level: 2
+Life: 28
+Attack: 9
+CounterAttack: 8
+Defence: 0
+RangedDefence: 0
+Resist: 2
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 110
+GoldPrice: 20
+GemPrice: 5
+GoldPayment: 0
+GemPayment: 4
+Race: 2
+UnitKind: 2
+UnitClass: 1
+Karma: -3
+SoundHit: 98
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 99
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Cannibal: 79
+DiseaseCarrier: 106
+Lesser_Undead: 61;
+		
+Lvl 01 upgrades: (2, 5; 4, 4)
+Lvl 02 upgrades: (2, 5; 16, 4)
+Lvl 03 upgrades: (2, 5; 7, 4)
+Lvl 04 upgrades: (2, 5; 10, 3)
+Lvl 05 upgrades: (2, 5; 4, 4)
+Lvl 06 upgrades: (2, 5; 13, 3)
+Lvl 07 upgrades: (2, 5; 7, 4; 4, 4)
+Lvl 08 upgrades: (2, 5; 16, 4)
+Lvl 09 upgrades: (2, 5; 4, 4)
+Lvl 10 upgrades: (2, 5; 80, 3; 71, 4)
+Lvl 11 upgrades: (2, 5; 7, 4)
+Lvl 12 upgrades: (2, 5; 10, 3)
+Lvl 13 upgrades: (3, 5; 38, 4)
+Lvl 14 upgrades: (3, 5; 13, 3)
+Lvl 15 upgrades: (3, 5; 38, 4; 81, 4)
+Lvl 16 upgrades: (3, 5; 16, 3)
+Lvl 17 upgrades: (3, 5; 5, 4)
+Lvl 18 upgrades: (3, 5; 10, 3)
+Lvl 19 upgrades: (3, 5; 8, 4)
+Lvl 20 upgrades: (3, 5; 13, 3)
+
+Lvl 01 loot: (64, 4)
+Lvl 02 loot: (71, 3; 111, 1)
+Lvl 03 loot: (105, 1; 117, 1)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (65, 4)
+Lvl 06 loot: (69, 2; 72, 2)
+Lvl 07 loot: (106, 1; 113, 1)
+Lvl 08 loot: (118, 1)
+Lvl 09 loot: (237, 1; 244, 1)
+Lvl 10 loot: (76, 2; 245, 1)
+Lvl 11 loot: (239, 1)
+Lvl 12 loot: (336, 1)
+Lvl 13 loot: (266, 1)
+Lvl 14 loot: (254, 1; 346, 1)
+Lvl 15 loot: (286, 1; 368, 1)
+Lvl 16 loot: (337, 1; 347, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/37
+Name: Чёрт;
+Level: 2
+Life: 29
+Attack: 12
+CounterAttack: 7
+Defence: 4
+RangedDefence: 2
+Resist: 3
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 12
+Morale: 10
+Exp: 30
+ExpMod: 110
+GoldPrice: 50
+GemPrice: 5
+GoldPayment: 0
+GemPayment: 4
+Race: 2
+UnitKind: 3
+UnitClass: 1
+Karma: -3
+SoundHit: 100
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 101
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Fear: 80;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 13, 4)
+Lvl 02 upgrades: (30, 4; 7, 4; 16, 4)
+Lvl 03 upgrades: (2, 4; 4, 4)
+Lvl 04 upgrades: (31, 4; 10, 4)
+Lvl 05 upgrades: (2, 4; 4, 4; 13, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 33, 4)
+Lvl 08 upgrades: (31, 4; 10, 4)
+Lvl 09 upgrades: (2, 4; 4, 4; 13, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 16, 4; 73, 4)
+Lvl 11 upgrades: (36, 4; 4, 4)
+Lvl 12 upgrades: (31, 4; 10, 4; 13, 4)
+Lvl 13 upgrades: (2, 4; 4, 4; 16, 4)
+Lvl 14 upgrades: (36, 4; 38, 4)
+Lvl 15 upgrades: (2, 4; 5, 4)
+Lvl 16 upgrades: (31, 4; 10, 4; 13, 4)
+Lvl 17 upgrades: (36, 4; 5, 4; 16, 4)
+Lvl 18 upgrades: (31, 4; 38, 4; 33, 4)
+Lvl 19 upgrades: (2, 4; 5, 4; 17, 4)
+Lvl 20 upgrades: (36, 4; 10, 4; 13, 4)
+
+Lvl 01 loot: (18, 6)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (19, 6)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (161, 2)
+Lvl 08 loot: (162, 1)
+Lvl 09 loot: (20, 4)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (163, 1)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (164, 1)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (166, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/38
+Name: Адская гончая;
+Level: 2
+Life: 25
+Attack: 10
+CounterAttack: 6
+Defence: 2
+RangedDefence: 6
+Resist: 3
+Speed: 3
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 120
+GoldPrice: 45
+GemPrice: 5
+GoldPayment: 0
+GemPayment: 3
+Race: 2
+UnitKind: 3
+UnitClass: 1
+Karma: -3
+SoundHit: 106
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 107
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Cripple: 81;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 13, 4)
+Lvl 02 upgrades: (30, 4; 7, 4; 16, 4)
+Lvl 03 upgrades: (1, 4; 4, 4)
+Lvl 04 upgrades: (31, 4; 10, 4)
+Lvl 05 upgrades: (2, 4; 4, 4; 13, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 33, 4)
+Lvl 08 upgrades: (31, 4; 10, 4)
+Lvl 09 upgrades: (2, 4; 4, 4; 13, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 16, 4; 19, 4)
+Lvl 11 upgrades: (36, 4; 4, 4)
+Lvl 12 upgrades: (31, 4; 10, 4; 13, 4)
+Lvl 13 upgrades: (2, 4; 4, 4; 16, 4)
+Lvl 14 upgrades: (36, 4; 38, 4)
+Lvl 15 upgrades: (2, 4; 5, 4)
+Lvl 16 upgrades: (31, 4; 10, 4; 13, 4)
+Lvl 17 upgrades: (36, 4; 5, 4; 16, 4)
+Lvl 18 upgrades: (31, 4; 38, 4; 33, 4)
+Lvl 19 upgrades: (2, 4; 5, 4; 17, 4)
+Lvl 20 upgrades: (36, 4; 10, 4; 13, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/39
+Name: Горгулья;
+Level: 2
+Life: 21
+Attack: 6
+CounterAttack: 7
+Defence: 4
+RangedDefence: 6
+Resist: 5
+Speed: 3
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 13
+Morale: 10
+Exp: 33
+ExpMod: 140
+GoldPrice: 100
+GemPrice: 15
+GoldPayment: 0
+GemPayment: 5
+Race: 2
+UnitKind: 4
+UnitClass: 5
+Karma: 0
+SoundHit: 96
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 97
+Missile: 0
+Resource: (6)
+
+Abilityes:
+Flying: 44
+Soulless: 49
+PoisonImmunity: 72
+Break_weapon: 82;
+		
+Lvl 01 upgrades: (1, 4; 30, 4; 16, 4; 7, 3)
+Lvl 02 upgrades: (30, 1; 10, 4; 4, 4)
+Lvl 03 upgrades: (1, 4; 13, 4)
+Lvl 04 upgrades: (30, 4; 16, 4; 7, 4)
+Lvl 05 upgrades: (2, 4; 10, 4; 4, 4)
+Lvl 06 upgrades: (30, 4; 13, 4)
+Lvl 07 upgrades: (2, 4; 16, 4; 7, 4)
+Lvl 08 upgrades: (31, 4; 10, 4; 4, 4)
+Lvl 09 upgrades: (2, 4; 13, 4)
+Lvl 10 upgrades: (36, 4; 16, 4; 7, 4)
+Lvl 11 upgrades: (2, 4; 10, 4; 4, 4)
+Lvl 12 upgrades: (31, 4; 13, 4)
+Lvl 13 upgrades: (2, 4; 16, 4; 7, 4)
+Lvl 14 upgrades: (36, 4; 40, 4; 4, 4)
+Lvl 15 upgrades: (3, 4; 17, 4)
+Lvl 16 upgrades: (31, 4; 7, 4)
+Lvl 17 upgrades: (3, 4; 40, 4; 4, 3)
+Lvl 18 upgrades: (32, 4; 17, 4)
+Lvl 19 upgrades: (3, 4; 38, 4)
+Lvl 20 upgrades: (37, 4; 41, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/40
+Name: Воин;
+Level: 2
+Life: 22
+Attack: 6
+CounterAttack: 4
+Defence: 0
+RangedDefence: 0
+Resist: 1
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 130
+GoldPrice: 0
+GemPrice: 0
+GoldPayment: 0
+GemPayment: 0
+Race: 2
+UnitKind: 5
+UnitClass: 2
+Karma: 0
+SoundHit: 0
+SoundShoot: 5
+SoundShootHit: 23
+SoundDeath: 8
+Missile: 0
+Resource: (0)
+
+Abilityes:
+None: 0;
+		
+Lvl 01 upgrades: (1, 10; 2, 10)
+Lvl 02 upgrades: (1, 10; 2, 10)
+Lvl 03 upgrades: (1, 10; 2, 10)
+Lvl 04 upgrades: (1, 10; 2, 10)
+Lvl 05 upgrades: (1, 10; 2, 10)
+Lvl 06 upgrades: (1, 10; 2, 10)
+Lvl 07 upgrades: (1, 10; 2, 10)
+Lvl 08 upgrades: (1, 10; 2, 10)
+Lvl 09 upgrades: (1, 10; 2, 10)
+Lvl 10 upgrades: (1, 10; 2, 10)
+Lvl 11 upgrades: (1, 10; 2, 10)
+Lvl 12 upgrades: (1, 10; 2, 10)
+Lvl 13 upgrades: (1, 10; 2, 10)
+Lvl 14 upgrades: (1, 10; 2, 10)
+Lvl 15 upgrades: (1, 10; 2, 10)
+Lvl 16 upgrades: (1, 10; 2, 10)
+Lvl 17 upgrades: (1, 10; 2, 10)
+Lvl 18 upgrades: (1, 10; 2, 10)
+Lvl 19 upgrades: (1, 10; 2, 10)
+Lvl 20 upgrades: (1, 10; 2, 10)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/41
+Name: Разведчик;
+Level: 2
+Life: 17
+Attack: 4
+CounterAttack: 3
+Defence: 0
+RangedDefence: 0
+Resist: 1
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 100
+GoldPrice: 0
+GemPrice: 0
+GoldPayment: 0
+GemPayment: 0
+Race: 2
+UnitKind: 5
+UnitClass: 2
+Karma: 0
+SoundHit: 0
+SoundShoot: 5
+SoundShootHit: 23
+SoundDeath: 8
+Missile: 0
+Resource: (0)
+
+Abilityes:
+None: 0;
+		
+Lvl 01 upgrades: (1, 10; 2, 10)
+Lvl 02 upgrades: (1, 10; 2, 10)
+Lvl 03 upgrades: (1, 10; 2, 10)
+Lvl 04 upgrades: (1, 10; 2, 10)
+Lvl 05 upgrades: (1, 10; 2, 10)
+Lvl 06 upgrades: (1, 10; 2, 10)
+Lvl 07 upgrades: (1, 10; 2, 10)
+Lvl 08 upgrades: (1, 10; 2, 10)
+Lvl 09 upgrades: (1, 10; 2, 10)
+Lvl 10 upgrades: (1, 10; 2, 10)
+Lvl 11 upgrades: (1, 10; 2, 10)
+Lvl 12 upgrades: (1, 10; 2, 10)
+Lvl 13 upgrades: (1, 10; 2, 10)
+Lvl 14 upgrades: (1, 10; 2, 10)
+Lvl 15 upgrades: (1, 10; 2, 10)
+Lvl 16 upgrades: (1, 10; 2, 10)
+Lvl 17 upgrades: (1, 10; 2, 10)
+Lvl 18 upgrades: (1, 10; 2, 10)
+Lvl 19 upgrades: (1, 10; 2, 10)
+Lvl 20 upgrades: (1, 10; 2, 10)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/42
+Name: Командир;
+Level: 2
+Life: 15
+Attack: 3
+CounterAttack: 3
+Defence: 0
+RangedDefence: 0
+Resist: 2
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 100
+GoldPrice: 0
+GemPrice: 0
+GoldPayment: 0
+GemPayment: 0
+Race: 2
+UnitKind: 5
+UnitClass: 2
+Karma: 0
+SoundHit: 0
+SoundShoot: 5
+SoundShootHit: 23
+SoundDeath: 8
+Missile: 0
+Resource: (0)
+
+Abilityes:
+None: 0;
+		
+Lvl 01 upgrades: (1, 10; 2, 10)
+Lvl 02 upgrades: (1, 10; 2, 10)
+Lvl 03 upgrades: (1, 10; 2, 10)
+Lvl 04 upgrades: (1, 10; 2, 10)
+Lvl 05 upgrades: (1, 10; 2, 10)
+Lvl 06 upgrades: (1, 10; 2, 10)
+Lvl 07 upgrades: (1, 10; 2, 10)
+Lvl 08 upgrades: (1, 10; 2, 10)
+Lvl 09 upgrades: (1, 10; 2, 10)
+Lvl 10 upgrades: (1, 10; 2, 10)
+Lvl 11 upgrades: (1, 10; 2, 10)
+Lvl 12 upgrades: (1, 10; 2, 10)
+Lvl 13 upgrades: (1, 10; 2, 10)
+Lvl 14 upgrades: (1, 10; 2, 10)
+Lvl 15 upgrades: (1, 10; 2, 10)
+Lvl 16 upgrades: (1, 10; 2, 10)
+Lvl 17 upgrades: (1, 10; 2, 10)
+Lvl 18 upgrades: (1, 10; 2, 10)
+Lvl 19 upgrades: (1, 10; 2, 10)
+Lvl 20 upgrades: (1, 10; 2, 10)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/43
+Name: Волшебник;
+Level: 2
+Life: 14
+Attack: 2
+CounterAttack: 3
+Defence: 0
+RangedDefence: 0
+Resist: 4
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 30
+ExpMod: 100
+GoldPrice: 0
+GemPrice: 0
+GoldPayment: 0
+GemPayment: 0
+Race: 2
+UnitKind: 5
+UnitClass: 4
+Karma: 0
+SoundHit: 60
+SoundShoot: 57
+SoundShootHit: 117
+SoundDeath: 118
+Missile: 5
+Resource: (0)
+
+Abilityes:
+None: 0;
+		
+Lvl 01 upgrades: (1, 10; 2, 10)
+Lvl 02 upgrades: (1, 10; 2, 10)
+Lvl 03 upgrades: (1, 10; 2, 10)
+Lvl 04 upgrades: (1, 10; 2, 10)
+Lvl 05 upgrades: (1, 10; 2, 10)
+Lvl 06 upgrades: (1, 10; 2, 10)
+Lvl 07 upgrades: (1, 10; 2, 10)
+Lvl 08 upgrades: (1, 10; 2, 10)
+Lvl 09 upgrades: (1, 10; 2, 10)
+Lvl 10 upgrades: (1, 10; 2, 10)
+Lvl 11 upgrades: (1, 10; 2, 10)
+Lvl 12 upgrades: (1, 10; 2, 10)
+Lvl 13 upgrades: (1, 10; 2, 10)
+Lvl 14 upgrades: (1, 10; 2, 10)
+Lvl 15 upgrades: (1, 10; 2, 10)
+Lvl 16 upgrades: (1, 10; 2, 10)
+Lvl 17 upgrades: (1, 10; 2, 10)
+Lvl 18 upgrades: (1, 10; 2, 10)
+Lvl 19 upgrades: (1, 10; 2, 10)
+Lvl 20 upgrades: (1, 10; 2, 10)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+
+/44
+Name: Рыцарь;
+Level: 3
+Life: 37
+Attack: 17
+CounterAttack: 11
+Defence: 4
+RangedDefence: 10
+Resist: 2
+Speed: 3
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 16
+Morale: 12
+Exp: 80
+ExpMod: 250
+GoldPrice: 400
+GemPrice: 0
+GoldPayment: 80
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 3
+Karma: 2
+SoundHit: 108
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 109
+Missile: 0
+Resource: (1, 3, 7)
+
+Abilityes:
+Charge: 67;
+		
+Lvl 01 upgrades: (2, 4; 4, 4; 10, 4; 34, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 13, 4)
+Lvl 03 upgrades: (2, 4; 4, 4; 16, 4; 34, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 40, 4; 34, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 46, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 10, 4; 34, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 103, 4)
+Lvl 09 upgrades: (2, 4; 38, 4; 16, 4; 34, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 40, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 14, 4; 35, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 42, 4)
+Lvl 13 upgrades: (3, 4; 5, 4; 11, 4; 35, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 40, 4)
+Lvl 15 upgrades: (3, 4; 38, 4; 43, 4; 35, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 41, 3)
+Lvl 17 upgrades: (37, 4; 8, 4; 42, 4; 35, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 11, 4)
+Lvl 19 upgrades: (3, 4; 8, 4; 14, 4; 35,4)
+Lvl 20 upgrades: (37, 4; 6, 4; 41, 4)
+
+Lvl 01 loot: (11, 4; 44, 3)
+Lvl 02 loot: (27, 3; 61, 3)
+Lvl 03 loot: (78, 2; 91, 4; 148, 1)
+Lvl 04 loot: (103, 2; 109, 1; 149, 1; 233, 1)
+Lvl 05 loot: (12, 4; 45, 6; 175, 1; 259, 1)
+Lvl 06 loot: (28, 3; 62, 3; 176, 1; 280, 1)
+Lvl 07 loot: (79, 4; 92, 2; 182, 1; 300, 1)
+Lvl 08 loot: (104, 2; 110, 1; 119, 1; 321, 1)
+Lvl 09 loot: (150, 1; 224, 1; 357, 1)
+Lvl 10 loot: (177, 1; 185, 1)
+Lvl 11 loot: (186, 1; 225, 1)
+Lvl 12 loot: (261, 1; 281, 1)
+Lvl 13 loot: (301, 1; 322, 1)
+Lvl 14 loot: (226, 1; 348, 1)
+Lvl 15 loot: (187, 1; 371, 1)
+Lvl 16 loot: (372, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/45
+Name: Жрец;
+Level: 3
+Life: 15
+Attack: 6
+CounterAttack: 8
+Defence: 2
+RangedDefence: 2
+Resist: 5
+Speed: 2
+RangedAttack: 6
+ShootingRange: 7
+Ammo: 4
+Stamina: 12
+Morale: 10
+Exp: 70
+ExpMod: 220
+GoldPrice: 300
+GemPrice: 50
+GoldPayment: 60
+GemPayment: 8
+Race: 1
+UnitKind: 1
+UnitClass: 4
+Karma: 2
+SoundHit: 60
+SoundShoot: 110
+SoundShootHit: 44
+SoundDeath: 111
+Missile: 9
+Resource: (4, 5)
+
+Abilityes:
+Heal: 94
+Magic_shot: 58
+Meditation: 52
+Dispel: 125;
+		
+Lvl 01 upgrades: (1, 4; 33, 4; 26, 4; 16, 4)
+Lvl 02 upgrades: (30, 4; 20, 4; 13, 4)
+Lvl 03 upgrades: (1, 4; 26, 4; 10, 4; 119, 4)
+Lvl 04 upgrades: (30, 4; 33, 4; 27, 4)
+Lvl 05 upgrades: (1, 4; 20, 4; 16, 4; 57, 4)
+Lvl 06 upgrades: (30, 4; 26, 4; 10, 4)
+Lvl 07 upgrades: (1, 4; 33, 4; 13, 4; 103, 4)
+Lvl 08 upgrades: (30, 4; 20, 4; 27, 4; 143, 4)
+Lvl 09 upgrades: (2, 4; 26, 4; 16, 4)
+Lvl 10 upgrades: (31, 4; 34, 4; 10, 4)
+Lvl 11 upgrades: (2, 4; 20, 4; 13, 4)
+Lvl 12 upgrades: (31, 4; 26, 4; 27, 4)
+Lvl 13 upgrades: (2, 4; 34, 4; 17, 4)
+Lvl 14 upgrades: (31, 4; 20, 4; 10, 4)
+Lvl 15 upgrades: (2, 4; 26, 4; 13, 4)
+Lvl 16 upgrades: (36, 4; 34, 4; 42, 4)
+Lvl 17 upgrades: (2, 4; 21, 4; 10, 4)
+Lvl 18 upgrades: (31, 4; 26, 4; 13, 4)
+Lvl 19 upgrades: (2, 4; 42, 4; 27, 4)
+Lvl 20 upgrades: (36, 4; 21, 4; 43, 4)
+
+Lvl 01 loot: (7, 5; 69, 2)
+Lvl 02 loot: (129, 1; 128, 1; 345, 1)
+Lvl 03 loot: (139, 3; 326, 1)
+Lvl 04 loot: (238, 1; 285, 1; 367, 1)
+Lvl 05 loot: (8, 5; 66, 3; 265, 1; 305, 1)
+Lvl 06 loot: (70, 2; 95, 2; 125, 1)
+Lvl 07 loot: (112, 1; 116, 1; 130, 1)
+Lvl 08 loot: (131, 1; 327, 1; 346, 1)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (358, 1)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (381, 1)
+Lvl 13 loot: (382, 1)
+Lvl 14 loot: (307, 1)
+Lvl 15 loot: (267, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/46
+Name: Катапульта;
+Level: 3
+Life: 20
+Attack: 0
+CounterAttack: 0
+Defence: 1
+RangedDefence: 5
+Resist: 0
+Speed: 1
+RangedAttack: 12
+ShootingRange: 6
+Ammo: 3
+Stamina: 10
+Morale: 10
+Exp: 70
+ExpMod: 250
+GoldPrice: 500
+GemPrice: 0
+GoldPayment: 100
+GemPayment: 0
+Race: 1
+UnitKind: 4
+UnitClass: 2
+Karma: 0
+SoundHit: 7
+SoundShoot: 112
+SoundShootHit: 113
+SoundDeath: 17
+Missile: 4
+Resource: (1, 2, 7)
+
+Abilityes:
+Gather_ammo: 53
+Don't_fight: 68
+Soulless: 49
+Siege: 101
+PoisonImmunity: 72;
+		
+Lvl 01 upgrades: (2, 4; 20, 4; 27, 1; 13, 1; 16, 1)
+Lvl 02 upgrades: (31, 4; 13, 4)
+Lvl 03 upgrades: (2, 4; 20, 4; 47, 4; 100, 4)
+Lvl 04 upgrades: (31, 4; 16, 4)
+Lvl 05 upgrades: (2, 4; 20, 4; 27, 4)
+Lvl 06 upgrades: (31, 4; 13, 4; 100, 4)
+Lvl 07 upgrades: (2, 4; 20, 4)
+Lvl 08 upgrades: (31, 4; 10, 4; 23, 4)
+Lvl 09 upgrades: (2, 4; 20, 4; 100, 4)
+Lvl 10 upgrades: (31, 4; 13, 4; 27, 4)
+Lvl 11 upgrades: (2, 4; 21, 4)
+Lvl 12 upgrades: (31, 4; 16, 4; 100, 4)
+Lvl 13 upgrades: (2, 4; 21, 4)
+Lvl 14 upgrades: (31, 4; 13, 4)
+Lvl 15 upgrades: (3, 4; 21, 4; 27, 4; 100, 4)
+Lvl 16 upgrades: (32, 4; 10, 4)
+Lvl 17 upgrades: (3, 4; 21, 4)
+Lvl 18 upgrades: (32, 4; 13, 4; 100, 4)
+Lvl 19 upgrades: (3, 4; 21, 4)
+Lvl 20 upgrades: (32, 4; 16, 4; 27, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/47
+Name: Грифон;
+Level: 3
+Life: 42
+Attack: 18
+CounterAttack: 14
+Defence: 3
+RangedDefence: 1
+Resist: 5
+Speed: 4
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 18
+Morale: 10
+Exp: 60
+ExpMod: 190
+GoldPrice: 350
+GemPrice: 20
+GoldPayment: 70
+GemPayment: 5
+Race: 1
+UnitKind: 1
+UnitClass: 7
+Karma: 0
+SoundHit: 114
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 115
+Missile: 0
+Resource: (5)
+
+Abilityes:
+Fly: 44
+Charge: 67;
+		
+Lvl 01 upgrades: (2, 4; 4, 4; 10, 4; 33, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 03 upgrades: (2, 4; 4, 4; 13, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 33, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 10, 4; 34, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4)
+Lvl 09 upgrades: (2, 4; 38, 4; 16, 4; 34, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 70, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 34, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 42, 4; 19, 4)
+Lvl 13 upgrades: (3, 4; 5, 4; 10, 4; 34, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 15 upgrades: (3, 4; 38, 4; 42, 4; 34, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 10, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 13, 4; 35, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 17, 4)
+Lvl 19 upgrades: (3, 4; 8, 4; 14, 4; 35,4)
+Lvl 20 upgrades: (37, 4; 6, 4; 41, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/48
+Name: Маг;
+Level: 3
+Life: 15
+Attack: 4
+CounterAttack: 6
+Defence: 1
+RangedDefence: 6
+Resist: 8
+Speed: 2
+RangedAttack: 12
+ShootingRange: 5
+Ammo: 6
+Stamina: 12
+Morale: 10
+Exp: 70
+ExpMod: 230
+GoldPrice: 300
+GemPrice: 70
+GoldPayment: 60
+GemPayment: 10
+Race: 1
+UnitKind: 1
+UnitClass: 4
+Karma: -1
+SoundHit: 60
+SoundShoot: 116
+SoundShootHit: 117
+SoundDeath: 118
+Missile: 5
+Resource: (4, 5, 5)
+
+Abilityes:
+Magic_shot: 58
+Air_Shield: 120
+Slow: 139;
+		
+Lvl 01 upgrades: (1, 4; 20, 4; 16, 4; 150, 4)
+Lvl 02 upgrades: (30, 4; 27, 4; 33, 4; 57, 4)
+Lvl 03 upgrades: (1, 4; 20, 4; 7, 4; 117, 4)
+Lvl 04 upgrades: (30, 4; 13, 4; 16, 4)
+Lvl 05 upgrades: (1, 4; 20, 4; 33, 4; 150, 4)
+Lvl 06 upgrades: (30, 4; 27, 4; 4, 4)
+Lvl 07 upgrades: (1, 4; 20, 4; 16, 4; 142, 4)
+Lvl 08 upgrades: (30, 4; 10, 4; 33, 4)
+Lvl 09 upgrades: (1, 4; 20, 4; 7, 4; 52, 4)
+Lvl 10 upgrades: (31, 4; 27, 4; 16, 4; 23, 4)
+Lvl 11 upgrades: (1, 4; 21, 4; 33, 4; 150, 4)
+Lvl 12 upgrades: (31, 4; 13, 4; 4, 4)
+Lvl 13 upgrades: (2, 4; 21, 4; 17, 4)
+Lvl 14 upgrades: (31, 4; 27, 4; 42, 4)
+Lvl 15 upgrades: (2, 4; 21, 4; 7, 4)
+Lvl 16 upgrades: (31, 4; 10, 4; 42, 4; 150, 4)
+Lvl 17 upgrades: (2, 4; 21, 4; 34, 4)
+Lvl 18 upgrades: (31, 4; 27, 4; 4, 4)
+Lvl 19 upgrades: (2, 4; 21, 4; 17, 4)
+Lvl 20 upgrades: (31, 4; 13, 4; 43, 4; 150, 4)
+
+Lvl 01 loot: (7, 5; 69, 2; 93, 1)
+Lvl 02 loot: (118, 4; 128, 1; 39, 3; 237, 1)
+Lvl 03 loot: (129, 1; 205, 1; 214, 1)
+Lvl 04 loot: (133, 1; 140, 1; 206, 1)
+Lvl 05 loot: (8, 5; 66, 3; 40, 5; 215, 1)
+Lvl 06 loot: (70, 2; 83, 4; 95, 1)
+Lvl 07 loot: (112, 1; 130, 1; 131, 1)
+Lvl 08 loot: (141, 1; 216, 1)
+Lvl 09 loot: (135, 1; 240, 1)
+Lvl 10 loot: (142, 2; 217, 1; 266, 1)
+Lvl 11 loot: (207, 1; 286, 1)
+Lvl 12 loot: (208, 1; 306, 1)
+Lvl 13 loot: (241, 1; 347, 1)
+Lvl 14 loot: (136, 1)
+Lvl 15 loot: (209, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/49
+Name: Палач;
+Level: 3
+Life: 43
+Attack: 16
+CounterAttack: 16
+Defence: 3
+RangedDefence: 8
+Resist: 2
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 20
+Morale: 9
+Exp: 60
+ExpMod: 160
+GoldPrice: 200
+GemPrice: 0
+GoldPayment: 40
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 1
+Karma: -2
+SoundHit: 119
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 120
+Missile: 0
+Resource: (1, 7)
+
+Abilityes:
+Cripple: 81
+Round_attack: 108;
+		
+Lvl 01 upgrades: (2, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 03 upgrades: (2, 4; 4, 4; 16, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 33, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 10, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4)
+Lvl 09 upgrades: (2, 4; 38, 4; 33, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 102, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 13 upgrades: (3, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 15 upgrades: (3, 4; 38, 4; 33, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 19 upgrades: (3, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4)
+
+Lvl 01 loot: (15, 5; 57, 3)
+Lvl 02 loot: (75, 2; 100, 2)
+Lvl 03 loot: (88, 2; 106, 1)
+Lvl 04 loot: (155, 3; 252, 1)
+Lvl 05 loot: (16, 5; 58, 3; 275, 1)
+Lvl 06 loot: (76, 2; 101, 2; 295, 1)
+Lvl 07 loot: (89, 2; 107, 1; 316, 1)
+Lvl 08 loot: (156, 1; 339, 1; 356, 1)
+Lvl 09 loot: (254, 1)
+Lvl 10 loot: (157, 2)
+Lvl 11 loot: (276, 1)
+Lvl 12 loot: (296, 1; 368, 1)
+Lvl 13 loot: (317, 1)
+Lvl 14 loot: (158, 1)
+Lvl 15 loot: (318, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/50
+Name: Людоед;
+Level: 3
+Life: 68
+Attack: 19
+CounterAttack: 17
+Defence: 1
+RangedDefence: 2
+Resist: 0
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 23
+Morale: 9
+Exp: 90
+ExpMod: 170
+GoldPrice: 200
+GemPrice: 0
+GoldPayment: 40
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: -2
+SoundHit: 121
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 122
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Cannibalize: 79
+Crushing_blow: 89
+Hill_dweller: 63;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4; 70, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/51
+Name: Минотавр;
+Level: 3
+Life: 52
+Attack: 18
+CounterAttack: 18
+Defence: 4
+RangedDefence: 5
+Resist: 2
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 18
+Morale: 12
+Exp: 80
+ExpMod: 160
+GoldPrice: 250
+GemPrice: 10
+GoldPayment: 50
+GemPayment: 2
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: 0
+SoundHit: 123
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 124
+Missile: 0
+Resource: (1, 7)
+
+Abilityes:
+Berserk: 95;
+		
+Lvl 01 upgrades: (2, 4; 4, 4; 10, 4; 33, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 03 upgrades: (2, 4; 4, 4; 13, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4; 108, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 33, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 59, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 10, 4; 34, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 75, 4)
+Lvl 09 upgrades: (2, 4; 38, 4; 16, 4; 34, 4)
+Lvl 10 upgrades: (31, 4; 8, 4; 10, 4; 70, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 34, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 42, 4)
+Lvl 13 upgrades: (3, 4; 5, 4; 10, 4; 34, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 15 upgrades: (3, 4; 38, 4; 42, 4; 34, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 10, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 13, 4; 35, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 17, 4)
+Lvl 19 upgrades: (3, 4; 8, 4; 14, 4; 35,4)
+Lvl 20 upgrades: (37, 4; 6, 4; 41, 4)
+
+Lvl 01 loot: (15, 4; 53, 3)
+Lvl 02 loot: (27, 4; 72, 2)
+Lvl 03 loot: (97, 2; 106, 2)
+Lvl 04 loot: (155, 1; 176, 1)
+Lvl 05 loot: (16, 4; 54, 3)
+Lvl 06 loot: (28, 4; 86, 2)
+Lvl 07 loot: (119, 1)
+Lvl 08 loot: (156, 1)
+Lvl 09 loot: (247, 1)
+Lvl 10 loot: (157, 1; 271, 1)
+Lvl 11 loot: (178, 1; 291, 1)
+Lvl 12 loot: (311, 1)
+Lvl 13 loot: (369, 1)
+Lvl 14 loot: (159, 1)
+Lvl 15 loot: (340, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/52
+Name: Мантикора;
+Level: 3
+Life: 50
+Attack: 19
+CounterAttack: 14
+Defence: 3
+RangedDefence: 1
+Resist: 3
+Speed: 5
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 17
+Morale: 10
+Exp: 70
+ExpMod: 190
+GoldPrice: 170
+GemPrice: 15
+GoldPayment: 35
+GemPayment: 3
+Race: 2
+UnitKind: 1
+UnitClass: 7
+Karma: 0
+SoundHit: 126
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 127
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Fly: 44
+Poison: 133;
+		
+Lvl 01 upgrades: (2, 4; 4, 4; 10, 4; 33, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 03 upgrades: (2, 4; 4, 4; 13, 4; 140, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 33, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 81, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 10, 4; 33, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 140, 4)
+Lvl 09 upgrades: (2, 4; 38, 4; 16, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 70, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 34, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 42, 4; 19, 4)
+Lvl 13 upgrades: (3, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 15 upgrades: (3, 4; 38, 4; 42, 4; 34, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 10, 4; 140, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 17, 4)
+Lvl 19 upgrades: (3, 4; 8, 4; 14, 4; 34,4)
+Lvl 20 upgrades: (37, 4; 6, 4; 41, 4; 140, 4)
+
+Lvl 01 loot: (393, 10)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/53
+Name: Единорог;
+Level: 3
+Life: 47
+Attack: 17
+CounterAttack: 17
+Defence: 2
+RangedDefence: 3
+Resist: 9
+Speed: 3
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 16
+Morale: 12
+Exp: 70
+ExpMod: 180
+GoldPrice: 150
+GemPrice: 20
+GoldPayment: 30
+GemPayment: 4
+Race: 2
+UnitKind: 1
+UnitClass: 3
+Karma: 3
+SoundHit: 128
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 16
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Magic_strike: 57
+Forester: 62
+First_aid: 96;
+		
+Lvl 01 upgrades: (2, 4; 4, 4; 10, 4; 33, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 03 upgrades: (2, 4; 4, 4; 13, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4; 16, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 33, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 103, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 10, 4; 34, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 17, 4)
+Lvl 09 upgrades: (2, 4; 38, 4; 17, 4; 34, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 70, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 34, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 42, 4; 19, 4)
+Lvl 13 upgrades: (3, 4; 5, 4; 10, 4; 34, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 17, 4)
+Lvl 15 upgrades: (3, 4; 38, 4; 42, 4; 34, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 10, 4; 17, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 13, 4; 35, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 17, 4)
+Lvl 19 upgrades: (3, 4; 8, 4; 14, 4; 35,4)
+Lvl 20 upgrades: (37, 4; 6, 4; 41, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+
+/54
+Name: Тролль;
+Level: 3
+Life: 63
+Attack: 17
+CounterAttack: 19
+Defence: 3
+RangedDefence: 3
+Resist: 2
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 28
+Morale: 10
+Exp: 90
+ExpMod: 190
+GoldPrice: 250
+GemPrice: 0
+GoldPayment: 50
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: -2
+SoundHit: 26
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 18
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Regeneration: 97
+Swamp_dweller: 64
+Siege: 99;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 100, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4; 98, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 100, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 98, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4; 100, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4; 98, 4; 100, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/55
+Name: Призрак;
+Level: 3
+Life: 18
+Attack: 9
+CounterAttack: 10
+Defence: 20
+RangedDefence: 40
+Resist: 3
+Speed: 3
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 90
+ExpMod: 190
+GoldPrice: 50
+GemPrice: 10
+GoldPayment: 0
+GemPayment: 13
+Race: 3
+UnitKind: 2
+UnitClass: 7
+Karma: -3
+SoundHit: 24
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 19
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Fly: 44
+Undead: 61
+Soul_stealing: 102
+Magic_strike: 57;
+		
+Lvl 01 upgrades: (1, 4; 131, 4)
+Lvl 02 upgrades: (4, 4; 16, 4)
+Lvl 03 upgrades: (1, 4; 7, 4)
+Lvl 04 upgrades: (4, 4; 131, 4)
+Lvl 05 upgrades: (1, 4; 16, 4)
+Lvl 06 upgrades: (4, 4; 7, 4)
+Lvl 07 upgrades: (2, 4; 131, 4)
+Lvl 08 upgrades: (4, 4; 16, 4)
+Lvl 09 upgrades: (2, 4; 7, 4)
+Lvl 10 upgrades: (4, 4; 131, 4)
+Lvl 11 upgrades: (2, 4; 16, 4)
+Lvl 12 upgrades: (5, 4; 7, 7)
+Lvl 13 upgrades: (2, 4; 131, 4)
+Lvl 14 upgrades: (5, 4; 16, 4)
+Lvl 15 upgrades: (2, 4; 8, 4)
+Lvl 16 upgrades: (5, 4; 131, 4)
+Lvl 17 upgrades: (3, 4; 16, 4)
+Lvl 18 upgrades: (5, 4; 8, 4)
+Lvl 19 upgrades: (3, 4; 131, 4)
+Lvl 20 upgrades: (5, 4; 17, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/56
+Name: Демон;
+Level: 3
+Life: 42
+Attack: 20
+CounterAttack: 9
+Defence: 4
+RangedDefence: 3
+Resist: 4
+Speed: 4
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 1
+Stamina: 15
+Morale: 10
+Exp: 70
+ExpMod: 180
+GoldPrice: 100
+GemPrice: 10
+GoldPayment: 0
+GemPayment: 8
+Race: 3
+UnitKind: 3
+UnitClass: 7
+Karma: -3
+SoundHit: 131
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 132
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Fly: 44
+Curse: 73
+Fear: 80
+Cast Fear: 121
+Piercing_Strike: 69;
+		
+Lvl 01 upgrades: (2, 4; 4, 4; 10, 4; 33, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 03 upgrades: (2, 4; 4, 4; 13, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 33, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (2, 4; 4, 4; 10, 4; 33, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 27, 4)
+Lvl 09 upgrades: (2, 4; 38, 4; 16, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 70, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 34, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 42, 4; 19, 4)
+Lvl 13 upgrades: (3, 4; 5, 4; 10, 4; 102, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 27, 4)
+Lvl 15 upgrades: (3, 4; 38, 4; 42, 4; 34, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 10, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 17, 4)
+Lvl 19 upgrades: (3, 4; 8, 4; 14, 4; 34,4)
+Lvl 20 upgrades: (37, 4; 6, 4; 41, 4; 27, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/57
+Name: Паладин;
+Level: 4
+Life: 55
+Attack: 22
+CounterAttack: 22
+Defence: 6
+RangedDefence: 12
+Resist: 12
+Speed: 3
+RangedAttack: 0
+ShootingRange: 1
+Ammo: 1
+Stamina: 18
+Morale: 15
+Exp: 130
+ExpMod: 350
+GoldPrice: 600
+GemPrice: 30
+GoldPayment: 120
+GemPayment: 6
+Race: 1
+UnitKind: 1
+UnitClass: 3
+Karma: 3
+SoundHit: 108
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 109
+Missile: 0
+Resource: (3, 7, 8)
+
+Abilityes:
+Charge: 67
+Smite_evil: 103
+Heal: 94;
+		
+Lvl 01 upgrades: (2, 4; 4, 4; 10, 4; 34, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 13, 4; 26, 4)
+Lvl 03 upgrades: (2, 4; 4, 4; 16, 4; 34, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4; 26, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 40, 4; 34, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 46, 4)
+Lvl 07 upgrades: (2, 4; 5, 4; 10, 4; 34, 4)
+Lvl 08 upgrades: (36, 4; 8, 4; 13, 4; 26, 4)
+Lvl 09 upgrades: (2, 4; 38, 4; 17, 4; 34, 4)
+Lvl 10 upgrades: (31, 4; 8, 4; 40, 4; 26, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 14, 4; 35, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 42, 4; 26, 4)
+Lvl 13 upgrades: (3, 4; 5, 4; 11, 4; 35, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 40, 4; 26, 4)
+Lvl 15 upgrades: (3, 4; 38, 4; 43, 4; 35, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 41, 3; 26, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 42, 4; 35, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 11, 4; 26, 4)
+Lvl 19 upgrades: (3, 4; 8, 4; 14, 4; 35,4)
+Lvl 20 upgrades: (37, 4; 6, 4; 41, 4; 54, 4)
+
+Lvl 01 loot: (24, 6; 45, 5; 91, 1; 259, 3)
+Lvl 02 loot: (62, 3; 79, 2; 92, 2; 280, 3)
+Lvl 03 loot: (104, 2; 110, 1; 170, 1; 300, 3)
+Lvl 04 loot: (171, 1; 224, 1; 321, 3; 357, 3)
+Lvl 05 loot: (184, 1; 225, 1)
+Lvl 06 loot: (185, 1; 261, 1)
+Lvl 07 loot: (186, 1; 281, 1)
+Lvl 08 loot: (172, 1; 301, 1)
+Lvl 09 loot: (226, 1; 322, 1)
+Lvl 10 loot: (173, 1; 348, 1)
+Lvl 11 loot: (187, 1; 371, 1)
+Lvl 12 loot: (188, 1; 372, 1)
+Lvl 13 loot: (302, 1)
+Lvl 14 loot: (323, 1)
+Lvl 15 loot: (228, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/58
+Name: Боевой слон;
+Level: 4
+Life: 120
+Attack: 33
+CounterAttack: 22
+Defence: 2
+RangedDefence: 4
+Resist: 2
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 16
+Morale: 11
+Exp: 130
+ExpMod: 300
+GoldPrice: 700
+GemPrice: 0
+GoldPayment: 140
+GemPayment: 0
+Race: 1
+UnitKind: 1
+UnitClass: 6
+Karma: 0
+SoundHit: 133
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 134
+Missile: 0
+Resource: (1, 7, 7)
+
+Abilityes:
+Trample: 105;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4; 104, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 104, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4; 104, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4; 104, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4; 104, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+
+/59
+Name: Чернокнижник;
+Level: 4
+Life: 20
+Attack: 8
+CounterAttack: 8
+Defence: 3
+RangedDefence: 7
+Resist: 13
+Speed: 2
+RangedAttack: 18
+ShootingRange: 7
+Ammo: 7
+Stamina: 13
+Morale: 10
+Exp: 130
+ExpMod: 340
+GoldPrice: 450
+GemPrice: 100
+GoldPayment: 90
+GemPayment: 15
+Race: 1
+UnitKind: 1
+UnitClass: 4
+Karma: -3
+SoundHit: 60
+SoundShoot: 136
+SoundShootHit: 137
+SoundDeath: 138
+Missile: 5
+Resource: (5, 5, 9)
+
+Abilityes:
+Magic_shot: 58
+Raise_Zombie: 136
+Undead_Master: 137
+Energy_Control: 149;
+		
+Lvl 01 upgrades: (1, 4; 20, 4; 16, 4; 27, 3; 150, 4)
+Lvl 02 upgrades: (30, 4; 27, 4; 33, 4; 57, 4)
+Lvl 03 upgrades: (1, 4; 20, 4; 7, 4; 126, 4)
+Lvl 04 upgrades: (30, 4; 13, 4; 16, 4; 150, 4)
+Lvl 05 upgrades: (1, 4; 20, 4; 33, 4; 144, 4)
+Lvl 06 upgrades: (30, 4; 27, 4; 4, 4)
+Lvl 07 upgrades: (1, 4; 21, 4; 17, 4; 150, 4)
+Lvl 08 upgrades: (31, 4; 10, 4; 33, 4)
+Lvl 09 upgrades: (2, 4; 21, 4; 7, 4; 52, 4)
+Lvl 10 upgrades: (31, 4; 27, 4; 16, 4; 23, 4)
+Lvl 11 upgrades: (2, 4; 21, 4; 33, 4; 150, 4)
+Lvl 12 upgrades: (31, 4; 13, 4; 4, 4)
+Lvl 13 upgrades: (2, 4; 21, 4; 17, 4)
+Lvl 14 upgrades: (31, 4; 28, 4; 42, 4; 150, 4)
+Lvl 15 upgrades: (2, 4; 21, 4; 7, 4)
+Lvl 16 upgrades: (31, 4; 10, 4; 42, 4)
+Lvl 17 upgrades: (2, 4; 22, 4; 34, 4; 150, 4)
+Lvl 18 upgrades: (31, 4; 28, 4; 4, 4)
+Lvl 19 upgrades: (2, 4; 22, 4; 17, 4)
+Lvl 20 upgrades: (31, 4; 13, 4; 43, 4; 150, 4)
+
+Lvl 01 loot: (8, 4; 40, 4; 66, 3)
+Lvl 02 loot: (70, 2; 83, 2; 95, 2; 112, 1)
+Lvl 03 loot: (135, 1; 207, 1; 216, 1)
+Lvl 04 loot: (141, 1; 208, 3)
+Lvl 05 loot: (142, 1; 217, 1)
+Lvl 06 loot: (241, 1; 287, 1)
+Lvl 07 loot: (136, 1; 242, 1)
+Lvl 08 loot: (143, 1; 268, 1)
+Lvl 09 loot: (144, 1; 218, 1)
+Lvl 10 loot: (209, 1; 288, 1)
+Lvl 11 loot: (210, 1; 308, 1)
+Lvl 12 loot: (219, 1; 374, 1)
+Lvl 13 loot: (361, 1; 383, 1)
+Lvl 14 loot: (388, 1)
+Lvl 15 loot: (211, 1)
+Lvl 16 loot: (399, 1)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+
+/60
+Name: Дракон;
+Level: 4
+Life: 150
+Attack: 40
+CounterAttack: 35
+Defence: 10
+RangedDefence: 10
+Resist: 20
+Speed: 5
+RangedAttack: 30
+ShootingRange: 2
+Ammo: 10
+Stamina: 30
+Morale: 15
+Exp: 1000
+ExpMod: 500
+GoldPrice: 2500
+GemPrice: 100
+GoldPayment: 500
+GemPayment: 20
+Race: 2
+UnitKind: 1
+UnitClass: 7
+Karma: 0
+SoundHit: 139
+SoundShoot: 140
+SoundShootHit: 141
+SoundDeath: 142
+Missile: 5
+Resource: (0)
+
+Abilityes:
+Fly: 44
+Magic_shot: 58
+Immune_to_magic: 60;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4; 21, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 28, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 21, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4; 80, 3)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 21, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 28, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 22, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 34, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4; 22, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4; 28, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4; 42, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4; 22, 4)
+
+Lvl 01 loot: (149, 3; 200, 3)
+Lvl 02 loot: (150, 2; 201, 2)
+Lvl 03 loot: (342, 1)
+Lvl 04 loot: (359, 1; 256, 1)
+Lvl 05 loot: (256, 2; 227, 2)
+Lvl 06 loot: (151, 2; 298, 2)
+Lvl 07 loot: (202, 2; 278, 2)
+Lvl 08 loot: (152, 1; 319, 2)
+Lvl 09 loot: (203, 1; 351, 2)
+Lvl 10 loot: (362, 2; 349, 1)
+Lvl 11 loot: (373, 2)
+Lvl 12 loot: (341, 1)
+Lvl 13 loot: (344, 1)
+Lvl 14 loot: (376, 1)
+Lvl 15 loot: (365, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/61
+Name: Древочеловек;
+Level: 4
+Life: 90
+Attack: 19
+CounterAttack: 28
+Defence: 8
+RangedDefence: 10
+Resist: 6
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 28
+Morale: 12
+Exp: 200
+ExpMod: 280
+GoldPrice: 350
+GemPrice: 30
+GoldPayment: 70
+GemPayment: 6
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: 3
+SoundHit: 143
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 144
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Entangle: 109
+First_Aid: 110
+Siege: 99
+Forester: 62;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4; 65, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 100, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 70, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4; 65, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 100, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 72, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 65, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4; 100, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4; 65, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4; 100, 4)
+
+Lvl 01 loot: (405, 10)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/62
+Name: Гидра;
+Level: 4
+Life: 200
+Attack: 25
+CounterAttack: 25
+Defence: 3
+RangedDefence: 3
+Resist: 4
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 25
+Morale: 11
+Exp: 400
+ExpMod: 320
+GoldPrice: 800
+GemPrice: 40
+GoldPayment: 160
+GemPayment: 8
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: 0
+SoundHit: 14
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 15
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Regeneration: 97
+Multiply_attack: 107
+Poison: 78
+Swamp_Dweller: 64;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4; 98, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 140, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 98, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4; 147, 3)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 140, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4; 98, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4; 140, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4; 98, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4; 98, 4; 140, 4)
+
+Lvl 01 loot: (394, 10)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/63
+Name: Циклоп;
+Level: 4
+Life: 100
+Attack: 35
+CounterAttack: 32
+Defence: 4
+RangedDefence: 4
+Resist: 5
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 25
+Morale: 11
+Exp: 180
+ExpMod: 260
+GoldPrice: 400
+GemPrice: 0
+GoldPayment: 80
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: -2
+SoundHit: 26
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 145
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Trample: 111
+Hill_Dweller: 63;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4; 104, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 104, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 104, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 104, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4; 104, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/64
+Name: Вампир;
+Level: 4
+Life: 55
+Attack: 22
+CounterAttack: 15
+Defence: 5
+RangedDefence: 3
+Resist: 6
+Speed: 4
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 10
+Morale: 10
+Exp: 180
+ExpMod: 230
+GoldPrice: 60
+GemPrice: 15
+GoldPayment: 0
+GemPayment: 15
+Race: 3
+UnitKind: 2
+UnitClass: 7
+Karma: -3
+SoundHit: 153
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 154
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Fly: 44
+Drain_life: 112
+Undead: 61;
+		
+Lvl 01 upgrades: (2, 4; 10, 4)
+Lvl 02 upgrades: (4, 4; 16, 4)
+Lvl 03 upgrades: (2, 4; 7, 4; 13, 4)
+Lvl 04 upgrades: (4, 4; 10, 4)
+Lvl 05 upgrades: (2, 4; 16, 4)
+Lvl 06 upgrades: (4, 4; 7, 4)
+Lvl 07 upgrades: (2, 4; 10, 4; 13, 4)
+Lvl 08 upgrades: (4, 4; 16, 4)
+Lvl 09 upgrades: (2, 4; 7, 4)
+Lvl 10 upgrades: (4, 4; 56, 4)
+Lvl 11 upgrades: (2, 4; 16, 4; 13, 4)
+Lvl 12 upgrades: (5, 4; 7, 7)
+Lvl 13 upgrades: (2, 4; 10, 4)
+Lvl 14 upgrades: (5, 4; 17, 4)
+Lvl 15 upgrades: (3, 4; 8, 4; 13, 4)
+Lvl 16 upgrades: (5, 4; 11, 4)
+Lvl 17 upgrades: (3, 4; 17, 4)
+Lvl 18 upgrades: (5, 4; 8, 4)
+Lvl 19 upgrades: (3, 4; 11, 4; 13, 4)
+Lvl 20 upgrades: (5, 4; 17, 4)
+
+Lvl 01 loot: (54, 3; 131, 1; 130, 1)
+Lvl 02 loot: (125, 1; 116, 1; 379, 1)
+Lvl 03 loot: (380, 1; 327, 1; 358, 1)
+Lvl 04 loot: (370, 1; 329, 1)
+Lvl 05 loot: (359, 1; 368, 1)
+Lvl 06 loot: (248, 1; 381, 1)
+Lvl 07 loot: (272, 1; 382, 1)
+Lvl 08 loot: (292, 1; 383, 1)
+Lvl 09 loot: (312, 1; 384, 1)
+Lvl 10 loot: (350, 1; 386, 1)
+Lvl 11 loot: (249, 1; 385, 1)
+Lvl 12 loot: (273, 1; 330, 1)
+Lvl 13 loot: (293, 1; 331, 1)
+Lvl 14 loot: (313, 1; 332, 1)
+Lvl 15 loot: (263, 1; 387, 2)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/65
+Name: Дьявол;
+Level: 4
+Life: 70
+Attack: 33
+CounterAttack: 25
+Defence: 5
+RangedDefence: 6
+Resist: 8
+Speed: 2
+RangedAttack: 15
+ShootingRange: 4
+Ammo: 2
+Stamina: 19
+Morale: 11
+Exp: 200
+ExpMod: 220
+GoldPrice: 250
+GemPrice: 30
+GoldPayment: 0
+GemPayment: 20
+Race: 3
+UnitKind: 3
+UnitClass: 4
+Karma: -3
+SoundHit: 146
+SoundShoot: 147
+SoundShootHit: 148
+SoundDeath: 149
+Missile: 10
+Resource: (0)
+
+Abilityes:
+Magic_shot: 58
+Fear: 113
+Summon_Imp: 124
+Soul_stealing: 102
+Piercing_Strike: 69;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4; 21, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4; 16, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4; 131, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 131, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 21, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4; 131, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 27, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4; 16, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 21, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 131, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 17, 4; 131, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4; 27, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 21, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4; 17, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4; 131, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4; 131, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 17, 4; 21, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4; 27, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4)
+
+Lvl 01 loot: (133, 2; 155, 1; 215, 1)
+Lvl 02 loot: (207, 1; 336, 1)
+Lvl 03 loot: (135, 1; 260, 1)
+Lvl 04 loot: (157, 1; 208, 1)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (178, 1)
+Lvl 07 loot: (179, 2; 262, 1)
+Lvl 08 loot: (165, 1; 218, 1)
+Lvl 09 loot: (158, 1; 361, 1)
+Lvl 10 loot: (166, 3)
+Lvl 11 loot: (152, 1; 180, 1)
+Lvl 12 loot: (343, 1)
+Lvl 13 loot: (338, 1)
+Lvl 14 loot: (294, 1)
+Lvl 15 loot: (160, 1)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/66
+Name: Великан;
+Level: 4
+Life: 100
+Attack: 25
+CounterAttack: 25
+Defence: 3
+RangedDefence: 3
+Resist: 4
+Speed: 2
+RangedAttack: 20
+ShootingRange: 5
+Ammo: 3
+Stamina: 24
+Morale: 11
+Exp: 200
+ExpMod: 300
+GoldPrice: 450
+GemPrice: 0
+GoldPayment: 90
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 2
+Karma: -1
+SoundHit: 150
+SoundShoot: 151
+SoundShootHit: 113
+SoundDeath: 152
+Missile: 4
+Resource: (0)
+
+Abilityes:
+Siege: 101
+Gather_Ammo: 53
+Hill_Dweller: 63;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4; 47, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4; 21, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4; 100, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 21, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4; 100, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 21, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4; 100, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 21, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4; 100, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 21, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4; 100, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4; 22, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4; 100, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4; 22, 4)
+
+Lvl 01 loot: (0, 0)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/67
+Name: Медуза;
+Level: 3
+Life: 35
+Attack: 17
+CounterAttack: 14
+Defence: 3
+RangedDefence: 3
+Resist: 6
+Speed: 2
+RangedAttack: 6
+ShootingRange: 4
+Ammo: 4
+Stamina: 16
+Morale: 10
+Exp: 65
+ExpMod: 220
+GoldPrice: 300
+GemPrice: 40
+GoldPayment: 60
+GemPayment: 8
+Race: 2
+UnitKind: 1
+UnitClass: 6
+Karma: 0
+SoundHit: 161
+SoundShoot: 92
+SoundShootHit: 93
+SoundDeath: 162
+Missile: 0
+Resource: (4, 5)
+
+Abilityes:
+Stoning_eye: 145
+Poisonous_bite: 78
+Swamp_Dweller: 64;
+		
+Lvl 01 upgrades: (2, 4; 33, 4; 16, 4; 73, 3)
+Lvl 02 upgrades: (31, 4; 4, 4; 10, 4; 27, 4)
+Lvl 03 upgrades: (2, 4; 7, 4; 13, 4; 146, 4)
+Lvl 04 upgrades: (31, 4; 33, 4; 98, 4; 140, 4)
+Lvl 05 upgrades: (2, 4; 4, 4; 13, 4; 38, 3)
+Lvl 06 upgrades: (31, 4; 7, 4; 10, 4; 27, 4)
+Lvl 07 upgrades: (36, 4; 33, 4; 16, 4; 146, 4)
+Lvl 08 upgrades: (31, 4; 4, 4; 98, 4; 140, 4)
+Lvl 09 upgrades: (2, 4; 7, 4; 13, 4; 38, 4)
+Lvl 10 upgrades: (36, 4; 33, 4; 10, 4; 23, 3)
+Lvl 11 upgrades: (2, 4; 4, 4; 17, 4; 146, 4)
+Lvl 12 upgrades: (31, 4; 7, 4; 98, 4; 140, 4; 27, 4)
+Lvl 13 upgrades: (36, 4; 34, 4; 13, 4; 38, 4)
+Lvl 14 upgrades: (31, 4; 5, 4; 10, 4; 146, 4)
+Lvl 15 upgrades: (2, 4; 8, 4; 17, 4; 19, 4)
+Lvl 16 upgrades: (36, 4; 34, 4; 98, 4; 140, 4)
+Lvl 17 upgrades: (3, 4; 5, 4; 14, 4; 38, 4)
+Lvl 18 upgrades: (32, 4; 8, 4; 11, 4; 27, 4)
+Lvl 19 upgrades: (3, 4; 34, 4; 17, 4; 146, 4)
+Lvl 20 upgrades: (37, 4; 39, 4; 98, 4; 140, 4)
+
+Lvl 01 loot: (124, 5; 115, 2)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (125, 4; 116, 2)
+Lvl 04 loot: (366, 2)
+Lvl 05 loot: (327, 2)
+Lvl 06 loot: (369, 4)
+Lvl 07 loot: (328, 3)
+Lvl 08 loot: (370, 5)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (331, 1)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/68
+Name: Слизняк;
+Level: 2
+Life: 40
+Attack: 8
+CounterAttack: 8
+Defence: 1
+RangedDefence: 3
+Resist: 2
+Speed: 1
+RangedAttack: 8
+ShootingRange: 3
+Ammo: 5
+Stamina: 12
+Morale: 10
+Exp: 35
+ExpMod: 120
+GoldPrice: 80
+GemPrice: 0
+GoldPayment: 16
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 2
+Karma: 0
+SoundHit: 163
+SoundShoot: 86
+SoundShootHit: 87
+SoundDeath: 164
+Missile: 11
+Resource: (0)
+
+Abilityes:
+Poisonous_spit: 151
+Poisonous_flash: 147
+Poisono_immunity: 72
+Swamp_dweller: 64;
+		
+Lvl 01 upgrades: (1, 4; 4, 4; 10, 4; 82, 2)
+Lvl 02 upgrades: (30, 4; 7, 4; 13, 4; 20, 4)
+Lvl 03 upgrades: (2, 4; 33, 4; 16, 4; 27, 4; 75, 2)
+Lvl 04 upgrades: (31, 4; 4, 4; 147, 4; 79, 3)
+Lvl 05 upgrades: (2, 4; 7, 4; 10, 4; 132, 4)
+Lvl 06 upgrades: (31, 4; 33, 4; 13, 4; 20, 4)
+Lvl 07 upgrades: (38, 4; 4, 4; 16, 4; 140, 4)
+Lvl 08 upgrades: (31, 4; 7, 4; 27, 4; 27, 4)
+Lvl 09 upgrades: (2, 4; 33, 4; 10, 4; 20, 4)
+Lvl 10 upgrades: (38, 4; 4, 4; 13, 4; 132, 4)
+Lvl 11 upgrades: (2, 4; 7, 4; 16, 4; 23, 4)
+Lvl 12 upgrades: (31, 4; 34, 4; 147, 4; 140, 4)
+Lvl 13 upgrades: (38, 4; 4, 4; 10, 4; 27, 4)
+Lvl 14 upgrades: (31, 4; 7, 4; 13, 4; 20, 4)
+Lvl 15 upgrades: (2, 4; 34, 4; 16, 4; 132, 4)
+Lvl 16 upgrades: (38, 4; 5, 4; 147, 4; 140, 4)
+Lvl 17 upgrades: (3, 4; 38, 4; 11, 4; 27, 4)
+Lvl 18 upgrades: (32, 4; 34, 4; 14, 4; 20, 4)
+Lvl 19 upgrades: (3, 4; 5, 4; 17, 4; 132, 4)
+Lvl 20 upgrades: (39, 4; 38, 4; 147, 4; 21, 4)
+
+Lvl 01 loot: (395, 10)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/69
+Name: Людоящер;
+Level: 1
+Life: 20
+Attack: 8
+CounterAttack: 8
+Defence: 1
+RangedDefence: 2
+Resist: 1
+Speed: 2
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 12
+Morale: 10
+Exp: 20
+ExpMod: 100
+GoldPrice: 30
+GemPrice: 0
+GoldPayment: 6
+GemPayment: 0
+Race: 2
+UnitKind: 1
+UnitClass: 1
+Karma: 0
+SoundHit: 159
+SoundShoot: 0
+SoundShootHit: 0
+SoundDeath: 160
+Missile: 0
+Resource: (0)
+
+Abilityes:
+Regeneration: 98
+Swamp_dweller: 64;
+		
+Lvl 01 upgrades: (1, 4; 30, 4; 4, 4; 7, 3)
+Lvl 02 upgrades: (13, 3; 33, 4; 10, 3)
+Lvl 03 upgrades: (1, 4; 2, 10; 13, 3; 59, 3)
+Lvl 04 upgrades: (30, 4; 4, 4; 51, 4)
+Lvl 05 upgrades: (2, 4; 7, 4; 98, 4; 85, 4)
+Lvl 06 upgrades: (30, 4; 16, 4; 10, 3)
+Lvl 07 upgrades: (2, 4; 4, 4; 13, 3)
+Lvl 08 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 09 upgrades: (2, 4; 33, 4; 51, 4)
+Lvl 10 upgrades: (36, 4; 4, 4; 10, 3; 98, 4)
+Lvl 11 upgrades: (2, 4; 7, 4; 13, 3; 33, 4)
+Lvl 12 upgrades: (31, 4; 16, 4; 81, 4; 85, 4)
+Lvl 13 upgrades: (2, 4; 4, 4; 51, 4)
+Lvl 14 upgrades: (36, 4; 7, 4; 10, 3)
+Lvl 15 upgrades: (2, 4; 33, 4; 13, 3; 98, 4)
+Lvl 16 upgrades: (31, 4; 5, 4; 42, 4)
+Lvl 17 upgrades: (3, 4; 38, 4; 51, 4; 16, 4)
+Lvl 18 upgrades: (32, 4; 16, 2; 10, 3; 85, 4)
+Lvl 19 upgrades: (3, 4; 5, 4; 13, 3; 34, 4)
+Lvl 20 upgrades: (36, 4; 38, 4; 98, 4; 42, 4)
+
+Lvl 01 loot: (17, 6; 41, 4; 51, 3)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (18, 6)
+Lvl 04 loot: (43, 4)
+Lvl 05 loot: (52, 3)
+Lvl 06 loot: (117, 3)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (221, 1)
+Lvl 09 loot: (19, 6)
+Lvl 10 loot: (44, 2)
+Lvl 11 loot: (53, 3)
+Lvl 12 loot: (113, 2)
+Lvl 13 loot: (119, 2)
+Lvl 14 loot: (244, 2)
+Lvl 15 loot: (163, 2)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (246, 2)
+Lvl 18 loot: (164, 2)
+Lvl 19 loot: (247, 2)
+Lvl 20 loot: (0, 0)
+
+/70
+Name: Феникс;
+Level: 4
+Life: 70
+Attack: 35
+CounterAttack: 25
+Defence: 3
+RangedDefence: 4
+Resist: 10
+Speed: 5
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 25
+Morale: 16
+Exp: 800
+ExpMod: 400
+GoldPrice: 2000
+GemPrice: 80
+GoldPayment: 400
+GemPayment: 15
+Race: 2
+UnitKind: 1
+UnitClass: 7
+Karma: 0
+SoundHit: 165
+SoundShoot: 140
+SoundShootHit: 141
+SoundDeath: 166
+Missile: 5
+Resource: (5, 8, 8)
+
+Abilityes:
+Fly: 44
+Magic_strike: 57
+Reincarnation: 152;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4; 17, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 33, 4; 42, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4; 17, 4)
+Lvl 06 upgrades: (31, 4; 7, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4; 42, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4; 17, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 33, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4; 72, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 17, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 42, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4; 18, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 33, 4; 43, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4; 18, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 43, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4; 18, 4; 39, 4)
+
+Lvl 01 loot: (205, 4; 215, 3; 396, 4)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (233, 2)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (151, 1; 226, 1)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (365, 1)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)
+
+/71
+Name: Каменный голем;
+Level: 3
+Life: 60
+Attack: 15
+CounterAttack: 15
+Defence: 7
+RangedDefence: 8
+Resist: 1
+Speed: 1
+RangedAttack: 0
+ShootingRange: 0
+Ammo: 0
+Stamina: 20
+Morale: 10
+Exp: 100
+ExpMod: 170
+GoldPrice: 200
+GemPrice: 50
+GoldPayment: 0
+GemPayment: 10
+Race: 2
+UnitKind: 4
+UnitClass: 6
+Karma: 0
+SoundHit: 167
+SoundShoot: 0
+SoundShootHit: 5
+SoundDeath: 168
+Missile: 0
+Resource: (5, 6, 6)
+
+Abilityes:
+Soulless: 49
+PoisonImmunity: 72
+Break_weapon: 82
+Stunning_blow: 70
+Immune_to_magic: 60;
+		
+Lvl 01 upgrades: (3, 4; 4, 4; 13, 4; 31, 4)
+Lvl 02 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 03 upgrades: (3, 4; 4, 4; 89, 4)
+Lvl 04 upgrades: (31, 4; 7, 4; 10, 4; 40, 4)
+Lvl 05 upgrades: (36, 4; 4, 4; 13, 4)
+Lvl 06 upgrades: (31, 4; 7, 4; 16, 4)
+Lvl 07 upgrades: (3, 4; 4, 4; 10, 4; 70, 4)
+Lvl 08 upgrades: (36, 4; 7, 4; 13, 4)
+Lvl 09 upgrades: (3, 4; 38, 4; 40, 4)
+Lvl 10 upgrades: (31, 4; 7, 4; 10, 4)
+Lvl 11 upgrades: (36, 4; 5, 4; 13, 4; 40, 4)
+Lvl 12 upgrades: (32, 4; 38, 4; 16, 4; 70, 4)
+Lvl 13 upgrades: (25, 4; 5, 4; 10, 4)
+Lvl 14 upgrades: (37, 4; 8, 4; 13, 4)
+Lvl 15 upgrades: (25, 4; 38, 4; 40, 4)
+Lvl 16 upgrades: (32, 4; 6, 4; 40, 4)
+Lvl 17 upgrades: (37, 4; 8, 4; 14, 4)
+Lvl 18 upgrades: (32, 4; 38, 4; 16, 4; 41, 4)
+Lvl 19 upgrades: (25, 4; 8, 4; 14, 4)
+Lvl 20 upgrades: (37, 4; 6, 4; 11, 4; 70, 4; 41, 4)
+
+Lvl 01 loot: (406, 10)
+Lvl 02 loot: (0, 0)
+Lvl 03 loot: (0, 0)
+Lvl 04 loot: (0, 0)
+Lvl 05 loot: (0, 0)
+Lvl 06 loot: (0, 0)
+Lvl 07 loot: (0, 0)
+Lvl 08 loot: (0, 0)
+Lvl 09 loot: (0, 0)
+Lvl 10 loot: (0, 0)
+Lvl 11 loot: (0, 0)
+Lvl 12 loot: (0, 0)
+Lvl 13 loot: (0, 0)
+Lvl 14 loot: (0, 0)
+Lvl 15 loot: (0, 0)
+Lvl 16 loot: (0, 0)
+Lvl 17 loot: (0, 0)
+Lvl 18 loot: (0, 0)
+Lvl 19 loot: (0, 0)
+Lvl 20 loot: (0, 0)

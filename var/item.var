@@ -1,0 +1,10216 @@
+Quantity: 406
+
+/0
+Name: Пусто;
+Slot: 0
+Class: 0
+Durability: 0
+GoldCost: 0
+GemCost: 0
+ShopLevel: 0
+Rarity: 0
+Building: 0
+Pic: 0
+Resourse: (0)
+Effects:
+
+Effect: 0
+Power: 0
+Area: 0;
+
+/1
+Name: Нож;
+Slot: 1
+Class: 0
+Durability: 20
+GoldCost: 5
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 2
+Pic: 317
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 1
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+
+AimedStrike: 76
+Power: 1
+Area: 0;
+
+/2
+Name: Кинжал;
+Slot: 1
+Class: 0
+Durability: 30
+GoldCost: 20
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 93
+Pic: 318
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+AimedStrike: 76
+Power: 1
+Area: 0;
+
+/3
+Name: Стилет;
+Slot: 1
+Class: 0
+Durability: 20
+GoldCost: 70
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 145
+Pic: 319
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+ArmorPiercing: 39
+Power: 1
+Area: 0;
+
+/4
+Name: Тесак;
+Slot: 1
+Class: 0
+Durability: 50
+GoldCost: 90
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 186
+Pic: 320
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0
+
+AimedStrike: 76
+Power: 1
+Area: 0;
+
+/5
+Name: Короткий посох;
+Slot: 100
+Class: 0
+Durability: 40
+GoldCost: 10
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 35
+Pic: 291
+Resourse: (2)
+Effects:
+
+Attack: 2
+Power: 1
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/6
+Name: Дорожный посох;
+Slot: 100
+Class: 0
+Durability: 40
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 93
+Pic: 292
+Resourse: (2)
+Effects:
+
+Attack: 2
+Power: 1
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/7
+Name: Длинный посох;
+Slot: 100
+Class: 0
+Durability: 60
+GoldCost: 80
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 145
+Pic: 293
+Resourse: (2)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/8
+Name: Боевой посох;
+Slot: 100
+Class: 0
+Durability: 60
+GoldCost: 140
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 186
+Pic: 294
+Resourse: (2)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+Defense: 4
+Power: 1
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/9
+Name: Короткий меч;
+Slot: 1
+Class: 1
+Durability: 40
+GoldCost: 15
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 2
+Pic: 341
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0;
+
+/10
+Name: Сабля;
+Slot: 1
+Class: 1
+Durability: 50
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 89
+Pic: 342
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0;
+
+/11
+Name: Длинный меч;
+Slot: 1
+Class: 1
+Durability: 50
+GoldCost: 90
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 141
+Pic: 343
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0;
+
+/12
+Name: Палаш;
+Slot: 1
+Class: 1
+Durability: 50
+GoldCost: 170
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 182
+Pic: 344
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+/13
+Name: Ручной топор;
+Slot: 1
+Class: 1
+Durability: 40
+GoldCost: 20
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 2
+Pic: 0
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0;
+
+/14
+Name: Секира;
+Slot: 1
+Class: 1
+Durability: 50
+GoldCost: 50
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 89
+Pic: 1
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0;
+
+/15
+Name: Боевой топор;
+Slot: 1
+Class: 2
+Durability: 60
+GoldCost: 100
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 141
+Pic: 2
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0;
+
+/16
+Name: Боевая секира;
+Slot: 1
+Class: 2
+Durability: 70
+GoldCost: 190
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 182
+Pic: 3
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0;
+
+/17
+Name: Короткое копье;
+Slot: 1
+Class: 1
+Durability: 30
+GoldCost: 10
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 1
+Pic: 12
+Resourse: (2)
+Effects:
+
+Attack: 2
+Power: 1
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0;
+
+/18
+Name: Длинное копье;
+Slot: 1
+Class: 1
+Durability: 40
+GoldCost: 30
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 90
+Pic: 13
+Resourse: (1, 2)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0;
+
+/19
+Name: Протазан;
+Slot: 100
+Class: 1
+Durability: 45
+GoldCost: 100
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 142
+Pic: 14
+Resourse: (1, 2)
+Effects:
+
+First_strike: 16
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+/20
+Name: Алебарда;
+Slot: 100
+Class: 1
+Durability: 50
+GoldCost: 190
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 183
+Pic: 15
+Resourse: (1, 2)
+Effects:
+
+First_strike: 16
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0;
+
+/21
+Name: Палица;
+Slot: 1
+Class: 1
+Durability: 40
+GoldCost: 15
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 37
+Pic: 353
+Resourse: (2)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0;
+
+/22
+Name: Булава;
+Slot: 1
+Class: 1
+Durability: 50
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 89
+Pic: 354
+Resourse: (1)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0;
+
+/23
+Name: Молот;
+Slot: 1
+Class: 2
+Durability: 50
+GoldCost: 90
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 141
+Pic: 355
+Resourse: (1)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0;
+
+/24
+Name: Шестопёр;
+Slot: 1
+Class: 2
+Durability: 60
+GoldCost: 230
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 182
+Pic: 356
+Resourse: (1)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+/25
+Name: Полуторный меч;
+Slot: 100
+Class: 2
+Durability: 50
+GoldCost: 40
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 37
+Pic: 11
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0;
+
+/26
+Name: Двуручный меч;
+Slot: 100
+Class: 2
+Durability: 60
+GoldCost: 80
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 89
+Pic: 377
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+/27
+Name: Клэймор;
+Slot: 100
+Class: 2
+Durability: 70
+GoldCost: 150
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 141
+Pic: 378
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0;
+
+/28
+Name: Фламберг;
+Slot: 100
+Class: 2
+Durability: 80
+GoldCost: 250
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 182
+Pic: 379
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 7
+Area: 0
+
+CounterAttack: 3
+Power: 6
+Area: 0;
+
+/29
+Name: Короткий лук;
+Slot: 1
+Class: 3
+Durability: 30
+GoldCost: 20
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 1
+Pic: 364
+Resourse: (2)
+Effects:
+
+RangedAttack: 8
+Power: 6
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0;
+
+/30
+Name: Охотничий лук;
+Slot: 1
+Class: 3
+Durability: 40
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 90
+Pic: 365
+Resourse: (2)
+Effects:
+
+RangedAttack: 8
+Power: 7
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0;
+
+/31
+Name: Длинный лук;
+Slot: 1
+Class: 3
+Durability: 50
+GoldCost: 100
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 142
+Pic: 366
+Resourse: (2)
+Effects:
+
+RangedAttack: 8
+Power: 8
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0;
+
+/32
+Name: Композитный лук;
+Slot: 1
+Class: 3
+Durability: 60
+GoldCost: 170
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 183
+Pic: 367
+Resourse: (2)
+Effects:
+
+RangedAttack: 8
+Power: 9
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0;
+
+/33
+Name: Ручной арбалет;
+Slot: 1
+Class: 3
+Durability: 30
+GoldCost: 30
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 37
+Pic: 387
+Resourse: (1, 2)
+Effects:
+
+RangedAttack: 8
+Power: 5
+Area: 0
+
+ShootingRange: 9
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 6
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0;
+
+/34
+Name: Легкий арбалет;
+Slot: 1
+Class: 3
+Durability: 40
+GoldCost: 60
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 90
+Pic: 388
+Resourse: (1, 2)
+Effects:
+
+RangedAttack: 8
+Power: 6
+Area: 0
+
+ShootingRange: 9
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0;
+
+/35
+Name: Тяжелый арбалет;
+Slot: 1
+Class: 3
+Durability: 50
+GoldCost: 150
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 142
+Pic: 389
+Resourse: (1, 2)
+Effects:
+
+RangedAttack: 8
+Power: 7
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0;
+
+/36
+Name: Гвардейский арбалет;
+Slot: 1
+Class: 3
+Durability: 60
+GoldCost: 220
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 183
+Pic: 390
+Resourse: (1, 2)
+Effects:
+
+RangedAttack: 8
+Power: 8
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0;
+
+/37
+Name: Простой жезл;
+Slot: 1
+Class: 4
+Durability: 20
+GoldCost: 20
+GemCost: 1
+ShopLevel: 1
+Rarity: 1
+Building: 35
+Pic: 253
+Resourse: (0)
+Effects:
+
+RangeAttack: 8
+Power: 3
+Area: 0
+
+Range: 9
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0;
+
+/38
+Name: Жезл Шамана;
+Slot: 1
+Class: 4
+Durability: 25
+GoldCost: 40
+GemCost: 2
+ShopLevel: 2
+Rarity: 1
+Building: 93
+Pic: 254
+Resourse: (4)
+Effects:
+
+RangeAttack: 8
+Power: 4
+Area: 0
+
+Range: 9
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0;
+
+/39
+Name: Жезл Колдуна;
+Slot: 1
+Class: 4
+Durability: 25
+GoldCost: 100
+GemCost: 5
+ShopLevel: 3
+Rarity: 1
+Building: 145
+Pic: 255
+Resourse: (4)
+Effects:
+
+RangeAttack: 8
+Power: 5
+Area: 0
+
+Range: 9
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0;
+
+/40
+Name: Жезл Мага;
+Slot: 1
+Class: 4
+Durability: 25
+GoldCost: 200
+GemCost: 10
+ShopLevel: 4
+Rarity: 1
+Building: 186
+Pic: 256
+Resourse: (5)
+Effects:
+
+RangeAttack: 8
+Power: 6
+Area: 0
+
+Range: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0;
+
+/41
+Name: Кулачный щит;
+Slot: 2
+Class: 9
+Durability: 30
+GoldCost: 15
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 2
+Pic: 329
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0;
+
+/42
+Name: Деревянный щит;
+Slot: 2
+Class: 9
+Durability: 20
+GoldCost: 10
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 1
+Pic: 328
+Resourse: (2)
+Effects:
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+/43
+Name: Круглый щит;
+Slot: 2
+Class: 9
+Durability: 40
+GoldCost: 30
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 89
+Pic: 330
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+/44
+Name: Пехотный щит;
+Slot: 2
+Class: 9
+Durability: 50
+GoldCost: 60
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 141
+Pic: 331
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0;
+
+/45
+Name: Рыцарский щит;
+Slot: 2
+Class: 9
+Durability: 60
+GoldCost: 130
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 182
+Pic: 332
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0;
+
+/46
+Name: Обычные стрелы;
+Slot: 2
+Class: 3
+Durability: 15
+GoldCost: 10
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 1
+Pic: 264
+Resourse: (0)
+Effects:
+
+RangedAttack: 993
+Power: 1
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0;
+
+/47
+Name: Оперенные стрелы;
+Slot: 2
+Class: 3
+Durability: 12
+GoldCost: 10
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 37
+Pic: 265
+Resourse: (0)
+Effects:
+
+RangedAttack: 993
+Power: 2
+Area: 0
+
+Ammo: 10
+Power: 3
+Area: 0;
+
+/48
+Name: Зазубренные стрелы;
+Slot: 2
+Class: 3
+Durability: 15
+GoldCost: 20
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 90
+Pic: 266
+Resourse: (1)
+Effects:
+
+RangedAttack: 993
+Power: 3
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0;
+
+/49
+Name: Утяжеленные стрелы;
+Slot: 2
+Class: 3
+Durability: 30
+GoldCost: 40
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 142
+Pic: 267
+Resourse: (1)
+Effects:
+
+RangedAttack: 993
+Power: 3
+Area: 0
+
+Ammo: 10
+Power: 3
+Area: 0
+
+HeavyMissile: 69
+Power: 3
+Area: 0;
+
+/50
+Name: Мифрильные стрелы;
+Slot: 2
+Class: 3
+Durability: 16
+GoldCost: 80
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 183
+Pic: 268
+Resourse: (7)
+Effects:
+
+RangedAttack: 993
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0;
+
+/51
+Name: Кожаная куртка;
+Slot: 3
+Class: 6
+Durability: 20
+GoldCost: 15
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 1
+Pic: 201
+Resourse: (0)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+/52
+Name: Дубленая куртка;
+Slot: 3
+Class: 6
+Durability: 25
+GoldCost: 30
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 91
+Pic: 202
+Resourse: (0)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+/53
+Name: Стеганая куртка;
+Slot: 3
+Class: 6
+Durability: 30
+GoldCost: 60
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 143
+Pic: 203
+Resourse: (0)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0;
+
+/54
+Name: Клепаная куртка;
+Slot: 3
+Class: 6
+Durability: 35
+GoldCost: 120
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 184
+Pic: 204
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 3
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0;
+
+/55
+Name: Простая кольчуга;
+Slot: 3
+Class: 7
+Durability: 30
+GoldCost: 25
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 2
+Pic: 81
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0;
+
+/56
+Name: Пластинчатая кольчуга;
+Slot: 3
+Class: 7
+Durability: 40
+GoldCost: 50
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 87
+Pic: 82
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 3
+Area: 0;
+
+/57
+Name: Чешуйчатая кольчуга;
+Slot: 3
+Class: 7
+Durability: 35
+GoldCost: 100
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 139
+Pic: 83
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 3
+Area: 0
+
+RangedDefence: 5
+Power: 3
+Area: 0;
+
+/58
+Name: Мифрильная кольчуга;
+Slot: 3
+Class: 7
+Durability: 50
+GoldCost: 200
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 180
+Pic: 84
+Resourse: (7)
+Effects:
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0;
+
+/59
+Name: Нагрудник;
+Slot: 3
+Class: 8
+Durability: 40
+GoldCost: 40
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 37
+Pic: 160
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 3
+Area: 0
+
+RangedDefence: 5
+Power: 3
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0;
+
+/60
+Name: Кираса;
+Slot: 3
+Class: 8
+Durability: 50
+GoldCost: 80
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 88
+Pic: 161
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0
+
+Attack: 2
+Power: -1
+Area: 0;
+
+/61
+Name: Панцирь;
+Slot: 3
+Class: 8
+Durability: 50
+GoldCost: 160
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 140
+Pic: 162
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0
+
+Attack: 2
+Power: -2
+Area: 0
+
+CounterAttack: 3
+Power: -1
+Area: 0;
+
+/62
+Name: Мифрильная кираса;
+Slot: 3
+Class: 8
+Durability: 50
+GoldCost: 320
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 181
+Pic: 163
+Resourse: (7)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0;
+
+/63
+Name: Тога;
+Slot: 3
+Class: 0
+Durability: 10
+GoldCost: 10
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 35
+Pic: 123
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/64
+Name: Туника;
+Slot: 3
+Class: 0
+Durability: 15
+GoldCost: 20
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 92
+Pic: 124
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/65
+Name: Кафтан;
+Slot: 3
+Class: 0
+Durability: 20
+GoldCost: 40
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 144
+Pic: 125
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0;
+
+/66
+Name: Мантия;
+Slot: 3
+Class: 0
+Durability: 15
+GoldCost: 120
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 185
+Pic: 126
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+/67
+Name: Сандалии;
+Slot: 7
+Class: 0
+Durability: 10
+GoldCost: 15
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 35
+Pic: 143
+Resourse: (0)
+Effects:
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/68
+Name: Туфли;
+Slot: 7
+Class: 0
+Durability: 15
+GoldCost: 25
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 92
+Pic: 144
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/69
+Name: Легкие сапоги;
+Slot: 7
+Class: 0
+Durability: 20
+GoldCost: 60
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 144
+Pic: 145
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/70
+Name: Замшевые сапоги;
+Slot: 7
+Class: 0
+Durability: 20
+GoldCost: 100
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 185
+Pic: 146
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/71
+Name: Кожаные боты;
+Slot: 7
+Class: 6
+Durability: 20
+GoldCost: 30
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 91
+Pic: 220
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/72
+Name: Кожаные сапоги;
+Slot: 7
+Class: 6
+Durability: 30
+GoldCost: 50
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 143
+Pic: 221
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0;
+
+/73
+Name: Сапоги Следопыта;
+Slot: 7
+Class: 6
+Durability: 35
+GoldCost: 100
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 184
+Pic: 222
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/74
+Name: Солдатские боты;
+Slot: 7
+Class: 7
+Durability: 30
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 87
+Pic: 100
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0;
+
+/75
+Name: Тяжелые сапоги;
+Slot: 7
+Class: 7
+Durability: 35
+GoldCost: 70
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 139
+Pic: 101
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0;
+
+/76
+Name: Кованые сапоги;
+Slot: 7
+Class: 7
+Durability: 40
+GoldCost: 120
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 180
+Pic: 102
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0;
+
+/77
+Name: Латные боты;
+Slot: 7
+Class: 8
+Durability: 40
+GoldCost: 50
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 88
+Pic: 179
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0;
+
+/78
+Name: Латные сапоги;
+Slot: 7
+Class: 8
+Durability: 45
+GoldCost: 80
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 140
+Pic: 180
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0;
+
+/79
+Name: Рыцарские сапоги;
+Slot: 7
+Class: 8
+Durability: 50
+GoldCost: 150
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 181
+Pic: 181
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0;
+
+/80
+Name: Простая шапка;
+Slot: 4
+Class: 0
+Durability: 10
+GoldCost: 10
+GemCost: 0
+ShopLevel: 1
+Rarity: 1
+Building: 35
+Pic: 134
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 1
+Area: 0;
+
+/81
+Name: Шляпа;
+Slot: 4
+Class: 0
+Durability: 10
+GoldCost: 25
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 92
+Pic: 135
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/82
+Name: Тюрбан;
+Slot: 4
+Class: 0
+Durability: 15
+GoldCost: 40
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 144
+Pic: 136
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/83
+Name: Шляпа Волшебника;
+Slot: 4
+Class: 0
+Durability: 15
+GoldCost: 100
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 186
+Pic: 137
+Resourse: (4)
+Effects:
+
+Exp_gain: 991
+Power: 5
+Area: 0;
+
+/84
+Name: Кожаная шляпа;
+Slot: 4
+Class: 6
+Durability: 15
+GoldCost: 30
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 91
+Pic: 212
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/85
+Name: Шапка Следопыта;
+Slot: 4
+Class: 6
+Durability: 15
+GoldCost: 70
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 143
+Pic: 213
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+Morale: 12
+Power: 1
+Area: 0;
+
+/86
+Name: Кожаный шлем;
+Slot: 4
+Class: 6
+Durability: 20
+GoldCost: 100
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 184
+Pic: 214
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0;
+
+/87
+Name: Открытый шлем;
+Slot: 4
+Class: 7
+Durability: 20
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 87
+Pic: 92
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0;
+
+/88
+Name: Шлем Командира;
+Slot: 4
+Class: 7
+Durability: 25
+GoldCost: 90
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 139
+Pic: 93
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+Morale: 12
+Power: 1
+Area: 0;
+
+/89
+Name: Закрытый шлем;
+Slot: 4
+Class: 7
+Durability: 30
+GoldCost: 140
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 180
+Pic: 94
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0;
+
+/90
+Name: Латный шлем;
+Slot: 4
+Class: 8
+Durability: 30
+GoldCost: 50
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 88
+Pic: 171
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0;
+
+/91
+Name: Рыцарский шлем;
+Slot: 4
+Class: 8
+Durability: 35
+GoldCost: 120
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 140
+Pic: 172
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Morale: 12
+Power: 1
+Area: 0;
+
+/92
+Name: Мифрильный шлем;
+Slot: 4
+Class: 8
+Durability: 40
+GoldCost: 160
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 181
+Pic: 173
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0;
+
+/93
+Name: Перчатки Волшебника;
+Slot: 8
+Class: 0
+Durability: 10
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 93
+Pic: 152
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 1
+Area: 0;
+
+/94
+Name: Шерстяные перчатки;
+Slot: 8
+Class: 0
+Durability: 15
+GoldCost: 50
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 144
+Pic: 153
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/95
+Name: Шелковые перчатки;
+Slot: 8
+Class: 0
+Durability: 10
+GoldCost: 80
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 185
+Pic: 154
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/96
+Name: Кожаные перчатки;
+Slot: 8
+Class: 6
+Durability: 15
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 91
+Pic: 228
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/97
+Name: Клепаные перчатки;
+Slot: 8
+Class: 6
+Durability: 20
+GoldCost: 80
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 143
+Pic: 229
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/98
+Name: Перчатки Лучника;
+Slot: 8
+Class: 6
+Durability: 15
+GoldCost: 200
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 184
+Pic: 230
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 1
+Area: 0
+
+Bow_Attack: 993
+Power: 1
+Area: 0;
+
+/99
+Name: Кольчужные рукавицы;
+Slot: 8
+Class: 7
+Durability: 25
+GoldCost: 50
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 87
+Pic: 108
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/100
+Name: Кольчужные перчатки;
+Slot: 8
+Class: 7
+Durability: 20
+GoldCost: 90
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 139
+Pic: 109
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0;
+
+/101
+Name: Перчатки Командира;
+Slot: 8
+Class: 7
+Durability: 25
+GoldCost: 200
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 180
+Pic: 110
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+Morale: 12
+Power: 1
+Area: 0;
+
+/102
+Name: Латные рукавицы;
+Slot: 8
+Class: 8
+Durability: 40
+GoldCost: 60
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 88
+Pic: 187
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0;
+
+/103
+Name: Латные перчатки;
+Slot: 8
+Class: 8
+Durability: 35
+GoldCost: 100
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 140
+Pic: 188
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0;
+
+/104
+Name: Боевые перчатки;
+Slot: 8
+Class: 8
+Durability: 40
+GoldCost: 250
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 181
+Pic: 189
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Attack: 2
+Power: 1
+Area: 0;
+
+/105
+Name: Кольчужный наруч;
+Slot: 10
+Class: 7
+Durability: 20
+GoldCost: 30
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 87
+Pic: 117
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/106
+Name: Железный наруч;
+Slot: 10
+Class: 7
+Durability: 25
+GoldCost: 60
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 139
+Pic: 118
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/107
+Name: Мифрильный наруч;
+Slot: 10
+Class: 7
+Durability: 30
+GoldCost: 120
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 180
+Pic: 119
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0;
+
+/108
+Name: Латный наруч;
+Slot: 10
+Class: 8
+Durability: 30
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 88
+Pic: 195
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0;
+
+/109
+Name: Тяжелый наруч;
+Slot: 10
+Class: 8
+Durability: 35
+GoldCost: 80
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 140
+Pic: 196
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0;
+
+/110
+Name: Бронированный наруч;
+Slot: 10
+Class: 8
+Durability: 40
+GoldCost: 150
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 181
+Pic: 197
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0;
+
+/111
+Name: Холщовый наруч;
+Slot: 10
+Class: 0
+Durability: 10
+GoldCost: 25
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 92
+Pic: 302
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 1
+Area: 0;
+
+/112
+Name: Шелковый наруч;
+Slot: 10
+Class: 0
+Durability: 10
+GoldCost: 100
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 185
+Pic: 303
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/113
+Name: Кожаный наруч;
+Slot: 10
+Class: 6
+Durability: 15
+GoldCost: 50
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 143
+Pic: 236
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/114
+Name: Браслет Кузнеца;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 80
+GemCost: 2
+ShopLevel: 2
+Rarity: 1
+Building: 86
+Pic: 305
+Resourse: (1)
+Effects:
+
+Smithing: 995
+Power: 10
+Area: 0;
+
+/115
+Name: Медный браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 150
+GemCost: 5
+ShopLevel: 3
+Rarity: 1
+Building: 138
+Pic: 306
+Resourse: (0)
+Effects:
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/116
+Name: Серебряный браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 200
+GemCost: 10
+ShopLevel: 4
+Rarity: 1
+Building: 179
+Pic: 307
+Resourse: (0)
+Effects:
+
+Morale: 12
+Power: 1
+Area: 0;
+
+
+/117
+Name: Кожаный пояс;
+Slot: 5
+Class: 0
+Durability: 15
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 91
+Pic: 240
+Resourse: (0)
+Effects:
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/118
+Name: Кушак Волшебника;
+Slot: 5
+Class: 0
+Durability: 10
+GoldCost: 80
+GemCost: 3
+ShopLevel: 3
+Rarity: 1
+Building: 145
+Pic: 241
+Resourse: (0)
+Effects:
+
+Reinvigoration: 21
+Power: 1
+Area: 0;
+
+/119
+Name: Пояс Воина;
+Slot: 5
+Class: 0
+Durability: 15
+GoldCost: 120
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 184
+Pic: 242
+Resourse: (0)
+Effects:
+
+Stamina: 11
+Power: 2
+Area: 0
+
+Life: 1
+Power: 1
+Area: 0;
+
+/120
+Name: Походный плащ;
+Slot: 6
+Class: 0
+Durability: 10
+GoldCost: 30
+GemCost: 0
+ShopLevel: 2
+Rarity: 1
+Building: 92
+Pic: 277
+Resourse: (0)
+Effects:
+
+Reinvigoration: 21
+Power: 1
+Area: 0;
+
+/121
+Name: Теплый плащ;
+Slot: 6
+Class: 0
+Durability: 15
+GoldCost: 60
+GemCost: 0
+ShopLevel: 3
+Rarity: 1
+Building: 144
+Pic: 278
+Resourse: (0)
+Effects:
+
+Reinvigoration: 21
+Power: 1
+Area: 0
+
+Life: 1
+Power: 1
+Area: 0;
+
+/122
+Name: Плащ Следопыта;
+Slot: 6
+Class: 0
+Durability: 10
+GoldCost: 150
+GemCost: 0
+ShopLevel: 4
+Rarity: 1
+Building: 185
+Pic: 279
+Resourse: (0)
+Effects:
+
+Reinvigoration: 21
+Power: 2
+Area: 0
+
+Life: 1
+Power: 1
+Area: 0;
+
+/123
+Name: Медаль Командира;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 100
+GemCost: 3
+ShopLevel: 2
+Rarity: 1
+Building: 86
+Pic: 32
+Resourse: (0)
+Effects:
+
+Morale: 12
+Power: 1
+Area: 0;
+
+/124
+Name: Малахитовый амулет;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 150
+GemCost: 5
+ShopLevel: 3
+Rarity: 1
+Building: 138
+Pic: 33
+Resourse: (4)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0;
+
+/125
+Name: Агатовый амулет;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 300
+GemCost: 10
+ShopLevel: 4
+Rarity: 1
+Building: 179
+Pic: 34
+Resourse: (4)
+Effects:
+
+Resist: 6
+Power: 2
+Area: 0;
+
+/126
+Name: Медное кольцо;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 100
+GemCost: 5
+ShopLevel: 2
+Rarity: 1
+Building: 86
+Pic: 46
+Resourse: (0)
+Effects:
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/127
+Name: Железное кольцо;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 80
+GemCost: 5
+ShopLevel: 2
+Rarity: 1
+Building: 86
+Pic: 47
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 1
+Area: 0;
+
+/128
+Name: Серебряное кольцо;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 130
+GemCost: 5
+ShopLevel: 3
+Rarity: 1
+Building: 138
+Pic: 48
+Resourse: (0)
+Effects:
+
+Morale: 12
+Power: 1
+Area: 0;
+
+/129
+Name: Стальное кольцо;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 170
+GemCost: 10
+ShopLevel: 3
+Rarity: 1
+Building: 138
+Pic: 49
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0;
+
+/130
+Name: Бронзовое кольцо;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 220
+GemCost: 15
+ShopLevel: 4
+Rarity: 1
+Building: 179
+Pic: 50
+Resourse: (0)
+Effects:
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/131
+Name: Золотое кольцо;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 270
+GemCost: 15
+ShopLevel: 4
+Rarity: 1
+Building: 179
+Pic: 51
+Resourse: (0)
+Effects:
+
+Morale: 12
+Power: 2
+Area: 0;
+
+/132
+Name: Стилет Убийцы;
+Slot: 1
+Class: 0
+Durability: 20
+GoldCost: 170
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 321
+Resourse: (1, 4)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+ArmorPiercing: 39
+Power: 1
+Area: 0
+
+Poison: 41
+Power: 1
+Area: 0;
+
+/133
+Name: Ритуальный нож;
+Slot: 1
+Class: 0
+Durability: 25
+GoldCost: 300
+GemCost: 20
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 322
+Resourse: (9)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+StealSoul: 57
+Power: 5
+Area: 0;
+
+/134
+Name: Тесак Мясника;
+Slot: 1
+Class: 0
+Durability: 50
+GoldCost: 200
+GemCost: 0
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 323
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Cripple: 51
+Power: 1
+Area: 0;
+
+/135
+Name: Нож Некроманта;
+Slot: 1
+Class: 0
+Durability: 20
+GoldCost: 300
+GemCost: 50
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 324
+Resourse: (9)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0
+
+PowerfulUndeads: 909
+Power: 1
+Area: 0
+
+Curse: 43
+Power: 5
+Area: 0;
+
+
+/136
+Name: Кинжал Чародея;
+Slot: 1
+Class: 0
+Durability: 20
+GoldCost: 500
+GemCost: 80
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 325
+Resourse: (5, 7)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+DropResist: 908
+Power: 1
+Area: 0;
+
+
+/137
+Name: Молниеносный кинжал;
+Slot: 1
+Class: 0
+Durability: 30
+GoldCost: 800
+GemCost: 80
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 326
+Resourse: (5, 7, 8)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+Speed: 7
+Power: 1
+Area: 0
+
+AimedStrike: 76
+Power: 2
+Area: 0
+
+Agility: 26
+Power: 1
+Area: 0;
+
+
+/138
+Name: Кинжал Междумирья;
+Slot: 1
+Class: 0
+Durability: 30
+GoldCost: 1000
+GemCost: 100
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 327
+Resourse: (7, 8, 9)
+Effects:
+
+Attack: 2
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+MagicStrike: 27
+Power: 1
+Area: 0
+
+LayVulnerability: 79
+Power: 4
+Area: 0
+
+SpellPenetration: 908
+Power: 1
+Area: 0;
+
+/139
+Name: Посох Целителя;
+Slot: 100
+Class: 0
+Durability: 50
+GoldCost: 120
+GemCost: 20
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 295
+Resourse: (2, 4)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Heal: 24
+Power: 4
+Area: 0
+
+Range: 9
+Power: 3
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+/140
+Name: Посох Вызывателя;
+Slot: 100
+Class: 0
+Durability: 60
+GoldCost: 150
+GemCost: 30
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 296
+Resourse: (2, 5)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+Summon: 907
+Power: 1
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/141
+Name: Посох Заклинателя;
+Slot: 100
+Class: 0
+Durability: 60
+GoldCost: 300
+GemCost: 30
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 297
+Resourse: (2, 5)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+SpellDuration: 906
+Power: 1
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/142
+Name: Посох Мага;
+Slot: 100
+Class: 0
+Durability: 60
+GoldCost: 350
+GemCost: 40
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 298
+Resourse: (2, 5)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+SpellPower: 905
+Power: 1
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+
+/143
+Name: Рунный посох;
+Slot: 100
+Class: 0
+Durability: 60
+GoldCost: 700
+GemCost: 100
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 299
+Resourse: (2, 5, 9)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+SpellPower: 905
+Power: 2
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0;
+
+
+/144
+Name: Лунный посох;
+Slot: 100
+Class: 0
+Durability: 60
+GoldCost: 650
+GemCost: 100
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 300
+Resourse: (2, 5, 8)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+SpellCost: 983
+Power: 20
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0;
+
+/145
+Name: Посох Архимага;
+Slot: 100
+Class: 0
+Durability: 80
+GoldCost: 1500
+GemCost: 200
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 301
+Resourse: (5, 8, 9)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+SpellPower: 905
+Power: 3
+Area: 0
+
+Stamina: 11
+Power: 4
+Area: 0;
+
+/146
+Name: Ятаган;
+Slot: 1
+Class: 1
+Durability: 60
+GoldCost: 70
+GemCost: 0
+ShopLevel: 2
+Rarity: 2
+Building: 121
+Pic: 345
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0;
+
+
+/147
+Name: Зачарованный клинок;
+Slot: 1
+Class: 1
+Durability: 40
+GoldCost: 200
+GemCost: 20
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 346
+Resourse: (1, 5)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0
+
+MagicStrike: 27
+Power: 1
+Area: 0;
+
+
+/148
+Name: Защитник;
+Slot: 1
+Class: 1
+Durability: 70
+GoldCost: 400
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 347
+Resourse: (7)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+Parry: 53
+Power: 2
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0;
+
+
+/149
+Name: Рапира Фехтовальщика;
+Slot: 1
+Class: 1
+Durability: 40
+GoldCost: 300
+GemCost: 0
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 348
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+AimedStrike: 76
+Power: 2
+Area: 0
+
+Parry: 53
+Power: 1
+Area: 0;
+
+
+/150
+Name: Меч Правосудия;
+Slot: 1
+Class: 1
+Durability: 70
+GoldCost: 350
+GemCost: 15
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 349
+Resourse: (7)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+SmiteEvil: 61
+Power: 1
+Area: 0
+
+Parry: 53
+Power: 1
+Area: 0;
+
+
+/151
+Name: Огненный меч;
+Slot: 1
+Class: 1
+Durability: 50
+GoldCost: 500
+GemCost: 70
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 350
+Resourse: (7, 5, 5)
+Effects:
+
+Attack: 2
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+MagicStrike: 27
+Power: 1
+Area: 0;
+
+
+/152
+Name: Клинок Ночи;
+Slot: 1
+Class: 1
+Durability: 50
+GoldCost: 550
+GemCost: 20
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 351
+Resourse: (7, 4)
+Effects:
+
+Attack: 2
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+Poison: 41
+Power: 2
+Area: 0
+
+Agility: 26
+Power: 1
+Area: 0;
+
+
+/153
+Name: Меч Древних;
+Slot: 1
+Class: 1
+Durability: 80
+GoldCost: 750
+GemCost: 50
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 352
+Resourse: (7, 7, 8)
+Effects:
+
+Attack: 2
+Power: 7
+Area: 0
+
+CounterAttack: 3
+Power: 7
+Area: 0
+
+AimedStrike: 76
+Power: 4
+Area: 0
+
+FirstStrike: 16
+Power: 1
+Area: 0;
+
+
+/154
+Name: Гномий топор;
+Slot: 1
+Class: 2
+Durability: 80
+GoldCost: 160
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 196
+Pic: 4
+Resourse: (7)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+
+/155
+Name: Топор Палача;
+Slot: 1
+Class: 2
+Durability: 70
+GoldCost: 300
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 5
+Resourse: (7)
+Effects:
+
+Attack: 2
+Power: 7
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+Cripple: 51
+Power: 1
+Area: 0;
+
+/156
+Name: Топор Берсерка;
+Slot: 1
+Class: 2
+Durability: 70
+GoldCost: 400
+GemCost: 0
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 6
+Resourse: (7)
+Effects:
+
+Attack: 2
+Power: 8
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Defence: 4
+Power: -1
+Area: 0
+
+Berserk: 25
+Power: 3
+Area: 0;
+
+/157
+Name: Душегуб;
+Slot: 1
+Class: 2
+Durability: 80
+GoldCost: 500
+GemCost: 30
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 7
+Resourse: (7, 5)
+Effects:
+
+Attack: 2
+Power: 7
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+StealSoul: 57
+Power: 5
+Area: 0;
+
+/158
+Name: Кровопийца;
+Slot: 1
+Class: 2
+Durability: 90
+GoldCost: 800
+GemCost: 50
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 8
+Resourse: (7, 9)
+Effects:
+
+Attack: 2
+Power: 8
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+DrainLife: 68
+Power: 30
+Area: 0;
+
+
+/159
+Name: Секира Ярости;
+Slot: 1
+Class: 2
+Durability: 90
+GoldCost: 900
+GemCost: 30
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 9
+Resourse: (7, 9)
+Effects:
+
+Attack: 2
+Power: 9
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+CrushingBlow: 59
+Power: 4
+Area: 0;
+
+
+/160
+Name: Разрушитель;
+Slot: 1
+Class: 2
+Durability: 100
+GoldCost: 1500
+GemCost: 50
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 10
+Resourse: (7, 7, 9)
+Effects:
+
+Attack: 2
+Power: 10
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+DamageArmor: 45
+Power: 3
+Area: 0
+
+Damageweapon: 52
+Power: 3
+Area: 0
+
+Cripple: 51
+Power: 1
+Area: 0;
+
+/161
+Name: Бердыш;
+Slot: 100
+Class: 1
+Durability: 50
+GoldCost: 150
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 16
+Resourse: (1, 2)
+Effects:
+
+First_strike: 16
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+/162
+Name: Гвардейская алебарда;
+Slot: 100
+Class: 1
+Durability: 60
+GoldCost: 250
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 17
+Resourse: (7, 2)
+Effects:
+
+First_strike: 16
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+AimedStrike: 76
+Power: 2
+Area: 0;
+
+/163
+Name: Копье Возмездия;
+Slot: 100
+Class: 1
+Durability: 50
+GoldCost: 250
+GemCost: 30
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 18
+Resourse: (7, 2, 4)
+Effects:
+
+First_strike: 16
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 6
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0
+
+Curse: 43
+Power: 3
+Area: 0;
+
+/164
+Name: Разящее копье;
+Slot: 100
+Class: 1
+Durability: 60
+GoldCost: 400
+GemCost: 30
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 19
+Resourse: (7)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 6
+Area: 0
+
+First_strike: 16
+Power: 1
+Area: 0
+
+Piercing_strike: 39
+Power: 1
+Area: 0;
+
+
+/165
+Name: Коса Смерти;
+Slot: 100
+Class: 1
+Durability: 70
+GoldCost: 500
+GemCost: 50
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 20
+Resourse: (7, 9)
+Effects:
+
+Attack: 2
+Power: 9
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+Life: 1
+Power: -5
+Area: 0
+
+LayDisease: 80
+Power: 3
+Area: 0;
+
+
+/166
+Name: Дьявольский трезубец;
+Slot: 100
+Class: 1
+Durability: 70
+GoldCost: 700
+GemCost: 50
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 21
+Resourse: (7, 9)
+Effects:
+
+Attack: 2
+Power: 8
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+Summon: 907
+Power: 2
+Area: 0
+
+CauseFear: 50
+Power: 1
+Area: 0;
+
+
+/167
+Name: Копье Судьбы;
+Slot: 100
+Class: 1
+Durability: 80
+GoldCost: 1500
+GemCost: 70
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 22
+Resourse: (7, 8, 9)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 7
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 1
+
+CounterAttack: 3
+Power: 2
+Area: 1;
+
+
+/168
+Name: Дубина Тролля;
+Slot: 1
+Class: 2
+Durability: 60
+GoldCost: 130
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 357
+Resourse: (2)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0;
+
+
+/169
+Name: Костолом;
+Slot: 1
+Class: 2
+Durability: 60
+GoldCost: 180
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 358
+Resourse: (1, 2)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Cripple: 51
+Power: 1
+Area: 0;
+
+
+/170
+Name: Мечелом;
+Slot: 1
+Class: 2
+Durability: 65
+GoldCost: 300
+GemCost: 0
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 359
+Resourse: (1)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+DamageWeapon: 52
+Power: 4
+Area: 0;
+
+
+/171
+Name: Щитолом;
+Slot: 1
+Class: 2
+Durability: 70
+GoldCost: 320
+GemCost: 0
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 360
+Resourse: (1)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+DamageArmor: 45
+Power: 4
+Area: 0;
+
+
+/172
+Name: Кистень Грома;
+Slot: 1
+Class: 2
+Durability: 70
+GoldCost: 500
+GemCost: 10
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 361
+Resourse: (7, 5)
+Effects:
+
+Stun: 40
+Power: 2
+Area: 0
+
+Attack: 2
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 6
+Area: 0;
+
+
+/173
+Name: Молот Сокрушения;
+Slot: 1
+Class: 2
+Durability: 80
+GoldCost: 700
+GemCost: 30
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 362
+Resourse: (7, 9)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 7
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+CrushingBlow: 59
+Power: 4
+Area: 0;
+
+
+/174
+Name: Молот Создателя;
+Slot: 100
+Class: 2
+Durability: 100
+GoldCost: 2200
+GemCost: 150
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 363
+Resourse: (7, 8, 9)
+Effects:
+
+Stun: 40
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 8
+Area: 0
+
+CounterAttack: 3
+Power: 8
+Area: 0
+
+Restless: 18
+Power: 1
+Area: 0;
+
+
+/175
+Name: Старинный меч;
+Slot: 100
+Class: 2
+Durability: 75
+GoldCost: 200
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 380
+Resourse: (1)
+Effects:
+
+Attack: 2
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 6
+Area: 0
+
+Morale: 12
+Power: 1
+Area: 0;
+
+
+/176
+Name: Великий меч;
+Slot: 100
+Class: 2
+Durability: 80
+GoldCost: 300
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 381
+Resourse: (7)
+Effects:
+
+Attack: 2
+Power: 7
+Area: 0
+
+CounterAttack: 3
+Power: 7
+Area: 0;
+
+
+/177
+Name: Меч Мастера;
+Slot: 100
+Class: 2
+Durability: 80
+GoldCost: 400
+GemCost: 0
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 382
+Resourse: (7)
+Effects:
+
+Attack: 2
+Power: 8
+Area: 0
+
+CounterAttack: 3
+Power: 8
+Area: 0
+
+AimedStrike: 76
+Power: 2
+Area: 0;
+
+
+/178
+Name: Меч Безумия;
+Slot: 100
+Class: 2
+Durability: 85
+GoldCost: 300
+GemCost: 30
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 383
+Resourse: (7, 4)
+Effects:
+
+Attack: 2
+Power: 11
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+Berserk: 25
+Power: 4
+Area: 0;
+
+
+/179
+Name: Демонический клинок;
+Slot: 100
+Class: 2
+Durability: 90
+GoldCost: 500
+GemCost: 50
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 384
+Resourse: (7, 9)
+Effects:
+
+Attack: 2
+Power: 12
+Area: 0
+
+CounterAttack: 3
+Power: 7
+Area: 0
+
+StealSoul: 57
+Power: 5
+Area: 0
+
+LayCurse: 43
+Power: 6
+Area: 0;
+
+
+/180
+Name: Меч Крови;
+Slot: 100
+Class: 2
+Durability: 100
+GoldCost: 1200
+GemCost: 90
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 385
+Resourse: (7, 9, 9)
+Effects:
+
+Attack: 2
+Power: 10
+Area: 0
+
+CounterAttack: 3
+Power: 9
+Area: 0
+
+DrainLife: 68
+Power: 40
+Area: 0;
+
+
+/181
+Name: Меч Бессмертных;
+Slot: 100
+Class: 2
+Durability: 100
+GoldCost: 1500
+GemCost: 80
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 386
+Resourse: (7, 8, 8)
+Effects:
+
+Attack: 2
+Power: 13
+Area: 0
+
+CounterAttack: 3
+Power: 11
+Area: 0
+
+Regeneration: 48
+Power: 4
+Area: 0;
+
+
+/182
+Name: Флаг Бесстрашия;
+Slot: 1
+Class: 5
+Durability: 40
+GoldCost: 180
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 24
+Resourse: (2)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0
+
+Morale: 12
+Power: 3
+Area: 1;
+
+
+/183
+Name: Флаг Неутомимости;
+Slot: 1
+Class: 5
+Durability: 40
+GoldCost: 220
+GemCost: 10
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 25
+Resourse: (2)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 1;
+
+
+/184
+Name: Стяг Ярости;
+Slot: 100
+Class: 5
+Durability: 50
+GoldCost: 500
+GemCost: 20
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 26
+Resourse: (2, 4)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 1
+
+CounterAttack: 3
+Power: 2
+Area: 1;
+
+
+/185
+Name: Знамя Несокрушимости;
+Slot: 100
+Class: 5
+Durability: 55
+GoldCost: 600
+GemCost: 30
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 27
+Resourse: (2, 4)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 1
+
+RangedDefence: 5
+Power: 1
+Area: 1
+
+Resist: 6
+Power: 1
+Area: 1;
+
+
+/186
+Name: Вымпел Орла;
+Slot: 1
+Class: 5
+Durability: 50
+GoldCost: 550
+GemCost: 40
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 28
+Resourse: (2, 4)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+RangedAttack: 8
+Power: 2
+Area: 1
+
+Morale: 12
+Power: 2
+Area: 1;
+
+/187
+Name: Знамя Победы;
+Slot: 100
+Class: 5
+Durability: 60
+GoldCost: 900
+GemCost: 60
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 29
+Resourse: (2, 5)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Life: 1
+Power: 3
+Area: 1
+
+Stamina: 11
+Power: 4
+Area: 1
+
+Morale: 12
+Power: 5
+Area: 1;
+
+
+/188
+Name: Вымпел Дракона;
+Slot: 1
+Class: 5
+Durability: 70
+GoldCost: 1000
+GemCost: 80
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 30
+Resourse: (2, 8)
+Effects:
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0
+
+Life: 1
+Power: 7
+Area: 1
+
+Resist: 6
+Power: 2
+Area: 1;
+
+
+/189
+Name: Стяг Древних;
+Slot: 100
+Class: 5
+Durability: 80
+GoldCost: 2500
+GemCost: 120
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 31
+Resourse: (2, 8, 8)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 5
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 1
+
+CounterAttack: 3
+Power: 2
+Area: 1
+
+Defence: 4
+Power: 2
+Area: 1
+
+RangedDefence: 5
+Power: 2
+Area: 1;
+
+
+/190
+Name: Лук Степняков;
+Slot: 1
+Class: 3
+Durability: 45
+GoldCost: 70
+GemCost: 0
+ShopLevel: 2
+Rarity: 2
+Building: 121
+Pic: 368
+Resourse: (2)
+Effects:
+
+RangedAttack: 8
+Power: 8
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 6
+Area: 0;
+
+/191
+Name: Бандитский лук;
+Slot: 1
+Class: 3
+Durability: 55
+GoldCost: 150
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 369
+Resourse: (2)
+Effects:
+
+RangedAttack: 8
+Power: 8
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Looter: 992
+Power: 1
+Area: 0;
+
+
+/192
+Name: Лук Кентавра;
+Slot: 1
+Class: 3
+Durability: 60
+GoldCost: 200
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 370
+Resourse: (2)
+Effects:
+
+RangedAttack: 8
+Power: 9
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/193
+Name: Эльфийский лук;
+Slot: 1
+Class: 3
+Durability: 65
+GoldCost: 220
+GemCost: 5
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 371
+Resourse: (2, 4)
+Effects:
+
+RangedAttack: 8
+Power: 10
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+AimedShot: 77
+Power: 2
+Area: 0;
+
+
+/194
+Name: Лук Черного Леса;
+Slot: 1
+Class: 3
+Durability: 70
+GoldCost: 250
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 372
+Resourse: (2, 4)
+Effects:
+
+RangedAttack: 8
+Power: 11
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+GatherAmmo: 23
+Power: 3
+Area: 0;
+
+
+/195
+Name: Пламенный лук;
+Slot: 1
+Class: 3
+Durability: 70
+GoldCost: 350
+GemCost: 40
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 373
+Resourse: (2, 5)
+Effects:
+
+RangedAttack: 8
+Power: 13
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+FlamingArrows: 60
+Power: 6
+Area: 0;
+
+
+/196
+Name: Лук Ветра;
+Slot: 1
+Class: 3
+Durability: 75
+GoldCost: 500
+GemCost: 40
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 374
+Resourse: (2, 5)
+Effects:
+
+RangedAttack: 8
+Power: 15
+Area: 0
+
+ShootingRange: 9
+Power: 7
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Initiative: 999
+Power: 1
+Area: 0;
+
+
+/197
+Name: Лук Ренвера;
+Slot: 1
+Class: 3
+Durability: 80
+GoldCost: 1000
+GemCost: 80
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 375
+Resourse: (2, 8, 8)
+Effects:
+
+RangedAttack: 8
+Power: 17
+Area: 0
+
+ShootingRange: 9
+Power: 7
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+AimedShot: 77
+Power: 4
+Area: 0;
+
+
+/198
+Name: Гномий арбалет;
+Slot: 1
+Class: 3
+Durability: 50
+GoldCost: 200
+GemCost: 0
+ShopLevel: 2
+Rarity: 2
+Building: 196
+Pic: 391
+Resourse: (1, 2)
+Effects:
+
+RangedAttack: 8
+Power: 7
+Area: 0
+
+ShootingRange: 9
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0
+
+
+Life: 1
+Power: 3
+Area: 0;
+
+/199
+Name: Точный арбалет;
+Slot: 1
+Class: 3
+Durability: 55
+GoldCost: 250
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 392
+Resourse: (1, 2)
+Effects:
+
+RangedAttack: 8
+Power: 8
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0
+
+Aimed_shot: 77
+Power: 2
+Area: 0;
+
+
+/200
+Name: Зачарованный арбалет;
+Slot: 1
+Class: 3
+Durability: 60
+GoldCost: 300
+GemCost: 20
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 393
+Resourse: (1, 2, 4)
+Effects:
+
+RangedAttack: 8
+Power: 9
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0
+
+FlamingArrows: 60
+Power: 3
+Area: 0;
+
+/201
+Name: Стреломет;
+Slot: 1
+Class: 3
+Durability: 65
+GoldCost: 400
+GemCost: 0
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 394
+Resourse: (1, 2, 7)
+Effects:
+
+RangedAttack: 8
+Power: 11
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 6
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0;
+
+
+/202
+Name: Ручная баллиста;
+Slot: 1
+Class: 3
+Durability: 80
+GoldCost: 600
+GemCost: 0
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 395
+Resourse: (2, 7, 7)
+Effects:
+
+RangedAttack: 8
+Power: 13
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0
+
+Siege: 55
+Power: 3
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0;
+
+
+/203
+Name: Эфирный арбалет;
+Slot: 1
+Class: 3
+Durability: 70
+GoldCost: 600
+GemCost: 60
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 396
+Resourse: (7, 2, 5)
+Effects:
+
+RangedAttack: 8
+Power: 13
+Area: 0
+
+ShootingRange: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0;
+
+
+/204
+Name: Арбалет Гнева;
+Slot: 1
+Class: 3
+Durability: 80
+GoldCost: 1000
+GemCost: 40
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 397
+Resourse: (2, 7, 9)
+Effects:
+
+RangedAttack: 8
+Power: 15
+Area: 0
+
+ShootingRange: 9
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Piercing_shot: 17
+Power: 1
+Area: 0
+
+PoisonShot: 78
+Power: 3
+Area: 0;
+
+
+/205
+Name: Огненный жезл;
+Slot: 1
+Class: 4
+Durability: 30
+GoldCost: 140
+GemCost: 10
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 257
+Resourse: (4)
+Effects:
+
+RangeAttack: 8
+Power: 6
+Area: 0
+
+Range: 9
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0;
+
+
+/206
+Name: Жезл Молний;
+Slot: 1
+Class: 4
+Durability: 30
+GoldCost: 170
+GemCost: 10
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 258
+Resourse: (4)
+Effects:
+
+RangeAttack: 8
+Power: 5
+Area: 0
+
+Range: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Energy_control: 95
+Power: 1
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0;
+
+
+/207
+Name: Жезл Тьмы;
+Slot: 1
+Class: 4
+Durability: 35
+GoldCost: 240
+GemCost: 15
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 259
+Resourse: (5)
+Effects:
+
+RangeAttack: 8
+Power: 6
+Area: 0
+
+Range: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 0
+
+LayCurse: 43
+Power: 4
+Area: 0;
+
+
+/208
+Name: Жезл Чернокнижника;
+Slot: 1
+Class: 4
+Durability: 40
+GoldCost: 250
+GemCost: 40
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 260
+Resourse: (9)
+Effects:
+
+RangeAttack: 8
+Power: 6
+Area: 0
+
+Range: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Energy_control: 95
+Power: 1
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0
+
+UndeadPower: 909
+Power: 1
+Area: 0;
+
+
+/209
+Name: Жезл Власти;
+Slot: 1
+Class: 4
+Durability: 45
+GoldCost: 400
+GemCost: 50
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 261
+Resourse: (5, 9)
+Effects:
+
+RangeAttack: 8
+Power: 7
+Area: 0
+
+Range: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Energy_control: 95
+Power: 1
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0
+
+LowerResist: 908
+Power: 1
+Area: 0;
+
+
+/210
+Name: Жезл Бури;
+Slot: 1
+Class: 4
+Durability: 50
+GoldCost: 500
+GemCost: 60
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 262
+Resourse: (5, 9)
+Effects:
+
+RangeAttack: 8
+Power: 8
+Area: 0
+
+Range: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 3
+Area: 0
+
+Energy_control: 95
+Power: 2
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0
+
+SpellPower: 905
+Power: 1
+Area: 0;
+
+
+/211
+Name: Жезл Вечности;
+Slot: 1
+Class: 4
+Durability: 50
+GoldCost: 1200
+GemCost: 100
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 263
+Resourse: (5, 8, 9)
+Effects:
+
+RangeAttack: 8
+Power: 9
+Area: 0
+
+Range: 9
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Energy_control: 95
+Power: 3
+Area: 0
+
+Magic_shot: 28
+Power: 1
+Area: 0
+
+SpellDuration: 906
+Power: 1
+Area: 0;
+
+
+/212
+Name: Хрустальная сфера;
+Slot: 2
+Class: 4
+Durability: 10
+GoldCost: 30
+GemCost: 10
+ShopLevel: 2
+Rarity: 1
+Building: 0
+Pic: 66
+Resourse: (4)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0;
+
+
+/213
+Name: Сфера Памяти;
+Slot: 2
+Class: 4
+Durability: 15
+GoldCost: 40
+GemCost: 15
+ShopLevel: 2
+Rarity: 2
+Building: 0
+Pic: 67
+Resourse: (4)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+Ammo: 10
+Power: 1
+Area: 0;
+
+/214
+Name: Сфера Знаний;
+Slot: 2
+Class: 4
+Durability: 15
+GoldCost: 80
+GemCost: 20
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 68
+Resourse: (5)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+Ammo: 10
+Power: 2
+Area: 0;
+
+
+/215
+Name: Сфера Пламени;
+Slot: 2
+Class: 4
+Durability: 20
+GoldCost: 100
+GemCost: 20
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 69
+Resourse: (5)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+RangedAttack: 994
+Power: 1
+Area: 0;
+
+
+/216
+Name: Сфера Мысли;
+Slot: 2
+Class: 4
+Durability: 25
+GoldCost: 200
+GemCost: 40
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 70
+Resourse: (5)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+Ammo: 10
+Power: 2
+Area: 0
+
+RangedAttack: 994
+Power: 1
+Area: 0
+
+Energy_control: 95
+Power: 1
+Area: 0;
+
+
+/217
+Name: Сфера Мудрости;
+Slot: 2
+Class: 4
+Durability: 30
+GoldCost: 250
+GemCost: 50
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 71
+Resourse: (5)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+Ammo: 10
+Power: 2
+Area: 0
+
+ExpGain: 991
+Power: 10
+Area: 0;
+
+
+/218
+Name: Сфера Разрушения;
+Slot: 2
+Class: 4
+Durability: 40
+GoldCost: 500
+GemCost: 50
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 72
+Resourse: (5, 9)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+RangedAttack: 994
+Power: 3
+Area: 0
+
+Ammo: 10
+Power: 1
+Area: 0
+
+Energy_control: 95
+Power: 1
+Area: 0;
+
+
+/219
+Name: Кристаллическая сфера;
+Slot: 2
+Class: 4
+Durability: 40
+GoldCost: 800
+GemCost: 100
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 73
+Resourse: (5, 8, 8)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+SpellCost: 983
+Power: 10
+Area: 0;
+
+
+/220
+Name: Сфера Вечности;
+Slot: 2
+Class: 4
+Durability: 50
+GoldCost: 1500
+GemCost: 80
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 23
+Resourse: (5, 8, 9)
+Effects:
+
+Resist: 6
+Power: 2
+Area: 0
+
+RangedAttack: 994
+Power: 1
+Area: 0
+
+Ammo: 10
+Power: 2
+Area: 0
+
+Energy_control: 95
+Power: 2
+Area: 0
+
+SpellPower: 905
+Power: 1
+Area: 0;
+
+
+/221
+Name: Укрепленный щит;
+Slot: 2
+Class: 9
+Durability: 50
+GoldCost: 50
+GemCost: 0
+ShopLevel: 2
+Rarity: 2
+Building: 0
+Pic: 333
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Life: 1
+Power: 3
+Area: 0;
+
+/222
+Name: Гномий щит;
+Slot: 2
+Class: 9
+Durability: 70
+GoldCost: 90
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 196
+Pic: 334
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Life: 1
+Power: 5
+Area: 0;
+
+
+/223
+Name: Щит Воина;
+Slot: 2
+Class: 9
+Durability: 60
+GoldCost: 100
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 335
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0;
+
+
+/224
+Name: Серебряный щит;
+Slot: 2
+Class: 9
+Durability: 65
+GoldCost: 180
+GemCost: 10
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 336
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0;
+
+
+/225
+Name: Мифрильный щит;
+Slot: 2
+Class: 9
+Durability: 70
+GoldCost: 220
+GemCost: 15
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 337
+Resourse: (7)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/226
+Name: Огненный щит;
+Slot: 2
+Class: 9
+Durability: 75
+GoldCost: 400
+GemCost: 50
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 338
+Resourse: (5, 7)
+Effects:
+
+Defence: 4
+Power: 3
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0;
+
+
+/227
+Name: Драконий щит;
+Slot: 2
+Class: 9
+Durability: 80
+GoldCost: 500
+GemCost: 50
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 339
+Resourse: (5, 7)
+Effects:
+
+Defence: 4
+Power: 3
+Area: 0
+
+RangedDefence: 5
+Power: 3
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/228
+Name: Священный щит;
+Slot: 2
+Class: 9
+Durability: 100
+GoldCost: 1500
+GemCost: 100
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 340
+Resourse: (7, 8, 8)
+Effects:
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0
+
+Resist: 6
+Power: 3
+Area: 0
+
+FirstAid: 35
+Power: 5
+Area: 0
+
+Recover: 21
+Power: 5
+Area: 0;
+
+
+/229
+Name: Стрелы Степняков;
+Slot: 2
+Class: 3
+Durability: 22
+GoldCost: 40
+GemCost: 0
+ShopLevel: 2
+Rarity: 2
+Building: 121
+Pic: 269
+Resourse: (1)
+Effects:
+
+RangedAttack: 993
+Power: 3
+Area: 0
+
+Ammo: 10
+Power: 6
+Area: 0;
+
+/230
+Name: Серебряные стрелы;
+Slot: 2
+Class: 3
+Durability: 12
+GoldCost: 60
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 270
+Resourse: (1)
+Effects:
+
+RangedAttack: 993
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 3
+Area: 0;
+
+
+/231
+Name: Отравленные стрелы;
+Slot: 2
+Class: 3
+Durability: 20
+GoldCost: 70
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 271
+Resourse: (1)
+Effects:
+
+RangedAttack: 993
+Power: 3
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+PoisonShot: 78
+Power: 1
+Area: 0;
+
+
+/232
+Name: Эльфийские стрелы;
+Slot: 2
+Class: 3
+Durability: 20
+GoldCost: 120
+GemCost: 10
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 272
+Resourse: (7)
+Effects:
+
+RangedAttack: 993
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+AimedShot: 77
+Power: 1
+Area: 0;
+
+
+/233
+Name: Огненные стрелы;
+Slot: 2
+Class: 3
+Durability: 20
+GoldCost: 120
+GemCost: 20
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 273
+Resourse: (5)
+Effects:
+
+RangedAttack: 993
+Power: 4
+Area: 0
+
+Ammo: 10
+Power: 3
+Area: 0
+
+FireArrows: 60
+Power: 4
+Area: 0;
+
+
+/234
+Name: Грифоньи стрелы;
+Slot: 2
+Class: 3
+Durability: 27
+GoldCost: 200
+GemCost: 10
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 274
+Resourse: (7)
+Effects:
+
+RangedAttack: 993
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+Range: 9
+Power: 1
+Area: 0;
+
+
+/235
+Name: Стрелы Смерти;
+Slot: 2
+Class: 3
+Durability: 25
+GoldCost: 250
+GemCost: 20
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 275
+Resourse: (7, 9)
+Effects:
+
+RangedAttack: 993
+Power: 6
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0;
+
+
+/236
+Name: Стрелы Ренвера;
+Slot: 2
+Class: 3
+Durability: 33
+GoldCost: 500
+GemCost: 40
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 276
+Resourse: (5, 7, 8)
+Effects:
+
+RangedAttack: 993
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 5
+Area: 0
+
+FireArrows: 60
+Power: 5
+Area: 0
+
+AimedShot: 77
+Power: 2
+Area: 0;
+
+
+/237
+Name: Тога Колдуна;
+Slot: 3
+Class: 0
+Durability: 20
+GoldCost: 60
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 127
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0;
+
+
+/238
+Name: Мантия Иллюзий;
+Slot: 3
+Class: 0
+Durability: 20
+GoldCost: 60
+GemCost: 5
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 128
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+
+/239
+Name: Кафтан Торговца;
+Slot: 3
+Class: 0
+Durability: 25
+GoldCost: 150
+GemCost: 0
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 129
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+GoldIncome: 81
+Power: 10
+Area: 0;
+
+
+/240
+Name: Мантия Воплощений;
+Slot: 3
+Class: 0
+Durability: 20
+GoldCost: 170
+GemCost: 30
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 130
+Resourse: (5)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+Summon: 907
+Power: 1
+Area: 0;
+
+
+/241
+Name: Мантия Заклинателя;
+Slot: 3
+Class: 0
+Durability: 30
+GoldCost: 400
+GemCost: 50
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 131
+Resourse: (5)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0
+
+SpellDuration: 906
+Power: 1
+Area: 0;
+
+
+/242
+Name: Мантия Тайны;
+Slot: 3
+Class: 0
+Durability: 35
+GoldCost: 500
+GemCost: 70
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 132
+Resourse: (5, 9)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0
+
+SpellPenetration: 908
+Power: 1
+Area: 0;
+
+
+/243
+Name: Мантия Архимага;
+Slot: 3
+Class: 0
+Durability: 40
+GoldCost: 1000
+GemCost: 150
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 133
+Resourse: (5, 8, 9)
+Effects:
+
+Life: 1
+Power: 10
+Area: 0
+
+Resist: 6
+Power: 3
+Area: 0
+
+Defence: 4
+Power: 3
+Area: 0
+
+RangedDefence: 5
+Power: 3
+Area: 0
+
+SpellPower: 905
+Power: 1
+Area: 0;
+
+
+/244
+Name: Куртка Ловчего;
+Slot: 3
+Class: 6
+Durability: 30
+GoldCost: 90
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 205
+Resourse: (0)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Explore: 996
+Power: 3
+Area: 0;
+
+
+/245
+Name: Куртка Мошенника;
+Slot: 3
+Class: 6
+Durability: 35
+GoldCost: 100
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 206
+Resourse: (0)
+Effects:
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 3
+Area: 0
+
+Pillage: 982
+Power: 15
+Area: 0;
+
+
+/246
+Name: Куртка Атамана;
+Slot: 3
+Class: 6
+Durability: 35
+GoldCost: 150
+GemCost: 0
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 207
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 3
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Looter: 992
+Power: 1
+Area: 0;
+
+
+/247
+Name: Куртка Василиска;
+Slot: 3
+Class: 6
+Durability: 40
+GoldCost: 200
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 208
+Resourse: (4)
+Effects:
+
+Defence: 4
+Power: 3
+Area: 0
+
+RangedDefence: 5
+Power: 3
+Area: 0
+
+Life: 1
+Power: 5
+Area: 0;
+
+
+/248
+Name: Куртка Мантикоры;
+Slot: 3
+Class: 6
+Durability: 45
+GoldCost: 400
+GemCost: 20
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 209
+Resourse: (4, 5)
+Effects:
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0;
+
+
+/249
+Name: Куртка Единорога;
+Slot: 3
+Class: 6
+Durability: 50
+GoldCost: 500
+GemCost: 40
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 210
+Resourse: (4, 5, 8)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/250
+Name: Троллиная куртка;
+Slot: 3
+Class: 6
+Durability: 60
+GoldCost: 1200
+GemCost: 30
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 211
+Resourse: (4, 4, 9)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Regeneration: 48
+Power: 4
+Area: 0;
+
+
+/251
+Name: Гномья кольчуга;
+Slot: 3
+Class: 7
+Durability: 50
+GoldCost: 150
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 196
+Pic: 85
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Life: 1
+Power: 5
+Area: 0;
+
+
+/252
+Name: Кольчуга Ветерана;
+Slot: 3
+Class: 7
+Durability: 45
+GoldCost: 170
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 86
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 3
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/253
+Name: Эльфийская кольчуга;
+Slot: 3
+Class: 7
+Durability: 40
+GoldCost: 250
+GemCost: 20
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 87
+Resourse: (7)
+Effects:
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/254
+Name: Кольчуга Героя;
+Slot: 3
+Class: 7
+Durability: 50
+GoldCost: 300
+GemCost: 5
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 88
+Resourse: (7)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0
+
+Morale: 12
+Power: 3
+Area: 0;
+
+
+/255
+Name: Зачарованная кольчуга;
+Slot: 3
+Class: 7
+Durability: 55
+GoldCost: 500
+GemCost: 40
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 89
+Resourse: (7, 5, 5)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Resist: 6
+Power: 4
+Area: 0;
+
+
+/256
+Name: Драконья кольчуга;
+Slot: 3
+Class: 7
+Durability: 60
+GoldCost: 700
+GemCost: 30
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 90
+Resourse: (7, 5, 8)
+Effects:
+
+Defence: 4
+Power: 6
+Area: 0
+
+RangedDefence: 5
+Power: 6
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/257
+Name: Кольчуга Древних;
+Slot: 3
+Class: 7
+Durability: 70
+GoldCost: 1500
+GemCost: 50
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 91
+Resourse: (7, 9, 8)
+Effects:
+
+Defence: 4
+Power: 7
+Area: 0
+
+RangedDefence: 5
+Power: 7
+Area: 0
+
+Resist: 6
+Power: 4
+Area: 0;
+
+
+/258
+Name: Гвардейский панцирь;
+Slot: 3
+Class: 8
+Durability: 60
+GoldCost: 200
+GemCost: 0
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 164
+Resourse: (1)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0
+
+Attack: 2
+Power: -1
+Area: 0;
+
+
+/259
+Name: Кираса Паладина;
+Slot: 3
+Class: 8
+Durability: 65
+GoldCost: 230
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 165
+Resourse: (7)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0
+
+Attack: 2
+Power: -1
+Area: 0
+
+Morale: 12
+Power: 2
+Area: 0;
+
+/260
+Name: Тёмный доспех;
+Slot: 3
+Class: 8
+Durability: 75
+GoldCost: 350
+GemCost: 10
+ShopLevel: 4
+Rarity: 2
+Building: 0
+Pic: 166
+Resourse: (7)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0
+
+Attack: 2
+Power: 1
+Area: 0;
+
+
+/261
+Name: Нагрудник Доблести;
+Slot: 3
+Class: 8
+Durability: 70
+GoldCost: 400
+GemCost: 15
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 167
+Resourse: (7)
+Effects:
+
+Defence: 4
+Power: 6
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0
+
+Morale: 12
+Power: 3
+Area: 0;
+
+
+/262
+Name: Кровавая кираса;
+Slot: 3
+Class: 8
+Durability: 80
+GoldCost: 800
+GemCost: 15
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 168
+Resourse: (7, 7)
+Effects:
+
+Defence: 4
+Power: 6
+Area: 0
+
+RangedDefence: 5
+Power: 6
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0
+
+Attack: 2
+Power: 3
+Area: 0;
+
+
+/263
+Name: Панцирь Величия;
+Slot: 3
+Class: 8
+Durability: 100
+GoldCost: 1000
+GemCost: 20
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 169
+Resourse: (7, 7, 8)
+Effects:
+
+Defence: 4
+Power: 7
+Area: 0
+
+RangedDefence: 5
+Power: 7
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/264
+Name: Несокрушимая кираса;
+Slot: 3
+Class: 8
+Durability: 200
+GoldCost: 2000
+GemCost: 50
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 170
+Resourse: (7, 7, 7, 8)
+Effects:
+
+Defence: 4
+Power: 9
+Area: 0
+
+RangedDefence: 5
+Power: 9
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0;
+
+
+/265
+Name: Сандалии Иллюзий;
+Slot: 7
+Class: 0
+Durability: 20
+GoldCost: 90
+GemCost: 10
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 147
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/266
+Name: Туфли Воплощений;
+Slot: 7
+Class: 0
+Durability: 20
+GoldCost: 150
+GemCost: 20
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 148
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0;
+
+
+/267
+Name: Астральные сапоги;
+Slot: 7
+Class: 0
+Durability: 25
+GoldCost: 300
+GemCost: 40
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 149
+Resourse: (5)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+GemIncome: 82
+Power: 5
+Area: 0;
+
+
+/268
+Name: Сапоги Тайны;
+Slot: 7
+Class: 0
+Durability: 30
+GoldCost: 400
+GemCost: 60
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 150
+Resourse: (5, 9)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/269
+Name: Сапоги Левитации;
+Slot: 7
+Class: 0
+Durability: 35
+GoldCost: 1000
+GemCost: 100
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 151
+Resourse: (5, 5, 8)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Float: 15
+Power: 1
+Area: 0
+
+Speed: 7
+Power: 1
+Area: 0;
+
+
+/270
+Name: Сапоги Путешественника;
+Slot: 7
+Class: 6
+Durability: 35
+GoldCost: 80
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 223
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+Explore: 996
+Power: 3
+Area: 0;
+
+
+/271
+Name: Сапоги Василиска;
+Slot: 7
+Class: 6
+Durability: 40
+GoldCost: 160
+GemCost: 15
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 224
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0
+
+Swampwalk: 34
+Power: 4
+Area: 0;
+
+
+/272
+Name: Сапоги Мантикоры;
+Slot: 7
+Class: 6
+Durability: 45
+GoldCost: 300
+GemCost: 20
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 225
+Resourse: (4, 5)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0
+
+Hillwalk: 33
+Power: 4
+Area: 0;
+
+
+/273
+Name: Сапоги Единорога;
+Slot: 7
+Class: 6
+Durability: 40
+GoldCost: 400
+GemCost: 25
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 226
+Resourse: (5, 5)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0
+
+Forestwalk: 32
+Power: 4
+Area: 0;
+
+
+/274
+Name: Сапоги-Скороходы;
+Slot: 7
+Class: 6
+Durability: 40
+GoldCost: 1000
+GemCost: 50
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 227
+Resourse: (5, 5, 8)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0
+
+Speed: 7
+Power: 1
+Area: 0
+
+Initiative: 999
+Power: 1
+Area: 0;
+
+
+/275
+Name: Сапоги Ветерана;
+Slot: 7
+Class: 7
+Durability: 40
+GoldCost: 120
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 103
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/276
+Name: Сапоги Героя;
+Slot: 7
+Class: 7
+Durability: 45
+GoldCost: 180
+GemCost: 0
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 104
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+Morale: 12
+Power: 2
+Area: 0;
+
+
+/277
+Name: Сапоги Защитника;
+Slot: 7
+Class: 7
+Durability: 50
+GoldCost: 400
+GemCost: 0
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 105
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0;
+
+
+/278
+Name: Драконьи сапоги;
+Slot: 7
+Class: 7
+Durability: 60
+GoldCost: 600
+GemCost: 20
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 106
+Resourse: (7, 5)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0;
+
+
+/279
+Name: Сапоги Генерала;
+Slot: 7
+Class: 7
+Durability: 55
+GoldCost: 1000
+GemCost: 20
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 107
+Resourse: (7, 8)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 1
+
+Stamina: 11
+Power: 2
+Area: 1;
+
+
+/280
+Name: Сапоги Паладина;
+Slot: 7
+Class: 8
+Durability: 50
+GoldCost: 120
+GemCost: 5
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 182
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Morale: 12
+Power: 2
+Area: 0;
+
+/281
+Name: Сапоги Доблести;
+Slot: 7
+Class: 8
+Durability: 55
+GoldCost: 200
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 183
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+Attack: 2
+Power: 1
+Area: 0;
+
+/282
+Name: Сапоги Монолита;
+Slot: 7
+Class: 8
+Durability: 65
+GoldCost: 400
+GemCost: 30
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 184
+Resourse: (7, 7)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+
+/283
+Name: Сапоги Величия;
+Slot: 7
+Class: 8
+Durability: 60
+GoldCost: 600
+GemCost: 40
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 185
+Resourse: (7, 7)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/284
+Name: Сапоги Камнекожи;
+Slot: 7
+Class: 8
+Durability: 80
+GoldCost: 1200
+GemCost: 70
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 186
+Resourse: (7, 7, 8)
+Effects:
+
+Life: 1
+Power: 10
+Area: 0
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0;
+
+
+/285
+Name: Шляпа Иллюзий;
+Slot: 4
+Class: 0
+Durability: 15
+GoldCost: 80
+GemCost: 15
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 138
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+GemIncome: 82
+Power: 2
+Area: 0;
+
+/286
+Name: Капюшон Воплощений;
+Slot: 4
+Class: 0
+Durability: 20
+GoldCost: 150
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 139
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+Recover: 21
+Power: 2
+Area: 0;
+
+
+/287
+Name: Капюшон Некроманта;
+Slot: 4
+Class: 0
+Durability: 20
+GoldCost: 300
+GemCost: 30
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 140
+Resourse: (9)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+UndeadPower: 909
+Power: 1
+Area: 0;
+
+
+/288
+Name: Капюшон Тайны;
+Slot: 4
+Class: 0
+Durability: 25
+GoldCost: 400
+GemCost: 40
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 141
+Resourse: (5, 9)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0
+
+ExpGain: 991
+Power: 10
+Area: 0;
+
+
+/289
+Name: Корона Мыслей;
+Slot: 4
+Class: 0
+Durability: 30
+GoldCost: 1000
+GemCost: 80
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 142
+Resourse: (5, 8, 9)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Resist: 6
+Power: 3
+Area: 0
+
+SpellPower: 905
+Power: 1
+Area: 0;
+
+
+/290
+Name: Шляпа Торговца;
+Slot: 4
+Class: 6
+Durability: 15
+GoldCost: 100
+GemCost: 5
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 215
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+GoldIncome: 81
+Power: 8
+Area: 0;
+
+/291
+Name: Шлем Василиска;
+Slot: 4
+Class: 6
+Durability: 30
+GoldCost: 160
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 216
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0;
+
+
+/292
+Name: Шлем Мантикоры;
+Slot: 4
+Class: 6
+Durability: 35
+GoldCost: 300
+GemCost: 15
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 217
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0;
+
+
+/293
+Name: Шлем Единорога;
+Slot: 4
+Class: 6
+Durability: 40
+GoldCost: 400
+GemCost: 25
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 218
+Resourse: (5)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0
+
+Morale: 12
+Power: 4
+Area: 0;
+
+
+/294
+Name: Маска Людоеда;
+Slot: 4
+Class: 6
+Durability: 40
+GoldCost: 300
+GemCost: 15
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 219
+Resourse: (4, 5)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Cannibalize: 49
+Power: 10
+Area: 0;
+
+
+/295
+Name: Шлем Ветерана;
+Slot: 4
+Class: 7
+Durability: 30
+GoldCost: 130
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 95
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+/296
+Name: Шлем Героя;
+Slot: 4
+Class: 7
+Durability: 35
+GoldCost: 180
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 96
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+Morale: 12
+Power: 3
+Area: 0;
+
+
+/297
+Name: Шлем Победителя;
+Slot: 4
+Class: 7
+Durability: 40
+GoldCost: 300
+GemCost: 20
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 97
+Resourse: (7, 5)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Morale: 12
+Power: 1
+Area: 1;
+
+
+/298
+Name: Драконий шлем;
+Slot: 4
+Class: 7
+Durability: 50
+GoldCost: 400
+GemCost: 35
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 98
+Resourse: (7, 7, 5)
+Effects:
+
+Life: 1
+Power: 9
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/299
+Name: Шлем Грифона;
+Slot: 4
+Class: 7
+Durability: 45
+GoldCost: 1000
+GemCost: 50
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 99
+Resourse: (7, 5, 8)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+RangedAttack: 8
+Power: 1
+Area: 1
+
+Initiative: 999
+Power: 1
+Area: 0;
+
+
+/300
+Name: Шлем Паладина;
+Slot: 4
+Class: 8
+Durability: 40
+GoldCost: 160
+GemCost: 5
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 174
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Morale: 12
+Power: 2
+Area: 0;
+
+
+/301
+Name: Шлем Доблести;
+Slot: 4
+Class: 8
+Durability: 45
+GoldCost: 200
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 175
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Attack: 2
+Power: 1
+Area: 0;
+
+
+/302
+Name: Шлем Бесстрашия;
+Slot: 4
+Class: 8
+Durability: 50
+GoldCost: 400
+GemCost: 15
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 176
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 10
+Area: 0
+
+Morale: 12
+Power: 6
+Area: 0;
+
+
+/303
+Name: Шлем Величия;
+Slot: 4
+Class: 8
+Durability: 55
+GoldCost: 500
+GemCost: 25
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 177
+Resourse: (7, 8)
+Effects:
+
+Life: 1
+Power: 10
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0;
+
+
+/304
+Name: Шлем Древних;
+Slot: 4
+Class: 8
+Durability: 60
+GoldCost: 1000
+GemCost: 45
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 178
+Resourse: (7, 8, 9)
+Effects:
+
+Life: 1
+Power: 12
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Resistance: 6
+Power: 2
+Area: 0;
+
+
+/305
+Name: Перчатки Иллюзий;
+Slot: 8
+Class: 0
+Durability: 15
+GoldCost: 80
+GemCost: 10
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 155
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0;
+
+
+/306
+Name: Перчатки Воплощений;
+Slot: 8
+Class: 0
+Durability: 15
+GoldCost: 120
+GemCost: 15
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 156
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+WandAttack: 994
+Power: 2
+Area: 0;
+
+
+/307
+Name: Перчатки Медитации;
+Slot: 8
+Class: 0
+Durability: 15
+GoldCost: 250
+GemCost: 20
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 157
+Resourse: (5)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+Recover: 21
+Power: 2
+Area: 0
+
+FirstAid: 35
+Power: 2
+Area: 0;
+
+
+/308
+Name: Перчатки Тайны;
+Slot: 8
+Class: 0
+Durability: 20
+GoldCost: 350
+GemCost: 30
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 158
+Resourse: (5, 9)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+WandAttack: 994
+Power: 2
+Area: 0
+
+Energy_control: 95
+Power: 2
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/309
+Name: Перчатки Заклинателя;
+Slot: 8
+Class: 0
+Durability: 25
+GoldCost: 800
+GemCost: 70
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 159
+Resourse: (5, 8, 9)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0
+
+SpellDuration: 906
+Power: 1
+Area: 0;
+
+
+/310
+Name: Перчатки Вора;
+Slot: 8
+Class: 6
+Durability: 25
+GoldCost: 120
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 231
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+StealAmmo: 44
+Power: 3
+Area: 0;
+
+
+/311
+Name: Перчатки Василиска;
+Slot: 8
+Class: 6
+Durability: 30
+GoldCost: 250
+GemCost: 0
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 232
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+FirstAid: 35
+Power: 2
+Area: 0;
+
+
+/312
+Name: Перчатки Мантикоры;
+Slot: 8
+Class: 6
+Durability: 30
+GoldCost: 400
+GemCost: 0
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 233
+Resourse: (4, 5)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Looter: 992
+Power: 1
+Area: 0
+
+BowAttack: 993
+Power: 1
+Area: 0;
+
+
+/313
+Name: Перчатки Единорога;
+Slot: 8
+Class: 6
+Durability: 35
+GoldCost: 500
+GemCost: 0
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 234
+Resourse: (5, 5)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0
+
+BowAttack: 993
+Power: 2
+Area: 0;
+
+
+/314
+Name: Перчатки Снайпера;
+Slot: 8
+Class: 6
+Durability: 35
+GoldCost: 1000
+GemCost: 0
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 235
+Resourse: (5, 5, 8)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+AimedShot: 77
+Power: 3
+Area: 0
+
+BowAttack: 993
+Power: 3
+Area: 0;
+
+
+/315
+Name: Гномьи рукавицы;
+Slot: 8
+Class: 7
+Durability: 30
+GoldCost: 130
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 196
+Pic: 111
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Smithing: 995
+Power: 10
+Area: 0;
+
+
+/316
+Name: Перчатки Ветерана;
+Slot: 8
+Class: 7
+Durability: 25
+GoldCost: 150
+GemCost: 0
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 112
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+Stamina: 11
+Power: 1
+Area: 0
+
+Parry: 53
+Power: 1
+Area: 0;
+
+/317
+Name: Перчатки Героя;
+Slot: 8
+Class: 7
+Durability: 30
+GoldCost: 250
+GemCost: 5
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 113
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Attack: 2
+Power: 1
+Area: 0;
+
+
+/318
+Name: Перчатки Силы;
+Slot: 8
+Class: 7
+Durability: 35
+GoldCost: 500
+GemCost: 15
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 114
+Resourse: (7, 4)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Attack: 2
+Power: 3
+Area: 0;
+
+
+/319
+Name: Драконьи перчатки;
+Slot: 8
+Class: 7
+Durability: 40
+GoldCost: 600
+GemCost: 25
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 115
+Resourse: (7, 5)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 0;
+
+
+/320
+Name: Перчатки Владык;
+Slot: 8
+Class: 7
+Durability: 40
+GoldCost: 1000
+GemCost: 40
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 116
+Resourse: (7, 5, 8)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Economy: 997
+Power: 20
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 0;
+
+
+/321
+Name: Перчатки Паладина;
+Slot: 8
+Class: 8
+Durability: 40
+GoldCost: 130
+GemCost: 5
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 190
+Resourse: (1)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Parry: 53
+Power: 1
+Area: 0;
+
+
+/322
+Name: Перчатки Доблести;
+Slot: 8
+Class: 8
+Durability: 40
+GoldCost: 350
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 191
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Attack: 2
+Power: 1
+Area: 0
+
+Parry: 53
+Power: 2
+Area: 0;
+
+
+/323
+Name: Перчатки Воли;
+Slot: 8
+Class: 8
+Durability: 45
+GoldCost: 500
+GemCost: 15
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 192
+Resourse: (7, 5)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0;
+
+
+/324
+Name: Перчатки Величия;
+Slot: 8
+Class: 8
+Durability: 50
+GoldCost: 600
+GemCost: 20
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 193
+Resourse: (7, 5, 8)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+Parry: 53
+Power: 2
+Area: 0
+
+GoldIncome: 81
+Power: 15
+Area: 0;
+
+
+/325
+Name: Перчатки Сокрушения;
+Slot: 8
+Class: 8
+Durability: 60
+GoldCost: 1000
+GemCost: 30
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 194
+Resourse: (7, 7, 8)
+Effects:
+
+Life: 1
+Power: 10
+Area: 0
+
+Attack: 2
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+
+/326
+Name: Вышитый наруч;
+Slot: 10
+Class: 0
+Durability: 10
+GoldCost: 220
+GemCost: 10
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 304
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 1
+Area: 0
+
+GoldIncome: 81
+Power: 7
+Area: 0;
+
+/327
+Name: Сияющий браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 250
+GemCost: 20
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 308
+Resourse: (4)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0;
+
+
+/328
+Name: Змеиный браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 300
+GemCost: 20
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 309
+Resourse: (4)
+Effects:
+
+initiative: 999
+Power: 1
+Area: 0;
+
+
+/329
+Name: Топазовый браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 350
+GemCost: 25
+ShopLevel: 4
+Rarity: 5
+Building: 0
+Pic: 310
+Resourse: (5)
+Effects:
+
+RangedAttack: 8
+Power: 1
+Area: 0;
+
+
+/330
+Name: Рубиновый браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 400
+GemCost: 20
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 311
+Resourse: (5)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+
+/331
+Name: Сапфировый браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 450
+GemCost: 25
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 312
+Resourse: (5)
+Effects:
+
+Morale: 12
+Power: 4
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0;
+
+
+/332
+Name: Изумрудный браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 550
+GemCost: 35
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 313
+Resourse: (5, 9)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0;
+
+
+/333
+Name: Алмазный браслет;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 550
+GemCost: 35
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 314
+Resourse: (5, 8)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+Rangedefence: 5
+Power: 1
+Area: 0;
+
+
+/334
+Name: Браслет Луны;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 1000
+GemCost: 60
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 315
+Resourse: (5, 9, 9)
+Effects:
+
+Summon: 907
+Power: 1
+Area: 0;
+
+
+/335
+Name: Браслет Солнца;
+Slot: 10
+Class: 0
+Durability: 1
+GoldCost: 1500
+GemCost: 100
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 316
+Resourse: (5, 8, 8)
+Effects:
+
+SpellPower: 905
+Power: 1
+Area: 0;
+
+
+/336
+Name: Наруч Мародера;
+Slot: 10
+Class: 6
+Durability: 15
+GoldCost: 250
+GemCost: 5
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 237
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 3
+Area: 0
+
+Looter: 992
+Power: 1
+Area: 0;
+
+
+/337
+Name: Наруч Черепахи;
+Slot: 10
+Class: 6
+Durability: 30
+GoldCost: 500
+GemCost: 15
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 238
+Resourse: (4, 4, 4)
+Effects:
+
+Life: 1
+Power: 5
+Area: 0
+
+Defence: 4
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Speed: 7
+Power: -1
+Area: 0;
+
+
+/338
+Name: Наруч Убийцы;
+Slot: 10
+Class: 6
+Durability: 30
+GoldCost: 1000
+GemCost: 25
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 239
+Resourse: (4, 4, 5)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+PoisonAttack: 41
+Power: 2
+Area: 0
+
+PoisonShot: 78
+Power: 2
+Area: 0;
+
+
+/339
+Name: Наруч Воителя;
+Slot: 10
+Class: 7
+Durability: 20
+GoldCost: 250
+GemCost: 5
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 120
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0;
+
+
+/340
+Name: Наруч Гладиатора;
+Slot: 10
+Class: 7
+Durability: 30
+GoldCost: 500
+GemCost: 15
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 121
+Resourse: (7)
+Effects:
+
+Life: 1
+Power: 6
+Area: 0
+
+Attack: 2
+Power: 2
+Area: 0
+
+Parry: 53
+Power: 1
+Area: 0;
+
+
+/341
+Name: Наруч Могущества;
+Slot: 10
+Class: 7
+Durability: 40
+GoldCost: 1000
+GemCost: 30
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 122
+Resourse: (7, 7, 8)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 3
+Area: 0;
+
+
+/342
+Name: Наруч Краба;
+Slot: 10
+Class: 8
+Durability: 30
+GoldCost: 280
+GemCost: 10
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 198
+Resourse: (7, 4)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0;
+
+
+/343
+Name: Обсидиановый наруч;
+Slot: 10
+Class: 8
+Durability: 40
+GoldCost: 550
+GemCost: 20
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 199
+Resourse: (5, 5)
+Effects:
+
+Life: 1
+Power: 7
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0;
+
+
+/344
+Name: Наруч Гор;
+Slot: 10
+Class: 8
+Durability: 50
+GoldCost: 1100
+GemCost: 50
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 200
+Resourse: (7, 7, 8)
+Effects:
+
+Life: 1
+Power: 10
+Area: 0
+
+Defence: 4
+Power: 4
+Area: 0
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+HillDweller: 33
+Power: 4
+Area: 0;
+
+
+/345
+Name: Пояс Монаха;
+Slot: 5
+Class: 0
+Durability: 10
+GoldCost: 100
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 243
+Resourse: (0)
+Effects:
+
+Life: 1
+Power: 2
+Area: 0
+
+Reinvigoration: 21
+Power: 2
+Area: 0;
+
+/346
+Name: Пояс Друида;
+Slot: 5
+Class: 0
+Durability: 15
+GoldCost: 120
+GemCost: 5
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 244
+Resourse: (4)
+Effects:
+
+Stamina: 11
+Power: 2
+Area: 0
+
+Forester: 32
+Power: 1
+Area: 0;
+
+/347
+Name: Пояс Воплощений;
+Slot: 5
+Class: 0
+Durability: 15
+GoldCost: 150
+GemCost: 20
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 245
+Resourse: (5)
+Effects:
+
+GemIncome: 82
+Power: 3
+Area: 0
+
+Life: 1
+Power: 1
+Area: 0;
+
+
+/348
+Name: Пояс Доблести;
+Slot: 5
+Class: 0
+Durability: 20
+GoldCost: 180
+GemCost: 15
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 246
+Resourse: (5)
+Effects:
+
+Morale: 12
+Power: 2
+Area: 0
+
+Life: 1
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0;
+
+
+/349
+Name: Пояс Левитации;
+Slot: 5
+Class: 0
+Durability: 15
+GoldCost: 400
+GemCost: 40
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 247
+Resourse: (4, 5, 5)
+Effects:
+
+Float: 15
+Power: 1
+Area: 0
+
+Life: 1
+Power: 2
+Area: 0;
+
+
+/350
+Name: Пояс Мантикоры;
+Slot: 5
+Class: 0
+Durability: 15
+GoldCost: 450
+GemCost: 25
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 248
+Resourse: (4, 5, 5)
+Effects:
+
+BowAttack: 993
+Power: 1
+Area: 0
+
+Initiative: 999
+Power: 1
+Area: 0
+
+Life: 1
+Power: 4
+Area: 0;
+
+
+/351
+Name: Драконий пояс;
+Slot: 5
+Class: 0
+Durability: 20
+GoldCost: 500
+GemCost: 30
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 249
+Resourse: (7, 5, 5)
+Effects:
+
+Resist: 6
+Power: 2
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Life: 1
+Power: 6
+Area: 0;
+
+
+/352
+Name: Пояс Великана;
+Slot: 5
+Class: 0
+Durability: 20
+GoldCost: 550
+GemCost: 25
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 250
+Resourse: (7, 5, 5)
+Effects:
+
+Attack: 2
+Power: 3
+Area: 0
+
+CounterAttack: 3
+Power: 2
+Area: 0
+
+Life: 1
+Power: 7
+Area: 0;
+
+
+/353
+Name: Пояс Тролля;
+Slot: 5
+Class: 0
+Durability: 30
+GoldCost: 1000
+GemCost: 40
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 251
+Resourse: (5, 5, 9)
+Effects:
+
+Regeneration: 48
+Power: 2
+Area: 0
+
+Life: 1
+Power: 8
+Area: 0;
+
+
+/354
+Name: Пояс Вечности;
+Slot: 5
+Class: 0
+Durability: 25
+GoldCost: 1000
+GemCost: 60
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 252
+Resourse: (5, 8, 9)
+Effects:
+
+Summon: 907
+Power: 2
+Area: 0
+
+Life: 1
+Power: 5
+Area: 0;
+
+
+/355
+Name: Плащ Иллюзий;
+Slot: 6
+Class: 0
+Durability: 15
+GoldCost: 100
+GemCost: 20
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 280
+Resourse: (4)
+Effects:
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Life: 1
+Power: 1
+Area: 0;
+
+
+/356
+Name: Плащ ветерана;
+Slot: 6
+Class: 0
+Durability: 20
+GoldCost: 120
+GemCost: 10
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 281
+Resourse: (4)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+Life: 1
+Power: 2
+Area: 0;
+
+
+/357
+Name: Плащ Паладина;
+Slot: 6
+Class: 0
+Durability: 20
+GoldCost: 110
+GemCost: 15
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 282
+Resourse: (4)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+Life: 1
+Power: 3
+Area: 0;
+
+
+/358
+Name: Плащ Дождей;
+Slot: 6
+Class: 0
+Durability: 15
+GoldCost: 200
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 283
+Resourse: (4)
+Effects:
+
+SwampDweller: 34
+Power: 1
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+
+/359
+Name: Плащ Вихрей;
+Slot: 6
+Class: 0
+Durability: 15
+GoldCost: 300
+GemCost: 20
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 284
+Resourse: (5)
+Effects:
+
+RangedDefence: 5
+Power: 2
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+
+/360
+Name: Плащ Радуги;
+Slot: 6
+Class: 0
+Durability: 20
+GoldCost: 500
+GemCost: 40
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 285
+Resourse: (4. 5)
+Effects:
+
+Resist: 6
+Power: 2
+Area: 0
+
+Life: 1
+Power: 2
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0
+
+Morale: 12
+Power: 2
+Area: 0;
+
+
+/361
+Name: Плащ Ужаса;
+Slot: 6
+Class: 0
+Durability: 25
+GoldCost: 550
+GemCost: 40
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 286
+Resourse: (5, 9)
+Effects:
+
+Defence: 4
+Power: 1
+Area: 0
+
+CauseFear: 50
+Power: 1
+Area: 0;
+
+/362
+Name: Драконий плащ;
+Slot: 6
+Class: 0
+Durability: 30
+GoldCost: 650
+GemCost: 30
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 287
+Resourse: (5, 8)
+Effects:
+
+Resist: 6
+Power: 2
+Area: 0
+
+Smithing: 995
+Power: 20
+Area: 0;
+
+
+/363
+Name: Накидка Единорога;
+Slot: 6
+Class: 0
+Durability: 30
+GoldCost: 600
+GemCost: 40
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 288
+Resourse: (5, 8)
+Effects:
+
+RangedAttack: 8
+Power: 2
+Area: 0
+
+Initiative: 999
+Power: 1
+Area: 0;
+
+
+/364
+Name: Накидка Маршала;
+Slot: 6
+Class: 0
+Durability: 35
+GoldCost: 1200
+GemCost: 70
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 289
+Resourse: (5, 8, 8)
+Effects:
+
+Life: 1
+Power: 2
+Area: 1
+
+Attack: 2
+Power: 1
+Area: 1;
+
+
+/365
+Name: Плащ Феникса;
+Slot: 6
+Class: 0
+Durability: 40
+GoldCost: 1000
+GemCost: 80
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 290
+Resourse: (5, 8, 8)
+Effects:
+
+PoisonImmunity: 42
+Power: 1
+Area: 0
+
+Speed: 7
+Power: 1
+Area: 0;
+
+
+/366
+Name: Волчий клык;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 170
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 35
+Resourse: (4)
+Effects:
+
+Explore: 996
+Power: 2
+Area: 0;
+
+
+/367
+Name: Кулон Торговца;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 200
+GemCost: 5
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 36
+Resourse: (4)
+Effects:
+
+GoldIncome: 81
+Power: 10
+Area: 0;
+
+/368
+Name: Медальон Героя;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 320
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 37
+Resourse: (4)
+Effects:
+
+Morale: 12
+Power: 4
+Area: 0;
+
+
+/369
+Name: Ожерелье Василиска;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 350
+GemCost: 10
+ShopLevel: 4
+Rarity: 3
+Building: 0
+Pic: 38
+Resourse: (4)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0;
+
+
+/370
+Name: Змеиный амулет;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 350
+GemCost: 15
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 39
+Resourse: (4)
+Effects:
+
+Initiative: 999
+Power: 1
+Area: 0;
+
+
+/371
+Name: Медаль Капитана;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 600
+GemCost: 15
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 40
+Resourse: (5)
+Effects:
+
+ArmyPayment: 997
+Power: 10
+Area: 0;
+
+
+/372
+Name: Орден Величия;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 700
+GemCost: 20
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 41
+Resourse: (5, 8)
+Effects:
+
+Attack: 2
+Power: 1
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0
+
+Stamina: 11
+Power: 3
+Area: 0;
+
+
+/373
+Name: Драконий амулет;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 800
+GemCost: 30
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 42
+Resourse: (5, 8)
+Effects:
+
+Resist: 6
+Power: 2
+Area: 0
+
+ExpGain: 991
+Power: 15
+Area: 0;
+
+
+/374
+Name: Кулон Тайны;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 700
+GemCost: 40
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 43
+Resourse: (5, 9)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+GemIncome: 82
+Power: 7
+Area: 0;
+
+
+/375
+Name: Амулет Вечности;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 1200
+GemCost: 90
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 44
+Resourse: (5, 8, 9)
+Effects:
+
+Resist: 6
+Power: 1
+Area: 0
+
+SpellPenetration: 908
+Power: 1
+Area: 0;
+
+
+/376
+Name: Амулет Урагана;
+Slot: 9
+Class: 0
+Durability: 1
+GoldCost: 2000
+GemCost: 100
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 45
+Resourse: (8, 8, 9)
+Effects:
+
+Speed: 7
+Power: 1
+Area: 1;
+
+
+/377
+Name: Кольцо Торговца;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 150
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 52
+Resourse: (4)
+Effects:
+
+GoldIncome: 81
+Power: 5
+Area: 0;
+
+
+/378
+Name: Кристальное кольцо;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 130
+GemCost: 20
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 53
+Resourse: (4)
+Effects:
+
+GemIncome: 82
+Power: 2
+Area: 0;
+
+
+/379
+Name: Змеиное кольцо;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 280
+GemCost: 20
+ShopLevel: 4
+Rarity: 4
+Building: 0
+Pic: 54
+Resourse: (5)
+Effects:
+
+Initiative: 999
+Power: 1
+Area: 0;
+
+
+/380
+Name: Топазовый перстень;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 300
+GemCost: 25
+ShopLevel: 4
+Rarity: 5
+Building: 0
+Pic: 55
+Resourse: (5)
+Effects:
+
+RangedAttack: 8
+Power: 1
+Area: 0;
+
+
+/381
+Name: Рубиновый перстень;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 500
+GemCost: 25
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 56
+Resourse: (5)
+Effects:
+
+Life: 1
+Power: 4
+Area: 0
+
+Stamina: 11
+Power: 2
+Area: 0;
+
+
+/382
+Name: Сапфировый перстень;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 450
+GemCost: 35
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 57
+Resourse: (5)
+Effects:
+
+Morale: 12
+Power: 3
+Area: 0
+
+Resist: 6
+Power: 1
+Area: 0;
+
+
+/383
+Name: Кольцо некроманта;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 500
+GemCost: 40
+ShopLevel: 5
+Rarity: 4
+Building: 0
+Pic: 58
+Resourse: (5)
+Effects:
+
+UndeadPower: 909
+Power: 1
+Area: 0;
+
+
+/384
+Name: Изумрудный перстень;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 600
+GemCost: 40
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 59
+Resourse: (5, 9)
+Effects:
+
+Attack: 2
+Power: 1
+Area: 0
+
+CounterAttack: 3
+Power: 1
+Area: 0;
+
+/385
+Name: Алмазный перстень;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 700
+GemCost: 50
+ShopLevel: 5
+Rarity: 6
+Building: 0
+Pic: 60
+Resourse: (5, 8)
+Effects:
+
+defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0;
+
+
+/386
+Name: Кольцо Регенерации;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 600
+GemCost: 30
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 61
+Resourse: (5, 8)
+Effects:
+
+Regeneration: 48
+Power: 1
+Area: 0;
+
+
+/387
+Name: Кольцо Вампира;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 2000
+GemCost: 60
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 62
+Resourse: (5, 9, 9)
+Effects:
+
+Attack: 2
+Power: 2
+Area: 0
+
+DrainLife: 68
+Power: 20
+Area: 0;
+
+
+/388
+Name: Кольцо Заклинателя;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 1000
+GemCost: 70
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 63
+Resourse: (5, 8, 9)
+Effects:
+
+Recover: 21
+Power: 4
+Area: 0
+
+SpellDuration: 906
+Power: 1
+Area: 0;
+
+
+/389
+Name: Кольцо Чародея;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 1200
+GemCost: 70
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 64
+Resourse: (5, 8, 9)
+Effects:
+
+Resist: 6
+Power: 2
+Area: 0
+
+SpellPenetration: 908
+Power: 1
+Area: 0;
+
+
+/390
+Name: Кольцо Архимага;
+Slot: 11
+Class: 0
+Durability: 1
+GoldCost: 1700
+GemCost: 100
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 65
+Resourse: (5, 8, 9)
+Effects:
+
+ExpGain: 991
+Power: 10
+Area: 0
+
+SpellPower: 905
+Power: 1
+Area: 0;
+
+/391
+Name: Паучье яйцо;
+Slot: 0
+Class: 0
+Durability: 1
+GoldCost: 100
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 79
+Resourse: (0)
+Effects:
+
+Summon: 84
+Power: 33
+Area: 0;
+
+/392
+Name: Яйцо василиска;
+Slot: 0
+Class: 0
+Durability: 1
+GoldCost: 100
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 78
+Resourse: (0)
+Effects:
+
+Summon: 84
+Power: 32
+Area: 0;
+
+/393
+Name: Яйцо мантикоры;
+Slot: 0
+Class: 0
+Durability: 1
+GoldCost: 200
+GemCost: 5
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 80
+Resourse: (0)
+Effects:
+
+Summon: 84
+Power: 52
+Area: 0;
+
+/394
+Name: Яйцо гидры;
+Slot: 0
+Class: 0
+Durability: 1
+GoldCost: 500
+GemCost: 10
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 376
+Resourse: (0)
+Effects:
+
+Summon: 84
+Power: 62
+Area: 0;
+
+/395
+Name: Икра слизня;
+Slot: 0
+Class: 0
+Durability: 1
+GoldCost: 100
+GemCost: 5
+ShopLevel: 3
+Rarity: 2
+Building: 0
+Pic: 398
+Resourse: (0)
+Effects:
+
+Summon: 84
+Power: 68
+Area: 0;
+
+/396
+Name: Яйцо феникса;
+Slot: 0
+Class: 0
+Durability: 1
+GoldCost: 500
+GemCost: 20
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 399
+Resourse: (0)
+Effects:
+
+Summon: 84
+Power: 70
+Area: 0;
+
+/397
+Name: Крылатая кольчуга;
+Slot: 3
+Class: 7
+Durability: 50
+GoldCost: 500
+GemCost: 100
+ShopLevel: 5
+Rarity: 5
+Building: 0
+Pic: 400
+Resourse: (7, 5, 8)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 5
+Area: 0
+
+Resist: 6
+Power: 3
+Area: 0
+
+Flying: 14
+Power: 1
+Area: 0
+
+Hil Dweller: 33
+Power: 4
+Area: 1;
+
+/398
+Name: Эльфийские клинки;
+Slot: 100
+Class: 1
+Durability: 40
+GoldCost: 200
+GemCost: 15
+ShopLevel: 3
+Rarity: 3
+Building: 0
+Pic: 401
+Resourse: (1, 7)
+Effects:
+
+FirstStrike: 16
+Power: 1
+Area: 0
+
+Smite Evil: 61
+Power: 1
+Area: 0
+
+Attack: 2
+Power: 6
+Area: 0
+
+CounterAttack: 3
+Power: 4
+Area: 0;
+
+/399
+Name: Книга Некруса;
+Slot: 2
+Class: 4
+Durability: 40
+GoldCost: 1000
+GemCost: 400
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 402
+Resourse: (9, 9, 9)
+Effects:
+
+Resist: 6
+Power: 3
+Area: 0
+
+Life: 1
+Power: -5
+Area: 0
+
+Undertaker: 64
+Power: 1
+Area: 0
+
+Necromancy: 909
+Power: 5
+Area: 0;
+
+/400
+Name: Стрелы Проклятых;
+Slot: 2
+Class: 3
+Durability: 25
+GoldCost: 300
+GemCost: 100
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 403
+Resourse: (7, 9, 9)
+Effects:
+
+RangedAttack: 993
+Power: 5
+Area: 0
+
+Ammo: 10
+Power: 4
+Area: 0
+
+Undertaker: 64
+Power: 1
+Area: 0
+
+PoisonShot: 78
+Power: 3
+Area: 0;
+
+/401
+Name: Шлем Орла;
+Slot: 4
+Class: 6
+Durability: 50
+GoldCost: 600
+GemCost: 55
+ShopLevel: 6
+Rarity: 5
+Building: 0
+Pic: 404
+Resourse: (5, 8)
+Effects:
+
+Life: 1
+Power: 8
+Area: 0
+
+Morale: 12
+Power: 6
+Area: 0
+
+AimedShot: 77
+Power: 4
+Area: 0;
+
+/402
+Name: Чешуя Хасарта;
+Slot: 3
+Class: 7
+Durability: 50
+GoldCost: 3000
+GemCost: 300
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 405
+Resourse: (7, 9, 9)
+Effects:
+
+Defence: 4
+Power: 5
+Area: 0
+
+RangedDefence: 5
+Power: 4
+Area: 0
+
+Resist: 6
+Power: 3
+Area: 0
+
+Poisonous Flash: 96
+Power: 4
+Area: 0
+ 
+Poison Strike: 41
+Power: 1
+Area: 1
+
+Speed: 7
+Power: -3
+Area: 0;
+
+/403
+Name: Знамя Единства;
+Slot: 100
+Class: 5
+Durability: 80
+GoldCost: 2400
+GemCost: 150
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 406
+Resourse: (2, 5, 8)
+Effects:
+
+Attack: 2
+Power: 5
+Area: 0
+
+CounterAttack: 3
+Power: 7
+Area: 0
+
+Tolerance: 98
+Power: 1
+Area: 1
+
+Life: 1
+Power: 5
+Area: 1
+
+Defence: 4
+Power: 3
+Area: 1
+
+RangedDefence: 5
+Power: 1
+Area: 1;
+
+/404
+Name: Солнечный Луч;
+Slot: 5
+Class: 0
+Durability: 30
+GoldCost: 750
+GemCost: 75
+ShopLevel: 6
+Rarity: 6
+Building: 0
+Pic: 407
+Resourse: (5, 8, 8)
+Effects:
+
+Life: 1
+Power: 10
+Area: 0
+
+Defence: 4
+Power: 1
+Area: 0
+
+RangedDefence: 5
+Power: 1
+Area: 0
+
+Resist: 6
+Power: 2
+Area: 0
+
+Smite Evil: 61
+Power: 1
+Area: 1;
+
+/405
+Name: Жёлудь древочеловека;
+Slot: 0
+Class: 0
+Durability: 1
+GoldCost: 400
+GemCost: 20
+ShopLevel: 6
+Rarity: 4
+Building: 0
+Pic: 408
+Resourse: (8)
+Effects:
+
+Summon: 84
+Power: 61
+Area: 0;
+
+/406
+Name: Заготовка голема;
+Slot: 0
+Class: 0
+Durability: 1
+GoldCost: 300
+GemCost: 15
+ShopLevel: 5
+Rarity: 3
+Building: 0
+Pic: 409
+Resourse: (6)
+Effects:
+
+Summon: 84
+Power: 71
+Area: 0;
