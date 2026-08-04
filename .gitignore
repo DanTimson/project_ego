@@ -12,3 +12,4 @@ var.zip
 .venv
 __pycache__/
 *.patch
+var
