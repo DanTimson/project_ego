@@ -212,3 +212,36 @@ robustness earns investment on those grounds.
    neutral morale and would have passed a wrong implementation.
 4. Where the engine assumes rather than knows, the assumption is recorded as an
    open question with a stated close condition, not left in a comment.
+
+---
+
+## Round 3 update: identity landed, and one claim corrected
+
+Canonical identity is implemented. `genesis:unit/5`, `genesis:upgrade/76`,
+`genesis:ability/53` — pack-qualified, keyed on the source record id, with
+display names demoted to localization and provenance carried alongside.
+
+**A correction to this document's own round-2 evidence.** It stated there was no
+live defect, only accumulating migration cost. That was wrong, and only because
+the check had not been run: New Horizons uses **11 display names for more than
+one record in the same pack**. «Паладин» is 22 attack / 55 life at record 57 and
+6 attack / 22 life at record 265; «Убийца», «Жрец», «Маг», «Колдун», «Снайпер»
+and «Атаман» are the same story. `build("Паладин")` returned whichever record
+came first. The cross-pack argument was correct but was not the strongest one
+available, and the intra-pack case was a present silent-wrong-answer bug rather
+than a future cost.
+
+Ambiguous names now fail loudly in both implementations rather than resolving to
+the first match. `coverage()` iterates canonical ids, so it no longer
+mis-attributes or under-counts on NH.
+
+**Scenario files were deliberately not migrated,** against the letter of the
+agreed task. Scenario units are not content references: they declare stats inline
+and use the name as a battle-local handle. `tests/scenarios/skirmish.json` gives
+«Мечник» 8 attack where the Genesis pack has 7, and «Ополченец» 12 life / 5
+attack where Genesis has 17 / 4 — matching neither profile. Rewriting those names
+to `genesis:unit/5` would assert a content identity the inline stats contradict,
+which is the opposite of what canonical identity is for. If scenarios should
+instantiate from a pack, that is a separate feature: an optional `def` field
+naming a canonical id, with the inline stats becoming overrides. Flagged rather
+than assumed.

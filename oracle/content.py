@@ -25,6 +25,8 @@ from __future__ import annotations
 
 import json
 import os
+
+import identity
 from dataclasses import dataclass, field
 
 
@@ -202,6 +204,11 @@ class ContentDb:
         self.pack = pack
         self.registry = registry
         self.report = report
+        # Canonical, pack-qualified identity over the loaded tables. Display
+        # names are localization only. See oracle/identity.py.
+        self.index = identity.Index(pack=pack.id)
+        for table_name, records in pack.tables.items():
+            self.index.add_table(table_name, records)
 
     @classmethod
     def load(cls, pack_id: str, pack_dir: str, registry: AbilityRegistry,

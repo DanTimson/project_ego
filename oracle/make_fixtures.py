@@ -826,10 +826,18 @@ def roster_fixture() -> dict:
              "ability_num": "ability_num.json"})
         r = rostermod.Roster(db)
 
+        # Keyed by CANONICAL ID. Display names are localization and cannot key
+        # a fixture: NH uses 11 names for more than one record. The name is kept
+        # as a field so the fixture stays readable.
         built = {}
-        for name in r.names():
-            b = r.build(name)
-            built[name] = {
+        for cid in r.ids():
+            b = r.build(cid)
+            if b is None or b.unit.name == "Пусто":
+                continue
+            built[cid] = {
+                "name": b.unit.name,
+                "content_id": b.content_id,
+                "provenance": b.provenance,
                 "stats": {k: getattr(b.unit, k) for k in
                           ("life", "life_base", "attack", "counter_attack",
                            "defence", "ranged_defence", "resist", "speed",
@@ -854,7 +862,7 @@ def roster_fixture() -> dict:
             "pack": "fixture_pack", "bindings": bindings,
             "tables": {"unit": units, "unit_upg": upgrades,
                        "ability_num": abilities},
-            "names": r.names(), "built": built,
+            "ids": r.ids(), "names": r.names(), "built": built,
             "coverage": {"units": cov["units"], "complete": cov["complete"],
                          "partial": cov["partial"],
                          "blockers": [[list(k), v] for k, v in cov["blockers"]]},

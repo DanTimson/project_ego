@@ -164,45 +164,26 @@
    }
   ]
  },
+ "ids": [
+  "fixture_pack:unit/1",
+  "fixture_pack:unit/2",
+  "fixture_pack:unit/3"
+ ],
  "names": [
   "Лучник",
   "Мечник",
   "Ополченец"
  ],
  "built": {
-  "Лучник": {
-   "stats": {
-    "life": 10,
-    "life_base": 10,
-    "attack": 3,
-    "counter_attack": 0,
-    "defence": 0,
-    "ranged_defence": 0,
-    "resist": 0,
-    "speed": 2,
-    "ranged_attack": 6,
-    "shooting_range": 5,
-    "ammo": 6,
-    "stamina": 10,
-    "stamina_base": 10,
-    "morale": 10,
-    "morale_base": 10
+  "fixture_pack:unit/1": {
+   "name": "Мечник",
+   "content_id": "fixture_pack:unit/1",
+   "provenance": {
+    "pack": "fixture_pack",
+    "source_kind": "var",
+    "source_file": "unit.var",
+    "source_record_index": 1
    },
-   "subtypes": [],
-   "modifiers": [],
-   "resolved": [],
-   "unresolved": [
-    {
-     "upgrade_index": 99,
-     "upgrade_name": "",
-     "opcode": -1,
-     "ability_name": "",
-     "reason": "no unit_upg record — the reference is dangling"
-    }
-   ],
-   "complete": false
-  },
-  "Мечник": {
    "stats": {
     "life": 17,
     "life_base": 17,
@@ -281,7 +262,15 @@
    ],
    "complete": false
   },
-  "Ополченец": {
+  "fixture_pack:unit/2": {
+   "name": "Ополченец",
+   "content_id": "fixture_pack:unit/2",
+   "provenance": {
+    "pack": "fixture_pack",
+    "source_kind": "var",
+    "source_file": "unit.var",
+    "source_record_index": 2
+   },
    "stats": {
     "life": 12,
     "life_base": 12,
@@ -304,6 +293,46 @@
    "resolved": [],
    "unresolved": [],
    "complete": true
+  },
+  "fixture_pack:unit/3": {
+   "name": "Лучник",
+   "content_id": "fixture_pack:unit/3",
+   "provenance": {
+    "pack": "fixture_pack",
+    "source_kind": "var",
+    "source_file": "unit.var",
+    "source_record_index": 3
+   },
+   "stats": {
+    "life": 10,
+    "life_base": 10,
+    "attack": 3,
+    "counter_attack": 0,
+    "defence": 0,
+    "ranged_defence": 0,
+    "resist": 0,
+    "speed": 2,
+    "ranged_attack": 6,
+    "shooting_range": 5,
+    "ammo": 6,
+    "stamina": 10,
+    "stamina_base": 10,
+    "morale": 10,
+    "morale_base": 10
+   },
+   "subtypes": [],
+   "modifiers": [],
+   "resolved": [],
+   "unresolved": [
+    {
+     "upgrade_index": 99,
+     "upgrade_name": "",
+     "opcode": -1,
+     "ability_name": "",
+     "reason": "no unit_upg record — the reference is dangling"
+    }
+   ],
+   "complete": false
   }
  },
  "coverage": {
@@ -313,15 +342,15 @@
   "blockers": [
    [
     [
-     null,
-     ""
+     30,
+     "Бронебойный удар"
     ],
     1
    ],
    [
     [
-     30,
-     "Бронебойный удар"
+     null,
+     ""
     ],
     1
    ]

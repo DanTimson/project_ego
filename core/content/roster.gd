@@ -92,11 +92,66 @@ func _init(p_db: ContentDb) -> void:
 			by_number[int(rec["Number"])] = rec
 
 
+## Canonical unit ids, sorted. This is the addressing mode callers should use.
+func ids() -> Array:
+	var out: Array = []
+	for key in units:
+		out.append(ContentId.make(db.pack.id, "unit", int(key)))
+	out.sort()
+	return out
+
+
+## Record for a canonical id.
+func by_id(content_id: String) -> Variant:
+	var cid := ContentId.parse(content_id)
+	if cid == null or cid.pack != db.pack.id or cid.kind != "unit":
+		return null
+	return units.get(cid.number)
+
+
+## Transitional pack-scoped name lookup. Prefer canonical ids.
+##
+## Returns null when the name is AMBIGUOUS rather than returning the first
+## match: New Horizons uses 11 names for more than one record, and silently
+## picking one is how a wrong unit reaches the battlefield looking correct.
+## `ambiguous_names()` lists them.
 func find(unit_name: String) -> Variant:
+	var hits: Array = []
 	for key in units:
 		if String((units[key] as Dictionary).get("Name", "")) == unit_name:
-			return units[key]
+			hits.append(units[key])
+	if hits.size() == 1:
+		return hits[0]
+	if hits.size() > 1:
+		push_error("ambiguous unit name '%s': %d records in pack '%s' — use a canonical id"
+			% [unit_name, hits.size(), db.pack.id])
 	return null
+
+
+## Canonical id for a display name, or "" when absent or ambiguous.
+func id_for_name(unit_name: String) -> String:
+	var found: Array = []
+	for key in units:
+		if String((units[key] as Dictionary).get("Name", "")) == unit_name:
+			found.append(int(key))
+	if found.size() == 1:
+		return ContentId.make(db.pack.id, "unit", found[0])
+	return ""
+
+
+## Display names used by more than one record in this pack.
+func ambiguous_names() -> Array:
+	var counts: Dictionary = {}
+	for key in units:
+		var n := String((units[key] as Dictionary).get("Name", ""))
+		if n != "" and n != "Пусто":
+			counts[n] = int(counts.get(n, 0)) + 1
+	var out: Array = []
+	for n in counts:
+		if int(counts[n]) > 1:
+			out.append(n)
+	out.sort()
+	return out
 
 
 func names() -> Array:
@@ -109,8 +164,10 @@ func names() -> Array:
 	return out
 
 
-func build(unit_name: String) -> Built:
-	var record: Variant = find(unit_name)
+## Build by canonical id or, transitionally, by display name.
+func build(reference: String) -> Built:
+	var record: Variant = by_id(reference) if ContentId.is_canonical(reference) \
+		else find(reference)
 	if record == null:
 		return null
 	var rec: Dictionary = record
@@ -248,14 +305,24 @@ func _resolve_one(ref: int, upgrade_name: String, opcode_v: Variant,
 ## can bind most of its opcodes and still have most of its units incomplete,
 ## because the unbound ones cluster on the interesting abilities.
 func coverage(limit: int = 0) -> Dictionary:
-	var all_names := names()
+	# Iterate canonical ids, not display names: NH uses 11 names for more than
+	# one record, so a name-driven sweep both mis-attributes and under-counts.
+	# /0 is the reserved empty record in every .var table, not a unit.
+	var all_ids: Array = []
+	for cid in ids():
+		var rec: Variant = by_id(String(cid))
+		if rec == null:
+			continue
+		var n := String((rec as Dictionary).get("Name", ""))
+		if n != "" and n != "Пусто":
+			all_ids.append(cid)
 	if limit > 0:
-		all_names = all_names.slice(0, limit)
+		all_ids = all_ids.slice(0, limit)
 	var complete: int = 0
 	var partial: int = 0
 	var missing: Dictionary = {}
-	for n in all_names:
-		var built := build(String(n))
+	for cid in all_ids:
+		var built := build(String(cid))
 		if built == null:
 			continue
 		if built.complete():
@@ -270,5 +337,5 @@ func coverage(limit: int = 0) -> Dictionary:
 	for key in missing:
 		blockers.append([key, missing[key]])
 	blockers.sort_custom(func(a, b): return int(a[1]) > int(b[1]))
-	return {"units": all_names.size(), "complete": complete,
+	return {"units": all_ids.size(), "complete": complete,
 			"partial": partial, "blockers": blockers}

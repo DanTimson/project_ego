@@ -27,6 +27,7 @@ fine — the exact failure mode the load report exists to prevent.
 
 from __future__ import annotations
 
+import identity
 from dataclasses import dataclass, field
 
 from combat import Combatant
@@ -77,6 +78,8 @@ class BuiltUnit:
     unit: Combatant
     resolved: list = field(default_factory=list)      # (opcode, name)
     unresolved: list = field(default_factory=list)    # UnresolvedAbility
+    content_id: str = ""                              # canonical, pack-qualified
+    provenance: dict = field(default_factory=dict)
 
     @property
     def complete(self) -> bool:
@@ -92,6 +95,7 @@ class Roster:
 
     def __init__(self, db):
         self.db = db
+        self.index = db.index
         self.units = db.pack.tables.get("unit", {})
         self.upgrades = db.pack.tables.get("unit_upg", {})
         self.abilities = db.pack.tables.get("ability_num", {})
@@ -106,20 +110,37 @@ class Roster:
     # -- lookup -------------------------------------------------------------
 
     def find(self, name: str):
-        for record in self.units.values():
-            if record.get("Name") == name:
-                return record
-        return None
+        """Transitional pack-scoped name lookup. Prefer canonical IDs.
+
+        Raises identity.AmbiguousName rather than returning the first match, so
+        an ambiguous name fails loudly instead of resolving to a plausible wrong
+        record. Cross-pack ambiguity cannot occur here — a Roster wraps exactly
+        one pack — but the same name can repeat inside one table.
+        """
+        return self.index.resolve(name, "unit")
 
     def names(self) -> list:
         return sorted(r.get("Name", "") for r in self.units.values()
                       if r.get("Name") and r.get("Name") != "Пусто")
 
+    def ids(self) -> list:
+        """Canonical unit IDs. This is the addressing mode callers should use."""
+        return self.index.ids("unit")
+
+    def id_for_name(self, name: str) -> str | None:
+        return self.index.id_for_name(name, "unit")
+
     # -- building -----------------------------------------------------------
 
-    def build(self, name_or_index, *, hook_for=None) -> BuiltUnit | None:
-        record = (self.units.get(name_or_index)
-                  if isinstance(name_or_index, int) else self.find(name_or_index))
+    def build(self, reference, *, hook_for=None) -> BuiltUnit | None:
+        """Build by canonical ID, by raw record index, or by display name.
+
+        Canonical ID is the supported form; the other two are transitional.
+        """
+        if isinstance(reference, int):
+            record = self.units.get(reference)
+        else:
+            record = self.index.resolve(reference, "unit")
         if record is None:
             return None
 
@@ -140,7 +161,19 @@ class Roster:
         elif isinstance(subtypes, int) and subtypes:
             unit.subtypes = {str(subtypes)}
 
-        built = BuiltUnit(unit=unit)
+        record_index = record.get("index", -1)
+        built = BuiltUnit(
+            unit=unit,
+            content_id=identity.make_id(self.db.pack.id, "unit", record_index)
+            if isinstance(record_index, int) and record_index >= 0 else "",
+            provenance=identity.Provenance(
+                pack=self.db.pack.id,
+                source_kind="var",
+                source_file="unit.var",
+                source_record_index=record_index
+                if isinstance(record_index, int) else -1,
+            ).as_dict(),
+        )
         for entry in record.get("Abilityes", []) or []:
             self._resolve_ability(entry, built, hook_for)
         return built
@@ -232,24 +265,29 @@ class Roster:
         A pack can bind most of its opcodes and still have most of its units
         incomplete, because the unbound ones cluster on interesting abilities.
         """
-        names = self.names()
+        # Iterate canonical IDs, not display names. NH uses 11 names for more
+        # than one record — «Паладин» is 22/55 at index 57 and 6/22 at index 265
+        # — so a name-driven sweep both mis-attributes and under-counts.
+        # /0 is the reserved empty record in every .var table, not a unit.
+        ids = [cid for cid in self.ids()
+               if (self.index.get(cid) or {}).get("Name") not in (None, "", "Пусто")]
         if limit:
-            names = names[:limit]
+            ids = ids[:limit]
         complete, partial = [], []
         missing = {}
-        for name in names:
-            built = self.build(name)
+        for cid in ids:
+            built = self.build(cid)
             if built is None:
                 continue
             if built.complete:
-                complete.append(name)
+                complete.append(cid)
             else:
-                partial.append(name)
+                partial.append(cid)
             for u in built.unresolved:
                 key = (u.opcode, u.ability_name or u.upgrade_name)
                 missing[key] = missing.get(key, 0) + 1
         return {
-            "units": len(names),
+            "units": len(ids),
             "complete": len(complete),
             "partial": len(partial),
             "blockers": sorted(missing.items(), key=lambda kv: -kv[1]),

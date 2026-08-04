@@ -62,6 +62,17 @@ func _init() -> void:
 	var r := Roster.new(db)
 
 	print("\n[1] the corpus loads")
+	var want_ids: Array = fx["ids"]
+	var got_ids := r.ids()
+	var ids_ok := got_ids.size() == want_ids.size()
+	if ids_ok:
+		for i in want_ids.size():
+			if String(got_ids[i]) != String(want_ids[i]):
+				ids_ok = false
+	_check(ids_ok, "canonical ids match, in the same order", "got %s" % str(got_ids))
+	_check(r.build("fixture_pack:unit/999") == null,
+		"an unknown canonical id returns null")
+
 	var want_names: Array = fx["names"]
 	var got_names := r.names()
 	var names_ok := got_names.size() == want_names.size()
@@ -74,23 +85,25 @@ func _init() -> void:
 	_check(r.build("Не существует") == null, "an unknown name returns null")
 
 	print("\n[2] stats come from the table")
-	for unit_name in fx["built"]:
-		var want: Dictionary = fx["built"][unit_name]["stats"]
-		var built := r.build(String(unit_name))
+	# Keyed by canonical id — display names cannot key a fixture, because a pack
+	# may use one name for several records.
+	for content_id in fx["built"]:
+		var want: Dictionary = fx["built"][content_id]["stats"]
+		var built := r.build(String(content_id))
 		if built == null:
-			_check(false, "%s builds" % unit_name)
+			_check(false, "%s builds" % content_id)
 			continue
 		var bad := ""
 		for key in want:
 			var got: int = int(built.unit.get(String(key)))
 			if got != int(want[key]):
 				bad += " %s=%d/%d" % [key, got, int(want[key])]
-		_check(bad == "", "%s stats" % unit_name, bad)
+		_check(bad == "", "%s stats" % content_id, bad)
 
 	print("\n[3] compound rows resolve PER OPCODE, not all-or-nothing")
-	for unit_name in fx["built"]:
-		var case: Dictionary = fx["built"][unit_name]
-		var built := r.build(String(unit_name))
+	for content_id in fx["built"]:
+		var case: Dictionary = fx["built"][content_id]
+		var built := r.build(String(content_id))
 		var want_mods: Array = case["modifiers"]
 		var ok := built.unit.modifiers.size() == want_mods.size()
 		var detail := "%d/%d modifiers" % [built.unit.modifiers.size(),
@@ -108,12 +121,12 @@ func _init() -> void:
 					detail = "modifier %d differs: %d/%s vs %d/%s" % [
 						i, m.ability, m.handler, int(w["ability"]),
 						String(w["handler"])]
-		_check(ok, "%s modifiers" % unit_name, detail)
+		_check(ok, "%s modifiers" % content_id, detail)
 
 	print("\n[4] failures are reported, never silently dropped")
-	for unit_name in fx["built"]:
-		var case: Dictionary = fx["built"][unit_name]
-		var built := r.build(String(unit_name))
+	for content_id in fx["built"]:
+		var case: Dictionary = fx["built"][content_id]
+		var built := r.build(String(content_id))
 		var want_un: Array = case["unresolved"]
 		var ok := built.unresolved.size() == want_un.size()
 		var detail := "%d/%d unresolved" % [built.unresolved.size(),
@@ -127,9 +140,9 @@ func _init() -> void:
 					ok = false
 					detail = "entry %d: '%s' vs '%s'" % [i, u.reason,
 						String(w["reason"])]
-		_check(ok, "%s unresolved entries" % unit_name, detail)
+		_check(ok, "%s unresolved entries" % content_id, detail)
 		_check(built.complete() == bool(case["complete"]),
-			"%s completeness = %s" % [unit_name, bool(case["complete"])])
+			"%s completeness = %s" % [content_id, bool(case["complete"])])
 
 	print("\n[5] coverage — the content-side progress meter")
 	var cov := r.coverage()

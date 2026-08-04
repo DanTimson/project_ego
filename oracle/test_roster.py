@@ -10,6 +10,7 @@ Run: python3 test_roster.py
 
 from __future__ import annotations
 
+import identity
 import json
 import os
 import sys
@@ -195,6 +196,62 @@ def test_both_packs() -> None:
               % (cov["complete"], cov["partial"], cov["units"]))
 
 
+def test_canonical_identity() -> None:
+    """Display names are localization; canonical ids are identity.
+
+    This is not a hypothetical. Genesis and NH share 69 unit names of which 27
+    carry different stats, and NH alone uses 11 names for more than one record —
+    «Паладин» is 22/55 at index 57 and 6/22 at index 265. Name-keyed lookup
+    returned whichever came first.
+    """
+    print("\n[9] identity is canonical, not the display name")
+    g = load("genesis")
+    ids = g.ids()
+    check(ids and all(i.startswith("genesis:unit/") for i in ids),
+          "ids are pack-qualified", ids[0] if ids else "none")
+
+    cid = g.id_for_name("Мечник")
+    built = g.build(cid)
+    check(built is not None and built.content_id == cid,
+          "a unit built by id carries that id back", str(cid))
+    check(built.provenance.get("source_file") == "unit.var"
+          and built.provenance.get("source_record_index") >= 0,
+          "and its provenance points at the source record",
+          str(built.provenance))
+    check(g.build("Мечник").unit.attack == built.unit.attack,
+          "the transitional name path agrees with the id path")
+
+    if not pack_available("new_horizons"):
+        return
+
+    n = load("new_horizons")
+    # Same name, different packs, different content — the cross-pack case.
+    shared = [nm for nm in ("Громила", "Пегас") if g.id_for_name(nm) and n.id_for_name(nm)]
+    for nm in shared:
+        gi, ni = g.id_for_name(nm), n.id_for_name(nm)
+        check(gi != ni, "%s is a different id in each pack" % nm, "%s vs %s" % (gi, ni))
+
+    # Ambiguous WITHIN one pack must fail loudly, not pick one.
+    ambiguous = []
+    seen = {}
+    for cid2 in n.ids():
+        rec = n.index.get(cid2) or {}
+        nm = rec.get("Name")
+        if nm and nm != "Пусто":
+            seen.setdefault(nm, []).append(cid2)
+    ambiguous = sorted(k for k, v in seen.items() if len(v) > 1)
+    check(ambiguous, "NH really does reuse display names", "%d names" % len(ambiguous))
+    if ambiguous:
+        try:
+            n.build(ambiguous[0])
+        except identity.AmbiguousName as exc:
+            check(True, "and building one by name refuses rather than guessing",
+                  str(exc)[:70])
+        else:
+            check(False, "and building one by name refuses rather than guessing",
+                  "it returned a unit")
+
+
 def test_determinism() -> None:
     print("\n[8] building is deterministic")
     r = load("genesis")
@@ -214,6 +271,7 @@ if __name__ == "__main__":
         test_resolved_becomes_a_modifier()
         test_coverage_is_the_content_progress_meter()
         test_both_packs()
+        test_canonical_identity()
         test_determinism()
     except PackUnavailable as exc:
         print("\nSKIPPED — %s" % exc)
