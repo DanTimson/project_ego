@@ -431,6 +431,39 @@ Attack, counterattack, and ranged attack are reduced by:
 - stamina below 6: minus 10% per missing point;
 - morale below 6: minus 10% per missing point.
 
+The three offensive-stat functions share the same final morale arithmetic:
+
+```text
+pre = trunc0(internal_scaled_value / 100)
+
+morale 0..5:
+    bonus_percent = 10 * morale - 60
+morale 6..15:
+    bonus_percent = 0
+morale >=16:
+    bonus_percent = 5 * triangular_band_index(morale)
+
+result = max(1, pre + trunc0(bonus_percent * pre / 100))
+```
+
+`EXP-R5-001` proves that both divisions truncate signed values toward zero.
+The final divide uses reciprocal `0x51EB851F`, arithmetic shift by five, then
+adds the shifted value's sign bit as the correction. At morale 0, `pre=19`
+returns 8 and `pre=7` returns 3; flooring a combined `0.4` multiplier would be
+wrong.
+
+Matching final tails:
+
+```text
+attack         004D1995..004D19ED
+counterattack  004D1824..004D187B
+ranged attack  004D15F6..004D164D
+```
+
+The executable's internal ×100 temporary representation is diagnostic only.
+The binding behaviour is the truncation order, signed rounding direction,
+percentage curve, and final minimum-one clamp.
+
 Modifier `0x26` disables attack/counterattack.
 
 ### 9.3 Melee damage calculator

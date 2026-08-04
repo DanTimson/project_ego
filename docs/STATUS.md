@@ -6,7 +6,7 @@ This is a coverage map, not a release claim.
 |---|---|---|---|---|
 | attack randomisation and chip damage | published tables + binary | implemented with native stream model | native + `LegacyRng` vector-tested | exact CRT generator and adapters implemented in isolation; end-to-end legacy call ordering pending |
 | stamina and wound multipliers | published tables + binary | implemented | implemented | strong |
-| morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and truncation point covered; negative-bonus rounding is R5 |
+| morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve, both truncation points, signed negative adjustment and minimum-one clamp recovered |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | provider coverage incomplete |
 | activated actions | docs, data, binary dispatcher | implemented | `Action` implemented | effect dictionary incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
@@ -44,8 +44,7 @@ The most consequential blockers are:
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11`, closed requests R1–R4, active request R5, and runtime
-schema version 14.
+`closer_inspection_11`, closed requests R1–R5, and runtime schema version 14.
 
 When a new checkpoint is produced, update together:
 

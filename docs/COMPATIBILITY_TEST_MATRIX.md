@@ -30,9 +30,9 @@ Status values:
 | DAMAGE-BASE-001 | damage | raw power 1..20 versus defence gaps 0..11 | `004CEC40` | spread, clamp, exact/one/zero damage branches | READY |
 | STATS-WOUND-001 | stats | life below half maximum | effective stat functions | 50% offensive penalty unless exempting modifier applies | READY |
 | STATS-STAMINA-001 | stats | stamina 0..6 | effective stat functions | −10% per missing point below 6 | READY |
-| STATS-MORALE-001 | stats | morale 0..15 | effective attack stat functions + `DOC-NH-MORALE`; `oracle/test_morale_binary.py` | multiplier `0.4 + 0.1*morale` for 0..5, exactly `1.0` for 6..15; settled points and truncation vectors pass | PARTIAL — signed rounding edge isolated as STATS-MORALE-003 |
+| STATS-MORALE-001 | stats | morale 0..15 | effective attack stat functions + `DOC-NH-MORALE`; `EXP-R5-001`; `oracle/test_morale_binary.py` | low-band percentage is `10*morale-60`; neutral band is zero; pre-morale truncation and signed adjustment truncation match the executable | IMPLEMENTED |
 | STATS-MORALE-002 | stats | high-morale breakpoints and integer application | `EXP-R1-001`; `DOC-NH-MORALE`; `oracle/test_morale_binary.py` | band `n` starts at `15 + n(n+1)/2`; +5 percentage points per band; first boundaries 16/18/21; truncate the pre-morale stat before applying the bonus | IMPLEMENTED |
-| STATS-MORALE-003 | stats | negative morale bonus with pre-morale attack not divisible by 10 | R5; `EXP-R1-001` decompilation | distinguish truncation toward zero from flooring; base 19 at morale 0 is 8 versus 7 | BLOCKED |
+| STATS-MORALE-003 | stats | negative morale bonus with pre-morale attack not divisible by 10 | `EXP-R5-001`; `oracle/test_morale_binary.py` | `pre + trunc0((10*morale-60)*pre/100)`, then clamp to 1; base 19/morale 0 is 8 and base 7/morale 0 is 3 | IMPLEMENTED |
 | MELEE-ORDER-001 | combat | ordinary attack without retaliation | `004DCD90` | secondary effects before channel accounting and life subtraction | READY |
 | MELEE-FIRST-001 | combat | defender modifier `0x10` | `004DCD90` | defender attacks first when all gating conditions pass | READY |
 | MELEE-NORETAL-001 | combat | attacker modifier `0x1A` | `004DCD90` | suppresses both first-strike and ordinary retaliation paths | READY |

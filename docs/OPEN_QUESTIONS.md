@@ -32,7 +32,6 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 | 12 | **Stamina cost after prior movement/action spending.** | `004D7050` chooses the 1-versus-2 cost from remaining versus effective action capacity, not directly from `steps_this_round`. Equivalence across re-entry and non-movement spending is unproven. | Test move/yield/attack, partial action spending without movement, and restored movement. |
 | 13 | **`Удар и возврат` anchor.** | Observation says command-start tile; no binary executor has yet established the stored anchor field and lifecycle. | Recover the action executor or instrument a split-activation case. |
 | 16 | **Whole-side phases versus unit-by-unit side alternation.** | `RoundLoop` currently models one side acting until pass, then the other. Initiative documentation says which side moves first but does not settle subsequent alternation. | Record one full original round with deliberate partial activations on both sides or inspect the tactical battle loop. |
-| 17 | **Rounding direction of the negative morale bonus.** | The R1 decompilation sends the negative sub-6 percentage through the same final signed-integer expression as the positive bands, which strongly supports truncation toward zero. The final machine-code divide sequence was not included, and base 19 at morale 0 still distinguishes 8 (truncate) from 7 (floor). | Read the final divide/negate sequence in one effective-attack listing, or observe one unit at morale 0 with a pre-morale attack not divisible by 10. |
 
 ## Data dictionaries
 
@@ -68,6 +67,7 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 
 | former ID | Result | Evidence |
 |---|---|---|
+| 17 | Negative morale adjustment uses signed division truncating toward zero after the pre-morale stat has already been truncated to an integer. The final result is `max(1, pre + trunc0(percent*pre/100))`; at morale 0, pre 19 returns 8 and pre 7 returns 3. | `EXP-R5-001`; identical reciprocal-multiply, arithmetic-shift and sign-correction sequences in `004D1890`, `004D1660`, and `004D14A0`. |
 | 4 | Genesis uses the statically linked Microsoft CRT generator. `00404B0B` writes the seed to thread-local `_ptiddata._holdrand`; ordinary random consumers use the paired CRT `_rand`. Principal reseed epochs are startup time modulo 10000, map/setup seed, map generation seed, and `map_seed + strategic_turn`. | `EXP-R4A-001`, `EXP-R4B-001`, `EXP-STRATEGIC-TICK-001`; see `LEGACY_RNG.md`. |
 | 4b | Ordinary gameplay randomness on one thread consumes one shared CRT sequence. `00454DC0`, `00454F80`, and `00455050` are non-CRT contextual selector paths, not independently advancing PRNG streams. Named subsystem streams are non-legacy. | `EXP-R4A-001`, `EXP-R4B-001`; direct call topology. |
 | 10 | Genesis modifier `0x25` reads the attacker's and target's current coordinates before the current command's movement, then calls the movement helper with the requested destination. The bonus is command-entry separation, not cumulative movement or destination displacement. | `EXP-CI11`, `004DCD90` at `004DCDCB..004DCE18`. |

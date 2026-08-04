@@ -145,21 +145,21 @@ steps it first converts the internal ×100 value back to an integer, then applie
 the morale percentage:
 
 ```text
-pre_morale = scaled_attack / 100
-result = pre_morale + bonus_percent * pre_morale / 100
+pre_morale = trunc0(scaled_attack / 100)
+result = max(1, pre_morale + trunc0(bonus_percent * pre_morale / 100))
 ```
 
-For positive offensive stats, division truncates downward. Thus base 19 at
-morale 16 still returns 19, while base 20 returns 21. Preserve this truncation
-point. Implementation and executable fixtures are maintained by the engine side.
+`trunc0` is signed truncation toward zero. The final division is compiled as a
+signed reciprocal multiply followed by a sign correction in all three recovered
+functions, so the negative low-morale branch is no longer inferred only from the
+source language. Thus base 19 at morale 16 still returns 19, base 20 returns 21,
+and base 19 at morale 0 returns 8 rather than 7. Preserve both truncation points,
+the signed rounding direction, and the minimum-one clamp.
 
-**Unresolved: the direction below morale 6.** The evidence above covers positive
-bonuses only, where truncation toward zero and flooring coincide. Below morale 6
-the bonus is negative and the two diverge by one point. The implementation uses C
-semantics — truncation toward zero, `19 at morale 0 -> 8`, not `7` — because the
-original is a C++ binary and its integer division truncates toward zero. That is
-an inference from the language, not from a read branch. Six of the forty-eight
-committed morale vectors sit on this divergence. See `OPEN_QUESTIONS` item 17.
+The internal ×100 representation is diagnostic rather than binding. An engine
+implementation may use another representation if it reproduces these observable
+results. Implementation and executable fixtures are maintained by the engine
+side.
 
 Carve-out: morale multiplies only direct attack bonuses, not conditional damage
 such as «Сокрушение зла» — see §1.1.

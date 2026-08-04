@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R5. R1–R4 are closed; R5 was raised by the engine-side morale vectors.
+**Current active request:** none. R1–R5 are closed. Resume binary extraction only when an engine-side fixture exposes a concrete ambiguity.
 
 ---
 
@@ -273,52 +273,80 @@ the engine-agent handoff are in `LEGACY_RNG.md`.
 
 ---
 
-## R5 — OPEN: rounding direction of the *negative* morale bonus
+## R5 — CLOSED: negative morale division truncates toward zero
 
-**Closes:** `OPEN_QUESTIONS` item 17
-**Ledger:** extends MORALE-001 / EXP-R1-001
-**Cost:** small — one branch, or one controlled observation
+**Closes:** `OPEN_QUESTIONS` item 17 · matrix STATS-MORALE-003
+**Ledger:** MORALE-003
+**Evidence:** `EXP-R5-001`
 
-**Question.** In the effective-attack morale step, when `bonus_percent` is
-negative, does the division truncate toward zero or floor toward negative
-infinity?
+**Result (2026-08-04).** The complete listings for effective attack
+(`004D1890`), counterattack (`004D1660`), and ranged attack (`004D14A0`) use the
+same signed divide-by-100 sequence for both the pre-morale integer conversion
+and the final morale adjustment.
 
-**Why it was not covered by R1.** The R1 packet resolved the multiplier curve and
-the truncation *point*, and its vectors are all positive bonuses, where the two
-roundings coincide. Below morale 6 the bonus is negative and they diverge by
-exactly one point. The implementation now applies
+For the final adjustment, the compiler emits signed multiplication by the
+`0x51EB851F` reciprocal, arithmetic shift by five, and an explicit sign
+correction:
 
-```text
-result = pre + bonus_percent * pre / 100
+```asm
+imul EDX, ECX
+mov  EAX, 0x51EB851F
+imul EDX
+sar  EDX, 5
+mov  EAX, EDX
+shr  EAX, 31
+add  EAX, EDX
 ```
 
-as C integer division truncating toward zero, so base 19 at morale 0 returns 8.
-Flooring returns 7. This is an inference from the source language, not something
-read from a branch — it is the one remaining assumption in an otherwise closed
-formula.
+The correction converts arithmetic-shift flooring for negative non-integral
+values into C-style signed division truncating toward zero.
 
-**Scope.** Six of the forty-eight committed morale vectors sit on the divergence:
-bases 7 and 19 at morale 0, 3 and 5. Every other vector is insensitive to the
-answer.
+The recovered rule is therefore:
 
-**Current binary evidence.** The R1 decompilation represents the low-morale
-percentage as a negative signed integer and routes it through the same final
-`bonus_percent * pre / 100` expression used by the positive bands in all three
-offensive-stat functions. That is consistent with truncation toward zero and
-rules out a separate low-morale formula at the decompiler level. The R1 packet
-did not include the final machine-code divide sequence, so the rounding result
-remains a strong inference rather than PROVEN.
+```text
+pre = trunc_toward_zero(internal_scaled_value / 100)
 
-**Minimum sufficient answer.** Either the divide/negate sequence for a negative
-bonus in one of the three effective-attack functions, or a single controlled
-observation: a unit at morale 0 whose base attack is not divisible by 10, read
-off the battle panel. The observation is probably cheaper than the branch, and it
-would also be the first entry in the ledger with
-`confirmed_by_observation = yes`.
+if morale < 6:
+    bonus_percent = 10 * morale - 60
+elif morale <= 15:
+    bonus_percent = 0
+else:
+    bonus_percent = 5 * triangular_band_index(morale)
 
-**Secondary result.** The decompilation already shows the sub-6 penalty entering
-the same percentage application path as the high-morale bonus. Only the signed
-rounding semantics of the final division remain open.
+result = pre + trunc_toward_zero(bonus_percent * pre / 100)
+result = max(result, 1)
+```
+
+Decisive examples:
+
+```text
+pre 19, morale 0:
+    19 + trunc_toward_zero(-1140 / 100)
+  = 19 - 11
+  = 8
+
+pre 7, morale 0:
+    7 + trunc_toward_zero(-420 / 100)
+  = 7 - 4
+  = 3
+```
+
+Flooring would produce 7 and 2 respectively. A direct
+`floor(pre * morale_multiplier)` is therefore not equivalent in the low-morale
+bands.
+
+Matching instruction ranges:
+
+- attack: pre conversion `004D1995..004D19A7`, final signed percentage division
+  `004D19D2..004D19E6`, clamp `004D19E8..004D19ED`;
+- counterattack: pre conversion `004D1824..004D1833`, final division
+  `004D185E..004D1874`, clamp `004D1876..004D187B`;
+- ranged attack: pre conversion `004D15F6..004D1605`, final division
+  `004D1630..004D1646`, clamp `004D1648..004D164D`.
+
+The original's internal ×100 representation remains `diagnostic_only`; the
+binding compatibility requirements are the two truncation points, signed
+rounding direction, percentage construction, and final minimum-one clamp.
 
 ---
 
