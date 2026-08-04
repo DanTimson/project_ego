@@ -350,6 +350,335 @@ rounding direction, percentage construction, and final minimum-one clamp.
 
 ---
 
+## R6 — OPEN: does the minimum-one attack clamp apply to units with no melee attack?
+
+**Closes:** the last unresolved consequence of the R5 morale packet
+**Ledger:** extends MORALE-001 / the effective-attack functions
+**Cost:** small — one controlled observation, or the clamp's guard condition
+
+**Question.** `FORMULAS.md` §1.4 now records the final line of all three
+recovered effective-attack functions as
+
+```text
+result = max(1, pre_morale + trunc0(bonus_percent * pre_morale / 100))
+```
+
+Taken literally the clamp is unconditional, so a unit whose melee attack is 0
+returns 1. Is that right, or is the clamp guarded — reached only when the unit
+actually has an attack value, or only when a morale bonus is non-zero?
+
+**Why it matters.** It is not an edge case in this corpus. **2 Genesis units and
+22 New Horizons units carry `Attack 0`** — Баллиста, Катапульта, Гномья пушка
+and the other siege engines, which are ranged-only. A base attack of 1 reduced by
+the stamina-0 halving also truncates to 0 before the clamp. Under the literal
+reading every one of those deals 1 melee damage rather than none, which is a
+visible gameplay difference, not a rounding detail.
+
+**Current engine behaviour.** Implemented literally: the clamp is applied
+unconditionally after the morale step, so `Attack 0` yields 1. Fixture bases 0
+and 1 cover it in `tests/fixtures/pipeline_fixture.json`. If the guard turns out
+to be conditional, the fix is one line and the fixtures already isolate it.
+
+**Minimum sufficient answer.** Either the branch guarding that `max` in one of
+`004D1890` / `004D1660` / `004D14A0`, or one controlled observation: put a
+ballista adjacent to an enemy in the original and see whether a melee attack is
+offered at all, and if so whether it deals 1.
+
+**Note on scope.** If melee is simply never offered to those units, the clamp
+question becomes unreachable in practice and the honest resolution is
+`diagnostic_only` for that case rather than a behavioural change.
+
+---
+
+## R7 — OPEN: whole-side phases or unit-by-unit alternation?
+
+**Closes:** `OPEN_QUESTIONS` item 16 · matrix TURN-STRUCTURE
+**Method:** observation preferred; tactical battle loop otherwise
+**Cost:** small by observation, medium by decompilation
+**Priority:** highest of the open set
+
+**Question.** After the first side is chosen, does a side keep acting until it
+passes, or do the sides alternate unit by unit?
+
+**Why this outranks everything else open.** It is the only remaining question
+whose answer can invalidate work already committed. `RoundLoop` models
+whole-side phases: one side acts until pass, then the other. Every scenario
+fixture, every battle log, and the entire end-to-end `LegacyRng` trace ordering
+sit on top of that assumption. If alternation is per unit, the fixtures are not
+merely wrong in detail — the RNG call *order* changes, which under one shared
+CRT state changes every downstream roll in the battle. Nothing else on this list
+has that blast radius.
+
+**Minimum sufficient answer.** One original battle, both sides holding at least
+two units, where the first side deliberately activates one unit and then stops
+without passing. If the second side may then act before the first side's
+remaining unit, alternation is per unit. That single case decides it.
+
+**Also useful.** Whether "pass" is a per-unit or per-side concept, and whether a
+unit that has already acted can be re-activated in the same round.
+
+---
+
+## R8 — OPEN: stamina cost basis across re-entry and partial spending
+
+**Closes:** `OPEN_QUESTIONS` item 12
+**Ledger:** existing, `004D7050`
+**Method:** decompilation, with observation as confirmation
+**Cost:** small — one function already located
+
+**Question.** `004D7050` selects the 1-versus-2 stamina cost from remaining
+versus effective action capacity rather than from `steps_this_round`. Is that
+selection equivalent to the step-count model in every path, specifically after
+(a) partial action spending with no movement, (b) yield and re-entry in the same
+round, and (c) movement that was subsequently restored?
+
+**Why it matters now.** The engine currently derives the cost from movement
+already spent. If capacity rather than steps is the true basis, the two agree in
+the common case and diverge exactly in the cases above — which is the shape of
+bug this project keeps producing: correct on the happy path, silently wrong at
+the edges, and invisible to existing tests.
+
+**Minimum sufficient answer.** The comparison operands in `004D7050` — what
+"remaining" and "effective capacity" are read from — and whether either is reset
+on re-entry.
+
+**Engine consequence.** If capacity-based, `steps_this_round` stops being the
+cost input and becomes diagnostic only, which is a small change now and an
+expensive one after action fixtures accumulate.
+
+---
+
+## R9 — OPEN: defence halving and clamp order, as vectors
+
+**Closes:** `OPEN_QUESTIONS` item 9 · matrix STATS-DEFENCE
+**Method:** decompilation
+**Cost:** small — mechanical once the path is open
+
+**Question.** In the effective-defence path, what is the exact order of clamping
+and the stamina-0 halving, and where does truncation land?
+
+**Requested form — vectors, not prose.** The morale packet worked because it
+returned specific values, so please answer in the same shape. Base defence
+values of −1, 0, 1, 2, 3 and 7, each at full stamina and at stamina 0, giving the
+final effective defence. Odd values are the ones that distinguish
+halve-then-clamp from clamp-then-halve, and negative and zero distinguish
+whether the clamp is a floor at 0 or at 1.
+
+**Why it matters.** §1.3 records the halving but not its ordering, and the engine
+currently guesses. Ranged defence should be stated too if it differs — the morale
+work established that attack and defence take different paths, so their orderings
+cannot be assumed to match.
+
+---
+
+## R10 — OPEN: where conditional attack bonuses enter the multiplier pipeline
+
+**Closes:** `OPEN_QUESTIONS` item 7
+**Ledger:** damage path `004D2E60`
+**Method:** decompilation
+**Cost:** medium
+
+**Question.** Conditional bonuses such as «Сокрушение зла» are excluded from
+morale multiplication. Where exactly do they enter relative to the additive
+bonuses, the stamina and wound multipliers, the integer truncation before
+morale, and the morale percentage itself?
+
+**Why the ordering is the whole question.** §1.4 established that the pipeline
+truncates to an integer before applying morale. That makes ordering observable
+rather than academic: a conditional bonus added before the truncation and one
+added after produce different results for the same unit. The engine has a
+provider order that has never been checked against the binary.
+
+**Minimum sufficient answer.** One conditional modifier traced from its provider
+through `004D2E60`, with the insertion point named relative to the four steps
+above, plus one wounded and one exhausted case to show whether the multipliers
+apply to the bonus or only to the base.
+
+---
+
+## R11 — OPEN: modifier `0x12` («Неутомимый») consumer list
+
+**Closes:** `OPEN_QUESTIONS` item 8
+**Method:** decompilation — XREF enumeration, little reduction needed
+**Cost:** small
+
+**Question.** Which stamina consumers check modifier `0x12`? Specifically: does
+the same check suppress direct stamina-setting effects and the zero-stamina
+attack penalty, or only the ordinary per-action costs?
+
+**Why it is cheap and worth doing early.** This is an XREF list rather than a
+semantic reduction, so it is one of the least expensive items here, and it
+determines whether the engine models the ability as "costs are skipped" or as
+"stamina cannot fall," which are different implementations rather than different
+wordings.
+
+**Minimum sufficient answer.** The list of call sites testing `0x12`, and for
+each, one word on what it suppresses. If any direct stamina-setting effect
+bypasses the check, say so explicitly — that is the case that distinguishes the
+two models.
+
+---
+
+## R12 — OPEN: `Удар и возврат` return anchor
+
+**Closes:** `OPEN_QUESTIONS` item 13
+**Method:** action executor, or instrumented observation
+**Cost:** medium
+
+**Question.** Observation says the unit returns to its command-start tile. What
+field stores that anchor, when is it written, and does it survive a split
+activation — move, yield, then attack later in the same round?
+
+**Why the lifecycle matters more than the value.** The engine can already return
+a unit to where it started. What is unproven is what "started" means when the
+activation is not contiguous. If the anchor is written at command entry it is one
+rule; if written at activation start and rewritten on re-entry it is another, and
+they differ exactly in the split case.
+
+**Minimum sufficient answer.** The write site of the anchor field and whether
+re-entry rewrites it.
+
+---
+
+## R13 — OPEN: start-of-turn effects — round boundary or activation?
+
+**Closes:** `OPEN_QUESTIONS` item 11
+**Method:** decompilation
+**Cost:** medium
+
+**Question.** Do start-of-turn effects fire once per round, or once per unit
+activation?
+
+**Coupling worth noting.** This interacts with R7. If turn structure is per-unit
+alternation, "start of turn" is ambiguous in a way it is not under whole-side
+phases, so answering R7 first may make this question sharper or may collapse it.
+Please take them in that order if both are in scope.
+
+**Minimum sufficient answer.** One `Прилив сил` or rage consumer traced across a
+yield and re-entry, showing whether it fires again.
+
+---
+
+## R14 — OPEN: does any unit occupy more than one tactical cell?
+
+**Closes:** `OPEN_QUESTIONS` item 2
+**Method:** observation is decisive and cheap
+**Cost:** very small
+
+**Question.** Does `Гигант` — or any category — occupy more than one hex in the
+inspected build?
+
+**Why it is worth asking despite looking settled.** The engine models every unit
+as single-cell. If that is right, this closes permanently and the battlefield
+geometry is finished. If it is wrong, placement, adjacency, movement blocking,
+area effects and aura reach all change at once. It is a cheap question with an
+expensive wrong answer, and it can be settled by placing a giant on the field and
+looking at it.
+
+**Minimum sufficient answer.** Yes or no, plus the footprint shape if yes.
+
+---
+
+## R15 — OPEN: all-zero weighted table and exhausted level-up pools
+
+**Closes:** `OPEN_QUESTIONS` items 6 and 6b together
+**Ledger:** weighted roller `00454E80`
+**Method:** constructed state, or the caller's guard
+**Cost:** small
+
+**Question.** Two halves of one situation. (a) What does the weighted roller do
+when every surviving weight is zero? (b) What does the level-up path do when a
+unit's pool is exhausted, or offers fewer choices than requested?
+
+**Current engine behaviour, stated so it can be contradicted.** `LegacyRng`
+raises on a zero total rather than returning a value, deliberately, because
+`LEGACY_RNG.md` says compatibility code must not invent a fallback. That is a
+placeholder for the real answer, not a claim about the original. If the original
+returns a sentinel, returns the first entry, or skips the selection entirely,
+the engine should match it.
+
+**Minimum sufficient answer.** The control flow after a zero total — whichever
+of return-early, sentinel, or caller-side guard it turns out to be. If the
+caller guarantees a positive total and the roller is never reached in that
+state, that is a complete answer and closes 6b as unreachable.
+
+---
+
+## R16 — OPEN: action dispatch table
+
+**Closes:** matrix ACTION-DISPATCH-001 (NEEDS EXTRACTION)
+**Method:** decompilation
+**Cost:** medium to large
+
+**Question.** How are tactical actions dispatched — a jump table, a chain of
+comparisons, or an indexed handler array — and what is the action ID space?
+
+**Why it is on the list despite being large.** It is the last structural unknown
+in the tactical layer. Everything else open is a rule detail inside a step whose
+existence is already known; this is the step list itself. It is also the
+prerequisite for the "one genuinely new action" half of the extension probe, so
+it gates agreed future work rather than only current work.
+
+**Minimum sufficient answer.** The dispatch mechanism and the ID-to-handler
+mapping for the ordinary actions — move, attack, ranged attack, wait, defend.
+Exotic actions can follow later.
+
+---
+
+## R17 — OPEN: melee hit secondary effects
+
+**Closes:** matrix MELEE-SECONDARY-001 (NEEDS EXTRACTION)
+**Ledger:** `004D9800`
+**Method:** decompilation
+**Cost:** large
+
+**Question.** The order and conditions of secondary effects on a melee hit:
+drains, debuffs, triggered actions, adjacent attacks and damage-proportional
+effects.
+
+**Priority note.** Lowest of the tactical set, and deliberately so. It is large,
+it is one function, and the engine can execute complete battles without it — the
+effects it governs are additive to a working hit rather than part of it. Take it
+only when the smaller items above are exhausted, or when a specific ability
+needs it.
+
+**Minimum sufficient answer.** The sequence of effect categories with their
+guards. Individual effect formulas can be separate follow-ups.
+
+---
+
+## Deferred, deliberately
+
+`ECON-RECRUIT-001` and `ECON-PROVINCE-001` remain open in the matrix. The engine
+is tactical-first and has no economy layer, so these would produce evidence with
+no consumer for some time. Recording the deferral so it reads as a decision
+rather than an oversight.
+
+`OPEN_QUESTIONS` item 4c — residual RNG persistence and the conditional
+battle-outcome reseed — stays deferred on its own stated condition: it becomes
+relevant when a fixture needs continuation inside one reseed epoch, or when save
+compatibility enters scope. Neither is true yet.
+
+---
+
+## Suggested batching
+
+Two clusters, because they use different tools and can proceed independently.
+
+**One session in the original game closes three items.** R14 (place a giant and
+look), R7 (one battle with a deliberate partial activation), and the observation
+half of R6 (put a ballista adjacent to an enemy). None needs Ghidra, and R7 and
+R14 are the two cheapest high-impact answers on the list.
+
+**Ghidra work, in rising cost.** R11 (XREF list) and R9 (vectors from a located
+path) are the small ones. R8 has its function already located. R10, R12 and R13
+are medium. R16 and R17 are the large ones and should come last.
+
+If only one thing is done: **R7**. It is the only open question that can
+invalidate committed fixtures rather than merely add to them.
+
+---
+
 ## Reporting conventions requested
 
 **Record both confidence axes.** `AGENTS.md` defines PROVEN (assembly, layout,
@@ -389,41 +718,3 @@ because a plausible reading was recorded without the alternatives it displaced.
 already large, while many evidence-ready rows still lack executable fixtures.
 The constraint on this project is conversion of evidence into fixtures, not
 acquisition of more evidence.
-
-## R6 — OPEN: does the minimum-one attack clamp apply to units with no melee attack?
-
-**Closes:** the last unresolved consequence of the R5 morale packet
-**Ledger:** extends MORALE-001 / the effective-attack functions
-**Cost:** small — one controlled observation, or the clamp's guard condition
-
-**Question.** `FORMULAS.md` §1.4 now records the final line of all three
-recovered effective-attack functions as
-
-```text
-result = max(1, pre_morale + trunc0(bonus_percent * pre_morale / 100))
-```
-
-Taken literally the clamp is unconditional, so a unit whose melee attack is 0
-returns 1. Is that right, or is the clamp guarded — reached only when the unit
-actually has an attack value, or only when a morale bonus is non-zero?
-
-**Why it matters.** It is not an edge case in this corpus. **2 Genesis units and
-22 New Horizons units carry `Attack 0`** — Баллиста, Катапульта, Гномья пушка
-and the other siege engines, which are ranged-only. A base attack of 1 reduced by
-the stamina-0 halving also truncates to 0 before the clamp. Under the literal
-reading every one of those deals 1 melee damage rather than none, which is a
-visible gameplay difference, not a rounding detail.
-
-**Current engine behaviour.** Implemented literally: the clamp is applied
-unconditionally after the morale step, so `Attack 0` yields 1. Fixture bases 0
-and 1 cover it in `tests/fixtures/pipeline_fixture.json`. If the guard turns out
-to be conditional, the fix is one line and the fixtures already isolate it.
-
-**Minimum sufficient answer.** Either the branch guarding that `max` in one of
-`004D1890` / `004D1660` / `004D14A0`, or one controlled observation: put a
-ballista adjacent to an enemy in the original and see whether a melee attack is
-offered at all, and if so whether it deals 1.
-
-**Note on scope.** If melee is simply never offered to those units, the clamp
-question becomes unreachable in practice and the honest resolution is
-`diagnostic_only` for that case rather than a behavioural change.
