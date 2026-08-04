@@ -22,6 +22,7 @@ Status values:
 | RNG-SEED-001 | RNG | startup, map generation and two consecutive strategic turns | `EXP-R2-001`, `EXP-R4B-001`, `EXP-STRATEGIC-TICK-001`; `tests/test_legacy_rng.gd` | seeds are time%10000, map seed/default 111, and map_seed+turn | PARTIAL — map/turn epochs pass; startup/setup/menu/battle wiring incomplete |
 | RNG-WEIGHT-001 | RNG | weighted selection and removal by selected value | `00454E80`, `LEGACY_RNG.md`; `tests/test_legacy_rng.gd` | cumulative interval, duplicate-value removal and exact seeded roll | IMPLEMENTED (isolated fixture) |
 | RNG-WEIGHT-002 | RNG | total weight zero | open question 6b | explicit legacy behaviour | BLOCKED |
+| TURN-STRUCTURE-001 | turn structure | two or more eligible units per side; partial action, reselection, explicit side pass and automatic exhaustion | `EXP-R7-001`; `004EC4C0`, `004E6530` | initiative chooses the first side; ordinary unit commands keep control on that side; any eligible current-side unit may be selected; explicit pass or no remaining eligible unit toggles the side exactly once | READY |
 | XP-LEVEL-001 | progression | coefficient 100 thresholds for levels 1..5 | `00432660` | 20, 50, 90, 140, 200; cap 30 | READY |
 | XP-ROUND-001 | progression | compare cumulative and per-term threshold helpers | `00432480`, `00432570`, `00432660` | preserve differing truncation where coefficients expose it | READY |
 | LEVELUP-SELECT-001 | progression | prerequisites, repeated candidates and levels 21..30 | `00432B60` | candidate pool and weights before roll | READY |

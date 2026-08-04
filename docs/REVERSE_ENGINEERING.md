@@ -530,9 +530,49 @@ Notable branches:
 
 ---
 
-## 10. Attack execution
+## 10. Tactical turn structure and attack execution
 
-### 10.1 Ordinary ranged attack
+### 10.1 Whole-side phase scheduler
+
+`004EC4C0` owns the tactical interaction loop. The active side is stored in
+`g_current_battle_side` (`DAT_0052E43C`). The initiative comparison writes the
+initial value at `004EEE1C` or `004EEE2D`.
+
+The side-advance helper is `004E6530`. It snapshots the current side at
+`004E6557`; when its first argument is nonzero, the assembly performs:
+
+```asm
+004E66F9  MOV ECX,1
+004E66FE  SUB ECX,EBX
+004E6700  MOV EBX,ECX
+004E6709  MOV [g_current_battle_side],EBX
+```
+
+The helper then initializes units belonging to the newly current side. A zero
+first argument bypasses this toggle.
+
+Inside `004EC4C0`, battlefield selection at `004F13C8..004F1453` scans the
+37 records belonging to `g_current_battle_side` and selects the record at the
+clicked coordinates. Movement, attack and action paths return to the same
+interaction loop without invoking the side-advance helper.
+
+Normal phase advances occur in two places:
+
+```text
+004F2070..004F2077  explicit side pass/end-phase command -> 004E6530(1,1)
+004F20AE..004F214D  all 37 current-side slots exhausted -> 004E6530(1,1)
+```
+
+Therefore Genesis uses whole-side phases. Units on one side may be selected in
+any order and may be re-entered while still eligible; the enemy receives control
+only after a side-level pass or exhaustion. Unit-by-unit side alternation is
+rejected.
+
+This control-flow result is binding for legacy RNG ordering. It does not by
+itself settle whether a specific start-of-turn effect belongs to the side-phase
+boundary, the complete two-side round boundary, or unit activation.
+
+### 10.2 Ordinary ranged attack
 
 `execute_ranged_attack_candidate`:
 
@@ -554,7 +594,7 @@ refresh UI
 
 Special attacker modifiers `0x2E` and `0x2F` replace ordinary damage with disabling runtime-effect packages.
 
-### 10.2 Melee exchange
+### 10.3 Melee exchange
 
 `execute_melee_attack_exchange_candidate` uses the global current battle unit as attacker and receives destination coordinates plus target.
 
@@ -590,7 +630,7 @@ requested destination. This is command-entry target separation, not cumulative
 movement history or destination displacement. A no-movement attack leaves the
 bonus at zero.
 
-### 10.3 Primary hit ordering
+### 10.4 Primary hit ordering
 
 For melee/counterattack:
 

@@ -13,7 +13,7 @@ This is a coverage map, not a release claim.
 | level-up selection | data + binary | implemented in part | options implemented | legacy RNG/underfull cases open |
 | battlefield coordinates and adjacency | binary | implemented | implemented | adjacency recovered |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
-| round/side control | observation + partial binary | implemented | implemented | whole-side-phase model open |
+| round/side control | observation + binary `004EC4C0`/`004E6530` | implemented | implemented | whole-side phases recovered; explicit binary-derived order fixture still needed |
 | melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
 | ranged execution | binary | partial compatibility model | partial | special modes incomplete; recovered zero-entry return is not yet mirrored by the generic stat clamp |
 | damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
@@ -44,7 +44,7 @@ The most consequential blockers are:
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11`, closed requests R1–R6, and runtime schema version 14.
+`closer_inspection_11`, closed requests R1–R7, and runtime schema version 14.
 
 When a new checkpoint is produced, update together:
 

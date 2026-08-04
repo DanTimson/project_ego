@@ -51,4 +51,6 @@ address,working_name,subsystem,confidence,summary
 004D9800,process_melee_or_counterattack_secondary_effects_candidate,combat lifecycle,strong inference,"Drains, statuses, cleave, triggers and healing"
 004DCD90,execute_melee_attack_exchange_candidate,combat lifecycle,proven,"Movement, first strike, primary attack and retaliation"
 004E4660,initialize_army_battle_formation_candidate,battlefield,strong inference,Persistent formation placement and side mirroring
+004E6530,advance_battle_side_phase_candidate,turn structure,proven,"With nonzero first argument, toggles g_current_battle_side and initializes the next whole-side phase"
+004EC4C0,run_tactical_battle_candidate,turn structure,proven,Whole-side tactical interaction loop; ordinary unit commands retain current-side control until pass or exhaustion
 004F4970,score_battle_action_against_target_candidate,tactical AI,strong inference,AI utility score for action-target pair

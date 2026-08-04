@@ -316,7 +316,7 @@ Exceptions:
 
 ## 6. Movement and commands
 
-`[OBS]` · **STATED**
+`[OBS][BIN:004EC4C0,004E6530]` · **RECOVERED / STATED**
 
 **Attack commands carry an implicit movement component.** Issuing an attack
 against a reachable target auto-paths the unit into position; the player does
@@ -326,6 +326,17 @@ from the same action-point pool.
 Activation is free and re-entrant: a unit may spend part of its movement, yield
 control, and be reselected later in the same round to finish acting. There is
 no initiative queue within a side.
+
+**Battle scheduling is whole-side.** Initiative chooses the first side once.
+Ordinary unit movement, attacks and actions do not yield control to the enemy.
+The current side retains control until the player/AI passes the side phase or no
+eligible current-side unit remains; `004E6530` then toggles
+`g_current_battle_side = 1 - g_current_battle_side` and initializes the next
+side phase. Pass is therefore per side, not per unit.
+
+This ordering is compatibility-significant because ordinary random consumers
+from the entire current-side phase advance one shared legacy CRT sequence before
+the opposing phase begins.
 
 Current Project EGO state:
 

@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R7 — whole-side phases or unit-by-unit alternation. R1–R6 are closed.
+**Current active request:** R8 — stamina cost basis across re-entry and partial spending. R1–R7 are closed.
 
 ---
 
@@ -414,32 +414,77 @@ question becomes unreachable in practice and the honest resolution is
 
 ---
 
-## R7 — OPEN: whole-side phases or unit-by-unit alternation?
+## R7 — CLOSED: tactical combat uses whole-side phases
 
-**Closes:** `OPEN_QUESTIONS` item 16 · matrix TURN-STRUCTURE
-**Method:** observation preferred; tactical battle loop otherwise
-**Cost:** small by observation, medium by decompilation
-**Priority:** highest of the open set
+**Closes:** `OPEN_QUESTIONS` item 16 · matrix TURN-STRUCTURE-001
+**Ledger:** TURN-001
+**Source:** `EXP-R7-001`
+**Method:** decompilation and assembly cross-check
+**Cost:** resolved from the existing `unit_calls_3.txt` export and canonical binary
 
-**Question.** After the first side is chosen, does a side keep acting until it
-passes, or do the sides alternate unit by unit?
+**Result (2026-08-05).** Genesis does not alternate sides after each unit.
+The battle scheduler holds one `g_current_battle_side` through the interaction
+loop. Any eligible unit on that side may be selected and acted with; control
+passes to the opponent only when the side explicitly ends its phase or has no
+actionable unit left.
 
-**Why this outranks everything else open.** It is the only remaining question
-whose answer can invalidate work already committed. `RoundLoop` models
-whole-side phases: one side acts until pass, then the other. Every scenario
-fixture, every battle log, and the entire end-to-end `LegacyRng` trace ordering
-sit on top of that assumption. If alternation is per unit, the fixtures are not
-merely wrong in detail — the RNG call *order* changes, which under one shared
-CRT state changes every downstream roll in the battle. Nothing else on this list
-has that blast radius.
+The controlling global is `DAT_0052E43C`, now named
+`g_current_battle_side`. Battle setup writes the initiative-selected side at
+`004EEE1C` or `004EEE2D`. The phase helper `004E6530` reads that global at
+`004E6557`. When its first argument is nonzero, it performs the only ordinary
+side transition:
 
-**Minimum sufficient answer.** One original battle, both sides holding at least
-two units, where the first side deliberately activates one unit and then stops
-without passing. If the second side may then act before the first side's
-remaining unit, alternation is per unit. That single case decides it.
+```asm
+004E66F9  MOV ECX,1
+004E66FE  SUB ECX,EBX
+004E6700  MOV EBX,ECX
+004E6709  MOV [g_current_battle_side],EBX
+```
 
-**Also useful.** Whether "pass" is a per-unit or per-side concept, and whether a
-unit that has already acted can be re-activated in the same round.
+The main tactical interaction loop in `004EC4C0` repeatedly indexes the
+37-slot roster using the unchanged current side. A battlefield click scans
+current-side slots and selects the matching unit at
+`004F13C8..004F1453`. Ordinary movement, attack and action paths return to this
+same loop; they do not call the side-transition helper.
+
+The two normal calls that pass `(1,1)` to `004E6530` are:
+
+- `004F2070..004F2077`: the explicit side-pass/end-phase input path;
+- `004F20AE..004F214D`: the automatic path after scanning all 37 slots and
+  finding no remaining selectable/actionable current-side unit.
+
+Calls with a zero first argument do not execute the toggle branch and belong to
+battle-control/exit handling rather than unit alternation.
+
+**Compatibility rule.**
+
+```text
+choose initial side from army initiative
+repeat until battle ends:
+    current side may select and reselect its eligible units in any order
+    ordinary unit commands do not transfer control
+    explicit side pass, or exhaustion of all eligible units:
+        current_side = 1 - current_side
+        initialize the next side phase
+```
+
+**Pass semantics.** Pass is a side-level operation. A unit ending its own
+action, being deselected, or retaining only part of its capacity does not yield
+control to the opposing side. The already-observed within-side re-entry
+behaviour is therefore consistent with the scheduler.
+
+**Rejected alternative.** Unit-by-unit side alternation is incompatible with
+both the side-global write topology and the absence of a transition-helper call
+from ordinary unit command paths.
+
+**Engine consequence.** The existing whole-side `RoundLoop` ordering is the
+correct Genesis compatibility model. Preserve this ordering for the shared
+legacy RNG: all random consumers from the current side's phase occur before the
+opponent's phase begins.
+
+**Residual scope.** This result does not settle whether a particular
+start-of-turn effect fires at each side phase, once per complete two-side round,
+or on unit activation. That remains R13.
 
 ---
 
