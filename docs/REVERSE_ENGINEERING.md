@@ -462,9 +462,32 @@ ranged attack  004D15F6..004D164D
 
 The executable's internal ×100 temporary representation is diagnostic only.
 The binding behaviour is the truncation order, signed rounding direction,
-percentage curve, and final minimum-one clamp.
+percentage curve, and the entry-specific reachability of the final clamp.
 
-Modifier `0x26` disables attack/counterattack.
+The three functions differ before that shared tail:
+
+```text
+attack
+    modifier 0x26 early return: 004D1895..004D18A7
+    final minimum-one clamp:    004D19E8..004D19ED
+
+counterattack
+    modifier 0x26 early return: 004D1667..004D167B
+    final minimum-one clamp:    004D1876..004D187B
+
+ranged attack
+    zero early-sum branch:      004D14D0..004D14D9
+    final minimum-one clamp:    004D1648..004D164D
+```
+
+For attack and counterattack, absence of modifier `0x26` leaves no zero-stat
+guard: a zero accumulated value reaches the clamp and returns `1`. Ranged
+attack instead tests the sum of definition base, instance modifiers and
+intrinsic modifiers. If that sum is zero, it returns zero before runtime-node
+modifiers, commander aura and all wound/stamina/morale arithmetic.
+
+This is a function-level result. It does not establish whether a ranged-only
+unit is offered a melee command by the tactical command layer.
 
 ### 9.3 Melee damage calculator
 

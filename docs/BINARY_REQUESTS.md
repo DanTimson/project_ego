@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** none. R1–R5 are closed. Resume binary extraction only when an engine-side fixture exposes a concrete ambiguity.
+**Current active request:** R7 — whole-side phases or unit-by-unit alternation. R1–R6 are closed.
 
 ---
 
@@ -350,11 +350,35 @@ rounding direction, percentage construction, and final minimum-one clamp.
 
 ---
 
-## R6 — OPEN: does the minimum-one attack clamp apply to units with no melee attack?
+## R6 — CLOSED: zero melee/counterattack reaches the clamp; ranged attack has an earlier zero return
 
 **Closes:** the last unresolved consequence of the R5 morale packet
 **Ledger:** extends MORALE-001 / the effective-attack functions
-**Cost:** small — one controlled observation, or the clamp's guard condition
+**Cost:** small — resolved from the existing `EXP-R5-001` assembly packet
+
+**Result (2026-08-05).** The three functions share a final minimum-one tail, but they do not share the same entry semantics.
+
+Attack (`004D1890`) and counterattack (`004D1660`) first test modifier `0x26` and return zero when it is present:
+
+```text
+attack         004D1895..004D18A7
+counterattack  004D1667..004D167B
+```
+
+Otherwise neither function has a zero-stat guard before its final clamp:
+
+```text
+attack clamp         004D19E8..004D19ED
+counterattack clamp  004D1876..004D187B
+```
+
+Therefore a zero accumulated melee or counterattack value returns `1` if the function is called and modifier `0x26` is absent.
+
+Ranged attack (`004D14A0`) differs. After adding only the definition base, instance modifiers and intrinsic modifiers, it branches at `004D14D2`. A zero sum returns immediately through `004D14D4..004D14D9`, before runtime-node modifiers, commander aura, wound/stamina processing, morale processing and the final clamp. Only the nonzero path reaches `004D1648..004D164D`.
+
+This closes the effective-stat question without a new observation. It does not establish whether the tactical command layer offers melee to a ranged-only siege unit; command reachability remains separate.
+
+**Implementation consequence.** A single unconditional clamp for all three attack kinds is not Genesis-compatible. Melee and counterattack retain the minimum-one result on the reached path, subject to modifier `0x26`; ranged attack needs the recovered early-zero guard.
 
 **Question.** `FORMULAS.md` §1.4 now records the final line of all three
 recovered effective-attack functions as
@@ -374,10 +398,10 @@ the stamina-0 halving also truncates to 0 before the clamp. Under the literal
 reading every one of those deals 1 melee damage rather than none, which is a
 visible gameplay difference, not a rounding detail.
 
-**Current engine behaviour.** Implemented literally: the clamp is applied
-unconditionally after the morale step, so `Attack 0` yields 1. Fixture bases 0
-and 1 cover it in `tests/fixtures/pipeline_fixture.json`. If the guard turns out
-to be conditional, the fix is one line and the fixtures already isolate it.
+**Engine state at closure.** The engine currently applies the final clamp
+uniformly across melee, counterattack and ranged attack. That matches the
+reached melee/counterattack paths but not the ranged early-zero branch. The
+engine side owns the implementation and fixture correction.
 
 **Minimum sufficient answer.** Either the branch guarding that `max` in one of
 `004D1890` / `004D1660` / `004D14A0`, or one controlled observation: put a

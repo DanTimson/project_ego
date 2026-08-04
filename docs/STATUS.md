@@ -6,7 +6,7 @@ This is a coverage map, not a release claim.
 |---|---|---|---|---|
 | attack randomisation and chip damage | published tables + binary | implemented with native stream model | native + `LegacyRng` vector-tested | exact CRT generator and adapters implemented in isolation; end-to-end legacy call ordering pending |
 | stamina and wound multipliers | published tables + binary | implemented | implemented | strong |
-| morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve, both truncation points, signed negative adjustment and minimum-one clamp recovered |
+| morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 proves the final clamp is reached differently by melee/counterattack and ranged attack |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | provider coverage incomplete |
 | activated actions | docs, data, binary dispatcher | implemented | `Action` implemented | effect dictionary incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
@@ -15,7 +15,7 @@ This is a coverage map, not a release claim.
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
 | round/side control | observation + partial binary | implemented | implemented | whole-side-phase model open |
 | melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
-| ranged execution | binary | partial compatibility model | partial | special modes incomplete |
+| ranged execution | binary | partial compatibility model | partial | special modes incomplete; recovered zero-entry return is not yet mirrored by the generic stat clamp |
 | damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
 | battle actions: eight-clause dispatcher | binary | partial | content model only | high-priority extraction |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
@@ -44,7 +44,7 @@ The most consequential blockers are:
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11`, closed requests R1–R5, and runtime schema version 14.
+`closer_inspection_11`, closed requests R1–R6, and runtime schema version 14.
 
 When a new checkpoint is produced, update together:
 

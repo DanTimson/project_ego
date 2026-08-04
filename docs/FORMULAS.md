@@ -149,6 +149,21 @@ pre_morale = trunc0(scaled_attack / 100)
 result = max(1, pre_morale + trunc0(bonus_percent * pre_morale / 100))
 ```
 
+This is the shared **final tail after entry-specific guards**, not an
+unconditional definition for every possible raw stat:
+
+- attack (`004D1890`) and counterattack (`004D1660`) return zero first when
+  modifier `0x26` is present; otherwise a zero accumulated stat reaches the
+  final clamp and returns `1`;
+- ranged attack (`004D14A0`) returns zero at `004D14D4..004D14D9` when the
+  early sum of definition base, instance modifiers and intrinsic modifiers is
+  zero. This occurs before runtime-node modifiers, commander aura and the
+  wound/stamina/morale tail. Only a nonzero early sum reaches the minimum-one
+  clamp.
+
+The effective-stat functions alone do not prove whether the command layer
+offers melee to a ranged-only unit.
+
 `trunc0` is signed truncation toward zero. The final division is compiled as a
 signed reciprocal multiply followed by a sign correction in all three recovered
 functions, so the negative low-morale branch is no longer inferred only from the
