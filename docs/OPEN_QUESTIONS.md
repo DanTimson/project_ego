@@ -70,6 +70,7 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 
 | former ID | Result | Evidence |
 |---|---|---|
+| R2 | `item.var`, `medal.var`, and `spell.var` `Effects` store direct effect/modifier opcodes in the namespace described by `ability_num.Number`; they do not store `unit_upg` record indexes. `unit.var Abilityes` remains the contrasting index-based path. | `EXP-R2-001`, `DATA-VAR-FULL-20260804`; consumers `004A1F90`, `00432950`, and the battle-action dispatcher. |
 | 1 | Genesis uses triangularly widening high-morale offensive bands beginning at 16, 18, 21, 25, 30, 36, 43 and 51, with +5 percentage points per band. Attack, counterattack and ranged attack use the same integer branch. Fixed 5-point and fixed 2-point bands are rejected. | `EXP-R1-001`: `004D1890`, `004D1660`, `004D14A0`; independently agrees with `DOC-NH-MORALE`. Implementation fixture remains owned by the engine side. |
 | 2, partial | Tactical field is an 8×8 odd-row offset hex grid; each side has 37 unit slots; six-neighbour adjacency is recovered. | `004CE9E0`, formation/deployment consumers, `eador_runtime.h`. |
 | 3 | Army-level initiative: higher leader value starts; ties go to attacker. | data/documentation and current tests. |

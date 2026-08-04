@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R2. R1 was closed on 2026-08-04 by `EXP-R1-001`.
+**Current active request:** R3. R1 was closed by `EXP-R1-001`; R2 was closed by `EXP-R2-001` and `DATA-VAR-FULL-20260804`.
 
 ---
 
@@ -80,11 +80,49 @@ float; ordering matters for parity.
 
 ---
 
-## R2 — Which table do `Effects` references resolve against?
+## R2 — CLOSED: `Effects` use direct opcodes, not `unit_upg` indexes
 
 **Closes:** the remaining half of the extraction→roster reference typing
 **Ledger:** new claim required
 **Blocks:** wiring spells and items into the rules pipeline at all
+
+**Result (2026-08-04).** The three tables use direct numeric effect identifiers,
+not `unit_upg` record indexes:
+
+```text
+unit.var Abilityes
+    -> unit_upg record index
+
+item.var Effects
+medal.var Effects
+spell.var Effects
+    -> direct effect/modifier opcode
+       in the namespace described by ability_num.Number
+```
+
+The runtime generally does not perform a second lookup through `ability_num`.
+It stores the integer and compares or dispatches it directly. `ability_num.var`
+is therefore a descriptor dictionary for the opcode namespace, not a required
+runtime indirection table.
+
+Decisive consumers:
+
+- `004A1F90` compares item effect IDs directly with the requested modifier ID;
+- `00432950` indexes a `0x88` medal record and compares its effect IDs directly;
+- `apply_battle_action_to_unit_candidate` switches on spell effect IDs and
+  passes ordinary IDs directly into runtime modifier nodes;
+- the contrasting `unit.var Abilityes` path multiplies its value by the
+  `unit_upg` stride `0x58`.
+
+Rejected alternatives:
+
+- `Effects` values are `unit_upg` record indexes;
+- `Effects` values are physical record indexes into `ability_num.var`;
+- localized labels such as `Жизнь +2` are mechanical identities.
+
+The source-format result does not prescribe Project EGO's runtime model. Import
+should normalize source references into explicit effect/magnitude records while
+retaining source provenance. See `CONTENT_REFERENCE_MODEL.md`.
 
 **Question.** For `item.var`, `spell.var` and `medal.var`, does the `Effects`
 block reference `ability_num` **by `Number`**, or `unit_upg` **by record index**?

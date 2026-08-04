@@ -3,7 +3,7 @@ address,working_name,subsystem,confidence,summary
 00432570,calculate_unit_experience_threshold_candidate,unit progression,strong inference,Instance-based threshold variant; rounding may differ
 00432660,calculate_unit_level_from_experience_candidate,unit progression,proven,"Returns XP-derived level, capped at 30"
 004328F0,sum_unit_intrinsic_modifiers_candidate,modifiers,proven,Intrinsic UnitDef modifier aggregation
-00432950,sum_unit_instance_modifiers_candidate,modifiers,proven,"Selected upgrades, attachments and hero context"
+00432950,sum_unit_instance_modifiers_candidate,modifiers,proven,"Selected upgrades, medals and hero context"
 00432B60,choose_unit_level_upgrade_candidate,unit progression,proven,Weighted upgrade candidate selection
 00432E60,calculate_unit_gold_upkeep_candidate,economy,proven,"Base, attachment deltas, percent and flat modifiers"
 00433130,apply_unit_level_upgrade_candidate,unit progression,proven,Ordinary upgrade or modifier-0x3E transformation
@@ -21,6 +21,7 @@ address,working_name,subsystem,confidence,summary
 0045ED70,parse_var_string_candidate,parser,strong inference,Allocates and returns parsed string
 0045EE00,read_var_token_to_eax_candidate,parser,strong inference,Reads token until : or ;
 0045EE70,parse_var_integer_candidate,parser,proven,Signed decimal parser
+0045EF60,initialize_game_content_and_state,content loader,proven,Loads .var tables; R2 establishes item/spell/medal Effects storage and the 0x88 medal table
 00469D20,sum_ruler_structure_modifiers_candidate,economy,strong inference,Ruler-wide structure modifier aggregation
 0046B1D0,calculate_unit_gem_recruitment_cost_candidate,economy,strong inference,Gem recruitment price pipeline
 0046B2A0,calculate_unit_gold_recruitment_cost_candidate,economy,strong inference,Gold recruitment price pipeline

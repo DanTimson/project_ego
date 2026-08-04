@@ -89,7 +89,7 @@ typedef struct EadorUnitInstancePartial {
     eador_s32 formation_grid_y;         /* +0x18 */
 
     eador_s32 level_upgrade_ids[30];    /* +0x1C..+0x93 */
-    eador_s32 attachment_ids[3];        /* +0x94..+0x9F */
+    eador_s32 medal_ids[3];             /* +0x94..+0x9F */
 
     EadorHeroStatePartial *hero_state;  /* +0xA0 */
 } EadorUnitInstancePartial;             /* size 0xA4 */
@@ -202,7 +202,7 @@ Values above 1000 in `effect_type_ids` encode a unit-definition ID as `value - 1
 
 | Address | Working name | Status | Main result |
 |---|---|---:|---|
-| `00432950` | `sum_unit_instance_modifiers_candidate` | Proven | Sums selected upgrades, attachments, and hero context. |
+| `00432950` | `sum_unit_instance_modifiers_candidate` | Proven | Sums selected upgrades, medals, and hero context. |
 | `004328F0` | `sum_unit_intrinsic_modifiers_candidate` | Proven | Sums intrinsic UnitDef upgrade bundles. |
 | `004A1F90` | `sum_hero_context_modifiers_candidate` | Strong | Personal hero/class/skill/equipment/set channel. |
 | `004A2690` | `sum_commander_aura_modifiers_candidate` | Strong | Commander aura channel applied to troops. |
@@ -696,7 +696,41 @@ non-digit terminates integer parsing
 
 `parse_var_integer_candidate` returns a signed decimal integer with no visible overflow handling.
 
-The large startup loader contains enough repeated reads and error strings to reconstruct per-file schemas, but that extraction has not yet been performed systematically.
+The large startup loader contains enough repeated reads and error strings to
+reconstruct per-file schemas, but that extraction has not yet been performed
+systematically.
+
+### 17.1 R2 reference namespaces
+
+`initialize_game_content_and_state` at `0045EF60` and the corresponding
+consumers establish two distinct source-reference conventions:
+
+```text
+unit.var Abilityes -> unit_upg record index
+
+item.var Effects  -> direct modifier opcode
+medal.var Effects -> direct modifier opcode
+spell.var Effects -> direct action-effect opcode
+```
+
+The three direct opcode families use the numeric namespace documented by
+`ability_num.Number`. The executable generally stores and dispatches the number
+directly rather than looking up an `ability_num` record at runtime.
+
+The item consumer `004A1F90` compares effect IDs directly with its requested
+modifier. The medal consumer `00432950` does the same after indexing a `0x88`
+medal record. The battle-action dispatcher switches on spell effect IDs and uses
+ordinary IDs directly when creating runtime modifier nodes. None of these paths
+multiplies the effect value by the `unit_upg` stride `0x58`.
+
+The persistent fields at `EadorUnitInstancePartial +0x94..+0x9F`, previously
+named generically as attachments, are three `medal.var` record indexes. This
+semantic rename changes no layout. The stable header can adopt `medal_ids` at
+the next schema checkpoint.
+
+These source conventions do not require Project EGO to model named upgrades
+such as `Жизнь +2` as runtime effect types. The normalization boundary is defined
+in `CONTENT_REFERENCE_MODEL.md`.
 
 ---
 

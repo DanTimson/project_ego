@@ -46,6 +46,8 @@ Status values:
 | GRID-ADJ-001 | battlefield | every border/parity case | `004CE9E0` | exact six odd-row neighbours and no duplicates | READY |
 | FORMATION-001 | battlefield | mirrored deployment | `004E4660` | side 1 uses `7 - formation_x`; collision writes back | READY |
 | ACTION-DISPATCH-001 | battle actions | all observed effect IDs | `004D7A20~`, `spell.var` | per-case fields, resistance, runtime/immediate result | NEEDS EXTRACTION |
+| VAR-REFERENCE-001 | content references | distinguish unit ability indexes from direct item/medal/spell effect opcodes | `EXP-R2-001`; full Genesis var collection | unit Abilityes index 1 resolves through unit_upg; item effect 2 is Attack rather than unit_upg[2]; medal effect 12 is Morale rather than unit_upg[12]; spell effect 1 dispatches directly | READY |
+| LAYOUT-MEDAL-001 | runtime layout | persistent medal slots and medal table stride | `0045EF60`, `00432950`, `medal.var` | +0x94/+0x98/+0x9C are three medal record indexes; record stride 0x88 | READY |
 | VAR-LEXER-001 | parser | `:`, `;`, `#`, sign and EOF cases | parser helpers | token boundaries, consumed delimiter, integer sign | READY |
 | ECON-UPKEEP-001 | economy | base, attachments, percent, flat and clamp | `00432E60` | exact integer ordering | READY |
 | ECON-RECRUIT-001 | economy | route classes and resource surcharge | recruitment functions | exact gold/gem vectors | NEEDS VECTOR |
