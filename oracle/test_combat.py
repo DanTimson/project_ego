@@ -69,7 +69,10 @@ PUBLISHED_CHIP = {
 }
 
 
-def test_chip(trials: int) -> None:
+DEFAULT_TRIALS = 20_000
+
+
+def test_chip(trials: int = DEFAULT_TRIALS) -> None:
     print("\n[1] negative-damage rule vs published probability table")
     rng = Rng(20260726)
     for dmg, expected in PUBLISHED_CHIP.items():
@@ -86,7 +89,7 @@ def test_chip(trials: int) -> None:
 # The page states the exact formula AND its range summary; if my reading of the
 # integer arithmetic is right, the empirical support must match the range.
 
-def test_roll_range(trials: int) -> None:
+def test_roll_range(trials: int = DEFAULT_TRIALS) -> None:
     print("\n[2] attack roll support matches the stated interval")
     rng = Rng(7)
     for attack in (1, 2, 3, 4, 5, 7, 10, 13, 20, 37):
@@ -121,7 +124,7 @@ def test_roll_range(trials: int) -> None:
 # "небольшое отклонение". Quantifying that deviation is a check on my reading:
 # if the two agreed exactly, or diverged wildly, I would have misread one.
 
-def test_simplified_deviation(trials: int) -> None:
+def test_simplified_deviation(trials: int = DEFAULT_TRIALS) -> None:
     print("\n[3] exact vs simplified formula — simplified is biased low by a floor artifact")
     import random
     rnd = random.Random(11)

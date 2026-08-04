@@ -67,6 +67,40 @@ RE_RECORD = re.compile(r"^/(\d+)[ \t]*(.*)$", re.M)
 RE_FIELD = re.compile(r"^([^:\n]{1,60}?):[ \t]*(.*)$")
 RE_SECTION = re.compile(r"^([A-Za-z][A-Za-z ]*)\(([^)]*)\)\s*$")
 
+# ---------------------------------------------------------------- unit schema
+
+RE_LVL_UPGRADE = re.compile(r"Lvl \d+ (upgrades|loot)$")
+
+
+def unit_ability_refs(record):
+    """Yield (label, unit_upg_index) for each ability in a unit.var record.
+
+    Identified STRUCTURALLY, by position: the `Abilityes:` block is exactly the
+    fields between the `Abilityes` marker and the first `Lvl NN upgrades/loot`
+    row, in file order (which parse() preserves in `record.order`).
+
+    This is what the format actually says, and it avoids the reference-table
+    trap. An exclusion allowlist looks equivalent and is not: Genesis unit
+    records carry `Race` and `UnitKind` metadata ints that New Horizons does not,
+    they sit BEFORE the marker, and they resolve to a perfectly valid unit_upg
+    index (1 -> «Жизнь +1»). An allowlist tuned on NH data therefore attaches two
+    phantom abilities to every Genesis unit while xref still reports zero
+    dangling references. Position excludes them for free.
+
+    Shared by xref() and tools/extract/build_pack.py so the two cannot drift.
+    """
+    order = record.order
+    try:
+        start = order.index("Abilityes") + 1
+    except ValueError:
+        return
+    for k in order[start:]:
+        if RE_LVL_UPGRADE.match(k):
+            break
+        v = record.fields.get(k)
+        if isinstance(v, int) and v:
+            yield k, v
+
 
 # ---------------------------------------------------------------- values
 
@@ -311,25 +345,15 @@ def xref(directory: str):
     dangling_ability, dangling_upgrade = Counter(), Counter()
     for r in unit.records:
         for k, v in r.fields.items():
-            if k in ("Name", "Subtype", "Analogs", "Resource", "Upgraded"):
-                continue
-            if re.match(r"Lvl \d+ (upgrades|loot)$", k):
+            if RE_LVL_UPGRADE.match(k):
                 rows = v if isinstance(v, list) else []
                 for row in rows:
                     uid = row[0] if isinstance(row, list) else row
                     if isinstance(uid, int) and uid and uid not in upg_ix:
                         dangling_upgrade[uid] += 1
-            elif isinstance(v, int) and k not in (
-                "Level", "Life", "Attack", "CounterAttack", "Defence",
-                "RangedDefence", "Resist", "Speed", "RangedAttack",
-                "ShootingRange", "Ammo", "Stamina", "Morale", "Exp", "ExpMod",
-                "GoldPrice", "GemPrice", "GoldPayment", "GemPayment",
-                "UnitClass", "Karma", "SoundHit", "SoundShoot",
-                "SoundShootHit", "SoundDeath", "Missile",
-            ):
-                # Abilityes-block entry: free-form key, value = unit_upg index
-                if v and v not in upg_ix:
-                    dangling_ability[v] += 1
+        for _label, ref in unit_ability_refs(r):
+            if ref not in upg_ix:
+                dangling_ability[ref] += 1
 
     orphan_opcodes = Counter()
     for r in upg.records:

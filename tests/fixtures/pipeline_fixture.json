@@ -298,6 +298,128 @@
     "stamina": 0,
     "expected": 0.4
    }
+  ],
+  "morale": [
+   {
+    "morale": 0,
+    "morale_base": 10,
+    "expected": 0.4
+   },
+   {
+    "morale": 1,
+    "morale_base": 10,
+    "expected": 0.5
+   },
+   {
+    "morale": 2,
+    "morale_base": 10,
+    "expected": 0.6
+   },
+   {
+    "morale": 3,
+    "morale_base": 10,
+    "expected": 0.7
+   },
+   {
+    "morale": 4,
+    "morale_base": 10,
+    "expected": 0.8
+   },
+   {
+    "morale": 5,
+    "morale_base": 10,
+    "expected": 0.9
+   },
+   {
+    "morale": 6,
+    "morale_base": 10,
+    "expected": 1.0
+   },
+   {
+    "morale": 10,
+    "morale_base": 10,
+    "expected": 1.0
+   },
+   {
+    "morale": 15,
+    "morale_base": 10,
+    "expected": 1.0
+   },
+   {
+    "morale": 16,
+    "morale_base": 10,
+    "expected": 1.05
+   },
+   {
+    "morale": 17,
+    "morale_base": 10,
+    "expected": 1.05
+   },
+   {
+    "morale": 18,
+    "morale_base": 10,
+    "expected": 1.1
+   },
+   {
+    "morale": 20,
+    "morale_base": 10,
+    "expected": 1.1
+   },
+   {
+    "morale": 21,
+    "morale_base": 10,
+    "expected": 1.15
+   },
+   {
+    "morale": 24,
+    "morale_base": 10,
+    "expected": 1.15
+   },
+   {
+    "morale": 25,
+    "morale_base": 10,
+    "expected": 1.2
+   },
+   {
+    "morale": 29,
+    "morale_base": 10,
+    "expected": 1.2
+   },
+   {
+    "morale": 30,
+    "morale_base": 10,
+    "expected": 1.25
+   },
+   {
+    "morale": 35,
+    "morale_base": 10,
+    "expected": 1.25
+   },
+   {
+    "morale": 36,
+    "morale_base": 10,
+    "expected": 1.3
+   },
+   {
+    "morale": 42,
+    "morale_base": 10,
+    "expected": 1.3
+   },
+   {
+    "morale": 43,
+    "morale_base": 10,
+    "expected": 1.35
+   },
+   {
+    "morale": 50,
+    "morale_base": 10,
+    "expected": 1.35
+   },
+   {
+    "morale": 51,
+    "morale_base": 10,
+    "expected": 1.4
+   }
   ]
  },
  "roll_attack": [

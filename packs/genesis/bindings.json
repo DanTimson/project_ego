@@ -1,0 +1,10 @@
+{
+ "pack": "genesis",
+ "note": "Skeleton. Regenerate locally with tools/extract/make_bindings.py <var-dir> genesis, then hand-edit the empty handlers. An empty 'abilities' map is a valid pack: every ability resolves as unbound and the load report counts it honestly.",
+ "summary": {
+  "opcodes": 0,
+  "bound": 0,
+  "unbound": 0
+ },
+ "abilities": {}
+}

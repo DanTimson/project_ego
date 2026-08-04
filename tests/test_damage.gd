@@ -67,6 +67,13 @@ func _init() -> void:
 		var got: float = Stamina.modifier(u)[0]
 		_check(absf(got - float(case["expected"])) < EPS,
 			"stamina: %d" % int(case["stamina"]), "got %.4f" % got)
+	for case in fx["multipliers"]["morale"]:
+		var u := Combatant.new()
+		u.morale = int(case["morale"])
+		u.morale_base = int(case["morale_base"])
+		var got: float = Morale.modifier(u)[0]
+		_check(absf(got - float(case["expected"])) < EPS,
+			"morale: %d" % int(case["morale"]), "got %.4f" % got)
 
 	print("\n[4] attack roll sequences (requires test_rng.gd to pass first)")
 	for case in fx["roll_attack"]:

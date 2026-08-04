@@ -47,11 +47,26 @@ def convert(var_dir: str, pack_id: str) -> None:
             absent.append(name)
             continue
         vf = E.parse(source)
+        records = []
+        for r in vf.records:
+            row = {"index": r.index, "label": r.label, **r.fields}
+            if name == "unit":
+                # parse() flattens the multi-line `Abilityes:` block into
+                # free-form-label int fields, so record["Abilityes"] arrives as
+                # "" and the roster's `for entry in rec.get("Abilityes", [])`
+                # silently attaches nothing. Rebuild the typed list the roster
+                # already expects, and drop the flat refs plus the now-empty
+                # marker so the ability set lives in exactly one place.
+                refs = list(E.unit_ability_refs(r))
+                for label, _ref in refs:
+                    row.pop(label, None)
+                row["Abilityes"] = [{"ref_label": label, "ref": ref}
+                                    for label, ref in refs]
+            records.append(row)
         payload = {
             "file": vf.name,
             "declared_quantity": vf.declared,
-            "records": [{"index": r.index, "label": r.label, **r.fields}
-                        for r in vf.records],
+            "records": records,
         }
         out = os.path.join(dest, "%s.json" % name)
         with open(out, "w", encoding="utf-8") as fh:
