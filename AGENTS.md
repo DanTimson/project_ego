@@ -12,6 +12,7 @@ Before changing mechanics, read:
 4. the relevant section of `docs/FORMULAS.md`
 5. `docs/REVERSE_ENGINEERING.md` when binary compatibility is involved
 6. `eador_runtime.h` when working with recovered layouts
+7. `docs/deliberations/README.md` for cross-agent architecture decisions
 
 Use `docs/FUNCTION_MAP.csv` to navigate recovered functions by address.
 
@@ -96,16 +97,33 @@ A reverse-engineering change should normally include:
 - header update when a layout changes;
 - a regression-test target when the rule is implementation-grade.
 
-## Current high-priority work
+## Deliberations and decisions
 
-1. Resolve and document the charge-distance discrepancy.
-2. Recover the underlying CRT `rand()` sequence and seed lifecycle.
-3. Complete the battle-action effect-type dictionary.
-4. Cross-reference modifier IDs with `.var` and localization.
-5. Implement timed status parity in `core/model/status.gd`.
-6. Extract explicit `.var` record schemas from the startup loader.
-7. Normalize economy formulas and add golden vectors.
-8. Consolidate tactical AI scoring only after mechanics parity is stable.
+Use `docs/deliberations/` when a question needs independent engine-side and
+binary-analysis positions before a binding decision.
 
-Do not request broad new decompilation dumps while an existing dispatcher or
-loader can answer the current question.
+- The human-owned `brief.md` defines the question and constraints.
+- Each side writes its own position before reading or editing the other's.
+- `cross_review.md` records agreements, disagreements and missing evidence.
+- `decision.md` is the canonical outcome; position files are analysis, not
+  specifications.
+- Accepted decisions name implementation ownership and verification criteria.
+- A changed decision is superseded by a new deliberation rather than silently
+  rewriting the old one.
+
+Run:
+
+```bash
+python3 tools/check_deliberations.py
+```
+
+before committing changes under `docs/deliberations/`.
+
+## Current work
+
+Use `docs/STATUS.md`, `docs/OPEN_QUESTIONS.md` and
+`docs/BINARY_REQUESTS.md` as the current work queues. Do not copy their live
+priority lists into `AGENTS.md`; copied lists become stale.
+
+Do not request broad new decompilation dumps while an existing dispatcher,
+loader or focused test can answer the current question.

@@ -1,0 +1,13 @@
+id: DELIB-0000
+title: replace-me
+state: draft
+opened: 2026-08-04
+decision:
+owner:
+supersedes:
+participants:
+  - human
+  - binary
+  - engine
+verification:
+pending:
