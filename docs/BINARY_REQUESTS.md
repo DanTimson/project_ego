@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** none. R1–R4 are closed. Engine-side implementation and executable fixtures are next; add a new binary request only when a test exposes a remaining ambiguity.
+**Current active request:** R5. R1–R4 are closed; R5 was raised by the engine-side morale vectors.
 
 ---
 
@@ -301,6 +301,14 @@ formula.
 bases 7 and 19 at morale 0, 3 and 5. Every other vector is insensitive to the
 answer.
 
+**Current binary evidence.** The R1 decompilation represents the low-morale
+percentage as a negative signed integer and routes it through the same final
+`bonus_percent * pre / 100` expression used by the positive bands in all three
+offensive-stat functions. That is consistent with truncation toward zero and
+rules out a separate low-morale formula at the decompiler level. The R1 packet
+did not include the final machine-code divide sequence, so the rounding result
+remains a strong inference rather than PROVEN.
+
 **Minimum sufficient answer.** Either the divide/negate sequence for a negative
 bonus in one of the three effective-attack functions, or a single controlled
 observation: a unit at morale 0 whose base attack is not divisible by 10, read
@@ -308,9 +316,9 @@ off the battle panel. The observation is probably cheaper than the branch, and i
 would also be the first entry in the ledger with
 `confirmed_by_observation = yes`.
 
-**Secondary.** Whether the sub-6 penalty is genuinely the same percentage path,
-or a separate branch with its own arithmetic. The implementation assumes the
-former.
+**Secondary result.** The decompilation already shows the sub-6 penalty entering
+the same percentage application path as the high-morale bonus. Only the signed
+rounding semantics of the final division remain open.
 
 ---
 
@@ -318,17 +326,32 @@ former.
 
 **Record both confidence axes.** `AGENTS.md` defines PROVEN (assembly, layout,
 call-site or data-flow evidence) and VERIFIED (checked against a table, fixture or
-controlled observation) as separate labels, and `EVIDENCE_LEDGER.csv` now carries
+controlled observation) as separate labels, and `EVIDENCE_LEDGER.csv` carries
 `confidence` and `confirmed_by_observation` as separate columns. A correct reading
 of a decompiled branch establishes what the code does; it does not establish that
-the shipped game behaves that way in every reachable state. Currently 25 of 26
-ledger claims sit at `confirmed_by_observation = no`, which is accurate and worth
-keeping visible rather than quietly upgrading.
+the shipped game behaves that way in every reachable state. Most ledger claims
+remain at `confirmed_by_observation = no`, which is accurate and worth keeping
+visible rather than quietly upgrading.
 
 **Say when two sources agree.** Cross-source agreement — binary and published
 table, or binary and controlled observation — is the strongest evidence available
 short of an executed vector, and it is currently under-recorded. Cite both source
 IDs when it happens.
+
+**Record the binding scope.** A recovered fact must state where it constrains
+Project EGO:
+
+- `legacy_behavior` — Genesis compatibility execution must reproduce it;
+- `eador_var_import` — the `.var` importer must parse or resolve it;
+- `original_persistence` — it matters only for original-compatible layouts or
+  persistence;
+- `diagnostic_only` — it is true of the executable but does not prescribe engine
+  representation;
+- `unresolved` — the evidence does not yet establish an obligation.
+
+The ledger also carries a one-sentence `engine_obligation`. This prevents
+register layouts, temporary scaling, and fixed source-array sizes from becoming
+accidental universal architecture.
 
 **Preserve rejected alternatives.** When a packet rules something out, the
 rejected hypothesis is worth a line in the ledger. Several open questions exist

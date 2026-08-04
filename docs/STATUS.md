@@ -4,9 +4,9 @@ This is a coverage map, not a release claim.
 
 | subsystem | evidence | Python oracle | GDScript core | parity status |
 |---|---|---|---|---|
-| attack randomisation and chip damage | published tables + binary | implemented with non-legacy stream model | implemented with non-legacy stream model | exact CRT generator/topology recovered; compatibility implementation pending |
+| attack randomisation and chip damage | published tables + binary | implemented with native stream model | native + `LegacyRng` vector-tested | exact CRT generator and adapters implemented in isolation; end-to-end legacy call ordering pending |
 | stamina and wound multipliers | published tables + binary | implemented | implemented | strong |
-| morale attack multiplier | Genesis binary + independent NH table | placeholder/partial | placeholder/partial | full curve and integer truncation recovered; implementation parity pending |
+| morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and truncation point covered; negative-bonus rounding is R5 |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | provider coverage incomplete |
 | activated actions | docs, data, binary dispatcher | implemented | `Action` implemented | effect dictionary incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
@@ -20,7 +20,7 @@ This is a coverage map, not a release claim.
 | battle actions: eight-clause dispatcher | binary | partial | content model only | high-priority extraction |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
 | scenario format and traces | Project EGO design | implemented | implemented | usable |
-| content packs and bindings | data analysis | implemented | implemented | usable |
+| content packs and bindings | data analysis | implemented | canonical IDs implemented | content-ID propagation and battle-instance identity remain incomplete |
 | `.var` lexical parser | binary | tools exist | n/a | record schemas incomplete |
 | unit upkeep/recruitment | binary | not normalized | not implemented | evidence available |
 | province income/economy | binary | not normalized | not implemented | evidence available |
@@ -35,7 +35,7 @@ battle end to end.
 
 The most consequential blockers are:
 
-1. implementation of the recovered shared CRT generator and principal reseed epochs;
+1. end-to-end use of the recovered shared legacy RNG and exact call ordering;
 2. GDScript timed-status/runtime-effect model;
 3. battle-action effect classification;
 4. porting death, revival, transformation and side-transfer semantics;
@@ -44,7 +44,8 @@ The most consequential blockers are:
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11`, R1–R4 packets, and runtime schema version 14.
+`closer_inspection_11`, closed requests R1–R4, active request R5, and runtime
+schema version 14.
 
 When a new checkpoint is produced, update together:
 

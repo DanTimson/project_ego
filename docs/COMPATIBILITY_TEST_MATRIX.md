@@ -11,14 +11,16 @@ Status values:
   or exact PRNG sequence is still required.
 - **NEEDS EXTRACTION** — an existing dispatcher/loader must be classified first.
 - **BLOCKED** — depends on an unresolved open question.
+- **PARTIAL** — an executable subset exists, but some listed assertions or lifecycle integration remain incomplete.
+- **IMPLEMENTED** — an executable deterministic fixture covers the complete row.
 
 | ID | subsystem | test | evidence | expected assertions | status |
 |---|---|---|---|---|---|
-| RNG-LEGACY-001 | RNG | raw MSVC sequence plus bounded helper at 0, 1, 10, 30000, 30001, 300000 and 3000001 | `EXP-R4A-001`, `EXP-R4B-001`, `LEGACY_RNG.md` | exact values, uint32 wrap, modulo bias and CRT call count | READY |
-| RNG-STATE-001 | RNG | seed 0, 1 and 111 raw sequences | `00404B0B`, linked CRT `_rand`, `LEGACY_RNG.md` | seed assignment and first eight 15-bit outputs | READY |
-| RNG-TOPOLOGY-001 | RNG | interleave direct rand, bounded and weighted consumers; call contextual selectors | `EXP-R4A-001`, `EXP-R4B-001` | ordinary consumers advance one shared state; contextual selectors do not advance it | READY |
-| RNG-SEED-001 | RNG | startup, map generation and two consecutive strategic turns | `EXP-R2-001`, `EXP-R4B-001`, `EXP-STRATEGIC-TICK-001` | seeds are time%10000, map seed/default 111, and map_seed+turn | READY for principal epochs |
-| RNG-WEIGHT-001 | RNG | weighted selection and removal by selected value | `00454E80`, `LEGACY_RNG.md` | cumulative interval, duplicate-value removal and exact seeded roll | READY |
+| RNG-LEGACY-001 | RNG | raw MSVC sequence plus bounded helper at 0, 1, 10, 30000, 30001, 300000 and 3000001 | `EXP-R4A-001`, `EXP-R4B-001`, `LEGACY_RNG.md`; `tests/test_legacy_rng.gd` | exact values, uint32 wrap, modulo bias and CRT call count | IMPLEMENTED (isolated fixture) |
+| RNG-STATE-001 | RNG | seed 0, 1 and 111 raw sequences | `00404B0B`, linked CRT `_rand`, `LEGACY_RNG.md`; `tests/test_legacy_rng.gd` | seed assignment and first eight 15-bit outputs | IMPLEMENTED (isolated fixture) |
+| RNG-TOPOLOGY-001 | RNG | interleave direct rand, bounded and weighted consumers; call contextual selectors | `EXP-R4A-001`, `EXP-R4B-001`; `tests/test_legacy_rng.gd` | ordinary stream labels share one state; contextual selectors are non-CRT paths | PARTIAL — shared-state boundary passes; contextual/combat integration pending |
+| RNG-SEED-001 | RNG | startup, map generation and two consecutive strategic turns | `EXP-R2-001`, `EXP-R4B-001`, `EXP-STRATEGIC-TICK-001`; `tests/test_legacy_rng.gd` | seeds are time%10000, map seed/default 111, and map_seed+turn | PARTIAL — map/turn epochs pass; startup/setup/menu/battle wiring incomplete |
+| RNG-WEIGHT-001 | RNG | weighted selection and removal by selected value | `00454E80`, `LEGACY_RNG.md`; `tests/test_legacy_rng.gd` | cumulative interval, duplicate-value removal and exact seeded roll | IMPLEMENTED (isolated fixture) |
 | RNG-WEIGHT-002 | RNG | total weight zero | open question 6b | explicit legacy behaviour | BLOCKED |
 | XP-LEVEL-001 | progression | coefficient 100 thresholds for levels 1..5 | `00432660` | 20, 50, 90, 140, 200; cap 30 | READY |
 | XP-ROUND-001 | progression | compare cumulative and per-term threshold helpers | `00432480`, `00432570`, `00432660` | preserve differing truncation where coefficients expose it | READY |
@@ -28,8 +30,9 @@ Status values:
 | DAMAGE-BASE-001 | damage | raw power 1..20 versus defence gaps 0..11 | `004CEC40` | spread, clamp, exact/one/zero damage branches | READY |
 | STATS-WOUND-001 | stats | life below half maximum | effective stat functions | 50% offensive penalty unless exempting modifier applies | READY |
 | STATS-STAMINA-001 | stats | stamina 0..6 | effective stat functions | −10% per missing point below 6 | READY |
-| STATS-MORALE-001 | stats | morale 0..15 | effective attack stat functions + `DOC-NH-MORALE` | multiplier `0.4 + 0.1*morale` for 0..5, exactly `1.0` for 6..15; both sources agree at every point | READY |
-| STATS-MORALE-002 | stats | high-morale breakpoints and integer application | `EXP-R1-001`; `DOC-NH-MORALE` | band `n` starts at `15 + n(n+1)/2`; +5 percentage points per band; first boundaries 16/18/21; truncate the pre-morale stat before applying the bonus | READY |
+| STATS-MORALE-001 | stats | morale 0..15 | effective attack stat functions + `DOC-NH-MORALE`; `oracle/test_morale_binary.py` | multiplier `0.4 + 0.1*morale` for 0..5, exactly `1.0` for 6..15; settled points and truncation vectors pass | PARTIAL — signed rounding edge isolated as STATS-MORALE-003 |
+| STATS-MORALE-002 | stats | high-morale breakpoints and integer application | `EXP-R1-001`; `DOC-NH-MORALE`; `oracle/test_morale_binary.py` | band `n` starts at `15 + n(n+1)/2`; +5 percentage points per band; first boundaries 16/18/21; truncate the pre-morale stat before applying the bonus | IMPLEMENTED |
+| STATS-MORALE-003 | stats | negative morale bonus with pre-morale attack not divisible by 10 | R5; `EXP-R1-001` decompilation | distinguish truncation toward zero from flooring; base 19 at morale 0 is 8 versus 7 | BLOCKED |
 | MELEE-ORDER-001 | combat | ordinary attack without retaliation | `004DCD90` | secondary effects before channel accounting and life subtraction | READY |
 | MELEE-FIRST-001 | combat | defender modifier `0x10` | `004DCD90` | defender attacks first when all gating conditions pass | READY |
 | MELEE-NORETAL-001 | combat | attacker modifier `0x1A` | `004DCD90` | suppresses both first-strike and ordinary retaliation paths | READY |

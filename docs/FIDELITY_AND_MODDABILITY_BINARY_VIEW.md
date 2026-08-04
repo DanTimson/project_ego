@@ -25,11 +25,14 @@ Therefore broad mod infrastructure should not be added now.
 
 The immediate architecture work is narrower:
 
-1. replace localized display-name identity with stable namespaced identity;
-2. implement the recovered shared legacy RNG behind one injected randomness
-   boundary;
-3. treat the `.var` importer as a first-class, dialect-tolerant mod inlet;
-4. defer other policy interfaces until a real altered rule, new action, or
+1. finish propagating stable namespaced content identity and provenance through
+   build products;
+2. finish integrating the implemented `LegacyRng` through an end-to-end combat
+   path;
+3. separate content-definition identity, battle-instance identity, and display
+   labels in scenarios;
+4. treat the `.var` importer as a first-class, dialect-tolerant mod inlet;
+5. defer other policy interfaces until a real altered rule, new action, or
    persistence case proves that they are needed.
 
 ## 1. Stable identity is the most urgent structural issue
@@ -118,6 +121,51 @@ source_file
 source_record_id
 source_opcode, when applicable
 ```
+
+### Content identity is not battle-instance identity
+
+The canonical-ID work now distinguishes same-named content definitions across
+packs. That identity must not replace every scenario-local name mechanically.
+
+A scenario may contain several instances of one content definition, two
+different definitions with the same display name, or a synthetic test unit with
+no content definition at all. These are separate concepts:
+
+```text
+content_id    stable definition reference, optional for synthetic units
+instance_id   unique command/replay target inside the scenario
+display_name  localized presentation only
+```
+
+A content-backed unit should eventually look conceptually like:
+
+```json
+{
+  "instance_id": "attacker_1",
+  "content_id": "genesis:unit/5",
+  "display_name": "Мечник"
+}
+```
+
+A synthetic fixture may omit `content_id`:
+
+```json
+{
+  "instance_id": "wounded_attacker",
+  "display_name": "Мечник",
+  "attack": 8
+}
+```
+
+Commands and trace references should target `instance_id`. Replacing a
+scenario's local `name` field directly with `content_id` would conflate
+definition identity with instance identity and would still fail when two
+instances share one definition.
+
+The current canonical IDs and ambiguous-name rejection are therefore a partial
+migration. The remaining work is to preserve `content_id` and provenance through
+the roster build result, and to introduce explicit scenario instance identity
+when that format is next revised.
 
 ## 2. The `.var` importer is a primary mod inlet
 
@@ -233,9 +281,9 @@ Each important claim should also include a one-sentence `engine_obligation`.
 | `_holdrand` resides at CRT thread-data offset `+0x14` | `diagnostic_only` | emulate the sequence, not the physical CRT structure |
 | Ghidra local/register names | `diagnostic_only` | none |
 
-The evidence ledger can adopt `binding_scope` and `engine_obligation` when it is
-next revised. This architecture note does not require an immediate ledger
-migration.
+`EVIDENCE_LEDGER.csv` now records `binding_scope` and
+`engine_obligation` for every claim. Future evidence updates should populate
+both fields at the moment the claim is added.
 
 ## 5. Empirical extension probe
 
@@ -278,28 +326,35 @@ first committed format.
 
 ## 7. Priority order
 
-1. **Identity migration**
-   - establish stable pack IDs;
-   - generate canonical object IDs from `.var` record IDs;
-   - add provenance;
-   - migrate fixtures and scenario artifacts away from display-name references;
-   - retain scoped name lookup only as a migration helper.
+1. **Complete identity propagation**
+   - preserve canonical `content_id` and source provenance through roster build
+     products;
+   - retain scoped name lookup only as a migration helper;
+   - do not replace battle-local identifiers with content IDs.
 
-2. **Legacy RNG**
-   - implement and test `LegacyRng` from `LEGACY_RNG.md`;
-   - inject it through one randomness boundary;
-   - preserve one shared compatibility instance and recovered reseed epochs.
+2. **Complete Legacy RNG integration**
+   - the generator, bounded adapter, weighted selection, vectors, snapshots, and
+     principal reseed helpers are implemented;
+   - route one end-to-end combat/scenario path through the shared compatibility
+     instance;
+   - verify that rule call sites accept the common randomness boundary rather
+     than a concrete native RNG type.
 
-3. **Importer dialect regression**
+3. **Introduce battle-instance identity when scenario format changes**
+   - `instance_id` for commands and traces;
+   - optional `content_id` for content-backed units;
+   - `display_name` for presentation only.
+
+4. **Importer dialect regression**
    - maintain paired Genesis/New Horizons tests;
    - add targeted fixtures for known schema differences and reference namespaces.
 
-4. **Empirical extension probe**
+5. **Empirical extension probe**
    - one altered rule;
    - one new action;
    - one ID-based save/load round trip.
 
-5. **Add only abstractions demanded by the probe.**
+6. **Add only abstractions demanded by the probe.**
 
 ## Working decision rule
 
