@@ -34,14 +34,37 @@ static func band(morale: int) -> int:
 		n += 1
 	return n
 
-## Returns [multiplier: float, note: String].
-static func modifier(u: Combatant) -> Array:
+## Morale as the INTEGER percentage the binary actually applies.
+##
+## The executable does not multiply by a float. After the wound and stamina
+## steps it converts the internal x100 value back to an integer and then adds a
+## whole-percent bonus:
+##
+##     pre_morale = scaled_attack / 100
+##     result     = pre_morale + bonus_percent * pre_morale / 100
+##
+## Both divisions truncate toward zero. docs/FORMULAS.md §1.4 (EXP-R1-001).
+##
+## Returns [percent: int, note: String].
+static func percent(u: Combatant) -> Array:
 	if u.has_flag(&"Боевое безумие"):
-		return [1.0, "morale effects suppressed"]
+		return [0, "morale effects suppressed"]
 	var m: int = u.morale
 	if m <= 5:
-		# m == 0 -> 0.4 and the unit panics; negative morale is unobserved.
-		return [0.4 + 0.1 * float(max(m, 0)), "morale %d" % m]
+		# -10 percentage points per point of morale missing below 6.
+		return [-10 * (6 - max(m, 0)), "morale %d" % m]
 	if m <= 15:
-		return [1.0, ""]
-	return [1.0 + 0.05 * float(band(m)), "morale %d" % m]
+		return [0, ""]
+	return [5 * band(m), "morale %d" % m]
+
+## The documented multiplier view of the same curve.
+##
+## Kept for the published-table fixtures and for tracing. The attack pipeline
+## uses percent() instead, because a float multiplier cannot reproduce the
+## binary: 1.15 is not exactly representable, so 100 * 1.15 truncates to 114
+## where the executable returns 115.
+##
+## Returns [multiplier: float, note: String].
+static func modifier(u: Combatant) -> Array:
+	var r: Array = percent(u)
+	return [1.0 + float(r[0]) / 100.0, r[1]]

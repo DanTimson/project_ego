@@ -74,6 +74,21 @@ func _init() -> void:
 		var got: float = Morale.modifier(u)[0]
 		_check(absf(got - float(case["expected"])) < EPS,
 			"morale: %d" % int(case["morale"]), "got %.4f" % got)
+	# Whole-stat vectors: these catch the integer truncation that a float
+	# multiplier cannot express (100 * 1.15 == 114.999... -> 114, binary 115).
+	for case in fx["morale_attack"]:
+		var u := Combatant.new()
+		var base: int = int(case["base"])
+		u.attack = base
+		u.counter_attack = base
+		u.ranged_attack = base
+		u.morale = int(case["morale"])
+		u.morale_base = 999
+		var res: Array = Damage.current_attack(u, int(case["kind"]) as Combatant.AttackKind)
+		var got: int = int(res[0])
+		_check(got == int(case["expected"]),
+			"morale attack: base %d morale %d kind %d" % [base, int(case["morale"]), int(case["kind"])],
+			"got %d want %d" % [got, int(case["expected"])])
 
 	print("\n[4] attack roll sequences (requires test_rng.gd to pass first)")
 	for case in fx["roll_attack"]:

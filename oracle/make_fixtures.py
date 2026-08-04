@@ -79,6 +79,7 @@ out = {
     "attack_value": [],
     "defence_value": [],
     "multipliers": {"wound": [], "stamina": [], "morale": []},
+    "morale_attack": [],
     "roll_attack": [],
     "resolve": [],
 }
@@ -115,6 +116,22 @@ for mo in (0, 1, 2, 3, 4, 5, 6, 10, 15, 16, 17, 18, 20, 21, 24, 25, 29, 30, 35,
     c = make(morale=mo, morale_base=10)
     out["multipliers"]["morale"].append({"morale": mo, "morale_base": 10,
                                          "expected": round(combat.morale_mod(c)[0], 6)})
+
+# Whole-stat vectors through current_attack(). These are the ones that catch the
+# integer truncation: the binary applies morale as a whole-percent bonus to an
+# integer, so a float multiplier diverges (100 * 1.15 == 114.999... -> 114 where
+# the executable returns 115). Bases are chosen so the percentage lands just
+# under, just over, and exactly on an integer boundary.
+for base in (7, 19, 20, 100):
+    for mo in (0, 3, 5, 15, 16, 18, 21, 25, 30, 43, 51, 60):
+        c = make(attack=base, counter_attack=base, ranged_attack=base,
+                 morale=mo, morale_base=999)
+        for kind in ("melee", "counter", "ranged"):
+            v, _ = combat.current_attack(c, KIND[kind])
+            out["morale_attack"].append({
+                "base": base, "morale": mo, "kind": KIND_ORD[kind],
+                "expected": int(v),
+            })
 
 # RNG-dependent: exact sequences given a fixed seed
 for attack in (1, 3, 5, 8, 13, 37):

@@ -153,6 +153,14 @@ For positive offensive stats, division truncates downward. Thus base 19 at
 morale 16 still returns 19, while base 20 returns 21. Preserve this truncation
 point. Implementation and executable fixtures are maintained by the engine side.
 
+**Unresolved: the direction below morale 6.** The evidence above covers positive
+bonuses only, where truncation toward zero and flooring coincide. Below morale 6
+the bonus is negative and the two diverge by one point. The implementation uses C
+semantics — truncation toward zero, `19 at morale 0 -> 8`, not `7` — because the
+original is a C++ binary and its integer division truncates toward zero. That is
+an inference from the language, not from a read branch. Six of the forty-eight
+committed morale vectors sit on this divergence. See `OPEN_QUESTIONS` item 17.
+
 Carve-out: morale multiplies only direct attack bonuses, not conditional damage
 such as «Сокрушение зла» — see §1.1.
 

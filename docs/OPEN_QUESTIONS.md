@@ -74,6 +74,7 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 | R2 | `item.var`, `medal.var`, and `spell.var` `Effects` store direct effect/modifier opcodes in the namespace described by `ability_num.Number`; they do not store `unit_upg` record indexes. `unit.var Abilityes` remains the contrasting index-based path. | `EXP-R2-001`, `DATA-VAR-FULL-20260804`; consumers `004A1F90`, `00432950`, and the battle-action dispatcher. |
 | 1 | Genesis uses triangularly widening high-morale offensive bands beginning at 16, 18, 21, 25, 30, 36, 43 and 51, with +5 percentage points per band. Attack, counterattack and ranged attack use the same integer branch. Fixed 5-point and fixed 2-point bands are rejected. | `EXP-R1-001`: `004D1890`, `004D1660`, `004D14A0`; independently agrees with `DOC-NH-MORALE`. Implementation fixture remains owned by the engine side. |
 | 2, partial | Tactical field is an 8×8 odd-row offset hex grid; each side has 37 unit slots; six-neighbour adjacency is recovered. | `004CE9E0`, formation/deployment consumers, `eador_runtime.h`. |
+| 17 | **Rounding direction of the negative morale bonus.** | The morale step applies `pre + bonus_percent * pre / 100` as C integer division. For positive bonuses truncation toward zero and flooring coincide, and the recovered evidence covers only that case. Below morale 6 the bonus is negative and the two differ by one point (base 19 at morale 0 gives 8 truncating, 7 flooring). The implementation assumes C truncation toward zero, inferred from the language rather than read from the branch. | Read the divide/negate sequence in the effective-attack morale branch for a negative bonus, or take one controlled observation of a unit at morale 0 with a base attack not divisible by 10. |
 | 3 | Army-level initiative: higher leader value starts; ties go to attacker. | data/documentation and current tests. |
 | 3b | Within-side unit selection is free and re-entrant. | observation and AI/UI consumers. |
 | 5 | Level-up candidate collection, prerequisite filtering, weighting and selected-value removal order are recovered. | `00432B60`, `00454E80`. |
@@ -82,3 +83,5 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 | C3 | Ordinary ranged execution and damage channels. | `004D7050`, `004D61E0`. |
 | C4 | Runtime modifier-node layout and head insertion. | `004CEC00`, `eador_runtime.h`. |
 | C5 | Unit level cap and 30 selected-upgrade slots. | `00432660`, `00433130`, `eador_runtime.h`. |
+
+Architectural obligations for these items — whether a recovered fact must be reproduced, imported, or merely recorded — are tracked by binding scope. The engine side's standing position is in `POSITION_ENGINE.md`.

@@ -96,9 +96,12 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 			t.steps.append(step)
 		value = float(passive[0])
 
+	# Stamina and wound act inside the x100 scaled domain; morale is applied
+	# LAST, on an integer, as a whole-percent bonus. The order is the binary's,
+	# not a rearrangement of the documented product: with truncation between the
+	# steps the order is observable. docs/FORMULAS.md §1.4.
 	for entry in [
 		["StaminaMod", Stamina.modifier(u)],
-		["MoraleMod", Morale.modifier(u)],
 		["WoundMod", Wounds.modifier(u)],
 	]:
 		var label: String = entry[0]
@@ -108,6 +111,16 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 			var nv: float = value * m
 			t.step("%s x%.2f" % [label, m], value, nv, note)
 			value = nv
+
+	var mor: Array = Morale.percent(u)
+	var pct: int = mor[0]
+	var mnote: String = mor[1]
+	if pct != 0 or mnote != "":
+		# int() truncates toward zero in GDScript, matching C.
+		var pre: int = int(value)
+		var nv: float = float(pre + int(float(pct * pre) / 100.0))
+		t.step("MoraleMod %+d%%" % pct, value, nv, mnote)
+		value = nv
 
 	t.result = value
 	return [value, t]

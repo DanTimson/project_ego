@@ -273,6 +273,47 @@ the engine-agent handoff are in `LEGACY_RNG.md`.
 
 ---
 
+## R5 — OPEN: rounding direction of the *negative* morale bonus
+
+**Closes:** `OPEN_QUESTIONS` item 17
+**Ledger:** extends MORALE-001 / EXP-R1-001
+**Cost:** small — one branch, or one controlled observation
+
+**Question.** In the effective-attack morale step, when `bonus_percent` is
+negative, does the division truncate toward zero or floor toward negative
+infinity?
+
+**Why it was not covered by R1.** The R1 packet resolved the multiplier curve and
+the truncation *point*, and its vectors are all positive bonuses, where the two
+roundings coincide. Below morale 6 the bonus is negative and they diverge by
+exactly one point. The implementation now applies
+
+```text
+result = pre + bonus_percent * pre / 100
+```
+
+as C integer division truncating toward zero, so base 19 at morale 0 returns 8.
+Flooring returns 7. This is an inference from the source language, not something
+read from a branch — it is the one remaining assumption in an otherwise closed
+formula.
+
+**Scope.** Six of the forty-eight committed morale vectors sit on the divergence:
+bases 7 and 19 at morale 0, 3 and 5. Every other vector is insensitive to the
+answer.
+
+**Minimum sufficient answer.** Either the divide/negate sequence for a negative
+bonus in one of the three effective-attack functions, or a single controlled
+observation: a unit at morale 0 whose base attack is not divisible by 10, read
+off the battle panel. The observation is probably cheaper than the branch, and it
+would also be the first entry in the ledger with
+`confirmed_by_observation = yes`.
+
+**Secondary.** Whether the sub-6 penalty is genuinely the same percentage path,
+or a separate branch with its own arithmetic. The implementation assumes the
+former.
+
+---
+
 ## Reporting conventions requested
 
 **Record both confidence axes.** `AGENTS.md` defines PROVEN (assembly, layout,

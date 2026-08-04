@@ -422,6 +422,872 @@
    }
   ]
  },
+ "morale_attack": [
+  {
+   "base": 7,
+   "morale": 0,
+   "kind": 0,
+   "expected": 3
+  },
+  {
+   "base": 7,
+   "morale": 0,
+   "kind": 1,
+   "expected": 3
+  },
+  {
+   "base": 7,
+   "morale": 0,
+   "kind": 2,
+   "expected": 3
+  },
+  {
+   "base": 7,
+   "morale": 3,
+   "kind": 0,
+   "expected": 5
+  },
+  {
+   "base": 7,
+   "morale": 3,
+   "kind": 1,
+   "expected": 5
+  },
+  {
+   "base": 7,
+   "morale": 3,
+   "kind": 2,
+   "expected": 5
+  },
+  {
+   "base": 7,
+   "morale": 5,
+   "kind": 0,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 5,
+   "kind": 1,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 5,
+   "kind": 2,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 15,
+   "kind": 0,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 15,
+   "kind": 1,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 15,
+   "kind": 2,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 16,
+   "kind": 0,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 16,
+   "kind": 1,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 16,
+   "kind": 2,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 18,
+   "kind": 0,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 18,
+   "kind": 1,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 18,
+   "kind": 2,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "morale": 21,
+   "kind": 0,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 21,
+   "kind": 1,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 21,
+   "kind": 2,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 25,
+   "kind": 0,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 25,
+   "kind": 1,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 25,
+   "kind": 2,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 30,
+   "kind": 0,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 30,
+   "kind": 1,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 30,
+   "kind": 2,
+   "expected": 8
+  },
+  {
+   "base": 7,
+   "morale": 43,
+   "kind": 0,
+   "expected": 9
+  },
+  {
+   "base": 7,
+   "morale": 43,
+   "kind": 1,
+   "expected": 9
+  },
+  {
+   "base": 7,
+   "morale": 43,
+   "kind": 2,
+   "expected": 9
+  },
+  {
+   "base": 7,
+   "morale": 51,
+   "kind": 0,
+   "expected": 9
+  },
+  {
+   "base": 7,
+   "morale": 51,
+   "kind": 1,
+   "expected": 9
+  },
+  {
+   "base": 7,
+   "morale": 51,
+   "kind": 2,
+   "expected": 9
+  },
+  {
+   "base": 7,
+   "morale": 60,
+   "kind": 0,
+   "expected": 10
+  },
+  {
+   "base": 7,
+   "morale": 60,
+   "kind": 1,
+   "expected": 10
+  },
+  {
+   "base": 7,
+   "morale": 60,
+   "kind": 2,
+   "expected": 10
+  },
+  {
+   "base": 19,
+   "morale": 0,
+   "kind": 0,
+   "expected": 8
+  },
+  {
+   "base": 19,
+   "morale": 0,
+   "kind": 1,
+   "expected": 8
+  },
+  {
+   "base": 19,
+   "morale": 0,
+   "kind": 2,
+   "expected": 8
+  },
+  {
+   "base": 19,
+   "morale": 3,
+   "kind": 0,
+   "expected": 14
+  },
+  {
+   "base": 19,
+   "morale": 3,
+   "kind": 1,
+   "expected": 14
+  },
+  {
+   "base": 19,
+   "morale": 3,
+   "kind": 2,
+   "expected": 14
+  },
+  {
+   "base": 19,
+   "morale": 5,
+   "kind": 0,
+   "expected": 18
+  },
+  {
+   "base": 19,
+   "morale": 5,
+   "kind": 1,
+   "expected": 18
+  },
+  {
+   "base": 19,
+   "morale": 5,
+   "kind": 2,
+   "expected": 18
+  },
+  {
+   "base": 19,
+   "morale": 15,
+   "kind": 0,
+   "expected": 19
+  },
+  {
+   "base": 19,
+   "morale": 15,
+   "kind": 1,
+   "expected": 19
+  },
+  {
+   "base": 19,
+   "morale": 15,
+   "kind": 2,
+   "expected": 19
+  },
+  {
+   "base": 19,
+   "morale": 16,
+   "kind": 0,
+   "expected": 19
+  },
+  {
+   "base": 19,
+   "morale": 16,
+   "kind": 1,
+   "expected": 19
+  },
+  {
+   "base": 19,
+   "morale": 16,
+   "kind": 2,
+   "expected": 19
+  },
+  {
+   "base": 19,
+   "morale": 18,
+   "kind": 0,
+   "expected": 20
+  },
+  {
+   "base": 19,
+   "morale": 18,
+   "kind": 1,
+   "expected": 20
+  },
+  {
+   "base": 19,
+   "morale": 18,
+   "kind": 2,
+   "expected": 20
+  },
+  {
+   "base": 19,
+   "morale": 21,
+   "kind": 0,
+   "expected": 21
+  },
+  {
+   "base": 19,
+   "morale": 21,
+   "kind": 1,
+   "expected": 21
+  },
+  {
+   "base": 19,
+   "morale": 21,
+   "kind": 2,
+   "expected": 21
+  },
+  {
+   "base": 19,
+   "morale": 25,
+   "kind": 0,
+   "expected": 22
+  },
+  {
+   "base": 19,
+   "morale": 25,
+   "kind": 1,
+   "expected": 22
+  },
+  {
+   "base": 19,
+   "morale": 25,
+   "kind": 2,
+   "expected": 22
+  },
+  {
+   "base": 19,
+   "morale": 30,
+   "kind": 0,
+   "expected": 23
+  },
+  {
+   "base": 19,
+   "morale": 30,
+   "kind": 1,
+   "expected": 23
+  },
+  {
+   "base": 19,
+   "morale": 30,
+   "kind": 2,
+   "expected": 23
+  },
+  {
+   "base": 19,
+   "morale": 43,
+   "kind": 0,
+   "expected": 25
+  },
+  {
+   "base": 19,
+   "morale": 43,
+   "kind": 1,
+   "expected": 25
+  },
+  {
+   "base": 19,
+   "morale": 43,
+   "kind": 2,
+   "expected": 25
+  },
+  {
+   "base": 19,
+   "morale": 51,
+   "kind": 0,
+   "expected": 26
+  },
+  {
+   "base": 19,
+   "morale": 51,
+   "kind": 1,
+   "expected": 26
+  },
+  {
+   "base": 19,
+   "morale": 51,
+   "kind": 2,
+   "expected": 26
+  },
+  {
+   "base": 19,
+   "morale": 60,
+   "kind": 0,
+   "expected": 27
+  },
+  {
+   "base": 19,
+   "morale": 60,
+   "kind": 1,
+   "expected": 27
+  },
+  {
+   "base": 19,
+   "morale": 60,
+   "kind": 2,
+   "expected": 27
+  },
+  {
+   "base": 20,
+   "morale": 0,
+   "kind": 0,
+   "expected": 8
+  },
+  {
+   "base": 20,
+   "morale": 0,
+   "kind": 1,
+   "expected": 8
+  },
+  {
+   "base": 20,
+   "morale": 0,
+   "kind": 2,
+   "expected": 8
+  },
+  {
+   "base": 20,
+   "morale": 3,
+   "kind": 0,
+   "expected": 14
+  },
+  {
+   "base": 20,
+   "morale": 3,
+   "kind": 1,
+   "expected": 14
+  },
+  {
+   "base": 20,
+   "morale": 3,
+   "kind": 2,
+   "expected": 14
+  },
+  {
+   "base": 20,
+   "morale": 5,
+   "kind": 0,
+   "expected": 18
+  },
+  {
+   "base": 20,
+   "morale": 5,
+   "kind": 1,
+   "expected": 18
+  },
+  {
+   "base": 20,
+   "morale": 5,
+   "kind": 2,
+   "expected": 18
+  },
+  {
+   "base": 20,
+   "morale": 15,
+   "kind": 0,
+   "expected": 20
+  },
+  {
+   "base": 20,
+   "morale": 15,
+   "kind": 1,
+   "expected": 20
+  },
+  {
+   "base": 20,
+   "morale": 15,
+   "kind": 2,
+   "expected": 20
+  },
+  {
+   "base": 20,
+   "morale": 16,
+   "kind": 0,
+   "expected": 21
+  },
+  {
+   "base": 20,
+   "morale": 16,
+   "kind": 1,
+   "expected": 21
+  },
+  {
+   "base": 20,
+   "morale": 16,
+   "kind": 2,
+   "expected": 21
+  },
+  {
+   "base": 20,
+   "morale": 18,
+   "kind": 0,
+   "expected": 22
+  },
+  {
+   "base": 20,
+   "morale": 18,
+   "kind": 1,
+   "expected": 22
+  },
+  {
+   "base": 20,
+   "morale": 18,
+   "kind": 2,
+   "expected": 22
+  },
+  {
+   "base": 20,
+   "morale": 21,
+   "kind": 0,
+   "expected": 23
+  },
+  {
+   "base": 20,
+   "morale": 21,
+   "kind": 1,
+   "expected": 23
+  },
+  {
+   "base": 20,
+   "morale": 21,
+   "kind": 2,
+   "expected": 23
+  },
+  {
+   "base": 20,
+   "morale": 25,
+   "kind": 0,
+   "expected": 24
+  },
+  {
+   "base": 20,
+   "morale": 25,
+   "kind": 1,
+   "expected": 24
+  },
+  {
+   "base": 20,
+   "morale": 25,
+   "kind": 2,
+   "expected": 24
+  },
+  {
+   "base": 20,
+   "morale": 30,
+   "kind": 0,
+   "expected": 25
+  },
+  {
+   "base": 20,
+   "morale": 30,
+   "kind": 1,
+   "expected": 25
+  },
+  {
+   "base": 20,
+   "morale": 30,
+   "kind": 2,
+   "expected": 25
+  },
+  {
+   "base": 20,
+   "morale": 43,
+   "kind": 0,
+   "expected": 27
+  },
+  {
+   "base": 20,
+   "morale": 43,
+   "kind": 1,
+   "expected": 27
+  },
+  {
+   "base": 20,
+   "morale": 43,
+   "kind": 2,
+   "expected": 27
+  },
+  {
+   "base": 20,
+   "morale": 51,
+   "kind": 0,
+   "expected": 28
+  },
+  {
+   "base": 20,
+   "morale": 51,
+   "kind": 1,
+   "expected": 28
+  },
+  {
+   "base": 20,
+   "morale": 51,
+   "kind": 2,
+   "expected": 28
+  },
+  {
+   "base": 20,
+   "morale": 60,
+   "kind": 0,
+   "expected": 29
+  },
+  {
+   "base": 20,
+   "morale": 60,
+   "kind": 1,
+   "expected": 29
+  },
+  {
+   "base": 20,
+   "morale": 60,
+   "kind": 2,
+   "expected": 29
+  },
+  {
+   "base": 100,
+   "morale": 0,
+   "kind": 0,
+   "expected": 40
+  },
+  {
+   "base": 100,
+   "morale": 0,
+   "kind": 1,
+   "expected": 40
+  },
+  {
+   "base": 100,
+   "morale": 0,
+   "kind": 2,
+   "expected": 40
+  },
+  {
+   "base": 100,
+   "morale": 3,
+   "kind": 0,
+   "expected": 70
+  },
+  {
+   "base": 100,
+   "morale": 3,
+   "kind": 1,
+   "expected": 70
+  },
+  {
+   "base": 100,
+   "morale": 3,
+   "kind": 2,
+   "expected": 70
+  },
+  {
+   "base": 100,
+   "morale": 5,
+   "kind": 0,
+   "expected": 90
+  },
+  {
+   "base": 100,
+   "morale": 5,
+   "kind": 1,
+   "expected": 90
+  },
+  {
+   "base": 100,
+   "morale": 5,
+   "kind": 2,
+   "expected": 90
+  },
+  {
+   "base": 100,
+   "morale": 15,
+   "kind": 0,
+   "expected": 100
+  },
+  {
+   "base": 100,
+   "morale": 15,
+   "kind": 1,
+   "expected": 100
+  },
+  {
+   "base": 100,
+   "morale": 15,
+   "kind": 2,
+   "expected": 100
+  },
+  {
+   "base": 100,
+   "morale": 16,
+   "kind": 0,
+   "expected": 105
+  },
+  {
+   "base": 100,
+   "morale": 16,
+   "kind": 1,
+   "expected": 105
+  },
+  {
+   "base": 100,
+   "morale": 16,
+   "kind": 2,
+   "expected": 105
+  },
+  {
+   "base": 100,
+   "morale": 18,
+   "kind": 0,
+   "expected": 110
+  },
+  {
+   "base": 100,
+   "morale": 18,
+   "kind": 1,
+   "expected": 110
+  },
+  {
+   "base": 100,
+   "morale": 18,
+   "kind": 2,
+   "expected": 110
+  },
+  {
+   "base": 100,
+   "morale": 21,
+   "kind": 0,
+   "expected": 115
+  },
+  {
+   "base": 100,
+   "morale": 21,
+   "kind": 1,
+   "expected": 115
+  },
+  {
+   "base": 100,
+   "morale": 21,
+   "kind": 2,
+   "expected": 115
+  },
+  {
+   "base": 100,
+   "morale": 25,
+   "kind": 0,
+   "expected": 120
+  },
+  {
+   "base": 100,
+   "morale": 25,
+   "kind": 1,
+   "expected": 120
+  },
+  {
+   "base": 100,
+   "morale": 25,
+   "kind": 2,
+   "expected": 120
+  },
+  {
+   "base": 100,
+   "morale": 30,
+   "kind": 0,
+   "expected": 125
+  },
+  {
+   "base": 100,
+   "morale": 30,
+   "kind": 1,
+   "expected": 125
+  },
+  {
+   "base": 100,
+   "morale": 30,
+   "kind": 2,
+   "expected": 125
+  },
+  {
+   "base": 100,
+   "morale": 43,
+   "kind": 0,
+   "expected": 135
+  },
+  {
+   "base": 100,
+   "morale": 43,
+   "kind": 1,
+   "expected": 135
+  },
+  {
+   "base": 100,
+   "morale": 43,
+   "kind": 2,
+   "expected": 135
+  },
+  {
+   "base": 100,
+   "morale": 51,
+   "kind": 0,
+   "expected": 140
+  },
+  {
+   "base": 100,
+   "morale": 51,
+   "kind": 1,
+   "expected": 140
+  },
+  {
+   "base": 100,
+   "morale": 51,
+   "kind": 2,
+   "expected": 140
+  },
+  {
+   "base": 100,
+   "morale": 60,
+   "kind": 0,
+   "expected": 145
+  },
+  {
+   "base": 100,
+   "morale": 60,
+   "kind": 1,
+   "expected": 145
+  },
+  {
+   "base": 100,
+   "morale": 60,
+   "kind": 2,
+   "expected": 145
+  }
+ ],
  "roll_attack": [
   {
    "attack": 1,

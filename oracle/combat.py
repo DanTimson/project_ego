@@ -319,6 +319,13 @@ def stamina_mod(u: Combatant) -> tuple[float, str]:
 # with a float sqrt, so this and the GDScript port agree bit for bit.
 
 
+def _trunc(x: float) -> int:
+    """C integer division truncates toward zero, not toward negative infinity.
+    Python's // floors, which diverges for the negative bonuses below morale 6.
+    """
+    return int(x)
+
+
 def morale_band(morale: int) -> int:
     """Band index n for morale >= 16; multiplier is 1.0 + 0.05 * n."""
     n = 1
@@ -327,16 +334,40 @@ def morale_band(morale: int) -> int:
     return n
 
 
-def morale_mod(u: Combatant) -> tuple[float, str]:
+def morale_percent(u: Combatant) -> tuple[int, str]:
+    """Morale as the INTEGER percentage the binary actually applies.
+
+    The executable does not multiply by a float. After the wound and stamina
+    steps it converts the internal x100 value back to an integer and then adds
+    a whole-percent bonus:
+
+        pre_morale = scaled_attack / 100
+        result     = pre_morale + bonus_percent * pre_morale / 100
+
+    Both divisions are C integer divisions, truncating toward zero.
+    See docs/FORMULAS.md 1.4 (source EXP-R1-001).
+    """
     if u.has_flag("Боевое безумие"):
-        return 1.0, "morale effects suppressed"
+        return 0, "morale effects suppressed"
     m = u.morale
     if m <= 5:
-        # m == 0 -> 0.4 and the unit panics; negative morale is unobserved.
-        return 0.4 + 0.1 * max(m, 0), f"morale {m}"
+        # -10 percentage points per point of morale missing below 6.
+        return -10 * (6 - max(m, 0)), f"morale {m}"
     if m <= 15:
-        return 1.0, ""
-    return 1.0 + 0.05 * morale_band(m), f"morale {m}"
+        return 0, ""
+    return 5 * morale_band(m), f"morale {m}"
+
+
+def morale_mod(u: Combatant) -> tuple[float, str]:
+    """The documented multiplier view of the same curve.
+
+    Kept for the published-table fixtures and for tracing. The attack pipeline
+    uses morale_percent() instead, because a float multiplier cannot reproduce
+    the binary: 1.15 is not exactly representable, so 100 * 1.15 truncates to
+    114 where the executable returns 115.
+    """
+    pct, note = morale_percent(u)
+    return 1.0 + pct / 100.0, note
 
 
 # ---------------------------------------------------------------------------
@@ -429,14 +460,24 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
             t.steps.append(step)
         value = nv
 
+    # Stamina and wound act inside the x100 scaled domain; morale is applied
+    # LAST, on an integer, as a whole-percent bonus. The order is the binary's,
+    # not a rearrangement of the documented product: with truncation between
+    # the steps the order is observable. docs/FORMULAS.md 1.4.
     for label, fn in (("StaminaMod", stamina_mod),
-                      ("MoraleMod", morale_mod),
                       ("WoundMod", wound_mod)):
         m, note = fn(u)
         if m != 1.0 or note:
             nv = value * m
             t.step(f"{label} x{m:.2f}", value, nv, note)
             value = nv
+
+    pct, note = morale_percent(u)
+    if pct or note:
+        pre = _trunc(value)
+        nv = float(pre + _trunc(pct * pre / 100))
+        t.step(f"MoraleMod {pct:+d}%", value, nv, note)
+        value = nv
 
     t.result = value
     return value, t
