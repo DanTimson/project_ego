@@ -473,7 +473,19 @@ First-strike conditions strongly support:
 0x26  offensive disable
 ```
 
-Modifier `0x25` provides a distance/charge damage bonus.
+Modifier `0x25` provides the charge damage bonus. `004DCD90` first compares the
+requested destination with the attacker's current coordinates. When movement is
+required, it reads the attacker's and target's current `+0x44/+0x48` coordinates
+and computes:
+
+```text
+max(abs(attacker_x-target_x) + abs(attacker_y-target_y) - 2, 0)
+```
+
+It stores that value before calling `move_battle_unit_candidate` with the
+requested destination. This is command-entry target separation, not cumulative
+movement history or destination displacement. A no-movement attack leaves the
+bonus at zero.
 
 ### 10.3 Primary hit ordering
 

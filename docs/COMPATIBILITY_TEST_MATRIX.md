@@ -30,8 +30,8 @@ Status values:
 | MELEE-ORDER-001 | combat | ordinary attack without retaliation | `004DCD90` | secondary effects before channel accounting and life subtraction | READY |
 | MELEE-FIRST-001 | combat | defender modifier `0x10` | `004DCD90` | defender attacks first when all gating conditions pass | READY |
 | MELEE-NORETAL-001 | combat | attacker modifier `0x1A` | `004DCD90` | suppresses both first-strike and ordinary retaliation paths | READY |
-| CHARGE-001 | combat | modifier `0x25` at coordinate distances | `004DCD90` | `max(abs(dx)+abs(dy)-2,0)` contribution | READY for binary rule |
-| CHARGE-002 | combat | compare coordinate rule with cumulative movement observation | open question 10 | identify build/context difference | BLOCKED |
+| CHARGE-001 | combat | modifier `0x25` with and without command movement | `EXP-CI11`, `004DCD90` | when movement is requested, compute `max(abs(current_attacker_x-target_x)+abs(current_attacker_y-target_y)-2,0)` before moving; no-movement attack leaves zero | READY |
+| CHARGE-002 | combat | split activation, earlier movement and backtracking | `EXP-CI11`, `004DCD90` | recompute from the tile occupied when the attack command starts; prior path length is not accumulated; cumulative `steps_this_round` is non-legacy | READY |
 | RANGED-EXEC-001 | combat | one and two shots | `004D7050` | cap by ammo, one ammo per shot, break on kill | READY |
 | RANGED-STAMINA-001 | combat | no prior expenditure versus prior expenditure | `004D7050` | base stamina cost 1 versus 2; modifier `0x12` blocks | READY |
 | RANGED-SPECIAL-001 | combat | modifiers `0x2E` and `0x2F` | `004D7050` | ordinary damage replaced by disabling runtime packages | READY |

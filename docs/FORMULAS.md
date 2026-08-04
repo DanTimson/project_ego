@@ -312,18 +312,41 @@ Current Project EGO state:
   issued;
 - start-of-turn effects currently fire once per round.
 
-Binary compatibility warning:
+Genesis compatibility rule:
 
-`[BIN:004DCD90]` Modifier `0x25`, the charge/distance-damage candidate, computes
+`[BIN:004DCD90]` Modifier `0x25` (`Charge / Атака с разгона`) is calculated
+before the current attack command's approach movement:
 
 ```text
-max(abs(attacker_x - target_x) + abs(attacker_y - target_y) - 2, 0)
+movement_requested =
+    destination_x != attacker.current_x
+    or destination_y != attacker.current_y
+
+charge_bonus =
+    movement_requested and attacker has modifier 0x25
+    ? max(
+          abs(attacker.current_x - target.current_x)
+        + abs(attacker.current_y - target.current_y)
+        - 2,
+          0
+      )
+    : 0
 ```
 
-before the movement helper is called. That is not the same as reading cumulative
-`steps_this_round`. The observation, current implementation and inspected
-binary must be reconciled before either rule is called canonical. See
-`OPEN_QUESTIONS` items 10, 12 and 14.
+The movement helper is called only after this value is stored. The formula
+therefore uses the tile occupied when the attack command begins, not cumulative
+path length and not the displacement to the selected destination.
+
+Consequences:
+
+- earlier movement affects charge only by changing the unit's current tile;
+- yielding and reselecting does not preserve a separate accumulated distance;
+- moving away and back cannot farm a larger Genesis bonus;
+- a cumulative `steps_this_round` rule is a Project EGO-native alternative, not
+  an exact legacy rule.
+
+This does not settle the separate stamina-cost question in `OPEN_QUESTIONS`
+item 12 or the `Удар и возврат` anchor in item 13.
 
 ---
 

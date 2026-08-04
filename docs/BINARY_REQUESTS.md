@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R3. R1 was closed by `EXP-R1-001`; R2 was closed by `EXP-R2-001` and `DATA-VAR-FULL-20260804`.
+**Current active request:** R4. R1 was closed by `EXP-R1-001`; R2 by `EXP-R2-001` and `DATA-VAR-FULL-20260804`; R3 by `EXP-CI11`.
 
 ---
 
@@ -157,10 +157,54 @@ carry `Effects`, CP1251-decoded, alongside the resolving code.
 
 ---
 
-## R3 — Charge distance: two rules that cannot both be exact
+## R3 — CLOSED: charge uses command-entry coordinates, not accumulated movement
 
 **Closes:** `OPEN_QUESTIONS` item 10 · matrix CHARGE-002
 **Ledger:** existing, `004DCD90` modifier `0x25`
+
+**Result.** `004DCD90` settles the ordering unambiguously.
+
+At function entry:
+
+```text
+ECX       = destination_x
+stack +4  = destination_y
+stack +8  = target
+global    = current attacker
+```
+
+The function first checks whether the requested destination already equals the
+attacker's current `+0x44/+0x48` coordinates. When movement is required and the
+attacker has modifier `0x25`, it computes:
+
+```text
+max(
+    abs(attacker.current_x - target.current_x)
+  + abs(attacker.current_y - target.current_y)
+  - 2,
+    0
+)
+```
+
+Only after storing that value does it call `move_battle_unit_candidate` with the
+requested destination coordinates. The calculation therefore reads the
+attacker's actual current tile at the start of this attack command and the
+target's current tile, before the command's approach movement.
+
+Consequences:
+
+- it is not cumulative `steps_this_round`;
+- it is not the displacement to the selected destination tile;
+- movement earlier in the round matters only insofar as it changed the
+  attacker's current tile;
+- moving away and back does not accumulate a larger legacy bonus;
+- split activation recomputes from the tile occupied when the attack command is
+  issued;
+- a no-movement melee attack bypasses the charge calculation and leaves the
+  bonus at zero.
+
+The cumulative movement model may remain as an explicit Project EGO-native rule,
+but it is not Genesis compatibility behaviour.
 
 Already well specified in the open-questions entry; restated here only to place
 it in priority order. The binary computes
