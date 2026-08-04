@@ -429,31 +429,69 @@ clauses, and 8 state stacking rules outright.
 
 ---
 
-## 10. Legacy bounded random and weighted selection
+## 10. Legacy CRT random and weighted selection
 
-`[BIN:00454C70,00454E80]` · **RECOVERED**
+`[BIN:00404B0B,00454C70,00454E80]` · **RECOVERED**
 
-The bounded helper receives the exclusive upper bound in `EBX` and returns the
-result in `EAX`.
+Full implementation notes and golden vectors are in `LEGACY_RNG.md`.
+
+### 10.1 CRT generator
 
 ```text
-bound == 0 -> 0
-ordinary bound -> CRT rand() % bound
-large bound -> append rand()%10 decimal digits, then modulo original bound
+seed:
+    state = seed mod 2^32
+
+next:
+    state = state * 214013 + 2531011 mod 2^32
+    return (state >> 16) & 32767
 ```
 
-The modulo bias is original behaviour.
+This is one shared state per calling thread, not one state per gameplay
+subsystem.
 
-The global weighted roller:
+### 10.2 Bounded adapter
 
-1. sums weights;
-2. rolls in `[0, total-1]`;
-3. walks cumulative weights;
-4. returns the selected value;
-5. optionally zeroes every weight whose associated value equals that value.
+```text
+random_below(0):
+    return 0                         # consume no CRT value
 
-Removal is by value, not by entry index. The underlying CRT generator and seed
-lifecycle remain open.
+random_below(bound > 0):
+    value = crt_rand()
+    reduced = bound
+    while reduced > 30000:
+        reduced = floor(reduced / 10)
+        value = value * 10 + crt_rand() % 10
+    return value % bound
+```
+
+All arithmetic in the accumulator is 32-bit legacy arithmetic. Do not replace
+the final modulo with rejection sampling: its bias is original behaviour.
+
+### 10.3 Weighted selection
+
+```text
+total = sum(weights)
+roll = random_below(total)
+select first entry whose cumulative weight exceeds roll
+```
+
+When removal is requested, every weight attached to the selected *value* is
+zeroed. Removal is not limited to the selected array index. Total weight zero
+remains unresolved.
+
+### 10.4 Seed boundaries
+
+Principal recovered seeds are:
+
+```text
+startup            time64() % 10000
+map generation     map_seed, with 0 replaced by 111
+strategic tick     map_seed + strategic_turn
+```
+
+Additional setup and menu/transition reseeds are documented in
+`LEGACY_RNG.md`. Independent named streams are a Project EGO-native design
+choice, not exact Genesis compatibility.
 
 ---
 

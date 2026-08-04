@@ -14,15 +14,18 @@ Status values:
 
 | ID | subsystem | test | evidence | expected assertions | status |
 |---|---|---|---|---|---|
-| RNG-LEGACY-001 | RNG | bounded helper with bounds 0, 1, 10, 30000 and >30000 | `00454C70` | result range, decimal extension, modulo behaviour, call count | NEEDS VECTOR |
-| RNG-WEIGHT-001 | RNG | weighted selection and removal by selected value | `00454E80` | cumulative interval, duplicate-value removal, unchanged values | READY except exact roll sequence |
+| RNG-LEGACY-001 | RNG | raw MSVC sequence plus bounded helper at 0, 1, 10, 30000, 30001, 300000 and 3000001 | `EXP-R4A-001`, `EXP-R4B-001`, `LEGACY_RNG.md` | exact values, uint32 wrap, modulo bias and CRT call count | READY |
+| RNG-STATE-001 | RNG | seed 0, 1 and 111 raw sequences | `00404B0B`, linked CRT `_rand`, `LEGACY_RNG.md` | seed assignment and first eight 15-bit outputs | READY |
+| RNG-TOPOLOGY-001 | RNG | interleave direct rand, bounded and weighted consumers; call contextual selectors | `EXP-R4A-001`, `EXP-R4B-001` | ordinary consumers advance one shared state; contextual selectors do not advance it | READY |
+| RNG-SEED-001 | RNG | startup, map generation and two consecutive strategic turns | `EXP-R2-001`, `EXP-R4B-001`, `EXP-STRATEGIC-TICK-001` | seeds are time%10000, map seed/default 111, and map_seed+turn | READY for principal epochs |
+| RNG-WEIGHT-001 | RNG | weighted selection and removal by selected value | `00454E80`, `LEGACY_RNG.md` | cumulative interval, duplicate-value removal and exact seeded roll | READY |
 | RNG-WEIGHT-002 | RNG | total weight zero | open question 6b | explicit legacy behaviour | BLOCKED |
 | XP-LEVEL-001 | progression | coefficient 100 thresholds for levels 1..5 | `00432660` | 20, 50, 90, 140, 200; cap 30 | READY |
 | XP-ROUND-001 | progression | compare cumulative and per-term threshold helpers | `00432480`, `00432570`, `00432660` | preserve differing truncation where coefficients expose it | READY |
 | LEVELUP-SELECT-001 | progression | prerequisites, repeated candidates and levels 21..30 | `00432B60` | candidate pool and weights before roll | READY |
 | LEVELUP-APPLY-001 | progression | ordinary max-life increase | `00433130` | preserve absolute missing life, not percentage | READY |
 | LEVELUP-TRANSFORM-001 | progression | first modifier ID `0x3E` | `00433130` | XP halved, definition replaced, level recalculated, tail cleared | READY |
-| DAMAGE-BASE-001 | damage | raw power 1..20 versus defence gaps 0..11 | `004CEC40` | spread, clamp, exact/one/zero damage branches | READY except PRNG sequence |
+| DAMAGE-BASE-001 | damage | raw power 1..20 versus defence gaps 0..11 | `004CEC40` | spread, clamp, exact/one/zero damage branches | READY |
 | STATS-WOUND-001 | stats | life below half maximum | effective stat functions | 50% offensive penalty unless exempting modifier applies | READY |
 | STATS-STAMINA-001 | stats | stamina 0..6 | effective stat functions | −10% per missing point below 6 | READY |
 | STATS-MORALE-001 | stats | morale 0..15 | effective attack stat functions + `DOC-NH-MORALE` | multiplier `0.4 + 0.1*morale` for 0..5, exactly `1.0` for 6..15; both sources agree at every point | READY |
@@ -55,8 +58,8 @@ Status values:
 | LAYOUT-UNIT-001 | runtime layout | persistent unit instance size and field offsets | `004331F0` | `0xA4` total; 30 level-upgrade IDs; three attachment IDs; `hero_state` present | READY |
 | MOD-INSTANCE-001 | modifiers | persistent instance contribution | `00432950` | selected upgrades, attachments and personal hero contributions all summed | READY |
 | MOD-AURA-001 | modifiers | commander aura channel is distinct from personal hero modifiers | `004A2690` | aura contribution does not enter the personal channel and vice versa | READY |
-| DAMAGE-MELEE-001 | damage | ordinary attack and counterattack calculation | `004D2E60` | custom register storage; modifier-specific branches; integer ordering preserved | READY except PRNG sequence |
-| DAMAGE-RANGED-001 | damage | ranged damage against ranged defence versus resistance | `004D2DA0` | correct defence selection; modifier-dependent branches | READY except PRNG sequence |
+| DAMAGE-MELEE-001 | damage | ordinary attack and counterattack calculation | `004D2E60` | custom register storage; modifier-specific branches; integer ordering preserved | READY |
+| DAMAGE-RANGED-001 | damage | ranged damage against ranged defence versus resistance | `004D2DA0` | correct defence selection; modifier-dependent branches | READY |
 | MELEE-SECONDARY-001 | combat | melee hit secondary effects | `004D9800` | drains, debuffs, triggered actions, adjacent attacks, damage-proportional effects | NEEDS EXTRACTION |
 | MORALE-ADJUST-001 | morale | morale adjustment and break accumulator | `004D0A70` | modifier `0x13` blocks adjustment; underflow raises break accumulator in ten-point steps and clamps | READY |
 | DEATH-LIFECYCLE-001 | death | full death lifecycle in one pass | `004D1D30` | adjacent morale, revival, transformation rollback, replacement, persistent/battle-owned split | READY |

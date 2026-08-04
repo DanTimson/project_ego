@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R4. R1 was closed by `EXP-R1-001`; R2 by `EXP-R2-001` and `DATA-VAR-FULL-20260804`; R3 by `EXP-CI11`.
+**Current active request:** none. R1–R4 are closed. Engine-side implementation and executable fixtures are next; add a new binary request only when a test exposes a remaining ambiguity.
 
 ---
 
@@ -220,24 +220,56 @@ accumulation exploit is preserved as legacy behaviour or corrected).
 
 ---
 
-## R4 — PRNG seeding and call topology
+## R4 — CLOSED: MSVC CRT state, shared topology and seed epochs
 
 **Closes:** `OPEN_QUESTIONS` items 4 and 4b · matrix RNG-LEGACY-001
-**Ledger:** RNG-001 (`00454C70`), RNG-002 (`00454E80`)
+**Ledger:** RNG-001 through RNG-005
+**Implementation handoff:** `LEGACY_RNG.md`
 
-Listed last deliberately, despite `STATUS.md` calling it the most consequential
-blocker. It is the largest item and the least likely to be closed by one packet,
-and every other test in the matrix marked "READY except PRNG sequence" is
-blocked behind it — which means it should be attacked when there is budget for a
-sustained effort, not interleaved with quick closures.
+**Result (2026-08-04).**
 
-**The narrower question that would help immediately.** Not the full seed
-lifecycle, but whether the executable consumes **one shared sequence** or several
-independent ones. The current implementation isolates named streams. If the
-original uses a single sequence, named streams can never reproduce it and must be
-reclassified as a test-only convenience rather than a compatibility mechanism.
-That is a design decision blocked on one bit of information, and it does not
-require recovering the CRT implementation.
+`00404B0B` is the statically linked CRT `srand` implementation:
+
+```c
+__getptd()->_holdrand = seed;
+```
+
+The paired `_rand` symbol is the Microsoft CRT generator. The compatibility
+target is the standard 32-bit recurrence:
+
+```text
+state = state * 214013 + 2531011       (mod 2^32)
+value = (state >> 16) & 0x7fff
+```
+
+The state belongs to the calling thread's CRT data. On the ordinary game thread,
+all direct `_rand()` calls, `00454C70`, and `00454E80` consume the same sequence.
+Project EGO's named independent streams are therefore test conveniences or a
+native rules mode, not exact Genesis compatibility behaviour.
+
+`00454C70` keeps its original modulo bias and consumes a variable number of CRT
+values for bounds above 30000. `00454E80` uses that helper for weighted
+selection. By contrast, `00454DC0`, `00454F80`, and `00455050` do not call
+`_rand`; they are contextual/deterministic selector paths, not independent
+advancing PRNG streams.
+
+Recovered seed boundaries include:
+
+- startup/content initialization: `time64() % 10000`;
+- map/setup initialization: stored map seed;
+- map generation: map seed, with zero replaced by `111`;
+- each global strategic tick: `map_seed + strategic_turn`;
+- two menu/transition paths: a counter cycling through `1..10000`.
+
+The `srand` XREF list also names a conditional battle-outcome path whose local
+seed expression was not included completely enough in the supplied packet to
+freeze safely. Save/load persistence of live `_holdrand` state is likewise not
+established. Those residual boundaries do not block implementation of the
+generator, shared topology, bounded adapter, weighted roller, or the recovered
+principal reseed epochs.
+
+Golden vectors, exact bounded-helper call counts, architecture constraints, and
+the engine-agent handoff are in `LEGACY_RNG.md`.
 
 ---
 
@@ -261,7 +293,7 @@ IDs when it happens.
 rejected hypothesis is worth a line in the ledger. Several open questions exist
 because a plausible reading was recorded without the alternatives it displaced.
 
-**Prefer one closed item to three partial ones.** There are now 44 matrix rows and
-26 ledger claims, and no matrix test has an executable implementation yet. The
-constraint on this project is conversion of evidence into fixtures, not
+**Prefer one closed item to three partial ones.** The matrix and ledger are
+already large, while many evidence-ready rows still lack executable fixtures.
+The constraint on this project is conversion of evidence into fixtures, not
 acquisition of more evidence.

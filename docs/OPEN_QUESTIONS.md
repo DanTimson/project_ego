@@ -18,8 +18,7 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 
 | ID | Question | Current evidence | How to close |
 |---|---|---|---|
-| 4 | **Underlying original PRNG and seed lifecycle.** | `00454C70` proves the bounded adapter: CRT `_rand()`, decimal-digit extension for large bounds, then modulo. The CRT implementation, initial seed, reseeding points and save/load state remain unresolved. The current named-stream LCG is a Project EGO placeholder. | Identify the linked CRT `rand()` implementation and every `srand`/seed-state write; add exact sequence fixtures. |
-| 4b | **Original random-call topology.** | The recovered executable appears to consume one shared legacy sequence, while Project EGO currently isolates named streams. | Trace representative complete actions and compare call order; decide whether named streams are test-only or a non-legacy rules mode. |
+| 4c | **Residual RNG persistence and conditional reseed boundaries.** | `srand` has a conditional XREF from the battle-outcome path, but the supplied packet does not contain enough of that local expression to freeze it safely. No evidence yet establishes whether save files serialize live CRT `_holdrand` state. | Reduce the battle-outcome call site and inspect save/load code only when a fixture requires continuation inside one reseed epoch. |
 | 6b | **All-zero weighted roller behaviour.** | Normal weighted selection is recovered, including removal by selected value. The normal path assumes a positive total. | Find or construct an all-zero caller state and inspect resulting control flow. |
 
 ## Current-model versus binary conflicts
@@ -68,6 +67,8 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 
 | former ID | Result | Evidence |
 |---|---|---|
+| 4 | Genesis uses the statically linked Microsoft CRT generator. `00404B0B` writes the seed to thread-local `_ptiddata._holdrand`; ordinary random consumers use the paired CRT `_rand`. Principal reseed epochs are startup time modulo 10000, map/setup seed, map generation seed, and `map_seed + strategic_turn`. | `EXP-R4A-001`, `EXP-R4B-001`, `EXP-STRATEGIC-TICK-001`; see `LEGACY_RNG.md`. |
+| 4b | Ordinary gameplay randomness on one thread consumes one shared CRT sequence. `00454DC0`, `00454F80`, and `00455050` are non-CRT contextual selector paths, not independently advancing PRNG streams. Named subsystem streams are non-legacy. | `EXP-R4A-001`, `EXP-R4B-001`; direct call topology. |
 | 10 | Genesis modifier `0x25` reads the attacker's and target's current coordinates before the current command's movement, then calls the movement helper with the requested destination. The bonus is command-entry separation, not cumulative movement or destination displacement. | `EXP-CI11`, `004DCD90` at `004DCDCB..004DCE18`. |
 | 14 | Back-and-forth accumulation is not Genesis compatibility behaviour. A cumulative-path implementation must be explicitly classified as a Project EGO-native alternative rather than a legacy-preservation mode. | Consequence of the closed item 10 call ordering. |
 | R2 | `item.var`, `medal.var`, and `spell.var` `Effects` store direct effect/modifier opcodes in the namespace described by `ability_num.Number`; they do not store `unit_upg` record indexes. `unit.var Abilityes` remains the contrasting index-based path. | `EXP-R2-001`, `DATA-VAR-FULL-20260804`; consumers `004A1F90`, `00432950`, and the battle-action dispatcher. |

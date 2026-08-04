@@ -333,7 +333,29 @@ Personal hero modifiers and commander-aura modifiers are separate channels in cl
 
 ## 8. Legacy RNG and weighted selection
 
-### 8.1 Random below bound
+The implementation-facing specification and vectors are in `LEGACY_RNG.md`.
+
+### 8.1 CRT state and generator
+
+`00404B0B` is `crt_srand`:
+
+```c
+__getptd()->_holdrand = seed;
+```
+
+The paired `_rand` symbol is the statically linked Microsoft CRT generator. Its
+compatibility recurrence is:
+
+```text
+state = state * 214013 + 2531011       (uint32 wrap)
+value = (state >> 16) & 0x7fff
+```
+
+The original state is thread-local CRT state. All ordinary random consumers
+executed on the main game thread therefore share one call-order-sensitive
+sequence. Project EGO's named independent streams are not Genesis-compatible.
+
+### 8.2 Random below bound
 
 `random_below_ebx_candidate`:
 
@@ -342,21 +364,46 @@ input bound: EBX
 return: EAX
 ```
 
-It combines `rand()` digits for bounds above 30000 and returns modulo bound. It is not unbiased. Preserve it for deterministic compatibility.
+It returns zero without advancing state when the bound is zero. Otherwise it
+consumes one CRT value. For bounds above 30000 it repeatedly divides a copy of
+the bound by ten and appends one `rand()%10` digit per loop before applying
+modulo to the original bound. The modulo bias and variable call count are
+original behaviour.
 
-### 8.2 Weighted roller
+### 8.3 Weighted roller
 
-Global arrays hold up to 1000 value/weight entries and terminate on value zero.
-
-The roller:
+The ordinary global roller at `00454E80`:
 
 1. sums all weights;
-2. rolls in `[0, total - 1]`;
+2. calls `00454C70` for a roll in `[0,total-1]`;
 3. finds the first cumulative interval containing the result;
 4. returns the corresponding value;
 5. optionally zeroes every entry whose value equals the selected value.
 
-Removal is by value, not by array position.
+Removal is by value, not by array position. Total weight zero remains open.
+
+### 8.4 Contextual selector family
+
+`00454DC0`, `00454F80`, and `00455050` do not call CRT `_rand` or
+`00454C70`. They are deterministic/contextual position selectors and must not
+be represented as separately advancing RNG streams. Their hidden register
+arguments and exact contextual formulas are not yet typed completely.
+
+### 8.5 Recovered reseed epochs
+
+Proven principal calls include:
+
+```text
+startup/content load     time64() % 10000
+setup/map initialization stored map seed
+map generation           map seed; zero becomes 111
+global strategic tick    map_seed + strategic_turn
+menu/transition paths    counter cycling 1..10000
+```
+
+The `crt_srand` XREF list also names a conditional battle-outcome call whose
+local expression was not fully included in the packet. Save/load persistence of
+live `_holdrand` state is not established. See open question 4c.
 
 ---
 

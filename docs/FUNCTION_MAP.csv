@@ -1,4 +1,6 @@
 address,working_name,subsystem,confidence,summary
+00404B0B,crt_srand,rng,proven,Writes supplied seed to thread-local _ptiddata._holdrand
+00404B1D,crt_rand,rng,strong inference,Linked Microsoft CRT rand paired with _holdrand; 15-bit compatibility generator
 00432480,calculate_unit_experience_threshold_by_definition_candidate,unit progression,strong inference,Cumulative XP threshold; explicit definition ID
 00432570,calculate_unit_experience_threshold_candidate,unit progression,strong inference,Instance-based threshold variant; rounding may differ
 00432660,calculate_unit_level_from_experience_candidate,unit progression,proven,"Returns XP-derived level, capped at 30"
@@ -8,9 +10,11 @@ address,working_name,subsystem,confidence,summary
 00432E60,calculate_unit_gold_upkeep_candidate,economy,proven,"Base, attachment deltas, percent and flat modifiers"
 00433130,apply_unit_level_upgrade_candidate,unit progression,proven,Ordinary upgrade or modifier-0x3E transformation
 004331F0,construct_unit_instance_candidate,unit progression,proven,Initializes 0xA4 persistent unit instance
-00454C70,random_below_ebx_candidate,rng,proven,Exclusive bound in EBX; CRT rand and modulo
-00454DC0,weighted_roll_alternate_rng_candidate,rng,candidate,Alternate weighted roller; helper ABI incomplete
-00454E80,weighted_roll_candidate,rng,proven,Weighted selection; optional removal by selected value
+00454C70,random_below_ebx_candidate,rng,proven,Modulo-biased bounded adapter; variable CRT call count above 30000
+00454DC0,weighted_roll_contextual_candidate,rng,proven,Weighted selector through 00454BB0; does not consume CRT rand
+00454E80,weighted_roll_candidate,rng,proven,Weighted selection through shared CRT adapter; optional removal by value
+00454F80,contextual_roll_position_candidate,rng,strong inference,Floating contextual position calculation; hidden register ABI incomplete; no CRT rand
+00455050,weighted_roll_contextual_biased_candidate,rng,strong inference,Weighted selector through 00454F80; no CRT-state advance
 00455630,sum_active_province_site_modifiers_candidate,economy,strong inference,Active/development-qualified site modifier aggregation
 00455C20,get_province_population_tier_candidate,economy,strong inference,Maps population-like value to tier 1..11
 00456AF0,calculate_province_gem_income_candidate,economy,strong inference,Province gem-income pipeline
@@ -25,6 +29,7 @@ address,working_name,subsystem,confidence,summary
 00469D20,sum_ruler_structure_modifiers_candidate,economy,strong inference,Ruler-wide structure modifier aggregation
 0046B1D0,calculate_unit_gem_recruitment_cost_candidate,economy,strong inference,Gem recruitment price pipeline
 0046B2A0,calculate_unit_gold_recruitment_cost_candidate,economy,strong inference,Gold recruitment price pipeline
+00479120,process_global_strategic_tick_candidate,strategic lifecycle,strong inference,Reseeds shared CRT state with map_seed + strategic_turn before global processing
 004A1F90,sum_hero_context_modifiers_candidate,modifiers,strong inference,Hero personal modifier channel
 004A2690,sum_commander_aura_modifiers_candidate,modifiers,strong inference,Commander aura channel
 004CE9E0,collect_adjacent_battle_units_candidate,battlefield,proven,Odd-row six-neighbour collector

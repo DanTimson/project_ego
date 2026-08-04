@@ -4,7 +4,7 @@ This is a coverage map, not a release claim.
 
 | subsystem | evidence | Python oracle | GDScript core | parity status |
 |---|---|---|---|---|
-| attack randomisation and chip damage | published tables + binary | implemented | implemented | strong, legacy PRNG pending |
+| attack randomisation and chip damage | published tables + binary | implemented with non-legacy stream model | implemented with non-legacy stream model | exact CRT generator/topology recovered; compatibility implementation pending |
 | stamina and wound multipliers | published tables + binary | implemented | implemented | strong |
 | morale attack multiplier | Genesis binary + independent NH table | placeholder/partial | placeholder/partial | full curve and integer truncation recovered; implementation parity pending |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | provider coverage incomplete |
@@ -35,7 +35,7 @@ battle end to end.
 
 The most consequential blockers are:
 
-1. exact original random sequence and seeding;
+1. implementation of the recovered shared CRT generator and principal reseed epochs;
 2. GDScript timed-status/runtime-effect model;
 3. battle-action effect classification;
 4. porting death, revival, transformation and side-transfer semantics;
@@ -44,7 +44,7 @@ The most consequential blockers are:
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11` and runtime schema version 14.
+`closer_inspection_11`, R1–R4 packets, and runtime schema version 14.
 
 When a new checkpoint is produced, update together:
 
