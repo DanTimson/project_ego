@@ -6,7 +6,7 @@ This is a coverage map, not a release claim.
 |---|---|---|---|---|
 | attack randomisation and chip damage | published tables + binary | implemented | implemented | strong, legacy PRNG pending |
 | stamina and wound multipliers | published tables + binary | implemented | implemented | strong |
-| morale attack multiplier | binary + published table | placeholder/partial | placeholder/partial | 0..15 settled by two agreeing sources; ≥16 band widths unread in Genesis |
+| morale attack multiplier | Genesis binary + independent NH table | placeholder/partial | placeholder/partial | full curve and integer truncation recovered; implementation parity pending |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | provider coverage incomplete |
 | activated actions | docs, data, binary dispatcher | implemented | `Action` implemented | effect dictionary incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
@@ -14,7 +14,7 @@ This is a coverage map, not a release claim.
 | battlefield coordinates and adjacency | binary | implemented | implemented | adjacency recovered |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
 | round/side control | observation + partial binary | implemented | implemented | whole-side-phase model open |
-| melee execution | binary | partial compatibility model | counterattack path implemented | full legacy lifecycle not yet ported |
+| melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
 | ranged execution | binary | partial compatibility model | partial | special modes incomplete |
 | damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
 | battle actions: eight-clause dispatcher | binary | partial | content model only | high-priority extraction |
@@ -38,8 +38,8 @@ The most consequential blockers are:
 1. exact original random sequence and seeding;
 2. GDScript timed-status/runtime-effect model;
 3. battle-action effect classification;
-4. reconciliation of movement/charge evidence;
-5. porting death, revival, transformation and side-transfer semantics.
+4. porting death, revival, transformation and side-transfer semantics;
+5. conversion of recovered binary rules into executable parity fixtures.
 
 ## Documentation checkpoint
 
