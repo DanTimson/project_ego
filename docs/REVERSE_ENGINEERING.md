@@ -1,6 +1,6 @@
 # Reverse-engineering checkpoint — Eador: Genesis
 
-**Status:** documentation checkpoint after `closer_inspection_1.txt` through `closer_inspection_11.txt`
+**Status:** documentation checkpoint after `closer_inspection_1.txt` through `closer_inspection_11.txt` and targeted R1–R8 packets
 **Canonical runtime schema:** root `eador_runtime.h`, schema version 14
 **Function index:** `docs/FUNCTION_MAP.csv`
 **Scope:** compatibility-relevant runtime layouts, unit progression, tactical combat, battle actions, economy fragments, parser primitives, and open reverse-engineering work.
@@ -19,6 +19,7 @@ The current corpus already supports implementation-grade descriptions of:
 - effective tactical stat calculation;
 - melee, counterattack, and ranged damage calculation;
 - attack execution order;
+- action-capacity, reselection, and ranged-stamina lifecycle;
 - runtime tactical-effect nodes;
 - damage application, morale reaction, death, revival, transformation, and side transfer;
 - hex adjacency and battle formation coordinates;
@@ -216,13 +217,17 @@ Values above 1000 in `effect_type_ids` encode a unit-definition ID as `value - 1
 | `004331F0` | `construct_unit_instance_candidate` | Proven | Initializes a `0xA4` persistent unit instance. |
 | `00432E60` | `calculate_unit_gold_upkeep_candidate` | Proven | Base + attachments + percentage/flat modifiers, clamped to zero. |
 | `004D01C0` | `get_effective_battle_modifier_candidate` | Proven | Runtime + persistent + intrinsic + aura with special override rules. |
+| `004D0560` | `get_effective_battle_speed_candidate` | Proven | Definition speed + modifier ID 7 providers, stamina penalties, floor 1. |
 | `004D0980` | `get_effective_battle_max_life_candidate` | Proven | Persistent max life plus side multiplier. |
 | `004CEC40` | `resolve_attack_against_defence_candidate` | Proven | Legacy power variation, defence subtraction, minimum-damage chance. |
 | `004D2DA0` | `calculate_ranged_attack_damage_candidate` | Proven | Ranged power versus ranged defence or resistance. |
 | `004D2E60` | `calculate_melee_or_counterattack_damage_candidate` | Proven | Attack/counterattack versus defence or resistance. |
 | `004D7050` | `execute_ranged_attack_candidate` | Proven | Full ordinary ranged execution lifecycle. |
 | `004DCD90` | `execute_melee_attack_exchange_candidate` | Proven | Movement, first strike, primary melee hit, retaliation. |
+| `004DE2B0` | `find_next_eligible_battle_unit_candidate` | Proven | Returns the next living `+0x5C`-eligible current-side record. |
+| `004E0280` | `select_battle_unit_and_refresh_panel_candidate` | Proven | Writes the selected-unit global and UI links; preserves `+0x04`/`+0x5C`. |
 | `004D9800` | `process_melee_or_counterattack_secondary_effects_candidate` | Strong | Hit-triggered debuffs, drains, cleave, action triggers, life steal. |
+| `004DA6B0` | `show_battle_unit_details_candidate` | Proven | Full unit-details interface; reads stats but does not select the unit. |
 | `004D11C0` | `apply_attacker_on_hit_modifiers_candidate` | Strong | Narrow on-hit debuff stage. |
 | `004D61E0` | `apply_damage_to_battle_unit_candidate` | Proven | Damage accounting, remove-on-damage effects, life, death, morale. |
 | `004D1D30` | `resolve_battle_unit_death_candidate` | Proven | Morale propagation, revival, replacement, corpse/removal, rewards. |
@@ -551,10 +556,20 @@ The side-advance helper is `004E6530`. It snapshots the current side at
 The helper then initializes units belonging to the newly current side. A zero
 first argument bypasses this toggle.
 
-Inside `004EC4C0`, battlefield selection at `004F13C8..004F1453` scans the
-37 records belonging to `g_current_battle_side` and selects the record at the
-clicked coordinates. Movement, attack and action paths return to the same
-interaction loop without invoking the side-advance helper.
+Inside `004EC4C0`, `004F13C8..004F1453` scans the 37 current-side records
+at the clicked coordinates and calls `004DA6B0`. The callee is the full
+battle-unit details interface, so this interval is inspection, not selection.
+
+Ordinary selection is performed by `004E0280`. The selected battle-unit pointer
+arrives in `EAX`; at `004E076C..004E0796` the function compares it with
+`g_current_battle_unit`, detaches the old presentation link, and writes the new
+pointer. It does not write selected-unit `+0x04` or `+0x5C`, so same-side
+deselection and reselection preserve remaining capacity and eligibility.
+`004DE2B0` separately finds the next living `+0x5C`-eligible current-side record
+without mutating either field or the global selection.
+
+Movement, attack and action paths return to the same interaction loop without
+invoking the side-advance helper.
 
 Normal phase advances occur in two places:
 
@@ -591,6 +606,23 @@ apply stamina cost
 clear remaining action/movement state
 refresh UI
 ```
+
+The base stamina cost is selected at `004D7953..004D797D`:
+
+```text
+effective_speed = 004D0560(attacker)
+base_cost = 2 if attacker[+0x04] < effective_speed else 1
+```
+
+`004D0560` uses definition speed plus numeric modifier ID `7` from persistent,
+intrinsic, runtime and eligible commander-aura providers. It subtracts one below
+stamina 5, subtracts another below stamina 3 while the value remains above 1,
+and floors the result at 1. Modifier `0x12` suppresses the attack deduction.
+
+This is not equivalent to accumulated movement. Action effects can restore or
+increment `+0x04`, and ordinary reselection through `004E0280` preserves the
+restored value. `steps_this_round` is therefore diagnostic or native-mode state,
+not the Genesis compatibility input for ranged stamina.
 
 Special attacker modifiers `0x2E` and `0x2F` replace ordinary damage with disabling runtime-effect packages.
 

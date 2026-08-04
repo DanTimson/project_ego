@@ -29,7 +29,6 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 | 8 | **Full `Неутомимый` semantics.** | Binary paths show modifier `0x12` suppressing several stamina costs. Whether every direct stamina-setting effect and the attack penalty are suppressed through the same check is not yet catalogued. | Build a consumer list for modifier `0x12`; test direct stamina drain and zero-stamina state. |
 | 9 | **Defence halving and clamp order in every path.** | Effective defence is clamped and halved at zero stamina, but all integer/truncation orderings have not been converted into vectors. | Add binary-derived tests for negative, 0, 1, odd and even defence. |
 | 11 | **Start-of-turn effects: round or activation.** | Current model fires once per round. Binary lifecycle evidence has not yet identified the exact boundary for every such effect. | Trace one `Прилив сил` or rage consumer across yield/re-entry. |
-| 12 | **Stamina cost after prior movement/action spending.** | `004D7050` chooses the 1-versus-2 cost from remaining versus effective action capacity, not directly from `steps_this_round`. Equivalence across re-entry and non-movement spending is unproven. | Test move/yield/attack, partial action spending without movement, and restored movement. |
 | 13 | **`Удар и возврат` anchor.** | Observation says command-start tile; no binary executor has yet established the stored anchor field and lifecycle. | Recover the action executor or instrument a split-activation case. |
 
 ## Data dictionaries

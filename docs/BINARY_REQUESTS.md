@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R8 — stamina cost basis across re-entry and partial spending. R1–R7 are closed.
+**Current active request:** R9 — defence halving and clamp order, as vectors. R1–R8 are closed.
 
 ---
 
@@ -488,32 +488,89 @@ or on unit activation. That remains R13.
 
 ---
 
-## R8 — OPEN: stamina cost basis across re-entry and partial spending
+## R8 — CLOSED: ranged stamina cost uses live capacity, not movement history
 
-**Closes:** `OPEN_QUESTIONS` item 12
-**Ledger:** existing, `004D7050`
-**Method:** decompilation, with observation as confirmation
-**Cost:** small — one function already located
+**Closes:** `OPEN_QUESTIONS` item 12 · matrix `RANGED-STAMINA-001`
+**Ledger:** new `STAMINA-001`; extends `COMBAT-002` and `TURN-001`
+**Evidence:** `EXP-R8A-001` through `EXP-R8E-001`
+**Method:** complete decompilation/listing, write-XREF reduction and caller tracing
 
-**Question.** `004D7050` selects the 1-versus-2 stamina cost from remaining
-versus effective action capacity rather than from `steps_this_round`. Is that
-selection equivalent to the step-count model in every path, specifically after
-(a) partial action spending with no movement, (b) yield and re-entry in the same
-round, and (c) movement that was subsequently restored?
+**Result (2026-08-05).** At `004D7953..004D797D`,
+`execute_ranged_attack_candidate` passes the attacker in `EAX` to `004D0560`,
+then compares the live tactical-unit field at `+0x04` with the returned effective
+speed:
 
-**Why it matters now.** The engine currently derives the cost from movement
-already spent. If capacity rather than steps is the true basis, the two agree in
-the common case and diverge exactly in the cases above — which is the shape of
-bug this project keeps producing: correct on the happy path, silently wrong at
-the edges, and invisible to existing tests.
+```text
+effective_speed = get_effective_battle_speed_candidate(attacker)
 
-**Minimum sufficient answer.** The comparison operands in `004D7050` — what
-"remaining" and "effective capacity" are read from — and whether either is reset
-on re-entry.
+if attacker.remaining_capacity < effective_speed:
+    base_stamina_cost = 2
+else:
+    base_stamina_cost = 1
+```
 
-**Engine consequence.** If capacity-based, `steps_this_round` stops being the
-cost input and becomes diagnostic only, which is a small change now and an
-expensive one after action fixtures accumulate.
+The branch is strict less-than. Equality and temporary over-capacity both select
+cost 1. Modifier `0x12` suppresses the deduction. After the ranged command, the
+executor clears both remaining capacity (`+0x04`) and the active/actionable flag
+(`+0x5C`).
+
+`004D0560` receives the battle-unit pointer in `EAX`, returns in `EAX`, takes no
+stack arguments and uses plain `RET`. Its recovered formula is:
+
+```text
+speed =
+    unit-definition speed
+  + persistent-instance modifier 7
+  + intrinsic modifier 7
+  + runtime-node modifier 7
+  + eligible commander-aura modifier 7
+
+if stamina < 5 and speed > 1:
+    speed -= 1
+if stamina < 3 and speed > 1:
+    speed -= 1
+
+return max(speed, 1)
+```
+
+Numeric modifier ID `7` remains the evidence identity; the working semantic name
+is effective battle speed.
+
+**Re-entry and restoration.** The comparison is not equivalent to movement
+history:
+
+- battle-action effect type `7` can increase `+0x04` and cap it to the current
+  `004D0560` result;
+- a separate non-movement tactical command increments `+0x04` by one;
+- `004E0280` performs ordinary player selection by writing
+  `g_current_battle_unit` and updating presentation links, but does not write the
+  selected unit's `+0x04` or `+0x5C`;
+- `004DE2B0` only returns the next living `+0x5C`-eligible unit on the current
+  side and does not mutate selection or capacity.
+
+Therefore a unit may move, have capacity restored to effective speed, be
+deselected and reselected, and then pay the one-point ranged cost. A
+`steps_this_round > 0` discriminator would incorrectly charge two.
+
+**Correction to R7 evidence wording.** `004F13C8..004F1453` is not the ordinary
+selection interval. It scans the clicked coordinates and opens
+`004DA6B0`, the battle-unit details interface. The whole-side-phase conclusion
+remains valid; actual selection is performed through `004E0280`.
+
+**Rejected alternatives.**
+
+- Cost 1 only when remaining capacity equals effective capacity: rejected,
+  because the branch is `remaining >= effective`.
+- `+0x04` is merely another encoding of accumulated movement: rejected, because
+  non-movement effects restore or increment it.
+- Ordinary same-side reselection refreshes capacity: rejected, because
+  `004E0280` preserves the unit record.
+
+**Engine consequence.** Genesis compatibility must derive ranged attack stamina
+cost from live remaining capacity versus current effective speed.
+`steps_this_round` may remain diagnostic or support an explicit native rules
+mode, but it is not the compatibility input. The existing engine implementation
+requires correction and a restored-capacity/reselection fixture.
 
 ---
 

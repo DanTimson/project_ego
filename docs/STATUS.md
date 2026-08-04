@@ -13,9 +13,9 @@ This is a coverage map, not a release claim.
 | level-up selection | data + binary | implemented in part | options implemented | legacy RNG/underfull cases open |
 | battlefield coordinates and adjacency | binary | implemented | implemented | adjacency recovered |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
-| round/side control | observation + binary `004EC4C0`/`004E6530` | implemented | implemented | whole-side phases recovered; explicit binary-derived order fixture still needed |
+| round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0` | implemented | implemented | whole-side phases and capacity-preserving reselection proven; explicit order fixture still needed |
 | melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
-| ranged execution | binary | partial compatibility model | partial | special modes incomplete; recovered zero-entry return is not yet mirrored by the generic stat clamp |
+| ranged execution | binary | partial compatibility model | partial | special modes and ranged zero-entry guard incomplete; current `steps_this_round` stamina discriminator diverges from live-capacity rule |
 | damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
 | battle actions: eight-clause dispatcher | binary | partial | content model only | high-priority extraction |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
@@ -39,12 +39,12 @@ The most consequential blockers are:
 2. GDScript timed-status/runtime-effect model;
 3. battle-action effect classification;
 4. porting death, revival, transformation and side-transfer semantics;
-5. conversion of recovered binary rules into executable parity fixtures.
+5. conversion of recovered binary rules into executable parity fixtures, including the ranged live-capacity stamina correction.
 
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11`, closed requests R1–R7, and runtime schema version 14.
+`closer_inspection_11`, closed requests R1–R8, and runtime schema version 14.
 
 When a new checkpoint is produced, update together:
 

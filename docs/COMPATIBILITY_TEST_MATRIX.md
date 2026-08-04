@@ -41,7 +41,7 @@ Status values:
 | CHARGE-001 | combat | modifier `0x25` with and without command movement | `EXP-CI11`, `004DCD90` | when movement is requested, compute `max(abs(current_attacker_x-target_x)+abs(current_attacker_y-target_y)-2,0)` before moving; no-movement attack leaves zero | READY |
 | CHARGE-002 | combat | split activation, earlier movement and backtracking | `EXP-CI11`, `004DCD90` | recompute from the tile occupied when the attack command starts; prior path length is not accumulated; cumulative `steps_this_round` is non-legacy | READY |
 | RANGED-EXEC-001 | combat | one and two shots | `004D7050` | cap by ammo, one ammo per shot, break on kill | READY |
-| RANGED-STAMINA-001 | combat | no prior expenditure versus prior expenditure | `004D7050` | base stamina cost 1 versus 2; modifier `0x12` blocks | READY |
+| RANGED-STAMINA-001 | combat | capacity equal/above effective speed, capacity below it, move→restore→reselect→attack | `EXP-R8A-001`..`EXP-R8E-001`; `004D0560`, `004D7050`, `004E0280` | base cost 1 when `remaining_capacity >= effective_speed`, otherwise 2; modifier `0x12` blocks; reselection preserves capacity | READY — current `steps_this_round` model diverges |
 | RANGED-SPECIAL-001 | combat | modifiers `0x2E` and `0x2F` | `004D7050` | ordinary damage replaced by disabling runtime packages | READY |
 | DAMAGE-SINK-001 | damage | all four received-damage channels | `004D61E0` | correct counter increment and life loss | READY |
 | DAMAGE-MORALE-001 | morale | 25% max-life hit, damage 10, channel 3 | `004D61E0` | large-hit reaction except channel 3 | READY |

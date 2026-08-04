@@ -285,11 +285,38 @@ regardless of its value.
 `[OBS]` Starting and ending the round on the same hex still counts as having
 moved in the observed build.
 
-`[BIN:004D7050]` The ranged executor selects the base attack stamina cost from
-whether current action/movement capacity is already below its effective
-maximum: no prior expenditure costs 1; prior expenditure costs 2. This is not
-yet proven equivalent to `steps_this_round > 0` across re-entry, restoration or
-non-movement spending. See `OPEN_QUESTIONS` item 12.
+`[BIN:004D0560,004D7050,004E0280]` · **RECOVERED**
+
+The executable's predicate is live capacity, not movement history:
+
+```text
+effective_speed =
+    unit-definition speed
+  + numeric modifier 7 from persistent, intrinsic and runtime providers
+  + eligible commander-aura modifier 7
+
+if stamina < 5 and effective_speed > 1:
+    effective_speed -= 1
+if stamina < 3 and effective_speed > 1:
+    effective_speed -= 1
+effective_speed = max(effective_speed, 1)
+
+base_ranged_attack_stamina_cost =
+    2 if remaining_capacity < effective_speed else 1
+```
+
+The comparison is strict less-than. Capacity equal to or temporarily above the
+current effective speed costs 1. Modifier `0x12` suppresses the deduction.
+
+Ordinary same-side deselection/reselection writes the selected-unit global and
+presentation links but preserves the unit's remaining capacity. Non-movement
+action effects can increment or restore that capacity, including restoration
+capped to current effective speed. Consequently `steps_this_round > 0` is not
+an equivalent Genesis compatibility predicate: move → restore to full capacity
+→ reselect → ranged attack costs 1 in the executable.
+
+The published “moved this round” wording remains useful player-facing prose, but
+the binding compatibility rule is the live-capacity comparison above.
 
 ---
 

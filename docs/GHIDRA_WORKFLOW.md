@@ -126,13 +126,18 @@ agreement is the strongest evidence available short of an executed vector.
 
 ## Current preferred targets
 
-Do not request broad dumps. Close one ledger item at a time.
+`BINARY_REQUESTS.md` is the authoritative queue. Do not duplicate closed targets
+or reopen a settled item because this workflow file is stale.
 
-1. full action-effect dispatcher classification;
-2. all consumers of modifier `0x12`;
-3. exact high-morale curve;
-4. `srand`/CRT random state and seed lifecycle;
-5. startup-loader schemas for the supplied `.var` files;
-6. charge-distance conflict;
-7. tactical battle-loop side/activation ordering;
-8. strategic economy normalization.
+Current near-term order:
+
+1. R9 — defence halving/clamp order as concrete vectors;
+2. R11 — complete consumer list for modifier `0x12`;
+3. R10 — conditional attack-bonus placement in the multiplier pipeline;
+4. R12 and R13 — return-anchor and start-effect lifecycle boundaries;
+5. R16 — tactical action dispatch table;
+6. R17 — melee-hit secondary-effect classification.
+
+R8 is closed. Do not request `004D7050`, `004D0560`, `004DA6B0`, `004E0280` or
+`004DE2B0` again unless a later contradictory fixture identifies a specific
+missing path.
