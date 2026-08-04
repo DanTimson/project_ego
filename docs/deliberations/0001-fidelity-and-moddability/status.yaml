@@ -13,8 +13,10 @@ verification:
   - core/content/content_id.gd
   - oracle/test_legacy_rng.py
   - tests/test_legacy_rng.gd
+  - oracle/test_legacy_rng_scenario.py
+  - oracle/test_roster.py
 pending:
-  - preserve canonical content identity and provenance through build products
-  - exercise LegacyRng through an end-to-end combat or scenario path
   - separate battle instance identity from display names when scenario format changes
-  - complete the altered-rule, new-action and save-round-trip probe
+  - scope a persistence layer before attempting the save-round-trip probe
+  - complete the altered-rule and new-action probe
+  - confirm whether the minimum-one attack clamp applies to units with no melee attack

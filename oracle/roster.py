@@ -144,7 +144,12 @@ class Roster:
         if record is None:
             return None
 
-        unit = Combatant(name=record.get("Name", "?"))
+        record_index_early = record.get("index", -1)
+        unit = Combatant(
+            name=record.get("Name", "?"),
+            content_id=identity.make_id(self.db.pack.id, "unit", record_index_early)
+            if isinstance(record_index_early, int) and record_index_early >= 0 else "",
+        )
         for column, attr in STAT_COLUMNS.items():
             value = record.get(column)
             if isinstance(value, int):

@@ -112,15 +112,27 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 			t.step("%s x%.2f" % [label, m], value, nv, note)
 			value = nv
 
+	# result = max(1, pre_morale + trunc0(bonus_percent * pre_morale / 100))
+	#
+	# The clamp is UNCONDITIONAL — it is the final line of all three recovered
+	# effective-attack functions, not part of the morale branch — so it applies
+	# at neutral morale too. 2 Genesis and 22 NH units carry Attack 0 (siege
+	# engines), and attack 1 reduced by the stamina-0 halving also truncates to
+	# 0; without the clamp those return 0 here and 1 in the original.
+	# docs/FORMULAS.md §1.4.
 	var mor: Array = Morale.percent(u)
 	var pct: int = mor[0]
 	var mnote: String = mor[1]
-	if pct != 0 or mnote != "":
-		# int() truncates toward zero in GDScript, matching C.
-		var pre: int = int(value)
-		var nv: float = float(pre + int(float(pct * pre) / 100.0))
-		t.step("MoraleMod %+d%%" % pct, value, nv, mnote)
-		value = nv
+	# int() truncates toward zero in GDScript, matching C.
+	var pre: int = int(value)
+	var raw: int = pre + int(float(pct * pre) / 100.0)
+	var nv: float = float(maxi(1, raw))
+	if pct != 0 or mnote != "" or nv != value:
+		var label: String = ("MoraleMod %+d%%" % pct) if pct != 0 else "MoraleMod"
+		if raw < 1:
+			label += " (min-1 clamp)"
+		t.step(label, value, nv, mnote)
+	value = nv
 
 	t.result = value
 	return [value, t]

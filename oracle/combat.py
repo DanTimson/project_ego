@@ -151,6 +151,12 @@ class AttackKind(Enum):
 @dataclass(eq=False)
 class Combatant:
     name: str = "unit"
+    # The content DEFINITION this instance was built from, e.g.
+    # "genesis:unit/5". Empty for inline synthetic units declared directly in a
+    # scenario, which are battle-local and are NOT pack content — see
+    # DELIB-0001 decision item 6, which keeps content identity, battle-instance
+    # identity and display name distinct. `name` remains presentation only.
+    content_id: str = ""
     # base (unmodified) stats
     attack: int = 0
     counter_attack: int = 0
@@ -480,12 +486,24 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
             t.step(f"{label} x{m:.2f}", value, nv, note)
             value = nv
 
+    # result = max(1, pre_morale + trunc0(bonus_percent * pre_morale / 100))
+    #
+    # The clamp is UNCONDITIONAL — it is the final line of all three recovered
+    # effective-attack functions, not part of the morale branch — so it applies
+    # at neutral morale too. That matters: 2 Genesis and 22 NH units carry
+    # Attack 0 (siege engines), and an attack of 1 reduced by the stamina-0
+    # halving also truncates to 0. Without the clamp those return 0 here and 1
+    # in the original. See docs/FORMULAS.md 1.4.
     pct, note = morale_percent(u)
-    if pct or note:
-        pre = _trunc(value)
-        nv = float(pre + _trunc(pct * pre / 100))
-        t.step(f"MoraleMod {pct:+d}%", value, nv, note)
-        value = nv
+    pre = _trunc(value)
+    raw = pre + _trunc(pct * pre / 100)
+    nv = float(max(1, raw))
+    if pct or note or nv != value:
+        label = f"MoraleMod {pct:+d}%" if pct else "MoraleMod"
+        if raw < 1:
+            label += " (min-1 clamp)"
+        t.step(label, value, nv, note)
+    value = nv
 
     t.result = value
     return value, t

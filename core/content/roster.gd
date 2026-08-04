@@ -173,6 +173,7 @@ func build(reference: String) -> Built:
 	var rec: Dictionary = record
 
 	var unit := Combatant.new()
+	unit.content_id = ContentId.make(db.pack.id, "unit", int(rec.get("index", -1)))
 	unit.name = String(rec.get("Name", "?"))
 	for column in STAT_COLUMNS:
 		var value: Variant = rec.get(column)

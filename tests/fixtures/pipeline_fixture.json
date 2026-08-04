@@ -33,7 +33,7 @@
     "life_base": 17,
     "life": 5
    },
-   "expected": 6.352941
+   "expected": 6.0
   },
   {
    "label": "wounded + painless",
@@ -101,7 +101,7 @@
     "morale": 10,
     "morale_base": 10
    },
-   "expected": 5.88
+   "expected": 5.0
   },
   {
    "label": "rage suppresses wound",
@@ -423,6 +423,438 @@
   ]
  },
  "morale_attack": [
+  {
+   "base": 0,
+   "morale": 0,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 0,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 0,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 3,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 3,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 3,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 5,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 5,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 5,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 15,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 15,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 15,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 16,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 16,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 16,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 18,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 18,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 18,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 21,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 21,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 21,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 25,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 25,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 25,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 30,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 30,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 30,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 43,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 43,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 43,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 51,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 51,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 51,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 60,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 60,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "morale": 60,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 0,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 0,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 0,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 3,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 3,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 3,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 5,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 5,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 5,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 15,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 15,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 15,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 16,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 16,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 16,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 18,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 18,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 18,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 21,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 21,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 21,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 25,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 25,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 25,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 30,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 30,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 30,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 43,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 43,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 43,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 51,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 51,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 51,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 60,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 60,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "morale": 60,
+   "kind": 2,
+   "expected": 1
+  },
   {
    "base": 7,
    "morale": 0,

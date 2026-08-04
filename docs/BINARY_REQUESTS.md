@@ -389,3 +389,41 @@ because a plausible reading was recorded without the alternatives it displaced.
 already large, while many evidence-ready rows still lack executable fixtures.
 The constraint on this project is conversion of evidence into fixtures, not
 acquisition of more evidence.
+
+## R6 — OPEN: does the minimum-one attack clamp apply to units with no melee attack?
+
+**Closes:** the last unresolved consequence of the R5 morale packet
+**Ledger:** extends MORALE-001 / the effective-attack functions
+**Cost:** small — one controlled observation, or the clamp's guard condition
+
+**Question.** `FORMULAS.md` §1.4 now records the final line of all three
+recovered effective-attack functions as
+
+```text
+result = max(1, pre_morale + trunc0(bonus_percent * pre_morale / 100))
+```
+
+Taken literally the clamp is unconditional, so a unit whose melee attack is 0
+returns 1. Is that right, or is the clamp guarded — reached only when the unit
+actually has an attack value, or only when a morale bonus is non-zero?
+
+**Why it matters.** It is not an edge case in this corpus. **2 Genesis units and
+22 New Horizons units carry `Attack 0`** — Баллиста, Катапульта, Гномья пушка
+and the other siege engines, which are ranged-only. A base attack of 1 reduced by
+the stamina-0 halving also truncates to 0 before the clamp. Under the literal
+reading every one of those deals 1 melee damage rather than none, which is a
+visible gameplay difference, not a rounding detail.
+
+**Current engine behaviour.** Implemented literally: the clamp is applied
+unconditionally after the morale step, so `Attack 0` yields 1. Fixture bases 0
+and 1 cover it in `tests/fixtures/pipeline_fixture.json`. If the guard turns out
+to be conditional, the fix is one line and the fixtures already isolate it.
+
+**Minimum sufficient answer.** Either the branch guarding that `max` in one of
+`004D1890` / `004D1660` / `004D14A0`, or one controlled observation: put a
+ballista adjacent to an enemy in the original and see whether a melee attack is
+offered at all, and if so whether it deals 1.
+
+**Note on scope.** If melee is simply never offered to those units, the clamp
+question becomes unreachable in practice and the honest resolution is
+`diagnostic_only` for that case rather than a behavioural change.

@@ -122,7 +122,9 @@ for mo in (0, 1, 2, 3, 4, 5, 6, 10, 15, 16, 17, 18, 20, 21, 24, 25, 29, 30, 35,
 # integer, so a float multiplier diverges (100 * 1.15 == 114.999... -> 114 where
 # the executable returns 115). Bases are chosen so the percentage lands just
 # under, just over, and exactly on an integer boundary.
-for base in (7, 19, 20, 100):
+# base 0 and 1 exercise the min-1 clamp: 2 Genesis and 22 NH units have
+# Attack 0, and attack 1 under the stamina-0 halving truncates to 0.
+for base in (0, 1, 7, 19, 20, 100):
     for mo in (0, 3, 5, 15, 16, 18, 21, 25, 30, 43, 51, 60):
         c = make(attack=base, counter_attack=base, ranged_attack=base,
                  morale=mo, morale_base=999)

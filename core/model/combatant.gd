@@ -14,6 +14,12 @@ extends RefCounted
 
 enum AttackKind { MELEE, COUNTER, RANGED }
 
+## The content DEFINITION this instance was built from, e.g. "genesis:unit/5".
+## Empty for inline synthetic scenario units, which are battle-local and are NOT
+## pack content — DELIB-0001 decision item 6 keeps content identity,
+## battle-instance identity and display name distinct. `name` is presentation.
+var content_id: String = ""
+
 var name: String = "unit"
 
 # base (unmodified) stats
