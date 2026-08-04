@@ -245,3 +245,49 @@ which is the opposite of what canonical identity is for. If scenarios should
 instantiate from a pack, that is a separate feature: an optional `def` field
 naming a canonical id, with the inline stats becoming overrides. Flagged rather
 than assumed.
+
+---
+
+## Round 4 update: LegacyRng landed
+
+The randomness seam — the one general abstraction both sides agreed to — is
+implemented, and the named-stream `Rng` is reclassified in code rather than only
+in prose.
+
+`LegacyRng` (oracle and port) implements the MSVC CRT recurrence, the
+decimal-extension bounded adapter at `00454C70`, the weighted roller at
+`00454E80` with removal by value, and the recovered map-generation and
+strategic-turn reseed epochs. Every published golden vector passes: three raw
+sequences, all seven bound/advance-count rows, and the weighted vector.
+
+Two details worth recording because they are easy to get silently wrong:
+
+- **Bound 1 consumes a value.** The existing `Rng.roll` short-circuits `x <= 1`
+  without advancing. The original does not: only bound 0 consumes nothing.
+  Short-circuiting bound 1 shifts every subsequent result, and no published
+  vector except the `bound 1` row catches it.
+- **The `30000`/`30001` pair is a real trap.** A `>= 30000` loop condition
+  passes every other vector.
+
+The seam sits at `Scenario` construction on both sides — the composition root —
+selected by `"rng": "legacy"` in the scenario spec or by direct injection. Rules
+never choose a generator and never branch on mode; they call `roll(x, stream)`
+and `stream` is simply ignored under compatibility. Default behaviour is
+unchanged, so no existing scenario or fixture moved.
+
+Test split is deliberate: `oracle/test_legacy_rng.py` asserts the vectors
+transcribed by hand from `LEGACY_RNG.md`, because a test reading the generated
+fixture would only prove the implementation agrees with itself;
+`tests/test_legacy_rng.gd` asserts the port against that fixture, including CRT
+advance counts, since advance counts are what decide whether call ordering can
+ever match. The fixture also carries longer unpublished sequences that exercise
+32-bit wraparound and repeated digit extension, which the single-draw vectors
+cannot reach.
+
+Deliberately not done: contextual selectors (`00454DC0`, `00454F80`,
+`00455050`) are not routed through `LegacyRng`, per the spec's instruction not
+to substitute a second RNG for paths whose formulas are not yet typed. Total
+weight zero raises rather than inventing a fallback (open question 6b). No
+per-battle reseed is implemented because none is documented — battles inherit
+the strategic-turn stream, which is worth confirming before battle replay
+fixtures are seeded.

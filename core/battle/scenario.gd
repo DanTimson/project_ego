@@ -22,7 +22,8 @@ var spec: Dictionary = {}
 var scenario_name: String = "unnamed"
 var seed_value: int = 0
 var log: Array[String] = []
-var rng: Rng
+## Either Rng (named streams) or LegacyRng (Genesis compatibility).
+var rng: Variant
 var field: Battlefield
 var units: Dictionary = {}          ## name -> Combatant
 var state: RoundLoop.BattleState
@@ -31,11 +32,23 @@ var state: RoundLoop.BattleState
 var auras_by_source: Dictionary = {}
 
 
-func _init(p_spec: Dictionary) -> void:
+func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
 	spec = p_spec
 	scenario_name = String(spec.get("name", "unnamed"))
 	seed_value = int(spec.get("seed", 0))
-	rng = Rng.new(seed_value)
+	# THE randomness boundary. Rules never choose a generator and never branch on
+	# mode — they receive whatever is injected here and call roll(x, stream).
+	# Genesis compatibility needs ONE shared LegacyRng because the original
+	# advances a single CRT state across every consumer; native mode keeps
+	# per-subsystem streams so adding a roll in one place does not invalidate
+	# every stored replay. Those requirements are irreconcilable, which is why
+	# this seam exists and why it is the only general seam in the engine.
+	if injected_rng != null:
+		rng = injected_rng
+	elif String(spec.get("rng", "")).to_lower() == "legacy":
+		rng = LegacyRng.new(seed_value)
+	else:
+		rng = Rng.new(seed_value)
 	field = _build_field(spec.get("battlefield", {}))
 	state = RoundLoop.BattleState.new()
 	state.sides = _build_sides(spec.get("sides", []))

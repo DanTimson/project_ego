@@ -46,12 +46,20 @@ from combat import AttackKind, Combatant, Rng
 
 
 class Scenario:
-    def __init__(self, spec: dict):
+    def __init__(self, spec: dict, rng=None):
         self.spec = spec
         self.name = spec.get("name", "unnamed")
         self.seed = int(spec.get("seed", 0))
         self.log: list[str] = []
-        self.rng = Rng(self.seed)
+        # THE randomness boundary. Rules never choose a generator and never
+        # branch on mode — they receive whatever is injected here and call
+        # roll(x, stream). Genesis compatibility needs ONE shared LegacyRng
+        # because the original advances a single CRT state across every
+        # consumer; native mode keeps per-subsystem streams so that adding a
+        # roll in one place does not invalidate every stored replay. Those two
+        # requirements are irreconcilable, which is why this seam exists and why
+        # it is the only general seam in the engine.
+        self.rng = rng if rng is not None else self._make_rng(spec)
         self.field = self._build_field(spec.get("battlefield", {}))
         self.units: dict[str, Combatant] = {}
         self.sides = self._build_sides(spec.get("sides", []))
@@ -61,6 +69,22 @@ class Scenario:
         self.auras_by_source = self._build_auras(spec.get("sides", []))
 
     # -- construction -------------------------------------------------------
+
+    @staticmethod
+    def _make_rng(spec: dict):
+        """Composition root: pick a generator from the scenario spec.
+
+        `"rng": "legacy"` selects Genesis compatibility. Anything else, including
+        absence, keeps the named-stream generator, so existing scenarios and
+        fixtures are unaffected.
+        """
+        seed = int(spec.get("seed", 0))
+        if str(spec.get("rng", "")).lower() == "legacy":
+            from legacy_rng import LegacyRng
+            r = LegacyRng(seed)
+            r.epoch = "scenario/%s" % spec.get("name", "unnamed")
+            return r
+        return Rng(seed)
 
     def _build_field(self, spec: dict) -> Battlefield:
         field = Battlefield(int(spec.get("width", 7)), int(spec.get("height", 7)))

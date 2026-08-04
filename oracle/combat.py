@@ -34,10 +34,18 @@ from enum import Enum
 # other subsystem's sequence. Without this, any rules change invalidates every
 # stored replay and differential testing becomes impossible.
 #
-# NOTE: this is a placeholder LCG. The ORIGINAL generator is unidentified —
-# it is one of the three remaining unknowns, alongside MoraleMod values and
-# grid geometry. Swapping this class out is the only change needed once the
-# real PRNG is identified, which is why the roll surface is kept this narrow.
+# STATUS: the original generator is no longer unknown. It is the MSVC CRT
+# recurrence, implemented in oracle/legacy_rng.py from docs/LEGACY_RNG.md.
+#
+# This class is NOT that, and is not a candidate for Genesis parity. Named
+# streams are structurally incompatible with the original, which advances one
+# shared CRT state across every consumer — see LegacyRng's header. Per
+# LEGACY_RNG.md they remain available for isolated tests and for an explicitly
+# Project-EGO-native deterministic mode, and must not be described as legacy
+# parity.
+#
+# Which generator a battle uses is decided once, at Scenario construction; rules
+# never choose and never branch on mode.
 # ---------------------------------------------------------------------------
 
 class Rng:

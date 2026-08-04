@@ -12,7 +12,11 @@ extends RefCounted
 ##     stream seed  :  fnv1a(name) XOR (seed * 2654435761), forced odd-nonzero
 ##     step         :  s = (1103515245 * s + 12345) mod 2^31
 ##
-## The step function is a PLACEHOLDER. The original game's generator is
+## STATUS: the original generator is no longer unknown — it is the MSVC CRT
+## recurrence, implemented in core/legacy_rng.gd from docs/LEGACY_RNG.md.
+## This class is NOT a candidate for Genesis parity: named streams are
+## structurally incompatible with a single shared CRT state. They remain
+## available for isolated tests and an explicitly native deterministic mode.
 ## unidentified (OPEN_QUESTIONS item 4). The roll surface is deliberately this
 ## narrow so replacing it is a one-file change.
 
