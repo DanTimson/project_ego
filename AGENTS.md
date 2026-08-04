@@ -17,6 +17,18 @@ Use `docs/FUNCTION_MAP.csv` to navigate recovered functions by address.
 
 ## Evidence labels
 
+Two questions are being answered, and they are independent:
+
+1. **How well is the rule established?** — PROVEN, STRONG INFERENCE, CANDIDATE,
+   STATED, RECOVERED, OPEN.
+2. **Has it been confirmed against observed behaviour?** — VERIFIED, or not.
+
+A claim can be PROVEN and not VERIFIED: reading the disassembly correctly
+establishes what the code does, not that the shipped game behaves that way in
+every reachable state. Most current ledger claims are in exactly that position.
+Never let VERIFIED be implied by a strong reading; it requires a table, fixture
+or controlled original-game observation.
+
 Use these labels in documentation and comments:
 
 - **PROVEN** — explicit assembly, layout, call-site or data-flow evidence.
@@ -30,7 +42,11 @@ Use these labels in documentation and comments:
 - **CANDIDATE** — useful working name only.
 - **OPEN** — unresolved or contradictory.
 
-Do not silently upgrade a candidate name into a game-facing term.
+Do not silently upgrade a candidate name into a game-facing term, and do not
+upgrade PROVEN to VERIFIED without naming the vector that confirmed it.
+
+`docs/EVIDENCE_LEDGER.csv` records the two axes in separate columns:
+`confidence` and `confirmed_by_observation`.
 
 ## Source hierarchy
 

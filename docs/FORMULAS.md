@@ -105,20 +105,39 @@ never loses stamina for any action at all.
 ### 1.4 MoraleMod
 
 `[BIN]` effective attack/counterattack/ranged-attack functions ·
-**RECOVERED, PARTIAL**
+`[GM]` «Боевой дух», Eadoropedia «Игровая механика» (NH 26.0620.f01)
 
-The binary closes the low and neutral ranges:
+Keyed on **absolute** morale. `morale_base` does not enter the attack
+multiplier. Applies to the three attack values only — never to defence, which is
+touched only by the stamina-0 halving in §1.3.
 
 ```text
-morale < 6   -> −10% attack per missing point
-6..15        -> no morale multiplier
-morale > 15  -> positive bonuses in 5% steps
+morale 0..5   ->  0.4 + 0.1 * morale        (0 -> 0.4, and the unit panics)
+morale 6..15  ->  1.0
+morale >= 16  ->  1.0 + 0.05 * n,  where band n starts at 15 + n(n+1)/2
+                  16-17 = 1.05   18-20 = 1.10   21-24 = 1.15   25-29 = 1.20
+                  30-35 = 1.25   36-42 = 1.30   43-50 = 1.35   … («и так далее»)
 ```
 
-The high-morale branch uses a nonlinear threshold progression. Its exact
-breakpoints and integer ordering still need to be normalized into a complete
-table; see `OPEN_QUESTIONS` item 1. The current linear placeholder must not be
-described as exact compatibility.
+**Low and neutral bands (0..15) — VERIFIED.** Two independent sources agree at
+every point. The binary gives −10% attack per missing point below morale 6; the
+published table gives `0.4 + 0.1 * morale` for 0..5. These are the same function:
+morale 0 → 0.40, 3 → 0.70, 5 → 0.90, 6..15 → 1.00. The agreement holds across
+two different builds (Genesis 1.05.2 binary, NH 26.0620.f01 documentation),
+which is also weak evidence that New Horizons did not alter this curve.
+
+**High band (≥16) — STRONG INFERENCE for Genesis.** The 5% step size is
+corroborated by both sources. The *band boundaries* come only from the NH
+published table; the Genesis high-morale branch has not been read. Do not claim
+exact Genesis compatibility above morale 15 until it is. See `OPEN_QUESTIONS`
+item 1 and `COMPATIBILITY_TEST_MATRIX` STATS-MORALE-002.
+
+The continuation beyond band 43-50 is the wiki's stated widening rule, computed
+rather than tabulated. Compute the band index iteratively rather than by float
+`sqrt`, so the oracle and the GDScript port stay bit-exact.
+
+Carve-out: morale multiplies only direct attack bonuses, not conditional damage
+such as «Сокрушение зла» — see §1.1.
 
 ---
 

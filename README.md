@@ -1,7 +1,13 @@
 # Project EGO
 
-Project EGO is a clean-room, data-driven reimplementation and extension platform
-for **Eador: Genesis** combat and content systems.
+Project EGO is an independent, data-driven reimplementation and extension
+platform for **Eador: Genesis** combat and content systems.
+
+Behaviour is recovered from published mechanics, extracted data, controlled
+observation and inspection of the original executable, and is then restated and
+implemented in new code. See
+[docs/PROVENANCE_AND_DATA_POLICY.md](docs/PROVENANCE_AND_DATA_POLICY.md) for the
+project's evidence rules and legal basis.
 
 The immediate goal is not presentation parity. It is a deterministic,
 headless-compatible rules core whose results can be compared with:

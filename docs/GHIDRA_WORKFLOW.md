@@ -76,16 +76,39 @@ What would falsify the hypothesis:
 
 ## Confidence update
 
+Labels are defined in `AGENTS.md`; this section only gives the binary-side
+criteria. Record two independent things.
+
+### Axis 1 — how well the rule is established
+
 A result may be marked **PROVEN** when at least one of these holds:
 
 - direct assembly establishes the value flow;
 - multiple concrete callers establish the ABI;
 - a structure offset is used consistently and passes size/layout checks;
-- a numeric ID is tied to a `.var` record and its runtime consumer;
-- a controlled original-game vector matches the recovered implementation.
+- a numeric ID is tied to a `.var` record and its runtime consumer.
 
 Use **STRONG INFERENCE** when the control flow is clear but one semantic link is
 indirect. Use **CANDIDATE** for names selected only for navigation.
+
+### Axis 2 — whether observed behaviour confirms it
+
+Set `confirmed_by_observation` in `docs/EVIDENCE_LEDGER.csv` to **yes** only when
+a controlled original-game vector, a published table, or an executed fixture
+matches the recovered rule. Otherwise **no**, or **n-a** for claims that are pure
+layout and have no observable behaviour of their own.
+
+A controlled vector is deliberately *not* one of the PROVEN criteria above. It
+answers the second question, not the first, and collapsing the two hides which
+claims have ever been checked against the running game. Static reading has
+already produced rules on this project that were internally consistent, resolved
+against real tables, and still wrong — a heuristic that mapped unit metadata to
+valid upgrade indices passed every cross-reference check until real Genesis data
+contradicted it.
+
+When two independent sources agree exactly — for example the binary's low-morale
+rule and the published morale table — record both source IDs. Cross-source
+agreement is the strongest evidence available short of an executed vector.
 
 ## Packet completion checklist
 

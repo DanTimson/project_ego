@@ -1,8 +1,17 @@
 # Provenance and data policy
 
-Project EGO is a clean-room reimplementation and research project. The
+Project EGO is an independent reimplementation and research project. The
 repository distinguishes original project work from evidence obtained from a
 local copy of Eador: Genesis.
+
+The project does **not** claim a clean-room (Chinese-wall) process. Clean-room
+has a specific meaning — one party inspects the original and writes a functional
+specification, and a separate party implements from that specification without
+access to the original. Project EGO is developed by contributors who both
+inspect the executable and write the implementation, so the term does not apply
+and is not used.
+
+What the project does claim is stated in *Legal basis* below.
 
 ## May be committed
 
@@ -36,7 +45,30 @@ repository to carry the evidence itself.
 - **derived evidence** — decompilation, structure map or trace;
 - **Project EGO implementation** — independently written code and tests.
 
-## Clean-room implementation rule
+## Legal basis
+
+The project relies on the principle that a program's *functionality*, its
+programming language and its *data file formats* are not themselves protected by
+copyright — the position taken by the Court of Justice of the European Union in
+*SAS Institute Inc. v World Programming Ltd* (C-406/10, 2 May 2012). Behavioural
+rules, numeric tables, `.var` grammar and file-format descriptions fall on that
+side of the line. Original expression — code, assets, text, bulk decompiler
+output — does not, and is never committed.
+
+Note explicitly what the project does *not* rely on: Article 6 of Directive
+2009/24/EC permits decompilation only for achieving interoperability with an
+independently created program, and is not a general permission to reimplement.
+Where inspection of the executable is used, it is used to determine the ideas
+and principles underlying a rule, and the resulting rule is then restated and
+implemented in new code.
+
+Eador: Genesis is a commercially available product. Nothing here treats it as
+abandonware.
+
+This section records the project's reasoning, not legal advice. Contributors
+distributing builds in their own jurisdiction should get their own.
+
+## Independent implementation rule
 
 Recovered behaviour should be restated as algorithms, invariants, test vectors
 and new code. Do not paste original executable bytes or bulk decompiler output
@@ -69,8 +101,13 @@ A pull request based on reverse engineering should state:
 The initial local archive is identified by:
 
 ```text
-SHA-256 {archive_sha}
-repository commit {repo_commit}
+archive              Eador_archive.zip
+SHA-256              2dcfe4acd86697f3f5b7d363a9916d13d44f19b48fe178368937794fe7b111b0
+size                 13,194,902 bytes
+repository anchor    5721c79d59ad370ae6f7ae8a6b4e5a3c48760ca2
+manifest             docs/EVIDENCE_SOURCES.csv (source ID ARCHIVE-20260803)
 ```
 
-It is not repository content.
+It is not repository content. The per-file breakdown, including the executable
+and Ghidra project hashes, is in `docs/EVIDENCE_SOURCES.csv` and
+`docs/BINARY_TARGET.md`.

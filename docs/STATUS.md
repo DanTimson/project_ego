@@ -6,7 +6,7 @@ This is a coverage map, not a release claim.
 |---|---|---|---|---|
 | attack randomisation and chip damage | published tables + binary | implemented | implemented | strong, legacy PRNG pending |
 | stamina and wound multipliers | published tables + binary | implemented | implemented | strong |
-| morale attack multiplier | binary partial | placeholder/partial | partial | high-morale curve open |
+| morale attack multiplier | binary + published table | placeholder/partial | placeholder/partial | 0..15 settled by two agreeing sources; ≥16 band widths unread in Genesis |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | provider coverage incomplete |
 | activated actions | docs, data, binary dispatcher | implemented | `Action` implemented | effect dictionary incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |

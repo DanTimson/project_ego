@@ -11,7 +11,7 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 
 | ID | Question | Current evidence | How to close |
 |---|---|---|---|
-| 1 | **Exact high-morale attack curve.** | Binary stat functions establish −10% per point below morale 6, no adjustment from 6 through 15, and positive 5% steps above 15. The upper breakpoints have not been normalized into exact pseudocode. | Re-read the high-morale assembly branch and add vectors for every reachable morale value. |
+| 1 | **High-morale band boundaries in the Genesis build.** | Narrowed. Morale 0..15 is settled: the binary's −10%-per-missing-point rule and the published table's `0.4 + 0.1*morale` are the same function at every point, across two builds — see `FORMULAS` §1.4. Above 15 both sources agree the step is 5%, but the band widths (`15 + n(n+1)/2`) come only from NH 26.0620.f01 documentation; the Genesis high-morale branch has not been read. | Read the high-morale branch at the effective-attack functions and confirm the first three boundaries (16, 18, 21). If they match, close; if not, Genesis and NH need separate profiles. |
 | 2 | **Large-unit battlefield footprint.** | The tactical grid and six-neighbour geometry are solved. It is still unclear whether `Гигант` or another category occupies more than one tactical cell in the inspected build. | Inspect placement/collision consumers for unit category and validate in-game. |
 | 6 | **Exhausted level-up pools.** | Selection, prerequisite filtering and removal-by-value are recovered. The behaviour when every surviving weight is zero or a unit has fewer than the requested choices remains unclear. | Construct a save/unit that exhausts its pool, or inspect the caller after an all-zero weighted table. |
 

@@ -10,6 +10,4 @@ tools/var/out
 tools/var/var
 var.zip
 .venv
-docs/ARCHITECTURE.md
-docs/RUNNING.md
 */__pycache__
