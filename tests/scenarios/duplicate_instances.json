@@ -1,0 +1,106 @@
+{
+  "name": "two swordsmen share a name",
+  "seed": 4242,
+  "battlefield": {
+    "width": 5,
+    "height": 3
+  },
+  "sides": [
+    {
+      "id": 0,
+      "name": "A",
+      "leader_initiative": 5,
+      "is_attacker": true,
+      "units": [
+        {
+          "id": "sword_a",
+          "name": "Мечник",
+          "at": [
+            0,
+            0
+          ],
+          "life": 17,
+          "attack": 7,
+          "counter_attack": 7,
+          "defence": 3,
+          "speed": 2,
+          "stamina": 10,
+          "morale": 10
+        },
+        {
+          "id": "sword_b",
+          "name": "Мечник",
+          "at": [
+            0,
+            2
+          ],
+          "life": 17,
+          "attack": 7,
+          "counter_attack": 7,
+          "defence": 3,
+          "speed": 2,
+          "stamina": 10,
+          "morale": 10
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "B",
+      "leader_initiative": 2,
+      "units": [
+        {
+          "name": "Ополченец",
+          "at": [
+            3,
+            1
+          ],
+          "life": 12,
+          "attack": 5,
+          "counter_attack": 4,
+          "defence": 2,
+          "speed": 2,
+          "stamina": 10,
+          "morale": 10
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "op": "move",
+      "unit": "sword_a",
+      "to": [
+        2,
+        0
+      ]
+    },
+    {
+      "op": "move",
+      "unit": "sword_b",
+      "to": [
+        2,
+        2
+      ]
+    },
+    {
+      "op": "end_phase"
+    },
+    {
+      "op": "move",
+      "unit": "Ополченец",
+      "to": [
+        2,
+        1
+      ]
+    },
+    {
+      "op": "end_phase"
+    },
+    {
+      "op": "attack",
+      "unit": "sword_b",
+      "target": "Ополченец"
+    }
+  ]
+}

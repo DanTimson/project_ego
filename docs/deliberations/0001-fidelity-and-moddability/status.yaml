@@ -19,7 +19,7 @@ verification:
   - oracle/test_legacy_rng_scenario.py
   - oracle/test_roster.py
 pending:
-  - separate battle instance identity from display names when scenario format changes
   - scope a persistence layer before attempting the save-round-trip probe
   - complete the altered-rule and new-action probe
   - split persistent-instance/intrinsic from runtime-node/aura providers if OQ 18 requires it
+  - decide whether scenario units may name a canonical content definition, instantiating from a pack instead of declaring stats inline

@@ -42,6 +42,63 @@ def run(spec=None):
     return scenario.Scenario(json.loads(json.dumps(spec or SPEC))).run()
 
 
+def test_instance_identity() -> None:
+    """Battle-instance identity is separate from the display name.
+
+    An army may field several units of one type. They share a display name and,
+    once wired to a pack, a content_id — and they must still be individually
+    addressable. Before this, the scenario builder keyed units by name and
+    rejected the second one outright, so a duplicate simply could not be
+    expressed. DELIB-0001 decision item 6.
+    """
+    print("\n[instance identity]")
+    spec = json.loads(json.dumps(SPEC))
+    a = spec["sides"][0]["units"][0]
+    a["id"] = "one"
+    dup = json.loads(json.dumps(a))
+    dup["id"] = "two"
+    dup["at"] = [0, 0]
+    spec["sides"][0]["units"].append(dup)
+    spec["commands"] = [{"op": "move", "unit": "two", "to": [1, 0]}]
+
+    sc = scenario.Scenario(spec)
+    check("one" in sc.units and "two" in sc.units,
+          "two units of the same type coexist", str(sorted(sc.units)))
+    check(sc.units["one"] is not sc.units["two"],
+          "and are distinct objects")
+    check(sc.units["one"].name == sc.units["two"].name,
+          "sharing a display name", sc.units["one"].name)
+    check(sc.units["one"].label() != sc.units["two"].label(),
+          "but not a label", "%s vs %s"
+          % (sc.units["one"].label(), sc.units["two"].label()))
+
+    result = sc.run()
+    moved = [l for l in result["log"] if "two" in l]
+    check(moved, "commands address the intended instance", str(moved[:1]))
+
+    # Omitting the id keeps the old behaviour exactly.
+    plain = scenario.Scenario(json.loads(json.dumps(SPEC)))
+    first = list(plain.units.values())[0]
+    check(first.instance_id == first.name,
+          "instance id defaults to the display name")
+    check(first.label() == first.name,
+          "so labels are unchanged for scenarios that declare no id")
+
+    # A duplicate WITHOUT ids must still fail loudly rather than silently drop.
+    bad = json.loads(json.dumps(SPEC))
+    clash = json.loads(json.dumps(bad["sides"][0]["units"][0]))
+    clash["at"] = [0, 0]
+    bad["sides"][0]["units"].append(clash)
+    try:
+        scenario.Scenario(bad)
+    except ValueError as exc:
+        check("instance id" in str(exc),
+              "a nameless duplicate is rejected with an actionable message",
+              str(exc)[:60])
+    else:
+        check(False, "a nameless duplicate is rejected with an actionable message")
+
+
 def test_determinism() -> None:
     print("\n[1] determinism — the property everything else rests on")
     first = run()
@@ -249,6 +306,7 @@ if __name__ == "__main__":
     test_ammunition()
     test_modifiers_actually_apply()
     test_round_upkeep()
+    test_instance_identity()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
                     % (len(FAILS), ", ".join(FAILS))))
     sys.exit(1 if FAILS else 0)

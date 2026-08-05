@@ -237,6 +237,154 @@
     }
    }
   },
+  "duplicate_instances.json": {
+   "spec": {
+    "name": "two swordsmen share a name",
+    "seed": 4242,
+    "battlefield": {
+     "width": 5,
+     "height": 3
+    },
+    "sides": [
+     {
+      "id": 0,
+      "name": "A",
+      "leader_initiative": 5,
+      "is_attacker": true,
+      "units": [
+       {
+        "id": "sword_a",
+        "name": "Мечник",
+        "at": [
+         0,
+         0
+        ],
+        "life": 17,
+        "attack": 7,
+        "counter_attack": 7,
+        "defence": 3,
+        "speed": 2,
+        "stamina": 10,
+        "morale": 10
+       },
+       {
+        "id": "sword_b",
+        "name": "Мечник",
+        "at": [
+         0,
+         2
+        ],
+        "life": 17,
+        "attack": 7,
+        "counter_attack": 7,
+        "defence": 3,
+        "speed": 2,
+        "stamina": 10,
+        "morale": 10
+       }
+      ]
+     },
+     {
+      "id": 1,
+      "name": "B",
+      "leader_initiative": 2,
+      "units": [
+       {
+        "name": "Ополченец",
+        "at": [
+         3,
+         1
+        ],
+        "life": 12,
+        "attack": 5,
+        "counter_attack": 4,
+        "defence": 2,
+        "speed": 2,
+        "stamina": 10,
+        "morale": 10
+       }
+      ]
+     }
+    ],
+    "commands": [
+     {
+      "op": "move",
+      "unit": "sword_a",
+      "to": [
+       2,
+       0
+      ]
+     },
+     {
+      "op": "move",
+      "unit": "sword_b",
+      "to": [
+       2,
+       2
+      ]
+     },
+     {
+      "op": "end_phase"
+     },
+     {
+      "op": "move",
+      "unit": "Ополченец",
+      "to": [
+       2,
+       1
+      ]
+     },
+     {
+      "op": "end_phase"
+     },
+     {
+      "op": "attack",
+      "unit": "sword_b",
+      "target": "Ополченец"
+     }
+    ]
+   },
+   "log": [
+    "== two swordsmen share a name (seed 4242) ==",
+    "-- round 1, side 0 first --",
+    "Мечник(sword_a) moves to 2,0 (2 steps, 2 total this round)",
+    "Мечник(sword_b) moves to 2,2 (2 steps, 2 total this round)",
+    "-- side 1 --",
+    "Ополченец moves to 2,1 (1 steps, 1 total this round)",
+    "-- round 2, side 0 first --",
+    "Мечник(sword_b) hits Ополченец for 5 (Ополченец at 7/12, stamina 9)",
+    "Ополченец counters for 2 (Мечник(sword_b) at 15/17)"
+   ],
+   "final": {
+    "sword_a": {
+     "alive": true,
+     "life": 17,
+     "stamina": 10,
+     "at": "2,0",
+     "steps_this_round": 0,
+     "action_spent": false,
+     "movement_remaining": 2
+    },
+    "sword_b": {
+     "alive": true,
+     "life": 15,
+     "stamina": 9,
+     "at": "2,2",
+     "steps_this_round": 0,
+     "action_spent": true,
+     "movement_remaining": 2
+    },
+    "Ополченец": {
+     "alive": true,
+     "life": 7,
+     "stamina": 10,
+     "at": "2,1",
+     "steps_this_round": 0,
+     "action_spent": false,
+     "movement_remaining": 2
+    }
+   }
+  },
   "first_strike.json": {
    "spec": {
     "name": "pikeman first strike versus a charging swordsman",

@@ -82,8 +82,13 @@ func _build_sides(specs: Array) -> Array:
 		for u in s.get("units", []):
 			var unit := Combatant.new()
 			unit.name = String(u["name"])
+			# Battle-instance identity, distinct from the display name; defaults
+			# to the name so existing scenarios are unaffected.
+			unit.instance_id = String(u.get("id", u["name"]))
 			for key in u:
 				var k := String(key)
+				if k == "id":
+					continue
 				if k in ["name", "at", "flags", "subtypes", "modifiers", "auras"]:
 					continue
 				unit.set(k, u[key])
@@ -105,7 +110,9 @@ func _build_sides(specs: Array) -> Array:
 				unit.morale_base = unit.morale
 			var at: Array = u["at"]
 			field.place(unit, Battlefield.offset_to_axial(int(at[0]), int(at[1])))
-			units[unit.name] = unit
+			if units.has(unit.instance_id):
+				push_error("duplicate unit instance id '%s' — give each unit an explicit \"id\" when several share a display name" % unit.instance_id)
+			units[unit.instance_id] = unit
 			side.units.append(unit)
 		out.append(side)
 	return out
@@ -118,7 +125,7 @@ func _build_auras(specs: Array) -> Dictionary:
 			var declared: Array = u.get("auras", [])
 			if declared.is_empty():
 				continue
-			var unit: Combatant = units[String(u["name"])]
+			var unit: Combatant = units[String(u.get("id", u["name"]))]
 			var built: Array = []
 			for a in declared:
 				var aura := Auras.Aura.new()
@@ -177,7 +184,7 @@ func _round_upkeep() -> void:
 				keys.sort()
 				for k in keys:
 					parts.append("%s %+d" % [String(k), int(totals[k])])
-				emit("  %s: auras (%s)" % [unit.name, ", ".join(parts)])
+				emit("  %s: auras (%s)" % [unit.label(), ", ".join(parts)])
 				if not unit.alive:
 					_fell(unit)
 					continue
@@ -186,7 +193,7 @@ func _round_upkeep() -> void:
 				for e in unit.statuses:
 					names.append(e.describe())
 				Statuses.tick_round(unit)
-				emit("  %s: %s" % [unit.name, ", ".join(names)])
+				emit("  %s: %s" % [unit.label(), ", ".join(names)])
 				if not unit.alive:
 					_fell(unit)
 
@@ -233,17 +240,17 @@ func cmd_move(unit: Combatant, col: int, row: int) -> void:
 	var goal := Battlefield.offset_to_axial(col, row)
 	var path := field.path(start, goal, false, unit.movement_remaining)
 	if path.is_empty():
-		emit("%s cannot reach %d,%d" % [unit.name, col, row])
+		emit("%s cannot reach %d,%d" % [unit.label(), col, row])
 		return
 	var cost := _path_cost(path)
 	if cost > unit.movement_remaining:
-		emit("%s lacks movement for %d,%d" % [unit.name, col, row])
+		emit("%s lacks movement for %d,%d" % [unit.label(), col, row])
 		return
 	field.remove_occupant(start)
 	field.place(unit, goal)
 	ActionPoints.spend_move(unit, cost, _path_stamina(path))
 	emit("%s moves to %s (%d steps, %d total this round)"
-		% [unit.name, _at(unit), path.size(), unit.steps_this_round])
+		% [unit.label(), _at(unit), path.size(), unit.steps_this_round])
 
 
 ## Attack commands carry an implicit move: issuing an attack against a reachable
@@ -273,7 +280,7 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	field.remove_occupant(here)
 	field.place(unit, best_dest)
 	ActionPoints.spend_move(unit, best_cost, _path_stamina(best_path))
-	emit("%s closes to %s (%d steps)" % [unit.name, _at(unit), best_path.size()])
+	emit("%s closes to %s (%d steps)" % [unit.label(), _at(unit), best_path.size()])
 	return true
 
 
@@ -281,7 +288,7 @@ func _fell(unit: Combatant) -> void:
 	var h := field.find_unit(unit)
 	if field.contains(h):
 		field.remove_occupant(h)
-	emit("%s falls" % unit.name)
+	emit("%s falls" % unit.label())
 
 
 ## One exchange: the attack and any retaliation, in the right order.
@@ -297,12 +304,12 @@ func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
 	for entry in ex.order:
 		if String(entry[0]) == "attack":
 			emit("%s hits %s for %d (%s at %d/%d, stamina %d)"
-				% [unit.name, target.name, int(entry[1]), target.name,
+				% [unit.label(), target.label(), int(entry[1]), target.label(),
 					maxi(0, target.life), target.life_base, unit.stamina])
 		else:
 			emit("%s counters%s for %d (%s at %d/%d)"
-				% [target.name, " first" if ex.counter_first else "",
-					int(entry[1]), unit.name,
+				% [target.label(), " first" if ex.counter_first else "",
+					int(entry[1]), unit.label(),
 					maxi(0, unit.life), unit.life_base])
 	if ex.defender_died:
 		_fell(target)
@@ -311,36 +318,36 @@ func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
 	if not ex.countered and ex.reason != Counterattack.NoCounter.RANGED \
 			and ex.reason != Counterattack.NoCounter.DEAD:
 		emit("  (%s does not counter: %s)"
-			% [target.name, Counterattack.REASON_TEXT[ex.reason]])
+			% [target.label(), Counterattack.REASON_TEXT[ex.reason]])
 
 
 func cmd_attack(unit: Combatant, target: Combatant) -> void:
 	if not target.alive:
-		emit("%s has no target: %s is down" % [unit.name, target.name])
+		emit("%s has no target: %s is down" % [unit.label(), target.label()])
 		return
 	if unit.action_spent:
-		emit("%s has already acted" % unit.name)
+		emit("%s has already acted" % unit.label())
 		return
 	if not _approach(unit, target):
-		emit("%s cannot reach %s" % [unit.name, target.name])
+		emit("%s cannot reach %s" % [unit.label(), target.label()])
 		return
 	_strike(unit, target, Combatant.AttackKind.MELEE)
 
 
 func cmd_shoot(unit: Combatant, target: Combatant) -> void:
 	if not target.alive:
-		emit("%s has no target: %s is down" % [unit.name, target.name])
+		emit("%s has no target: %s is down" % [unit.label(), target.label()])
 		return
 	if unit.action_spent:
-		emit("%s has already acted" % unit.name)
+		emit("%s has already acted" % unit.label())
 		return
 	if unit.ammo <= 0:
-		emit("%s is out of ammunition" % unit.name)
+		emit("%s is out of ammunition" % unit.label())
 		return
 	var dist := Battlefield.distance(field.find_unit(unit), field.find_unit(target))
 	if dist > unit.shooting_range:
 		emit("%s is out of range of %s (%d > %d)"
-			% [target.name, unit.name, dist, unit.shooting_range])
+			% [target.label(), unit.label(), dist, unit.shooting_range])
 		return
 	unit.ammo -= 1
 	_strike(unit, target, Combatant.AttackKind.RANGED)
@@ -348,7 +355,7 @@ func cmd_shoot(unit: Combatant, target: Combatant) -> void:
 
 func cmd_rest(unit: Combatant) -> void:
 	ActionPoints.rest(unit)
-	emit("%s rests (stamina %d)" % [unit.name, unit.stamina])
+	emit("%s rests (stamina %d)" % [unit.label(), unit.stamina])
 
 
 func cmd_extra_turn(unit: Combatant, c: Dictionary) -> void:
@@ -357,7 +364,7 @@ func cmd_extra_turn(unit: Combatant, c: Dictionary) -> void:
 		bool(c.get("once_per_round", false)),
 		bool(c.get("fire_round_start", false)))
 	emit("%s %s an extra turn (movement %d, steps %d)"
-		% [unit.name, "receives" if bool(r[0]) else "is refused",
+		% [unit.label(), "receives" if bool(r[0]) else "is refused",
 			unit.movement_remaining, unit.steps_this_round])
 
 
@@ -404,11 +411,11 @@ func _run() -> Dictionary:
 			emit("unknown unit '%s'" % c.get("unit", ""))
 			continue
 		if not unit.alive:
-			emit("%s is down and cannot act" % unit.name)
+			emit("%s is down and cannot act" % unit.label())
 			continue
 		var side := _side_of(unit)
 		if side != null and side.id != state.active_side:
-			emit("%s is not in the active side's phase" % unit.name)
+			emit("%s is not in the active side's phase" % unit.label())
 			continue
 		match op:
 			"move":

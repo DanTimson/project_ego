@@ -20,6 +20,25 @@ enum AttackKind { MELEE, COUNTER, RANGED }
 ## battle-instance identity and display name distinct. `name` is presentation.
 var content_id: String = ""
 
+## BATTLE-INSTANCE identity: the handle addressing this particular combatant
+## within one battle. Distinct from `name`, which is presentation, and from
+## `content_id`, which is the definition it came from. An army may field several
+## units of one type: they share a content_id and a display name and must still
+## be individually addressable. DELIB-0001 decision item 6.
+##
+## Defaults to the display name, so a scenario declaring no explicit id behaves
+## exactly as before.
+var instance_id: String = ""
+
+
+## Display text for logs and traces. The name alone, unless an explicit instance
+## id was given — two units of one type share a name, so a line naming only
+## «Мечник» would be ambiguous about which acted.
+func label() -> String:
+	if instance_id != "" and instance_id != name:
+		return "%s(%s)" % [name, instance_id]
+	return name
+
 var name: String = "unit"
 
 # base (unmodified) stats

@@ -151,6 +151,17 @@ class AttackKind(Enum):
 @dataclass(eq=False)
 class Combatant:
     name: str = "unit"
+    # BATTLE-INSTANCE identity: the handle addressing this particular combatant
+    # within one battle. Distinct from `name`, which is presentation, and from
+    # `content_id`, which is the definition it came from. Three identities,
+    # because an army can field several units of one type: they share a
+    # content_id, they share a display name, and they must still be individually
+    # addressable. DELIB-0001 decision item 6.
+    #
+    # Defaults to the display name, so a scenario that declares no explicit
+    # instance id behaves exactly as before.
+    instance_id: str = ""
+
     # The content DEFINITION this instance was built from, e.g.
     # "genesis:unit/5". Empty for inline synthetic units declared directly in a
     # scenario, which are battle-local and are NOT pack content — see
@@ -214,6 +225,18 @@ class Combatant:
     ## Cumulative path length this round — NOT displacement. Feeds Атака с
     ## разгона; its `> 0` test is the stamina -2/-1 discriminator.
     steps_this_round: int = 0
+
+    def label(self) -> str:
+        """Display text for logs and traces.
+
+        The display name alone, unless an explicit battle-instance id was given
+        — in which case the id is appended, because two units of one type share a
+        name and a log line naming only «Мечник» would be ambiguous about which
+        one acted.
+        """
+        if self.instance_id and self.instance_id != self.name:
+            return "%s(%s)" % (self.name, self.instance_id)
+        return self.name
 
     def has_flag(self, f: str) -> bool:
         """A flag is DERIVED, not stored.

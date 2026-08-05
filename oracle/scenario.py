@@ -111,8 +111,13 @@ class Scenario:
             )
             for u in s.get("units", []):
                 unit = Combatant(name=u["name"])
+                # Battle-instance identity, distinct from the display name. An
+                # army may field several units of one type; they share a name and
+                # must still be addressable individually. Defaults to the name,
+                # so existing scenarios are unaffected.
+                unit.instance_id = str(u.get("id") or u["name"])
                 for key, value in u.items():
-                    if key in ("name", "at", "flags", "subtypes",
+                    if key in ("name", "id", "at", "flags", "subtypes",
                                "modifiers", "auras"):
                         continue
                     setattr(unit, key, value)
@@ -136,9 +141,12 @@ class Scenario:
                 col, row = u["at"]
                 if not self.field.place(unit, bfmod.offset_to_axial(col, row)):
                     raise ValueError("cannot place %s at %s" % (unit.name, u["at"]))
-                if unit.name in self.units:
-                    raise ValueError("duplicate unit name %r" % unit.name)
-                self.units[unit.name] = unit
+                if unit.instance_id in self.units:
+                    raise ValueError(
+                        "duplicate unit instance id %r — give each unit an "
+                        "explicit \"id\" when several share a display name"
+                        % unit.instance_id)
+                self.units[unit.instance_id] = unit
                 side.units.append(unit)
             sides.append(side)
         return sides
@@ -208,18 +216,18 @@ class Scenario:
         goal = bfmod.offset_to_axial(col, row)
         path = self.field.path(start, goal, max_cost=unit.movement_remaining)
         if not path:
-            self.emit("%s cannot reach %d,%d" % (unit.name, col, row))
+            self.emit("%s cannot reach %d,%d" % (unit.label(), col, row))
             return
         cost = sum(self.field.tile(h).move_cost for h in path)
         if cost > unit.movement_remaining:
-            self.emit("%s lacks movement for %d,%d" % (unit.name, col, row))
+            self.emit("%s lacks movement for %d,%d" % (unit.label(), col, row))
             return
         stam = sum(self.field.tile(h).stam_cost for h in path)
         self.field.remove(start)
         self.field.place(unit, goal)
         turn.spend_move(unit, cost, stamina_cost=stam)
         self.emit("%s moves to %s (%d steps, %d total this round)"
-                  % (unit.name, self._at(unit), len(path), unit.steps_this_round))
+                  % (unit.label(), self._at(unit), len(path), unit.steps_this_round))
 
     def _approach(self, unit: Combatant, target: Combatant) -> bool:
         """Attack commands carry an implicit move: issuing an attack against a
@@ -248,14 +256,14 @@ class Scenario:
         self.field.remove(here)
         self.field.place(unit, dest)
         turn.spend_move(unit, cost, stamina_cost=stam)
-        self.emit("%s closes to %s (%d steps)" % (unit.name, self._at(unit), len(path)))
+        self.emit("%s closes to %s (%d steps)" % (unit.label(), self._at(unit), len(path)))
         return True
 
     def _fell(self, unit: Combatant) -> None:
         h = self.field.find(unit)
         if h is not None:
             self.field.remove(h)
-        self.emit("%s falls" % unit.name)
+        self.emit("%s falls" % unit.label())
 
     def _strike(self, unit: Combatant, target: Combatant, kind: AttackKind,
                 action=None) -> None:
@@ -271,13 +279,13 @@ class Scenario:
         for what, damage in ex.order:
             if what == "attack":
                 self.emit("%s hits %s for %d (%s at %d/%d, stamina %d)"
-                          % (unit.name, target.name, damage, target.name,
+                          % (unit.label(), target.label(), damage, target.label(),
                              max(0, target.life), target.life_base, unit.stamina))
             else:
                 self.emit("%s counters%s for %d (%s at %d/%d)"
-                          % (target.name,
+                          % (target.label(),
                              " first" if ex.counter_first else "",
-                             damage, unit.name,
+                             damage, unit.label(),
                              max(0, unit.life), unit.life_base))
         if ex.defender_died:
             self._fell(target)
@@ -286,41 +294,41 @@ class Scenario:
         if not ex.countered and ex.reason not in (ca.NoCounter.RANGED,
                                                   ca.NoCounter.DEAD):
             self.emit("  (%s does not counter: %s)"
-                      % (target.name, ex.reason.value))
+                      % (target.label(), ex.reason.value))
 
     def cmd_attack(self, unit: Combatant, target: Combatant) -> None:
         if not target.alive:
-            self.emit("%s has no target: %s is down" % (unit.name, target.name))
+            self.emit("%s has no target: %s is down" % (unit.label(), target.label()))
             return
         if unit.action_spent:
-            self.emit("%s has already acted" % unit.name)
+            self.emit("%s has already acted" % unit.label())
             return
         if not self._approach(unit, target):
-            self.emit("%s cannot reach %s" % (unit.name, target.name))
+            self.emit("%s cannot reach %s" % (unit.label(), target.label()))
             return
         self._strike(unit, target, AttackKind.MELEE)
 
     def cmd_shoot(self, unit: Combatant, target: Combatant) -> None:
         if not target.alive:
-            self.emit("%s has no target: %s is down" % (unit.name, target.name))
+            self.emit("%s has no target: %s is down" % (unit.label(), target.label()))
             return
         if unit.action_spent:
-            self.emit("%s has already acted" % unit.name)
+            self.emit("%s has already acted" % unit.label())
             return
         if unit.ammo <= 0:
-            self.emit("%s is out of ammunition" % unit.name)
+            self.emit("%s is out of ammunition" % unit.label())
             return
         dist = self.field.find(unit).distance(self.field.find(target))
         if dist > unit.shooting_range:
             self.emit("%s is out of range of %s (%d > %d)"
-                      % (target.name, unit.name, dist, unit.shooting_range))
+                      % (target.label(), unit.label(), dist, unit.shooting_range))
             return
         unit.ammo -= 1
         self._strike(unit, target, AttackKind.RANGED)
 
     def cmd_rest(self, unit: Combatant) -> None:
         turn.rest(unit)
-        self.emit("%s rests (stamina %d)" % (unit.name, unit.stamina))
+        self.emit("%s rests (stamina %d)" % (unit.label(), unit.stamina))
 
     def cmd_extra_turn(self, unit: Combatant, spec: dict) -> None:
         granted, _ = turn.grant_extra_turn(
@@ -329,7 +337,7 @@ class Scenario:
             fire_round_start=bool(spec.get("fire_round_start", False)),
         )
         self.emit("%s %s an extra turn (movement %d, steps %d)"
-                  % (unit.name, "receives" if granted else "is refused",
+                  % (unit.label(), "receives" if granted else "is refused",
                      unit.movement_remaining, unit.steps_this_round))
 
     def _round_upkeep(self) -> None:
@@ -352,14 +360,14 @@ class Scenario:
                     auras.apply_tick(unit, totals)
                     parts = ", ".join("%s %+d" % (k, v)
                                       for k, v in sorted(totals.items()))
-                    self.emit("  %s: auras (%s)" % (unit.name, parts))
+                    self.emit("  %s: auras (%s)" % (unit.label(), parts))
                     if not unit.alive:
                         self._fell(unit)
                         continue
                 if unit.statuses:
                     names = [e.describe() for e in unit.statuses]
                     st.tick_round(unit)
-                    self.emit("  %s: %s" % (unit.name, ", ".join(names)))
+                    self.emit("  %s: %s" % (unit.label(), ", ".join(names)))
                     if not unit.alive:
                         self._fell(unit)
 
@@ -432,11 +440,11 @@ class Scenario:
                 self.emit("unknown unit %r" % c.get("unit"))
                 continue
             if not unit.alive:
-                self.emit("%s is down and cannot act" % unit.name)
+                self.emit("%s is down and cannot act" % unit.label())
                 continue
             side = self._side_of(unit)
             if side is not None and side.id != self.state.active_side:
-                self.emit("%s is not in the active side's phase" % unit.name)
+                self.emit("%s is not in the active side's phase" % unit.label())
                 continue
             if op == "move":
                 self.cmd_move(unit, int(c["to"][0]), int(c["to"][1]))
