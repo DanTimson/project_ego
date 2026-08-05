@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed — cross-review complete and ready for human acceptance.
+Accepted by the human decision owner on 2026-08-06; binding.
 
 ## Context
 
@@ -52,9 +52,9 @@ necessity/transfer registry. At the community-release gate, transfer neutral
 tests and specifications into a fresh implementation repository and apply the
 `T0`–`T4` policy.
 
-## Proposed decision
+## Decision
 
-Adopt **Option C**, subject to human acceptance.
+Adopt **Option C**.
 
 1. The current repository remains the truthful mixed research/prototype lineage.
    It is not described as a formal clean-room implementation.
@@ -139,10 +139,9 @@ still leaving the mixed history materially true.
 
 ## Confirmation
 
-Before this decision can become verified:
+This decision is accepted and binding. It becomes verified after:
 
 - `python3 tools/check_deliberations.py` passes;
-- the human accepts the decision and `status.yaml` moves to `decided`;
 - the remaining binary queue is reissued under the necessity gate;
 - the public/spec test corpus has a transfer inventory;
 - a public-lineage gate checklist exists;

@@ -18,7 +18,7 @@ This is a coverage map, not a release claim.
 | melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
 | ranged execution | binary | partial compatibility model | partial | special modes and ranged zero-entry guard incomplete; current `steps_this_round` stamina discriminator diverges from live-capacity rule |
 | damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
-| battle actions: eight-clause dispatcher | binary | partial | content model only | high-priority extraction |
+| battle actions and target legality | public/data descriptions + selective binary evidence | partial | content model only | R16 whole-dispatcher reconstruction retired; observable action-semantics coverage matrix required |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
 | scenario format and traces | Project EGO design | implemented | implemented | usable |
 | content packs and bindings | data analysis | implemented | canonical IDs implemented | content-ID propagation and battle-instance identity remain incomplete |
@@ -45,7 +45,14 @@ The most consequential blockers are:
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11`, closed requests R1–R9 and R11, and runtime schema version 14.
+`closer_inspection_11`, closed requests R1–R9 and R11, and runtime schema version
+14.
+
+DELIB-0002 is accepted. The current repository remains the mixed
+research/prototype lineage. Future binary requests are necessity-gated, R16 is
+retired as structural reconstruction, and a future public implementation lineage
+will be created only at the community-release gate defined in
+`PUBLIC_LINEAGE_GATE.md`.
 
 When a new checkpoint is produced, update together:
 

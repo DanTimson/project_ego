@@ -14,16 +14,17 @@
 | remaining binary queue | Pause broad R16, reframe R17, and gate R10/R12/R13. | No disagreement. | `agreed` | Reissue the queue after the decision is accepted. |
 | relationship to DELIB-0001 | Do not rewrite the accepted decision; open a separate profile deliberation. | Agrees and adds the canonical scenario-definition question. | `resolved_after_review` | A follow-up deliberation will decide charge, restored-capacity attack cost, legacy/native RNG, canonical scenario definitions and the scope of exact fidelity. |
 
-## Remaining human decisions
+## Human decision
 
-1. Accept, amend or reject **Option C**: preserve the current mixed
-   research/prototype lineage and create a fresh public implementation lineage
-   only when the community-release gate is reached.
-2. Confirm that the converged amendments above become binding governance for
-   future binary requests and eventual transfer work.
+On 2026-08-06 the human decision owner accepted **Option C** and the converged
+cross-review amendments without further modification.
 
-The detailed Genesis/NH/native ruleset choices are deliberately deferred to a
-separate follow-up deliberation and do not block DELIB-0002.
+The current repository remains the mixed research/prototype lineage. A fresh
+public implementation lineage will be created only when the community-release
+gate is reached. The necessity gate and `T0`–`T4` transfer policy are binding
+prospective governance.
+
+The detailed Genesis/NH/native ruleset choices are deferred to DELIB-0003.
 
 ## Resolved during review
 

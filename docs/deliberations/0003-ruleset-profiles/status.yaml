@@ -1,0 +1,18 @@
+id: DELIB-0003
+title: ruleset-profiles
+state: independent_review
+opened: 2026-08-06
+decision:
+owner: human
+supersedes:
+participants:
+  - human
+  - binary
+  - engine
+verification:
+pending:
+  - engine-side independent position
+  - cross-review
+  - human decision
+  - NH charge observation
+  - restored-capacity attack-cost fixture

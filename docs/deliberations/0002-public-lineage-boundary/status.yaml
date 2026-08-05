@@ -1,8 +1,8 @@
 id: DELIB-0002
 title: public-lineage-boundary
-state: decision_required
+state: decided
 opened: 2026-08-06
-decision:
+decision: decision.md
 owner: human
 supersedes:
 participants:
@@ -15,6 +15,5 @@ verification:
   - public-lineage gate checklist exists
   - follow-up ruleset-profile deliberation opened
 pending:
-  - human acceptance or amendment
   - classify remaining implementation files before the public-lineage gate
   - keep populated generated bindings uncommitted until redistribution policy is decided

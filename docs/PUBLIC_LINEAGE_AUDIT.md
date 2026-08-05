@@ -1,15 +1,18 @@
 # Public-lineage necessity and transfer audit
 
-Status: **preliminary, non-binding audit**
+Status: **accepted prospective governance under DELIB-0002; living registry**
 Opened: 2026-08-06
 Scope: current mixed research/prototype repository, completed binary work through
 R11, the remaining binary queue, selected engine/oracle implementations, and the
 supplied Eadoropedia New Horizons corpus.
 
-This document is an engineering and provenance-control artifact. It is not a
-legal opinion, does not claim that the present repository is a clean-room
-implementation, and does not by itself authorize redistribution of third-party
-text, code, data or assets.
+This document is an engineering and provenance-control artifact. DELIB-0002
+accepts its necessity gate and transfer taxonomy as prospective governance. It
+remains a living registry rather than a frozen completeness claim.
+
+It is not a legal opinion, does not claim that the present repository is a
+clean-room implementation, and does not by itself authorize redistribution of
+third-party text, code, data or assets.
 
 ## 1. Operational question
 

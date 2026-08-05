@@ -8,7 +8,10 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R10 — conditional attack-bonus placement in the multiplier pipeline. R1–R9 and R11 are closed.
+**Current binary extraction:** none. R1–R9 and R11 are closed. R10, R12,
+R13, R15 and the reduced R17 questions must pass the DELIB-0002 necessity gate
+before a new extraction packet is issued. R16 is retired as structural
+reconstruction.
 
 ---
 
@@ -640,14 +643,20 @@ remains not independently observed at runtime.
 
 ---
 
-## R10 — OPEN: where conditional attack bonuses enter the multiplier pipeline
+## R10 — GATED PRECHECK: conditional attack-bonus placement
 
 **Closes:** `OPEN_QUESTIONS` item 7
 **Ledger:** damage path `004D2E60`
 **Method:** decompilation
-**Cost:** medium
+**Cost:** medium if the precheck survives
 
-**Question.** Conditional bonuses such as «Сокрушение зла» are excluded from
+**Necessity precheck.** Before requesting another function export, identify the
+specific conditional bonus types from public documentation/data and construct a
+minimal wounded and exhausted vector in which two reasonable insertion points
+produce different player-visible results. If the public description plus the
+vector settles the required engine rule, close R10 without further binary work.
+
+**Question, only if still unresolved.** Conditional bonuses such as «Сокрушение зла» are excluded from
 morale multiplication. Where exactly do they enter relative to the additive
 bonuses, the stamina and wound multipliers, the integer truncation before
 morale, and the morale percentage itself?
@@ -741,11 +750,16 @@ through a controlled original-game fixture.
 
 ---
 
-## R12 — OPEN: `Удар и возврат` return anchor
+## R12 — BLACK-BOX FIRST: `Удар и возврат` return anchor
 
 **Closes:** `OPEN_QUESTIONS` item 13
 **Method:** action executor, or instrumented observation
-**Cost:** medium
+**Cost:** medium only if controlled observation cannot settle the boundary
+
+**Required preflight.** Test contiguous attack, move/yield/reselect/attack,
+extra-turn re-entry and forced reselection. Record only the observable return
+tile and command sequence. Request binary evidence only for a remaining material
+boundary that cannot be isolated in play.
 
 **Question.** Observation says the unit returns to its command-start tile. What
 field stores that anchor, when is it written, and does it survive a split
@@ -762,11 +776,15 @@ re-entry rewrites it.
 
 ---
 
-## R13 — OPEN: start-of-turn effects — round boundary or activation?
+## R13 — BLACK-BOX FIRST: start-of-turn effects — round boundary or activation?
 
 **Closes:** `OPEN_QUESTIONS` item 11
 **Method:** decompilation
-**Cost:** medium
+**Cost:** medium only if controlled observation cannot settle the boundary
+
+**Required preflight.** Observe one public start-effect ability across round
+start, side-phase start, first activation, yield/reselection and an extra turn.
+Record state before and after each boundary.
 
 **Question.** Do start-of-turn effects fire once per round, or once per unit
 activation?
@@ -826,46 +844,53 @@ state, that is a complete answer and closes 6b as unreachable.
 
 ---
 
-## R16 — OPEN: action dispatch table
+## R16 — RETIRED: whole action-dispatch reconstruction
 
-**Closes:** matrix ACTION-DISPATCH-001 (NEEDS EXTRACTION)
-**Method:** decompilation
-**Cost:** medium to large
+**Disposition:** `N3_INTERNAL / T3_RESEARCH_ONLY`
+**Decision:** DELIB-0002
 
-**Question.** How are tactical actions dispatched — a jump table, a chain of
-comparisons, or an indexed handler array — and what is the action ID space?
+The jump-table shape, numeric switch grouping and original handler decomposition
+are not public-engine requirements. Reconstructing the complete dispatcher fails
+the observable/material necessity gate.
 
-**Why it is on the list despite being large.** It is the last structural unknown
-in the tactical layer. Everything else open is a rule detail inside a step whose
-existence is already known; this is the step list itself. It is also the
-prerequisite for the "one genuinely new action" half of the extension probe, so
-it gates agreed future work rather than only current work.
+Replacement work belongs in an address-free action-semantics coverage matrix:
 
-**Minimum sufficient answer.** The dispatch mechanism and the ID-to-handler
-mapping for the ordinary actions — move, attack, ranged attack, wait, defend.
-Exotic actions can follow later.
+- action kinds exposed by public data or gameplay;
+- target and range legality;
+- resource costs;
+- observable state transitions;
+- trigger order only where order changes an outcome;
+- Genesis/NH/native profile differences.
+
+A future missing action may generate a narrow request for one unresolved
+observable semantic cell. R16 itself is closed without extraction.
 
 ---
 
-## R17 — OPEN: melee hit secondary effects
+## R17 — REFRAMED: melee secondary-effect interaction matrix
 
-**Closes:** matrix MELEE-SECONDARY-001 (NEEDS EXTRACTION)
-**Ledger:** `004D9800`
-**Method:** decompilation
-**Cost:** large
+**Closes:** selected cells of matrix MELEE-SECONDARY-001
+**Ledger:** `004D9800` only when a gated cell survives
+**Method:** public descriptions and controlled observation first; narrow
+decompilation fallback
+**Cost:** per-cell, not whole-function
 
-**Question.** The order and conditions of secondary effects on a melee hit:
-drains, debuffs, triggered actions, adjacent attacks and damage-proportional
-effects.
+Do not reconstruct the monolithic melee processor. Build a finite matrix for
+implemented abilities and record only materially non-equivalent questions:
 
-**Priority note.** Lowest of the tactical set, and deliberately so. It is large,
-it is one function, and the engine can execute complete battles without it — the
-effects it governs are additive to a working hit rather than part of it. Take it
-only when the smaller items above are exhausted, or when a specific ability
-needs it.
+| dimension | candidate distinctions |
+|---|---|
+| trigger | attempted hit / successful hit / positive damage / kill |
+| zero damage | triggers / does not trigger |
+| ownership | attacker / defender / source action |
+| target | struck unit / adjacent unit / self |
+| defence | resistance / immunity / neither |
+| ordering | before or after retaliation, death, return and tile occupation |
 
-**Minimum sufficient answer.** The sequence of effect categories with their
-guards. Individual effect formulas can be separate follow-ups.
+A cell qualifies for binary work only when public material and controlled
+observation do not settle it and two reasonable orders produce different
+gameplay. The exported result must be a neutral event-order rule or finite
+fixture, never the original function structure.
 
 ---
 
@@ -885,15 +910,22 @@ compatibility enters scope. Neither is true yet.
 
 ## Suggested batching
 
-Two clusters, because they use different tools and can proceed independently.
+There is currently no active Ghidra batch.
 
-**Original-game observation work.** R14 (place a giant and inspect its
-footprint) and the observation half of R6 (put a ranged-only unit adjacent to an
-enemy) remain useful, but they are separate from the binary queue.
+**Public/data precheck.** R10: identify the affected conditional bonuses and
+produce a materially distinguishing wounded/exhausted vector.
 
-**Ghidra work, in rising cost.** R10 is next. R12 and R13 remain medium lifecycle questions. R16 and R17 are the large reductions and should come last.
+**Original-game observation.** R12 and R13 lifecycle matrices; R14 footprint;
+the remaining R6 ranged-only adjacency observation.
 
-If only one binary item is done next: **R10**. It closes the remaining provider-order conflict in the effective attack and damage pipeline.
+**Consumer-triggered only.** R15 when level-up implementation reaches a
+zero-total or exhausted-pool state.
+
+**Retired/reframed.** R16 is closed as structural reconstruction. R17 begins as
+an observable ability-interaction matrix and may yield narrow binary cells later.
+
+The next packet is whichever candidate first passes all five DELIB-0002
+necessity criteria, not whichever function is easiest to export.
 
 ---
 
