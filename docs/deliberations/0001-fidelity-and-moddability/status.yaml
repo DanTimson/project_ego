@@ -21,7 +21,7 @@ verification:
   - oracle/test_roster.py
 pending:
   - scope a persistence layer before attempting the save-round-trip probe
-  - port the action catalogue to GDScript; the oracle can now invoke actions in battle and the port has no Actions class at all
+  - port cmd_action to core/battle/scenario.gd; the oracle can now invoke catalogued actions in battle and the port has no such command. The Action model, Refusal reasons and the 14-entry catalogue are ALREADY ported (core/model/action.gd, built from action_fixture.json via from_dict), so this is the dispatcher only
   - carry unit_upg.Quantity magnitudes into Action instances so effect actions have something to apply
   - split persistent-instance/intrinsic from runtime-node/aura providers if OQ 18 requires it
   - decide whether scenario units may name a canonical content definition, instantiating from a pack instead of declaring stats inline
