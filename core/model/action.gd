@@ -128,6 +128,22 @@ func pay(actor: Combatant) -> void:
 ## Build from a pack definition dictionary. Actions are CONTENT: which exist and
 ## what they cost differs between the genesis and new_horizons packs, so this
 ## must be data-driven rather than a hardcoded catalogue.
+## Actions available to the running game.
+##
+## Loaded from data rather than hardcoded, mirroring the oracle's module-level
+## CATALOGUE. A scenario may declare its own entries so a committed scenario file
+## is self-contained and both implementations build the same catalogue from the
+## same bytes.
+static var CATALOGUE: Dictionary = {}
+
+
+## Merge `entries` (an Array of Dictionaries) into the catalogue.
+static func load_catalogue(entries: Array) -> void:
+	for d in entries:
+		var a := Action.from_dict(d)
+		CATALOGUE[a.id] = a
+
+
 static func from_dict(d: Dictionary) -> Action:
 	var a := Action.new()
 	a.id = StringName(d.get("id", ""))

@@ -24,6 +24,7 @@
    ],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": "Two shots at one target. Fully disables armour-piercing shot, halves accurate shot."
   },
   {
@@ -42,6 +43,7 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": ""
   },
   {
@@ -60,6 +62,7 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": ""
   },
   {
@@ -78,6 +81,7 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": ""
   },
   {
@@ -98,6 +102,7 @@
     "Бестелесный"
    ],
    "suppresses_counterattack": true,
+   "grants": [],
    "notes": "No damage and no normal on-hit effects; drains `magnitude` stamina from the target. Defender does not retaliate."
   },
   {
@@ -116,6 +121,7 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": "Heals the actor up to `magnitude`, capped at damage actually dealt — so the heal must be sequenced after damage resolution."
   },
   {
@@ -134,6 +140,23 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [
+    [
+     "Защита",
+     null,
+     1
+    ],
+    [
+     "Защита от выстрела",
+     null,
+     1
+    ],
+    [
+     "Бдительность",
+     1,
+     1
+    ]
+   ],
    "notes": "+magnitude to both defences and Бдительность until next turn; attack and counterattack drop by a second documented amount. OPEN: the penalty is a separate %d from the bonus."
   },
   {
@@ -152,6 +175,13 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [
+    [
+     "Скорость",
+     1,
+     0
+    ]
+   ],
    "notes": "+1 speed until end of turn."
   },
   {
@@ -175,6 +205,7 @@
    ],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": "Speed becomes 1 and shooting range +1 for the shot."
   },
   {
@@ -198,6 +229,7 @@
     "Стихийный дух"
    ],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": "Restores `magnitude` life on average — randomised, distribution unknown."
   },
   {
@@ -216,6 +248,7 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": "Mechanisms only. Restores `magnitude` on average and shortens armour and weapon damage effects."
   },
   {
@@ -234,6 +267,7 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": "Up to `magnitude` ammo. An adjacent Оруженосец guarantees at least one; multiple Оруженосец take the MAXIMUM, they do not sum."
   },
   {
@@ -254,6 +288,7 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": "Restores up to `magnitude` life. Free action for Крысолюд."
   },
   {
@@ -272,6 +307,7 @@
    "scales": [],
    "excluded_targets": [],
    "suppresses_counterattack": false,
+   "grants": [],
    "notes": "Returns to the tile where the ATTACK COMMAND was issued, not the round-start tile. FAILS if a defender carrying Корни or Калечащий удар counterattacks — so resolution is conditional on the counterattack outcome."
   }
  ],

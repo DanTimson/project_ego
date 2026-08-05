@@ -172,10 +172,10 @@ def test_the_boundaries_that_are_actually_missing() -> None:
 
     finding("no persistence layer exists, so the save/load third of the probe "
             "cannot run at all; it is tracked as its own pending item")
-    finding("the GDScript side ports the Action model, Refusal reasons and the "
-            "14-entry catalogue (core/model/action.gd, built from "
-            "action_fixture.json via from_dict) but has no scenario `action` "
-            "command, so the parity gap is the dispatcher only")
+    finding("action parity is now closed: the port has the Action model, Refusal "
+            "reasons, a data-loaded catalogue and cmd_action. A scenario may "
+            "declare its own `actions`, so a committed scenario is self-contained "
+            "and both implementations build the catalogue from the same bytes")
 
 
 def main() -> None:

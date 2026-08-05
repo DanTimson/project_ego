@@ -61,6 +61,15 @@ class Scenario:
         # requirements are irreconcilable, which is why this seam exists and why
         # it is the only general seam in the engine.
         self.rng = rng if rng is not None else self._make_rng(spec)
+        # Actions available in this battle. A scenario may declare its own so
+        # the file is self-contained and the GDScript port can build the same
+        # catalogue from the same source — the port loads its catalogue from
+        # data rather than hardcoding it, and a committed scenario must not
+        # depend on a fixture only one side reads.
+        self.catalogue = dict(actionsmod.CATALOGUE)
+        for entry in spec.get("actions", []) or []:
+            action = actionsmod.action_from_dict(entry)
+            self.catalogue[action.id] = action
         self.field = self._build_field(spec.get("battlefield", {}))
         self.units: dict[str, Combatant] = {}
         self.sides = self._build_sides(spec.get("sides", []))
@@ -415,7 +424,7 @@ class Scenario:
             from `unit_upg.Quantity`, which are not yet carried into Action
             instances — every catalogue magnitude is currently 0.
         """
-        action = actionsmod.CATALOGUE.get(action_id)
+        action = self.catalogue.get(action_id)
         if action is None:
             self.emit("unknown action %r" % action_id)
             return

@@ -23,6 +23,8 @@ var scenario_name: String = "unnamed"
 var seed_value: int = 0
 var log: Array[String] = []
 ## Either Rng (named streams) or LegacyRng (Genesis compatibility).
+var catalogue: Dictionary = {}
+
 var rng: Variant
 var field: Battlefield
 var units: Dictionary = {}          ## name -> Combatant
@@ -36,6 +38,12 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
 	spec = p_spec
 	scenario_name = String(spec.get("name", "unnamed"))
 	seed_value = int(spec.get("seed", 0))
+	# Actions available in this battle. A scenario may declare its own so the
+	# file is self-contained; see Action.CATALOGUE.
+	catalogue = Action.CATALOGUE.duplicate()
+	for entry in spec.get("actions", []):
+		var a := Action.from_dict(entry)
+		catalogue[a.id] = a
 	# THE randomness boundary. Rules never choose a generator and never branch on
 	# mode — they receive whatever is injected here and call roll(x, stream).
 	# Genesis compatibility needs ONE shared LegacyRng because the original
@@ -368,6 +376,59 @@ func cmd_extra_turn(unit: Combatant, c: Dictionary) -> void:
 			unit.movement_remaining, unit.steps_this_round])
 
 
+## Invoke a catalogued action.
+##
+## Executes what the Action model declares — `grants`, applied as timed statuses
+## through the normal status machinery. Everything else is REFUSED EXPLICITLY
+## rather than silently doing nothing, because an action that appears to succeed
+## and changes nothing is worse than one that reports it cannot run yet:
+##
+##   - `is_attack` actions need the attack pipeline plus `damage_scale`, whose
+##     insertion point is an open question (FORMULAS §1.1);
+##   - target-consuming effects need magnitudes from `unit_upg.Quantity`, which
+##     are not yet carried into Action instances.
+##
+## Log strings mirror oracle/scenario.py exactly; the scenario fixture compares
+## them line for line.
+func cmd_action(unit: Combatant, action_id: String) -> void:
+	if not catalogue.has(StringName(action_id)):
+		emit("unknown action '%s'" % action_id)
+		return
+	var action: Action = catalogue[StringName(action_id)]
+
+	var refusal: int = action.availability(unit)
+	if refusal != Action.Refusal.OK:
+		emit("%s cannot use %s: %s"
+			% [unit.label(), action.name, Action.REFUSAL_TEXT[refusal]])
+		return
+
+	if action.is_attack:
+		emit("%s: %s is an attack-replacing action and is not executable yet"
+			% [unit.label(), action.name])
+		return
+	if action.grants.is_empty():
+		emit("%s: %s has no executable effect yet (magnitudes are not loaded from unit_upg)"
+			% [unit.label(), action.name])
+		return
+
+	action.pay(unit)
+	var applied: Array = []
+	for g in action.grants:
+		var ability := String(g[0])
+		var magnitude: int = int(g[1]) if g[1] != null else 0
+		var duration: int = int(g[2]) if g.size() > 2 and g[2] != null else Statuses.PERMANENT
+		var effect := Statuses.Effect.new()
+		effect.id = StringName("%s:%s" % [action.id, ability])
+		effect.name = ability
+		effect.source = action.name
+		effect.duration = duration
+		effect.power = magnitude
+		Statuses.apply(unit, effect)
+		applied.append(ability)
+	emit("%s uses %s (%s; stamina %d)"
+		% [unit.label(), action.name, ", ".join(applied), unit.stamina])
+
+
 func cmd_end_phase() -> void:
 	if RoundLoop.end_phase(state):
 		emit("-- round %d, side %d first --" % [state.round_number, state.active_side])
@@ -426,6 +487,8 @@ func _run() -> Dictionary:
 				cmd_shoot(unit, units[String(c["target"])])
 			"rest":
 				cmd_rest(unit)
+			"action":
+				cmd_action(unit, String(c.get("action", "")))
 			"extra_turn":
 				cmd_extra_turn(unit, c)
 			_:

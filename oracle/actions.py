@@ -156,6 +156,39 @@ class Action:
 # here are the DEFINITIONS, not instances.
 # ---------------------------------------------------------------------------
 
+def action_from_dict(d: dict) -> Action:
+    """Build an Action from plain data.
+
+    Mirrors `Action.from_dict` in core/model/action.gd so a scenario file can
+    carry its own actions and both implementations build the same catalogue from
+    the same bytes.
+
+    `target` accepts the ORDINAL used by the fixtures (the port's enum index) as
+    well as this module's string value, because the serialized form the port
+    reads is the ordinal.
+    """
+    return Action(
+        id=str(d.get("id", "")),
+        name=str(d.get("name", "")),
+        cost=Cost(stamina=int(d.get("cost_stamina", 0)),
+                  ammo=int(d.get("cost_ammo", 0)),
+                  consumes_action=bool(d.get("consumes_action", True)),
+                  attack_surcharge=bool(d.get("attack_surcharge", False)),
+                  free_action_for=tuple(d.get("free_action_for", ()))),
+        target=(list(Target)[int(d["target"])] if isinstance(d.get("target"), int)
+                else Target(d.get("target", Target.SELF.value))),
+        magnitude=int(d.get("magnitude", 0)),
+        is_attack=bool(d.get("is_attack", False)),
+        damage_scale=float(d.get("damage_scale", 1.0)),
+        suppresses=tuple(d.get("suppresses", ())),
+        scales=tuple(tuple(x) for x in d.get("scales", ())),
+        excluded_targets=tuple(d.get("excluded_targets", ())),
+        grants=tuple(tuple(g) for g in d.get("grants", ())),
+        suppresses_counterattack=bool(d.get("suppresses_counterattack", False)),
+        notes=str(d.get("notes", "")),
+    )
+
+
 CATALOGUE: dict[str, Action] = {}
 
 

@@ -230,6 +230,11 @@ def action_fixture() -> dict:
             "scales": [list(p) for p in a.scales],
             "excluded_targets": list(a.excluded_targets),
             "suppresses_counterattack": a.suppresses_counterattack,
+            # grants were omitted here, so the port's catalogue silently had
+            # none: Action.from_dict reads them, the generator never emitted
+            # them, and the two grant-bearing actions (turtle, forced_march)
+            # arrived in GDScript with empty grants.
+            "grants": [list(g) for g in a.grants],
             "notes": a.notes,
         })
 
