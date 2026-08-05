@@ -576,6 +576,39 @@ Notable modifier branches:
 0x35  conditional defensive contribution on target
 ```
 
+#### Modifier `0x3D` / `Сокрушение зла` placement
+
+`004D2E60` first calls `004D1890` for ordinary attack. For counterattack it
+replaces that result with `004D1660`. Those effective-stat functions have
+already completed direct provider addition, wound/stamina scaling, pre-morale
+truncation, morale adjustment and final minimum handling.
+
+For an ordinary attack only, `004D2E93..004D2EA5` can then add
+`trunc0(attack_power / 2)` for the selected 1.5× attack mode.
+
+The `0x3D` branch follows at `004D2EA9..004D2EE7`:
+
+```text
+if effective_modifier(attacker, 0x3D) > 0
+and target_definition_alignment < 0:
+    attack_power +=
+        effective_modifier(attacker, 0x3D)
+        * abs(target_definition_alignment)
+```
+
+The combined value is not final damage. At `004D2F68..004D2F6D` it is passed to
+`004CEC40 resolve_attack_against_defence_candidate`, where legacy attack
+randomisation, defence/resistance subtraction and the minimum-damage rule occur.
+
+Binding consequences:
+
+- wound, stamina and morale do not scale the `0x3D` contribution;
+- the selected ordinary-attack 1.5× branch does not scale it;
+- attack randomisation does include it;
+- the same contribution can enter ordinary attack and counterattack;
+- original register allocation and the duplicated modifier lookup are not
+  binding engine architecture.
+
 ### 9.5 Ranged damage calculator
 
 Hidden register convention:

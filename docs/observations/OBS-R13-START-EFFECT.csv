@@ -1,0 +1,5 @@
+build,content_version,case_id,subject,subject_level,start_effect_magnitude,second_turn_source,max_stamina,stamina_before_boundary,stamina_after_boundary_before_selection,stamina_after_selection,event_sequence,cap_saturation,video_or_screenshot,observer_notes,interpretation
+,R13 fixture,R13-A,/122 Искатель ветра,0,2,,11,,,,enter own side phase; inspect before selection; select; inspect,,,,
+,R13 fixture,R13-B,/122 Искатель ветра,0,2,,11,,,,select; spend stamina; select other friendly; reselect in same phase,,,,
+,R13 fixture,R13-C,/122 Искатель ветра,0,2,,11,,,,record before pass; opponent phase begins; own next phase begins,,,,
+,R13 fixture,R13-D,/122 Искатель ветра,0,2,/111 Вожак,11,,,,act to <=7 stamina; record S; cast Слово вождя; record; select granted turn; record,,,,

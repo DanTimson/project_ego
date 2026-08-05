@@ -8,10 +8,9 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current binary extraction:** none. R1–R9 and R11 are closed. R10, R12,
-R13, R15 and the reduced R17 questions must pass the DELIB-0002 necessity gate
-before a new extraction packet is issued. R16 is retired as structural
-reconstruction.
+**Current binary extraction:** none. R1–R11 are closed. R12, R13, R15 and the
+reduced R17 questions must pass the DELIB-0002 necessity gate before a new
+extraction packet is issued. R16 is retired as structural reconstruction.
 
 ---
 
@@ -643,34 +642,76 @@ remains not independently observed at runtime.
 
 ---
 
-## R10 — GATED PRECHECK: conditional attack-bonus placement
+## R10 — CLOSED: conditional `Сокрушение зла` contribution is outside the effective-stat multipliers
 
-**Closes:** `OPEN_QUESTIONS` item 7
-**Ledger:** damage path `004D2E60`
-**Method:** decompilation
-**Cost:** medium if the precheck survives
+**Closes:** `OPEN_QUESTIONS` item 7 · matrix `DAMAGE-CONDITIONAL-001`
+**Evidence:** `EXP-R9-001`; `DOC-EADOROPEDIA-NH-26.0620-F01`
+**Resolver:** `004D2E60 calculate_melee_or_counterattack_damage_candidate`
+**New binary extraction:** none
 
-**Necessity precheck.** Before requesting another function export, identify the
-specific conditional bonus types from public documentation/data and construct a
-minimal wounded and exhausted vector in which two reasonable insertion points
-produce different player-visible results. If the public description plus the
-vector settles the required engine rule, close R10 without further binary work.
+**Result (2026-08-06).** The public precheck established a material ambiguity:
+Eadoropedia says morale does not increase `Сокрушение зла`, but does not state
+whether wound and stamina multipliers affect it. Wounded and exhausted examples
+produce different player-visible attack values under reasonable alternative
+placements.
 
-**Question, only if still unresolved.** Conditional bonuses such as «Сокрушение зла» are excluded from
-morale multiplication. Where exactly do they enter relative to the additive
-bonuses, the stamina and wound multipliers, the integer truncation before
-morale, and the morale percentage itself?
+No new Ghidra packet was necessary. The already captured R9 source packet
+contains the complete `004D2E60` body and settles the order:
 
-**Why the ordering is the whole question.** §1.4 established that the pipeline
-truncates to an integer before applying morale. That makes ordering observable
-rather than academic: a conditional bonus added before the truncation and one
-added after produce different results for the same unit. The engine has a
-provider order that has never been checked against the binary.
+```text
+attack_power =
+    effective_attack(attacker)
+    or effective_counterattack(attacker)
 
-**Minimum sufficient answer.** One conditional modifier traced from its provider
-through `004D2E60`, with the insertion point named relative to the four steps
-above, plus one wounded and one exhausted case to show whether the multipliers
-apply to the bonus or only to the base.
+if ordinary_attack and selected_1_5x_attack_mode:
+    attack_power += trunc0(attack_power / 2)
+
+if smite_evil > 0 and target_alignment < 0:
+    attack_power += smite_evil * abs(target_alignment)
+
+damage =
+    resolve_attack_against_defence(
+        attack_power,
+        selected_defence_or_resistance
+    )
+```
+
+`effective_attack` and `effective_counterattack` have already completed direct
+provider addition, wound and stamina multiplication, pre-morale truncation,
+morale adjustment and their final minimum-one handling. The `0x3D` contribution
+is therefore:
+
+- outside direct additive attack providers;
+- outside wound, stamina and morale multiplication;
+- after the pre-morale integer truncation and final effective-stat clamp;
+- after the selected ordinary-attack 1.5× branch, so that branch does not
+  multiply the contribution;
+- before attack randomisation, defence/resistance subtraction and chip-damage
+  resolution, so it modifies attack power rather than adding flat final damage;
+- shared by ordinary melee attack and counterattack.
+
+For a direct effective-stat input based on attack `20` and a qualifying
+conditional contribution of `5`:
+
+| state | recovered pre-resolver attack power | alternative with conditional bonus inside multiplier |
+|---|---:|---:|
+| healthy, neutral | `25` | `25` |
+| 25% life (`WoundMod = 0.75`) | `15 + 5 = 20` | `trunc0(25 × 0.75) = 18` |
+| stamina 0 (`StaminaMod = 0.4`) | `8 + 5 = 13` | `trunc0(25 × 0.4) = 10` |
+| morale 0 | `8 + 5 = 13` | `10` |
+| selected 1.5× ordinary attack | `30 + 5 = 35` | `trunc0(25 × 1.5) = 37` |
+
+These are attack-power inputs to the legacy randomisation/defence resolver, not
+guaranteed final life damage values.
+
+The current broad Project EGO placement of a generic conditional contribution
+after `current_attack()` and before attack randomisation agrees with this
+recovered rule. An explicit address-free parity fixture remains engine-side
+work.
+
+**Evidence status.** Exact placement is PROVEN from assembly and independently
+corroborated in part by public documentation's morale carve-out. It is not yet
+VERIFIED through a controlled original-game vector.
 
 ---
 
@@ -761,6 +802,8 @@ extra-turn re-entry and forced reselection. Record only the observable return
 tile and command sequence. Request binary evidence only for a remaining material
 boundary that cannot be isolated in play.
 
+**Observation packet.** `docs/observations/OBS-R12-R13-PREFLIGHT.md` uses NH level-zero Harpy `/31` for the ordinary cases and level-zero Warlord `/111` for a granted second turn. Results belong in `OBS-R12-HIT-RETURN.csv`.
+
 **Question.** Observation says the unit returns to its command-start tile. What
 field stores that anchor, when is it written, and does it survive a split
 activation — move, yield, then attack later in the same round?
@@ -785,6 +828,8 @@ re-entry rewrites it.
 **Required preflight.** Observe one public start-effect ability across round
 start, side-phase start, first activation, yield/reselection and an extra turn.
 Record state before and after each boundary.
+
+**Observation packet.** `docs/observations/OBS-R12-R13-PREFLIGHT.md` uses NH level-zero Wind Seeker `/122` (`Прилив сил +1` ×2) and Warlord `/111`. `Слово вождя` directly restores two stamina and grants a second turn, making +2 versus +4 a controlled discriminator. Results belong in `OBS-R13-START-EFFECT.csv`.
 
 **Question.** Do start-of-turn effects fire once per round, or once per unit
 activation?
@@ -912,8 +957,7 @@ compatibility enters scope. Neither is true yet.
 
 There is currently no active Ghidra batch.
 
-**Public/data precheck.** R10: identify the affected conditional bonuses and
-produce a materially distinguishing wounded/exhausted vector.
+**Closed from existing evidence.** R10 required no new packet: the public precheck established materiality and the archived `EXP-R9-001` body already settled the exact placement.
 
 **Original-game observation.** R12 and R13 lifecycle matrices; R14 footprint;
 the remaining R6 ranged-only adjacency observation.
@@ -924,8 +968,8 @@ zero-total or exhausted-pool state.
 **Retired/reframed.** R16 is closed as structural reconstruction. R17 begins as
 an observable ability-interaction matrix and may yield narrow binary cells later.
 
-The next packet is whichever candidate first passes all five DELIB-0002
-necessity criteria, not whichever function is easiest to export.
+The next packet is whichever remaining candidate first passes all five
+DELIB-0002 necessity criteria, not whichever function is easiest to export.
 
 ---
 

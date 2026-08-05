@@ -10,6 +10,7 @@ Status values:
 - **NEEDS VECTOR** — rule is understood, but a concrete original-game example
   or exact PRNG sequence is still required.
 - **NEEDS EXTRACTION** — an existing dispatcher/loader must be classified first.
+- **OBSERVATION READY** — a preregistered black-box protocol exists; the build result has not yet been recorded.
 - **BLOCKED** — depends on an unresolved open question.
 - **PARTIAL** — an executable subset exists, but some listed assertions or lifecycle integration remain incomplete.
 - **IMPLEMENTED** — an executable deterministic fixture covers the complete row.
@@ -42,11 +43,13 @@ Status values:
 | MELEE-NORETAL-001 | combat | attacker modifier `0x1A` | `004DCD90` | suppresses both first-strike and ordinary retaliation paths | READY |
 | CHARGE-001 | combat | modifier `0x25` with and without command movement | `EXP-CI11`, `004DCD90` | when movement is requested, compute `max(abs(current_attacker_x-target_x)+abs(current_attacker_y-target_y)-2,0)` before moving; no-movement attack leaves zero | READY |
 | CHARGE-002 | combat | split activation, earlier movement and backtracking | `EXP-CI11`, `004DCD90` | recompute from the tile occupied when the attack command starts; prior path length is not accumulated; cumulative `steps_this_round` is non-legacy | READY |
+| RETURN-ANCHOR-001 | lifecycle | NH Harpy `/31`: adjacent control, contiguous approach, move→other unit→reselect→attack, and granted-second-turn attack | `DOC-EADOROPEDIA-NH-26.0620-F01`; `docs/observations/OBS-R12-R13-PREFLIGHT.md` | record final tile A/B/C; split case distinguishes persistent phase/turn anchor from current attack-command movement start; second-turn case determines reset | OBSERVATION READY |
 | RANGED-EXEC-001 | combat | one and two shots | `004D7050` | cap by ammo, one ammo per shot, break on kill | READY |
 | RANGED-STAMINA-001 | combat | capacity equal/above effective speed, capacity below it, move→restore→reselect→attack | `EXP-R8A-001`..`EXP-R8E-001`; `004D0560`, `004D7050`, `004E0280` | base cost 1 when `remaining_capacity >= effective_speed`, otherwise 2; modifier `0x12` blocks; reselection preserves capacity | READY — current `steps_this_round` model diverges |
 | RANGED-SPECIAL-001 | combat | modifiers `0x2E` and `0x2F` | `004D7050` | ordinary damage replaced by disabling runtime packages | READY |
 | DAMAGE-SINK-001 | damage | all four received-damage channels | `004D61E0` | correct counter increment and life loss | READY |
 | DAMAGE-MORALE-001 | morale | 25% max-life hit, damage 10, channel 3 | `004D61E0` | large-hit reaction except channel 3 | READY |
+| START-EFFECT-001 | lifecycle | NH Wind Seeker `/122` with `Прилив сил +1` ×2 across own phase start, same-phase reselection, opponent transition, and Warlord `/111` granted second turn | `DOC-EADOROPEDIA-NH-26.0620-F01`; `docs/observations/OBS-R12-R13-PREFLIGHT.md` | record stamina at every boundary; Word of the Chieftain supplies direct +2 control, so total +2 means no extra tick and +4 means Surge fired on granted-turn start before cap | OBSERVATION READY |
 | STATUS-NODE-001 | runtime effects | head insertion and links | `004CEC00` | next/previous, source pointers and flags initialized | READY |
 | STATUS-REMOVE-001 | runtime effects | remove-on-damage list mutation | `004D61E0` | flagged nodes unlinked/freed before life subtraction | READY |
 | DEATH-REVIVE-001 | death | runtime effect `0x4A` | `004D1D30` | full life, runtime list cleared, record remains active | READY |
@@ -66,6 +69,7 @@ Status values:
 | MOD-INSTANCE-001 | modifiers | persistent instance contribution | `00432950` | selected upgrades, attachments and personal hero contributions all summed | READY |
 | MOD-AURA-001 | modifiers | commander aura channel is distinct from personal hero modifiers | `004A2690` | aura contribution does not enter the personal channel and vice versa | READY |
 | DAMAGE-MELEE-001 | damage | ordinary attack and counterattack calculation | `004D2E60` | custom register storage; modifier-specific branches; integer ordering preserved | READY |
+| DAMAGE-CONDITIONAL-001 | damage | direct attack 20 and qualifying `Сокрушение зла` contribution 5 under healthy, 25%-life, stamina-0, morale-0 and selected 1.5× ordinary-attack states | `EXP-R9-001`; `DOC-EADOROPEDIA-NH-26.0620-F01`; `004D2E60` | pre-resolver attack-power inputs 25, 20, 13, 13 and 35 respectively; contribution is after effective-stat and selected 1.5× processing but before randomisation and defence; counterattack uses the same placement | READY — current generic placement agrees; explicit parity fixture pending |
 | DAMAGE-RANGED-001 | damage | ranged damage against ranged defence versus resistance | `004D2DA0` | correct defence selection; modifier-dependent branches | READY |
 | MELEE-SECONDARY-001 | combat | melee hit secondary effects | `004D9800` | drains, debuffs, triggered actions, adjacent attacks, damage-proportional effects | NEEDS EXTRACTION |
 | MORALE-ADJUST-001 | morale | morale adjustment and break accumulator | `004D0A70` | modifier `0x13` blocks adjustment; underflow raises break accumulator in ten-point steps and clamps | READY |

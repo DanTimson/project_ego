@@ -191,6 +191,14 @@ Exact intermediate truncation, early-return boundaries and provider cut-offs are
 separate `N2_EXACT_EDGE` or `N3_INTERNAL` items. They should not cause the broad
 public formula to be labelled binary-derived.
 
+The R10 precheck is now closed. Eadoropedia establishes that morale does not
+scale `Сокрушение зла`; the already archived `EXP-R9-001` body establishes the
+remaining exact edge without new extraction. The qualifying contribution is
+added after effective attack/counterattack and after the selected ordinary-attack
+1.5× branch, but before attack randomisation and defence/resistance resolution.
+This is an `N2_EXACT_EDGE` reduced to an address-free rule and finite vectors;
+the current conventional generic placement may remain `T1_SANITIZE`.
+
 ### 5.3 Charge is a ruleset/profile question, not an architecture mandate
 
 The supplied Eadoropedia mechanics page itself documents the legacy
@@ -298,9 +306,9 @@ separate project-authored mode.
 
 | request | audit result | next action |
 |---|---|---|
-| R10 conditional attack-bonus placement | `N2_EXACT_EDGE`, potentially material | First map the affected bonus types against Eadoropedia and produce one minimal wounded/low-stamina vector. Continue binary work only for a remaining consequential ambiguity. |
-| R12 hit-and-return anchor | `N1_BLACKBOX`, possibly `N2_EXACT_EDGE` | Black-box command/selection/extra-turn fixtures first; no broad function export. |
-| R13 start-of-turn lifecycle | `N1_BLACKBOX` and high materiality | Black-box round/phase/reselection/extra-turn matrix first; binary only for inaccessible boundary order. |
+| R10 conditional attack-bonus placement | `CLOSED / N2_EXACT_EDGE` | Public material established the morale carve-out; existing `EXP-R9-001` already proved the remaining placement. Export neutral vectors; no new binary packet. |
+| R12 hit-and-return anchor | `N1_BLACKBOX`, possibly `N2_EXACT_EDGE` | Observation protocol ready: NH Harpy `/31`, same-phase reselection and Warlord-granted second turn; no binary packet unless a decisive case is unreachable. |
+| R13 start-of-turn lifecycle | `N1_BLACKBOX` and high materiality | Observation protocol ready: NH Wind Seeker `/122` supplies a +2 start effect and Warlord `/111` supplies a direct +2 plus second-turn control; binary only for an inaccessible remaining boundary. |
 | R16 action dispatcher | mostly `N3_INTERNAL` | Retire as whole-function reconstruction. Replace with player-facing action-semantics coverage matrix. |
 | R17 melee secondary effects | selective `N2_EXACT_EDGE` | Replace with finite trigger/order matrix; inspect only unresolved material cells. |
 

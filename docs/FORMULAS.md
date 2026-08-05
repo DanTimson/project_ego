@@ -44,21 +44,66 @@ This is not a stylistic choice — it is the resolution order and it is fixed.
 
 Applies identically to Атака, Контратака and Дистанционная Атака.
 
-### 1.1 The morale carve-out
+### 1.1 Conditional attack contributions
 
-`[GM] Боевой дух` · **STATED**
+`[GM] Боевой дух` · `[AB] Сокрушение зла` ·
+`[BIN:004D2E60; EXP-R9-001]` · **RECOVERED / PUBLICLY CORROBORATED**
 
-Morale multiplies only *direct* attack bonuses — those visible on the unit panel
-during battle (commander auras, spell effects). It does **not** multiply
-conditional damage such as `Сокрушение зла`.
+Eadoropedia states that morale multiplies direct attack bonuses visible on the
+battle panel but does not increase conditional damage such as
+`Сокрушение зла`. The executable resolves the previously unstated wound and
+stamina placement.
 
-*«Боевой дух не увеличивает урон от Сокрушения зла и подобных эффектов, только
-прямые бонусы на атаки.»*
+For ordinary melee attack and counterattack:
 
-So the additive stack is partitioned: part of it sits inside the multiplier
-chain, part outside. Whether stamina and wound multipliers also skip the
-conditional part is **not stated** — we currently apply conditional bonuses
-after all three. `[ASSUMED]`, `OPEN_QUESTIONS` item 7.
+```text
+direct =
+    effective_attack(attacker)
+    or effective_counterattack(attacker)
+
+if ordinary_attack and selected_1_5x_attack_mode:
+    direct += trunc0(direct / 2)
+
+conditional = 0
+if smite_evil > 0 and target_alignment < 0:
+    conditional = smite_evil * abs(target_alignment)
+
+attack_power = direct + conditional
+damage = resolve_attack_against_defence(attack_power, defence_or_resistance)
+```
+
+The effective-stat call has already completed:
+
+1. direct definition/instance/intrinsic/runtime/aura provider addition;
+2. wound and stamina multiplication;
+3. truncation to the pre-morale integer;
+4. morale adjustment;
+5. final effective-stat minimum handling.
+
+Consequently the conditional contribution is not reduced by wounds, exhaustion
+or low morale and is not enlarged by high morale. It is also added after the
+selected ordinary-attack 1.5× branch. It is nevertheless added **before** the
+legacy attack randomisation and defence/resistance resolver, so it is an attack
+power contribution rather than flat post-resolution damage.
+
+Minimal distinguishing vectors, with direct attack `20` and qualifying
+conditional contribution `5`:
+
+| state | recovered attack-power input | if conditional were inside multiplier |
+|---|---:|---:|
+| healthy, neutral | `25` | `25` |
+| 25% life (`×0.75`) | `20` | `18` |
+| stamina 0 (`×0.4`) | `13` | `10` |
+| morale 0 | `13` | `10` |
+| selected 1.5× ordinary attack | `35` | `37` |
+
+The vectors stop at the input to `resolve_attack_against_defence_candidate`;
+final life damage also depends on random attack variation, selected defence or
+resistance, and the minimum-damage rule.
+
+The public description supports the morale carve-out. Exact wound, stamina,
+1.5×-mode and randomisation placement comes from the already archived
+`EXP-R9-001` function body. No additional binary extraction was required.
 
 ### 1.2 WoundMod
 

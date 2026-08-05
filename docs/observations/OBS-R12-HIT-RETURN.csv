@@ -1,0 +1,5 @@
+build,content_version,case_id,subject,subject_level,second_turn_source,initial_tile,manual_move_tile,approach_tile,target_tile,command_sequence,final_tile,retaliation_or_displacement,video_or_screenshot,observer_notes,interpretation
+,R12 fixture,R12-A,/31 Гарпия,0,,A,,,T,adjacent attack without command movement,,,,,
+,R12 fixture,R12-B,/31 Гарпия,0,,A,,C,T,contiguous approach attack,,,,,
+,R12 fixture,R12-C,/31 Гарпия,0,,A,B,C,T,move A->B; select other friendly; reselect Harpy; attack via C,,,,,
+,R12 fixture,R12-D,/31 Гарпия,0,/111 Вожак,A,B,C,T,complete first turn; grant second turn; move A->B; attack via C,,,,,

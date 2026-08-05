@@ -8,7 +8,7 @@ This is a coverage map, not a release claim.
 | stamina and wound multipliers | published tables + binary; R11 complete `0x12` consumer audit | implemented | implemented | low-stamina penalties recovered; every recovered tactical stamina mutation is locally suppressed by effective modifier `0x12` |
 | effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | not assessed | not assessed | R9 closed: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets differ |
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 proves the final clamp is reached differently by melee/counterattack and ranged attack |
-| modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | provider coverage incomplete |
+| modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 closed: `0x3D` conditional contribution is after effective-stat and selected 1.5× processing but before randomisation/defence; explicit fixture pending; wider provider coverage incomplete |
 | activated actions | docs, data, binary dispatcher | implemented | `Action` implemented | effect dictionary incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
 | level-up selection | data + binary | implemented in part | options implemented | legacy RNG/underfull cases open |
@@ -45,8 +45,10 @@ The most consequential blockers are:
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11`, closed requests R1–R9 and R11, and runtime schema version
+`closer_inspection_11`, closed requests R1–R11, and runtime schema version
 14.
+
+R10 closed without new extraction: Eadoropedia supplied the public morale carve-out and the complete `004D2E60` body already archived in `EXP-R9-001` supplied the exact wound, stamina, 1.5×-mode and randomisation placement.
 
 DELIB-0002 is accepted. The current repository remains the mixed
 research/prototype lineage. Future binary requests are necessity-gated, R16 is
@@ -58,6 +60,8 @@ Work is divided among human decision ownership, binary/governance authority,
 engine semantic authority and bounded Codex execution. `CODEX_WORK_QUEUE.md`
 opens seven non-semantic repository-conformance tasks; CX-001 through CX-004 are
 ready, while aggregate preflight, export and CI work remain dependency-blocked.
+
+R12/R13 controlled-observation preflight is ready. One NH battle can use level-zero Harpy `/31`, Wind Seeker `/122` and Warlord `/111` to distinguish return-anchor lifetime, reselection timing and granted-turn start-effect firing without a new binary packet.
 
 When a new checkpoint is produced, update together:
 
