@@ -11,9 +11,8 @@ participants:
   - engine
 verification:
 pending:
-  - engine-side independent position
   - cross-review
   - human decision
   - classify remaining implementation files
-  - track immediate stamina correctness fix
+  - track immediate stamina correctness fix (LANDED: modifier 0x12 no longer exempts the attack multiplier, speed penalty or exhausted detection in either implementation)
   - open ruleset-profile deliberation after this decision

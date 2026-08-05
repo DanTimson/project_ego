@@ -170,8 +170,14 @@ def test_multiplier_tables() -> None:
 
     u = Combatant(life_base=100, life=10, flags={"Не чувствует боли"})
     check(wound_mod(u)[0] == 1.0, "«Не чувствует боли» suppresses wound penalty")
+    # R11: modifier 0x12 «Неутомимость» suppresses stamina MUTATIONS, not the
+    # low-stamina penalty. No recovered effective-stat function queries it, so a
+    # unit that reaches zero stamina by any other route — script, import,
+    # malformed content, mod — is penalised like anything else.
     u = Combatant(stamina=0, flags={"Неутомимый"})
-    check(stamina_mod(u)[0] == 1.0, "«Неутомимый» suppresses stamina penalty")
+    check(stamina_mod(u)[0] == 0.4,
+          "0x12 does NOT suppress the stamina penalty (R11)",
+          "%.2f" % stamina_mod(u)[0])
 
 
 # --- 5. exhausted defence halving -----------------------------------------

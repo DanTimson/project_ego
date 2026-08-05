@@ -318,14 +318,20 @@ def wound_mod(u: Combatant) -> tuple[float, str]:
 
 
 def stamina_mod(u: Combatant) -> tuple[float, str]:
-    """«Выносливость»: at stamina <= 5, 0.4 + 0.1 * stamina.
+    """«Усталость»: at stamina <= 5, 0.4 + 0.1 * stamina.
 
-    «Неутомимый» units never lose stamina at all, so they never reach the
-    penalty band; the check is on the flag rather than on the value so that a
-    debuff which sets stamina directly still cannot penalise them.
+    Derived from the LIVE stamina value. Modifier 0x12 «Неутомимость» is not
+    consulted: R11's write audit found that every recovered tactical stamina
+    mutation queries 0x12, but no recovered effective-stat function does —
+    effective attack, counterattack, ranged attack, speed and both defences all
+    derive their penalties from the current value.
+
+    The previous flag check was an inference ("such a unit never loses stamina,
+    so it never reaches the penalty band"). That is false whenever stamina is set
+    directly by a script, an import, malformed content or a mod, and it produced
+    a unit that was simultaneously at low stamina and unpenalised. 0x12 is
+    stamina-mutation immunity, not penalty immunity.
     """
-    if u.has_flag("Неутомимый"):
-        return 1.0, "tireless"
     if u.stamina > 5:
         return 1.0, ""
     return 0.4 + 0.1 * u.stamina, f"stamina {u.stamina}"
