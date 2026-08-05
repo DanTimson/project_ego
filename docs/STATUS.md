@@ -54,6 +54,11 @@ retired as structural reconstruction, and a future public implementation lineage
 will be created only at the community-release gate defined in
 `PUBLIC_LINEAGE_GATE.md`.
 
+Work is divided among human decision ownership, binary/governance authority,
+engine semantic authority and bounded Codex execution. `CODEX_WORK_QUEUE.md`
+opens seven non-semantic repository-conformance tasks; CX-001 through CX-004 are
+ready, while aggregate preflight, export and CI work remain dependency-blocked.
+
 When a new checkpoint is produced, update together:
 
 - `eador_runtime.h`;

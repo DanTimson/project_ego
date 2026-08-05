@@ -13,6 +13,8 @@ Before changing mechanics, read:
 5. `docs/REVERSE_ENGINEERING.md` when binary compatibility is involved
 6. `eador_runtime.h` when working with recovered layouts
 7. `docs/deliberations/README.md` for cross-agent architecture decisions
+8. `docs/WORK_ALLOCATION.md` before delegating work to another agent
+9. `docs/CODEX_WORK_QUEUE.md` when executing or reviewing a Codex task
 
 Use `docs/FUNCTION_MAP.csv` to navigate recovered functions by address.
 
@@ -118,6 +120,29 @@ python3 tools/check_deliberations.py
 ```
 
 before committing changes under `docs/deliberations/`.
+
+## Delegated execution
+
+Codex and similar coding agents are bounded executors, not independent semantic
+authorities or additional deliberation participants.
+
+Every delegated task must:
+
+- have a repository task contract under `docs/codex/tasks/`;
+- name its semantic owner and reviewer;
+- declare one task class from `docs/WORK_ALLOCATION.md`;
+- list allowed inputs and allowed output paths;
+- state whether runtime behaviour may change;
+- define acceptance commands before implementation;
+- stop and escalate when a semantic choice, new expected value or architectural
+  decision is required.
+
+Governance-owned tasks may touch executable files only when the task is
+non-semantic and behaviour-preserving. Gameplay semantics, profile policy,
+architecture and expected-result decisions remain engine-side or human-owned.
+
+A task that discovers a higher-risk decision is reclassified; the executor must
+not silently make the decision.
 
 ## Current work
 

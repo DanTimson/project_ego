@@ -29,7 +29,9 @@ Required now:
 - apply the binary necessity gate prospectively;
 - keep populated generated bindings uncommitted unless separately decided;
 - preserve raw evidence and commit history honestly;
-- convert completed binary findings into neutral rules and fixtures where useful.
+- convert completed binary findings into neutral rules and fixtures where useful;
+- route delegated implementation through `WORK_ALLOCATION.md` and a reviewed
+  task contract rather than an unbounded agent prompt.
 
 No migration or history rewrite is required at G0.
 
@@ -86,6 +88,9 @@ Checks:
       function boundaries.
 - [ ] Record specification/test references for each migrated subsystem.
 - [ ] Run the transferred verification corpus before accepting new contributions.
+- [ ] Give Codex or any other public-lineage executor access only to the fresh
+      lineage, permitted public sources, neutral specifications and transferred
+      verification seed—not to the mixed research repository.
 
 ## 7. G5 — open community implementation work
 
