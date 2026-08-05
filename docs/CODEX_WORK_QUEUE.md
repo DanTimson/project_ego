@@ -21,7 +21,7 @@ priority.
 
 | ID | class | title | owner/reviewer | state | dependencies |
 |---|---|---|---|---|---|
-| CX-001 | `NON_SEMANTIC_TOOLING` | validate public-lineage registries | binary/governance | `READY` | none |
+| CX-001 | `NON_SEMANTIC_TOOLING` | validate public-lineage registries | binary/governance | `REVIEW` | none |
 | CX-002 | `NON_SEMANTIC_TOOLING` | inventory unclassified tests and fixtures | binary/governance | `READY` | none |
 | CX-003 | `NON_SEMANTIC_TOOLING` | scan transfer candidates for research-only tokens | binary/governance | `READY` | none |
 | CX-004 | `NON_SEMANTIC_TOOLING` | guard populated generated bindings | binary/governance | `READY` | none |
