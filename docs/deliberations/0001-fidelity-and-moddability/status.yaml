@@ -10,6 +10,7 @@ participants:
   - binary
   - engine
 verification:
+  - oracle/test_extension_probe.py
   - oracle/test_fixtures_current.py
   - tests/test_auras.gd
   - oracle/test_var_dialect.py
@@ -20,6 +21,7 @@ verification:
   - oracle/test_roster.py
 pending:
   - scope a persistence layer before attempting the save-round-trip probe
-  - complete the altered-rule and new-action probe
+  - port the action catalogue to GDScript; the oracle can now invoke actions in battle and the port has no Actions class at all
+  - carry unit_upg.Quantity magnitudes into Action instances so effect actions have something to apply
   - split persistent-instance/intrinsic from runtime-node/aura providers if OQ 18 requires it
   - decide whether scenario units may name a canonical content definition, instantiating from a pack instead of declaring stats inline

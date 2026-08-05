@@ -39,6 +39,7 @@ import content
 import handlers
 import counterattack as ca
 import statuses as st
+import actions as actionsmod
 import turn
 from battlefield import Battlefield
 from modifier import Hook, Modifier, Pipeline
@@ -393,6 +394,61 @@ class Scenario:
                 if not turn.phase_done(self.state, self.state.active_side):
                     break
 
+    def cmd_action(self, unit: Combatant, action_id: str,
+                   target: Combatant | None = None) -> None:
+        """Invoke a catalogued action.
+
+        Before this, `oracle/actions.py` defined fourteen actions with costs,
+        availability and refusal reasons — and the battle layer had no command
+        that could invoke any of them. The whole catalogue was reachable only
+        from its own unit tests: tested, and inert.
+
+        What executes here is the part the Action model actually declares:
+        `grants`, applied as timed statuses through the normal status machinery.
+        Everything else is REFUSED EXPLICITLY rather than silently doing
+        nothing, because an action that appears to succeed and changes nothing is
+        worse than one that reports it cannot run yet:
+
+          - `is_attack` actions need the attack pipeline plus `damage_scale`,
+            whose insertion point is an open question (§1.1);
+          - target-consuming effects (healing, ammo transfer) need magnitudes
+            from `unit_upg.Quantity`, which are not yet carried into Action
+            instances — every catalogue magnitude is currently 0.
+        """
+        action = actionsmod.CATALOGUE.get(action_id)
+        if action is None:
+            self.emit("unknown action %r" % action_id)
+            return
+
+        refusal = action.availability(unit)
+        if refusal is not actionsmod.Refusal.OK:
+            self.emit("%s cannot use %s: %s"
+                      % (unit.label(), action.name, refusal.value))
+            return
+
+        if action.is_attack:
+            self.emit("%s: %s is an attack-replacing action and is not "
+                      "executable yet" % (unit.label(), action.name))
+            return
+        if not action.grants:
+            self.emit("%s: %s has no executable effect yet (magnitudes are not "
+                      "loaded from unit_upg)" % (unit.label(), action.name))
+            return
+
+        action.pay(unit)
+        applied = []
+        for ability, magnitude, duration in action.grants:
+            effect = st.StatusEffect(
+                id="%s:%s" % (action.id, ability),
+                name=ability, source=action.name,
+                duration=int(duration) if duration else st.PERMANENT,
+                power=int(magnitude or 0),
+            )
+            st.apply(unit, effect)
+            applied.append(ability)
+        self.emit("%s uses %s (%s; stamina %d)"
+                  % (unit.label(), action.name, ", ".join(applied), unit.stamina))
+
     def cmd_end_phase(self) -> None:
         new_round = turn.end_phase(self.state)
         if new_round:
@@ -454,6 +510,9 @@ class Scenario:
                 self.cmd_shoot(unit, self.units[c["target"]])
             elif op == "rest":
                 self.cmd_rest(unit)
+            elif op == "action":
+                self.cmd_action(unit, str(c.get("action", "")),
+                                self.units.get(c["target"]) if c.get("target") else None)
             elif op == "extra_turn":
                 self.cmd_extra_turn(unit, c)
             else:
