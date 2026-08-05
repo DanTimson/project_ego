@@ -1,6 +1,6 @@
 # Reverse-engineering checkpoint — Eador: Genesis
 
-**Status:** documentation checkpoint after `closer_inspection_1.txt` through `closer_inspection_11.txt` and targeted R1–R9 packets
+**Status:** documentation checkpoint after `closer_inspection_1.txt` through `closer_inspection_11.txt` and targeted R1–R9 and R11 packets
 **Canonical runtime schema:** root `eador_runtime.h`, schema version 14
 **Function index:** `docs/FUNCTION_MAP.csv`
 **Scope:** compatibility-relevant runtime layouts, unit progression, tactical combat, battle actions, economy fragments, parser primitives, and open reverse-engineering work.
@@ -238,6 +238,7 @@ Values above 1000 in `effect_type_ids` encode a unit-definition ID as `value - 1
 | `004CEB40` | `sum_runtime_battle_modifiers_candidate` | Proven | Runtime-only modifier sum. |
 | `004CEC00` | `initialize_runtime_modifier_node_candidate` | Proven | Initializes/inserts a preallocated `0x20` modifier node. |
 | `004D0A70` | `adjust_battle_unit_morale_candidate` | Proven | Applies morale delta unless modifier `0x13`; tracks morale break. |
+| `004D0AC0` | `spend_battle_unit_stamina_candidate` | Proven | Guarded generic stamina spend: amount in EAX, unit in ECX, shortfall morale, +0x40 accounting and +0x10 subtraction. |
 | `004D0B40` | `refresh_battle_unit_status_ui_candidate` | Proven | Presentation only; no combat mechanics. |
 | `004D7A20` approx. | `apply_battle_action_to_unit_candidate` | Strong | Eight-clause action dispatcher; returns target current life. |
 | `00458A90` | `calculate_province_gold_income_candidate` | Strong | Province gold-income pipeline. |
@@ -687,7 +688,33 @@ not the Genesis compatibility input for ranged stamina.
 
 Special attacker modifiers `0x2E` and `0x2F` replace ordinary damage with disabling runtime-effect packages.
 
-### 10.3 Melee exchange
+### 10.3 Modifier `0x12` stamina-subsystem exemption
+
+`EXP-R11-001` and `EXP-R11B-001` provide the complete recovered immediate-`0x12`
+consumer inventory plus a downward-write audit for battle-unit `+0x10`.
+
+The implementation is distributed. `004D0AC0` is a generic guarded spend helper,
+but movement, melee, ranged execution, battle actions, phase effects and scripted
+battle logic also inline their own checks. No central setter enforces the rule.
+
+All recovered reachable tactical decreases are guarded. Ordinary costs clamp
+the actual spend to available stamina, apply a morale adjustment on shortfall,
+increment `+0x40`, and subtract the actual amount. The scripted reduction at
+`004EF3DE` instead floors stamina at two, while action-effect type `0x0B` applies
+a signed adjustment clamped between zero and effective maximum stamina. Both are
+still skipped under `0x12`; the effect-type guard also suppresses positive
+restoration.
+
+The modifier has non-write consumers in tactical-AI scoring (`004F4E35`,
+`004F6210`), aggregate construction (`004EEEFB`), movement/path comparison
+(`004F38DD`) and selection-interface state (`004E1973`).
+
+No effective attack, counterattack, ranged-attack, speed or defence function
+queries `0x12`. Those functions use live stamina normally. The binding legacy
+behaviour is therefore stamina-mutation immunity through distributed checks,
+not separate immunity to the resulting stat penalties.
+
+### 10.4 Melee exchange
 
 `execute_melee_attack_exchange_candidate` uses the global current battle unit as attacker and receives destination coordinates plus target.
 

@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R11 — modifier `0x12` (`Неутомимый`) consumer list. R1–R9 are closed.
+**Current active request:** R10 — conditional attack-bonus placement in the multiplier pipeline. R1–R9 and R11 are closed.
 
 ---
 
@@ -665,26 +665,79 @@ apply to the bonus or only to the base.
 
 ---
 
-## R11 — OPEN: modifier `0x12` («Неутомимый») consumer list
+## R11 — CLOSED: modifier `0x12` exempts the unit from the recovered stamina subsystem
 
-**Closes:** `OPEN_QUESTIONS` item 8
-**Method:** decompilation — XREF enumeration, little reduction needed
-**Cost:** small
+**Closes:** `OPEN_QUESTIONS` item 8 · matrix STAMINA-IMMUNITY-001
+**Evidence:** `EXP-R11-001`, `EXP-R11B-001`
+**Primary resolver:** `004D01C0 get_effective_battle_modifier_candidate`
 
-**Question.** Which stamina consumers check modifier `0x12`? Specifically: does
-the same check suppress direct stamina-setting effects and the zero-stamina
-attack penalty, or only the ordinary per-action costs?
+**Result (2026-08-05).** The recovered executable implements modifier `0x12`
+through distributed consumer checks rather than one central stamina setter.
+Nevertheless, the complete recovered write audit establishes a de facto tactical
+invariant: every reachable operation found to decrease battle-unit
+`current_stamina` at `+0x10` first queries modifier `0x12` and skips the mutation
+when the result is nonzero.
 
-**Why it is cheap and worth doing early.** This is an XREF list rather than a
-semantic reduction, so it is one of the least expensive items here, and it
-determines whether the engine models the ability as "costs are skipped" or as
-"stamina cannot fall," which are different implementations rather than different
-wordings.
+State-changing consumers include:
 
-**Minimum sufficient answer.** The list of call sites testing `0x12`, and for
-each, one word on what it suppresses. If any direct stamina-setting effect
-bypasses the check, say so explicitly — that is the case that distinguishes the
-two models.
+| query site | operation gated |
+|---|---|
+| `004D0AC3` | generic requested stamina spend |
+| `004D1A12` | modifier-`0x1D` tactical command cost |
+| `004D1B9A` | fixed one-point command cost |
+| `004D26F1` | movement stamina cost |
+| `004D795D` | ordinary ranged base cost |
+| `004D79B9` | additional modifier-`0x14` ranged cost |
+| `004D998E` | target drain from attacker modifier `0x28` |
+| `004DD851` | ordinary melee base cost |
+| `004DD8AE` | additional modifier-`0x42` melee cost |
+| `004DD93B` | additional modifier-`0x3B` melee cost |
+| `004E305D` | action-definition stamina cost at `+0x24` |
+| `004E6A1B` | signed action-effect type `0x0B` stamina adjustment |
+| `004EF3DE` | scripted direct stamina reduction, minimum two |
+| `004F5FAE` | selected battle-action stamina cost at `+0x24` |
+
+The ordinary spend paths use:
+
+```text
+if modifier_0x12 == 0:
+    actual = min(current_stamina, requested)
+    if current_stamina < requested:
+        apply morale shortfall
+    stamina_spent += actual
+    current_stamina -= actual
+```
+
+Movement can suppress its shortfall-morale branch through modifier `0x13`.
+Two guarded direct-effect paths differ from ordinary accounting:
+
+- `004EF3DE` subtracts a scripted amount and clamps to a minimum of two without
+  updating `+0x40` or applying shortfall morale;
+- effect type `0x0B` adds a signed magnitude and clamps between zero and
+  effective maximum stamina without updating `+0x40`. Because the `0x12` check
+  guards the whole branch, positive restoration through this effect type is
+  skipped as well as negative drain.
+
+Non-state consumers also treat stamina mechanics as inapplicable:
+
+- `004F4E35` and `004F6210` omit stamina effects from tactical-AI scoring;
+- `004EEEFB` excludes immune units from a level-based aggregate;
+- `004F38DD` bypasses a movement/path stamina-cost comparison;
+- `004E1973` suppresses an exhaustedness-related selection-interface state when
+  `0x12` is present.
+
+No recovered effective-stat function queries `0x12`. Effective attack,
+counterattack, ranged attack, speed, ordinary defence and ranged defence all
+continue to derive penalties from the live stamina value. Therefore `0x12` is
+stamina-mutation immunity, not a separate low/zero-stamina penalty bypass.
+
+**Rejected alternatives.** Action-cost-only immunity, a central universal
+setter, reachable unguarded tactical drains, and separate effective-stat penalty
+immunity.
+
+**Evidence status.** The consumer inventory and recovered write audit are
+PROVEN from assembly and focused data flow. They are not independently VERIFIED
+through a controlled original-game fixture.
 
 ---
 
@@ -838,13 +891,9 @@ Two clusters, because they use different tools and can proceed independently.
 footprint) and the observation half of R6 (put a ranged-only unit adjacent to an
 enemy) remain useful, but they are separate from the binary queue.
 
-**Ghidra work, in rising cost.** R11 is the remaining small XREF-enumeration
-item. R10, R12 and R13 are medium. R16 and R17 are the large reductions and
-should come last.
+**Ghidra work, in rising cost.** R10 is next. R12 and R13 remain medium lifecycle questions. R16 and R17 are the large reductions and should come last.
 
-If only one binary item is done next: **R11**. It is bounded, mechanically
-falsifiable, and resolves whether modifier `0x12` means “skip listed costs” or
-“stamina cannot fall.”
+If only one binary item is done next: **R10**. It closes the remaining provider-order conflict in the effective attack and damage pipeline.
 
 ---
 

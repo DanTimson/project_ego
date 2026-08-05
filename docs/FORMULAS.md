@@ -144,10 +144,49 @@ positive. Effective modifier `0x0E` suppresses the direct terrain-definition
 contribution. Modifier `0x12` does not gate defence halving; its wider consumer
 scope remains R11.
 
-Published prose describes `Неутомимый` (undead, mechanisms, some hero
-artefacts) as suppressing stamina loss. Binary consumers are only partially
-catalogued; R11 determines whether it skips listed action costs or blocks every
-direct drain/set path.
+#### Modifier `0x12` (`Неутомимость`) stamina exemption
+
+`[BIN:004D01C0; EXP-R11-001; EXP-R11B-001]` · **RECOVERED**
+
+The executable implements the exemption through local consumer checks. All
+recovered reachable tactical stamina decreases query effective modifier `0x12`
+and skip the mutation when it is present. This includes movement, ordinary and
+additional melee/ranged costs, action-definition costs, on-hit stamina drain,
+phase effect type `0x0B`, and the recovered scripted direct reduction.
+
+The common spend shape is:
+
+```text
+if modifier_0x12 == 0:
+    actual = min(current_stamina, requested_cost)
+
+    if current_stamina < requested_cost:
+        apply morale adjustment for the shortfall
+
+    stamina_spent += actual
+    current_stamina -= actual
+```
+
+Exceptions remain guarded but use different accounting:
+
+- the `004EF3DE` scripted reduction clamps stamina to at least two and does not
+  update `stamina_spent`;
+- action-effect type `0x0B` applies a signed adjustment and clamps to
+  `[0, effective_max_stamina]` without updating `stamina_spent`. Its `0x12`
+  guard blocks positive restoration as well as negative drain.
+
+AI scoring, movement/path comparison, aggregate construction and
+selection-interface availability also query `0x12` and treat stamina mechanics
+as inapplicable.
+
+Effective attack, counterattack, ranged attack, speed, ordinary defence and
+ranged defence do **not** query `0x12`. They continue to derive penalties from
+the live stamina value. The recovered invariant is therefore:
+
+```text
+modifier 0x12 blocks every recovered tactical stamina mutation;
+it does not separately suppress low- or zero-stamina stat penalties.
+```
 
 ### 1.4 MoraleMod
 

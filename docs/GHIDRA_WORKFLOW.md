@@ -131,13 +131,12 @@ or reopen a settled item because this workflow file is stale.
 
 Current near-term order:
 
-1. R9 — defence halving/clamp order as concrete vectors;
-2. R11 — complete consumer list for modifier `0x12`;
-3. R10 — conditional attack-bonus placement in the multiplier pipeline;
-4. R12 and R13 — return-anchor and start-effect lifecycle boundaries;
-5. R16 — tactical action dispatch table;
-6. R17 — melee-hit secondary-effect classification.
+1. R10 — conditional attack-bonus placement in the multiplier pipeline;
+2. R12 and R13 — return-anchor and start-effect lifecycle boundaries;
+3. R16 — tactical action-dispatch table;
+4. R17 — melee-hit secondary-effect classification;
+5. startup-loader schemas and strategic-economy normalization after the current
+   tactical queue.
 
-R8 is closed. Do not request `004D7050`, `004D0560`, `004DA6B0`, `004E0280` or
-`004DE2B0` again unless a later contradictory fixture identifies a specific
-missing path.
+R8, R9 and R11 are closed. Do not request broad re-exports of their primary
+functions unless a contradictory fixture identifies a specific missing path.

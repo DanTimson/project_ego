@@ -42,10 +42,12 @@ address,working_name,subsystem,confidence,summary
 004D0820,get_effective_battle_defence_candidate,stats,proven,"Modifier ID 4 providers plus tactical additions; exact-zero stamina trunc0 divide by 2; final floor 0"
 004D0980,get_effective_battle_max_life_candidate,stats,proven,Persistent max life plus side multiplier
 004D0A70,adjust_battle_unit_morale_candidate,morale,proven,Morale delta and break accumulation
+004D0AC0,spend_battle_unit_stamina_candidate,stamina,proven,"Unit in ECX and requested amount in EAX; modifier 0x12 guard, shortfall morale, +0x40 accounting and +0x10 subtraction"
 004D0B40,refresh_battle_unit_status_ui_candidate,presentation,proven,UI refresh only
 004D11C0,apply_attacker_on_hit_modifiers_candidate,combat lifecycle,strong inference,Narrow on-hit debuff stage
 004D1BF0,transfer_battle_unit_to_opposite_side_slot_candidate,combat lifecycle,proven,Copies tactical record to opposite-side slot
 004D1D30,resolve_battle_unit_death_candidate,combat lifecycle,proven,"Death, revival, replacement, corpse and cleanup"
+004D2410,move_battle_unit_candidate,movement,proven,"Moves the hidden-ESI unit, spends guarded stamina, updates capacity and coordinates, and clears eligibility when capacity reaches zero without adjacent enemies"
 004D2DA0,calculate_ranged_attack_damage_candidate,damage,proven,Ranged attack versus ranged defence/resistance
 004D2E60,calculate_melee_or_counterattack_damage_candidate,damage,proven,Attack/counterattack versus defence/resistance
 004D61E0,apply_damage_to_battle_unit_candidate,damage,proven,"Channel accounting, status removal, life, death, morale"
