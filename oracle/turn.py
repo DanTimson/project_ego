@@ -46,20 +46,34 @@ class Refusal(Enum):
 
 
 def effective_speed(u: Combatant) -> tuple[int, Trace]:
-    """Speed after the documented stamina penalty. Floors at 1.
+    """`004D0560` — effective battle speed. Recovered form (R8):
 
-        stamina 3-4  ->  -1
-        stamina <= 2 ->  -2
+        speed = definition speed + modifier 7 from every provider class
+        if stamina < 5 and speed > 1: speed -= 1
+        if stamina < 3 and speed > 1: speed -= 1
+        return max(speed, 1)
 
-    `Неутомимый` never loses stamina, so it never reaches the penalty band.
+    Two successive conditional decrements, each guarded by `speed > 1`, rather
+    than the single banded penalty this used before. The banded form was
+    numerically identical for every reachable input, so no vector moves — but the
+    recovered form is what the binary does and is what later modifier-7 work will
+    extend.
+
+    ONE BEHAVIOURAL CHANGE: the previous implementation exempted «Неутомимый»
+    from the penalty, reasoning that such a unit never loses stamina. `004D0560`
+    contains no modifier `0x12` check, and stamina can also be set directly by an
+    effect, so the exemption is removed. Modifier `0x12` suppresses stamina
+    DEDUCTIONS (R8, and open question 8), not the speed penalty.
     """
     t = Trace(f"{u.name}.speed")
     t.base = u.speed
     value = u.speed
-    if not u.has_flag("Неутомимый") and u.stamina <= 4:
-        penalty = -1 if u.stamina >= 3 else -2
-        t.step(f"stamina {u.stamina}", value, value + penalty)
-        value += penalty
+    if u.stamina < 5 and value > 1:
+        t.step(f"stamina {u.stamina} < 5", value, value - 1)
+        value -= 1
+    if u.stamina < 3 and value > 1:
+        t.step(f"stamina {u.stamina} < 3", value, value - 1)
+        value -= 1
     if value < 1:
         t.step("floor", value, 1, "speed never drops below 1")
         value = 1
@@ -229,12 +243,24 @@ def spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> Trace:
 
 
 def attack_stamina_cost(u: Combatant) -> int:
-    """-2 if the unit moved at any point this round, -1 otherwise.
+    """2 when live remaining capacity is BELOW effective speed, else 1.
 
-    The discriminator is `steps_this_round > 0`, NOT a position comparison: a
-    unit that moved out and back to its starting tile has moved.
+    R8, `004D7953..004D797D`: the executor compares the tactical-unit field at
+    `+0x04` — remaining capacity — against `004D0560`'s effective speed. The
+    branch is strict less-than, so equality and temporary over-capacity both
+    select 1.
+
+    This is NOT `steps_this_round > 0`, which is what this function used before.
+    The two agree on the common path and diverge whenever capacity is restored:
+    battle-action effect type 7 can raise `+0x04` back up to the current
+    effective speed, and a non-movement command increments it by one. Ordinary
+    selection and reselection do not touch capacity at all. So a unit may move,
+    have capacity restored, be deselected and reselected, and still pay 1 — where
+    a movement-history discriminator would wrongly charge 2.
+
+    `steps_this_round` remains correct for «Атака с разгона» and is untouched.
     """
-    return 2 if u.moved_this_round() else 1
+    return 2 if u.movement_remaining < effective_speed(u)[0] else 1
 
 
 def spend_attack(u: Combatant) -> Trace:
@@ -242,9 +268,18 @@ def spend_attack(u: Combatant) -> Trace:
     cost = attack_stamina_cost(u)
     t.base = u.stamina
     if not u.has_flag("Неутомимый"):
+        # Modifier 0x12 «Неутомимость» suppresses the deduction itself, not the
+        # cost calculation.
         u.stamina = max(0, u.stamina - cost)
         t.step(f"-{cost} stamina", t.base, u.stamina,
-               "moved this round" if u.moved_this_round() else "attacked in place")
+               "capacity %d < effective speed %d"
+               % (u.movement_remaining, effective_speed(u)[0]) if cost == 2
+               else "capacity at or above effective speed")
+    # NOTE: R8 records that the RANGED executor clears remaining capacity
+    # (+0x04) as well as the actionable flag (+0x5C). This function is generic
+    # and also serves melee, for which no such evidence exists, so only the
+    # action flag is set here. Wire the capacity clear in when ranged commands
+    # are modelled as a distinct executor.
     u.action_spent = True
     if u.stamina <= 0 and not u.has_flag("Неутомимый"):
         u.forced_rest = True

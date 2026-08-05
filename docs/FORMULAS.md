@@ -415,7 +415,8 @@ the opposing phase begins.
 Current Project EGO state:
 
 - `steps_this_round` is cumulative path length, not displacement.
-- the stamina model currently uses prior movement/action state;
+- the attack stamina cost keys on live remaining capacity versus effective
+  speed (R8), not on prior movement state;
 - the observed `Удар и возврат` anchor is the tile where the attack command was
   issued;
 - start-of-turn effects currently fire once per round.

@@ -21,11 +21,24 @@ enum Refusal { OK, NO_MOVEMENT, ACTION_SPENT, EXHAUSTED, NOT_YOUR_PHASE }
 static func effective_speed(u: Combatant) -> Array:
 	var t := Trace.new("%s.speed" % u.name)
 	t.base = float(u.speed)
+	# `004D0560` recovered form (R8):
+	#     if stamina < 5 and speed > 1: speed -= 1
+	#     if stamina < 3 and speed > 1: speed -= 1
+	#     return max(speed, 1)
+	# Two guarded decrements rather than one banded penalty. Numerically
+	# identical for every reachable input, but this is what the binary does.
+	#
+	# ONE BEHAVIOURAL CHANGE: the «Неутомимый» exemption is removed. `004D0560`
+	# has no modifier 0x12 check; the exemption was inferred from "such a unit
+	# never loses stamina", which fails when an effect sets stamina directly.
+	# Modifier 0x12 suppresses stamina DEDUCTIONS, not the speed penalty.
 	var value: int = u.speed
-	if not u.has_flag(&"Неутомимый") and u.stamina <= 4:
-		var penalty: int = -1 if u.stamina >= 3 else -2
-		t.step("stamina %d" % u.stamina, float(value), float(value + penalty))
-		value += penalty
+	if u.stamina < 5 and value > 1:
+		t.step("stamina %d < 5" % u.stamina, float(value), float(value - 1))
+		value -= 1
+	if u.stamina < 3 and value > 1:
+		t.step("stamina %d < 3" % u.stamina, float(value), float(value - 1))
+		value -= 1
 	if value < 1:
 		t.step("floor", float(value), 1.0, "speed never drops below 1")
 		value = 1
@@ -191,10 +204,19 @@ static func spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> T
 	return t
 
 
-## -2 if the unit moved at any point this round, -1 otherwise. The test is
-## `steps_this_round > 0`, NOT a position comparison.
+## 2 when live remaining capacity is BELOW effective speed, else 1 (R8).
+##
+## `004D7953..004D797D` compares the tactical-unit field at `+0x04` — remaining
+## capacity — against `004D0560`'s effective speed, with a STRICT less-than, so
+## equality and temporary over-capacity both select 1.
+##
+## This is NOT `steps_this_round > 0`, which is what this used before. The two
+## agree on the common path and diverge whenever capacity is restored: effect
+## type 7 can raise `+0x04` back to effective speed, and a non-movement command
+## increments it by one, while ordinary selection and reselection do not touch it
+## at all. `steps_this_round` remains correct for «Атака с разгона».
 static func attack_stamina_cost(u: Combatant) -> int:
-	return 2 if u.moved_this_round() else 1
+	return 2 if u.movement_remaining < int(effective_speed(u)[0]) else 1
 
 
 static func spend_attack(u: Combatant) -> Trace:
@@ -204,7 +226,9 @@ static func spend_attack(u: Combatant) -> Trace:
 	if not u.has_flag(&"Неутомимый"):
 		u.stamina = maxi(0, u.stamina - cost)
 		t.step("-%d stamina" % cost, t.base, float(u.stamina),
-			"moved this round" if u.moved_this_round() else "attacked in place")
+			"capacity %d < effective speed %d" % [u.movement_remaining,
+				int(effective_speed(u)[0])] if cost == 2
+				else "capacity at or above effective speed")
 	u.action_spent = true
 	if u.stamina <= 0 and not u.has_flag(&"Неутомимый"):
 		u.forced_rest = true

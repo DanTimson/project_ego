@@ -2168,6 +2168,1016 @@
    "expected": 7
   }
  ],
+ "capacity_cost": [
+  {
+   "speed": 1,
+   "stamina": 0,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 1,
+   "stamina": 0,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 0,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 0,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 0,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 0,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 2,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 1,
+   "stamina": 2,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 2,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 2,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 2,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 2,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 3,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 1,
+   "stamina": 3,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 3,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 3,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 3,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 3,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 4,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 1,
+   "stamina": 4,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 4,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 4,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 4,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 4,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 5,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 1,
+   "stamina": 5,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 5,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 5,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 5,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 5,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 10,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 1,
+   "stamina": 10,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 10,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 10,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 10,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 1,
+   "stamina": 10,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 0,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 2,
+   "stamina": 0,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 0,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 0,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 0,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 0,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 2,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 2,
+   "stamina": 2,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 2,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 2,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 2,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 2,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 3,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 2,
+   "stamina": 3,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 3,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 3,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 3,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 3,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 4,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 2,
+   "stamina": 4,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 4,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 4,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 4,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 4,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 5,
+   "capacity": 0,
+   "effective_speed": 2,
+   "expected": 2
+  },
+  {
+   "speed": 2,
+   "stamina": 5,
+   "capacity": 1,
+   "effective_speed": 2,
+   "expected": 2
+  },
+  {
+   "speed": 2,
+   "stamina": 5,
+   "capacity": 2,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 5,
+   "capacity": 3,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 5,
+   "capacity": 5,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 5,
+   "capacity": 9,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 10,
+   "capacity": 0,
+   "effective_speed": 2,
+   "expected": 2
+  },
+  {
+   "speed": 2,
+   "stamina": 10,
+   "capacity": 1,
+   "effective_speed": 2,
+   "expected": 2
+  },
+  {
+   "speed": 2,
+   "stamina": 10,
+   "capacity": 2,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 10,
+   "capacity": 3,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 10,
+   "capacity": 5,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 2,
+   "stamina": 10,
+   "capacity": 9,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 0,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 0,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 0,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 0,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 0,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 0,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 2,
+   "capacity": 0,
+   "effective_speed": 1,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 2,
+   "capacity": 1,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 2,
+   "capacity": 2,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 2,
+   "capacity": 3,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 2,
+   "capacity": 5,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 2,
+   "capacity": 9,
+   "effective_speed": 1,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 3,
+   "capacity": 0,
+   "effective_speed": 2,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 3,
+   "capacity": 1,
+   "effective_speed": 2,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 3,
+   "capacity": 2,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 3,
+   "capacity": 3,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 3,
+   "capacity": 5,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 3,
+   "capacity": 9,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 4,
+   "capacity": 0,
+   "effective_speed": 2,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 4,
+   "capacity": 1,
+   "effective_speed": 2,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 4,
+   "capacity": 2,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 4,
+   "capacity": 3,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 4,
+   "capacity": 5,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 4,
+   "capacity": 9,
+   "effective_speed": 2,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 5,
+   "capacity": 0,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 5,
+   "capacity": 1,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 5,
+   "capacity": 2,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 5,
+   "capacity": 3,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 5,
+   "capacity": 5,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 5,
+   "capacity": 9,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 10,
+   "capacity": 0,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 10,
+   "capacity": 1,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 10,
+   "capacity": 2,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 3,
+   "stamina": 10,
+   "capacity": 3,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 10,
+   "capacity": 5,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 3,
+   "stamina": 10,
+   "capacity": 9,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 0,
+   "capacity": 0,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 0,
+   "capacity": 1,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 0,
+   "capacity": 2,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 0,
+   "capacity": 3,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 0,
+   "capacity": 5,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 0,
+   "capacity": 9,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 2,
+   "capacity": 0,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 2,
+   "capacity": 1,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 2,
+   "capacity": 2,
+   "effective_speed": 3,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 2,
+   "capacity": 3,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 2,
+   "capacity": 5,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 2,
+   "capacity": 9,
+   "effective_speed": 3,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 3,
+   "capacity": 0,
+   "effective_speed": 4,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 3,
+   "capacity": 1,
+   "effective_speed": 4,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 3,
+   "capacity": 2,
+   "effective_speed": 4,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 3,
+   "capacity": 3,
+   "effective_speed": 4,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 3,
+   "capacity": 5,
+   "effective_speed": 4,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 3,
+   "capacity": 9,
+   "effective_speed": 4,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 4,
+   "capacity": 0,
+   "effective_speed": 4,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 4,
+   "capacity": 1,
+   "effective_speed": 4,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 4,
+   "capacity": 2,
+   "effective_speed": 4,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 4,
+   "capacity": 3,
+   "effective_speed": 4,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 4,
+   "capacity": 5,
+   "effective_speed": 4,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 4,
+   "capacity": 9,
+   "effective_speed": 4,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 5,
+   "capacity": 0,
+   "effective_speed": 5,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 5,
+   "capacity": 1,
+   "effective_speed": 5,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 5,
+   "capacity": 2,
+   "effective_speed": 5,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 5,
+   "capacity": 3,
+   "effective_speed": 5,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 5,
+   "capacity": 5,
+   "effective_speed": 5,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 5,
+   "capacity": 9,
+   "effective_speed": 5,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 10,
+   "capacity": 0,
+   "effective_speed": 5,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 10,
+   "capacity": 1,
+   "effective_speed": 5,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 10,
+   "capacity": 2,
+   "effective_speed": 5,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 10,
+   "capacity": 3,
+   "effective_speed": 5,
+   "expected": 2
+  },
+  {
+   "speed": 5,
+   "stamina": 10,
+   "capacity": 5,
+   "effective_speed": 5,
+   "expected": 1
+  },
+  {
+   "speed": 5,
+   "stamina": 10,
+   "capacity": 9,
+   "effective_speed": 5,
+   "expected": 1
+  }
+ ],
  "roll_attack": [
   {
    "attack": 1,

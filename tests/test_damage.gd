@@ -76,6 +76,26 @@ func _init() -> void:
 			"morale: %d" % int(case["morale"]), "got %.4f" % got)
 	# Whole-stat vectors: these catch the integer truncation that a float
 	# multiplier cannot express (100 * 1.15 == 114.999... -> 114, binary 115).
+	# R8: attack stamina cost keys on live capacity vs effective speed, strict
+	# less-than. steps_this_round is deliberately nonzero in every vector, so a
+	# movement-history discriminator would fail here.
+	for case in fx["capacity_cost"]:
+		var u := Combatant.new()
+		u.speed = int(case["speed"])
+		u.stamina = int(case["stamina"])
+		u.stamina_base = 10
+		u.movement_remaining = int(case["capacity"])
+		u.steps_this_round = 3
+		var eff: int = int(ActionPoints.effective_speed(u)[0])
+		_check(eff == int(case["effective_speed"]),
+			"effective speed: speed %d stamina %d" % [int(case["speed"]), int(case["stamina"])],
+			"got %d want %d" % [eff, int(case["effective_speed"])])
+		var cost: int = ActionPoints.attack_stamina_cost(u)
+		_check(cost == int(case["expected"]),
+			"attack cost: speed %d stamina %d capacity %d"
+				% [int(case["speed"]), int(case["stamina"]), int(case["capacity"])],
+			"got %d want %d" % [cost, int(case["expected"])])
+
 	# R6: entry semantics differ per attack kind before the shared tail.
 	for case in fx["attack_entry"]:
 		var u := Combatant.new()

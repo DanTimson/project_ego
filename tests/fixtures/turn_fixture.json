@@ -43,7 +43,7 @@
    "flags": [
     "Неутомимый"
    ],
-   "expected": 3
+   "expected": 1
   }
  ],
  "sequences": [
@@ -314,7 +314,7 @@
    ],
    "after": {
     "stamina": 1,
-    "movement_remaining": 2,
+    "movement_remaining": 0,
     "steps_this_round": 2,
     "action_spent": true,
     "forced_rest": false,
@@ -409,7 +409,7 @@
     true
    ],
    "after": {
-    "stamina": 8,
+    "stamina": 9,
     "movement_remaining": 3,
     "steps_this_round": 2,
     "action_spent": true,

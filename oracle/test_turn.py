@@ -56,8 +56,15 @@ def test_effective_speed() -> None:
         check(got == want, "speed 3 at stamina %d -> %d" % (stamina, want), "got %d" % got)
     u = Combatant(speed=1, stamina=0, stamina_base=10)
     check(turn.effective_speed(u)[0] == 1, "speed floors at 1, never 0 or negative")
+    # R8: `004D0560` contains no modifier 0x12 check. The previous expectation
+    # here — that «Неутомимый» keeps full speed — was an inference from "such a
+    # unit never loses stamina", not evidence, and it fails once an effect sets
+    # stamina directly. Modifier 0x12 suppresses stamina DEDUCTIONS, not the
+    # speed penalty.
     u = Combatant(speed=3, stamina=0, flags={"Неутомимый"})
-    check(turn.effective_speed(u)[0] == 3, "Неутомимый keeps full speed at 0 stamina")
+    check(turn.effective_speed(u)[0] == 1,
+          "Неутомимый does NOT exempt the speed penalty (R8)",
+          "got %d" % turn.effective_speed(u)[0])
 
 
 def test_attack_cost() -> None:
@@ -196,8 +203,15 @@ def test_extra_turns() -> None:
     check(u.steps_this_round == 3,
           "steps do NOT reset — charge keeps accumulating across both turns",
           "steps %d" % u.steps_this_round)
+    # R8: the discriminator is live capacity, not movement history. Рывок has
+    # just restored movement_remaining to the full effective speed, so capacity
+    # is NOT below effective speed and the second attack costs 1, not 2. The
+    # previous expectation encoded the superseded `steps_this_round > 0` rule —
+    # and this is exactly the case R8 names as the one it gets wrong.
     turn.spend_attack(u)
-    check(u.stamina == 10 - 2 - 2, "and the attack still costs 2, having moved",
+    check(u.stamina == 10 - 2 - 1,
+          "the second attack costs 1: capacity was restored, so movement "
+          "history does not charge it (R8)",
           "stamina %d" % u.stamina)
 
     # A rest already taken is not undone by being handed another turn.

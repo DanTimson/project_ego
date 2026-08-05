@@ -82,6 +82,7 @@ out = {
     "morale_attack": [],
     "attack_entry": [],
     "defence_tail": [],
+    "capacity_cost": [],
     "roll_attack": [],
     "resolve": [],
 }
@@ -126,6 +127,22 @@ for mo in (0, 1, 2, 3, 4, 5, 6, 10, 15, 16, 17, 18, 20, 21, 24, 25, 29, 30, 35,
 # under, just over, and exactly on an integer boundary.
 # base 0 and 1 exercise the min-1 clamp: 2 Genesis and 22 NH units have
 # Attack 0, and attack 1 under the stamina-0 halving truncates to 0.
+# R8: the attack stamina cost keys on LIVE remaining capacity versus effective
+# speed, with a strict less-than — not on movement history. Capacity equal to or
+# above effective speed costs 1, including the restored-capacity case that the
+# old `steps_this_round > 0` rule charged 2 for.
+for speed in (1, 2, 3, 5):
+    for stamina in (0, 2, 3, 4, 5, 10):
+        for capacity in (0, 1, 2, 3, 5, 9):
+            c = make(speed=speed, stamina=stamina, stamina_base=10)
+            c.movement_remaining = capacity
+            c.steps_this_round = 3          # deliberately nonzero: must not matter
+            out["capacity_cost"].append({
+                "speed": speed, "stamina": stamina, "capacity": capacity,
+                "effective_speed": turn.effective_speed(c)[0],
+                "expected": turn.attack_stamina_cost(c),
+            })
+
 # R6 entry semantics: the three attack kinds differ BEFORE the shared tail.
 # Melee/counter return 0 under modifier 0x26; ranged returns 0 on a zero sum
 # without ever reaching the minimum-one clamp.
