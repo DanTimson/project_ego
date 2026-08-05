@@ -214,7 +214,7 @@
      "Неутомимый"
     ]
    },
-   "expected": 7
+   "expected": 3
   }
  ],
  "multipliers": {
@@ -439,7 +439,7 @@
    "base": 0,
    "morale": 0,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -457,7 +457,7 @@
    "base": 0,
    "morale": 3,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -475,7 +475,7 @@
    "base": 0,
    "morale": 5,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -493,7 +493,7 @@
    "base": 0,
    "morale": 15,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -511,7 +511,7 @@
    "base": 0,
    "morale": 16,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -529,7 +529,7 @@
    "base": 0,
    "morale": 18,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -547,7 +547,7 @@
    "base": 0,
    "morale": 21,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -565,7 +565,7 @@
    "base": 0,
    "morale": 25,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -583,7 +583,7 @@
    "base": 0,
    "morale": 30,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -601,7 +601,7 @@
    "base": 0,
    "morale": 43,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -619,7 +619,7 @@
    "base": 0,
    "morale": 51,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 0,
@@ -637,7 +637,7 @@
    "base": 0,
    "morale": 60,
    "kind": 2,
-   "expected": 1
+   "expected": 0
   },
   {
    "base": 1,
@@ -1718,6 +1718,454 @@
    "morale": 60,
    "kind": 2,
    "expected": 145
+  }
+ ],
+ "attack_entry": [
+  {
+   "base": 0,
+   "no_fight": false,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "no_fight": false,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 0,
+   "no_fight": false,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "base": 0,
+   "no_fight": true,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "base": 0,
+   "no_fight": true,
+   "kind": 1,
+   "expected": 0
+  },
+  {
+   "base": 0,
+   "no_fight": true,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "base": 1,
+   "no_fight": false,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "no_fight": false,
+   "kind": 1,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "no_fight": false,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 1,
+   "no_fight": true,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "base": 1,
+   "no_fight": true,
+   "kind": 1,
+   "expected": 0
+  },
+  {
+   "base": 1,
+   "no_fight": true,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "base": 7,
+   "no_fight": false,
+   "kind": 0,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "no_fight": false,
+   "kind": 1,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "no_fight": false,
+   "kind": 2,
+   "expected": 7
+  },
+  {
+   "base": 7,
+   "no_fight": true,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "base": 7,
+   "no_fight": true,
+   "kind": 1,
+   "expected": 0
+  },
+  {
+   "base": 7,
+   "no_fight": true,
+   "kind": 2,
+   "expected": 7
+  }
+ ],
+ "defence_tail": [
+  {
+   "value": -3,
+   "stamina": 10,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": -3,
+   "stamina": 10,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": -3,
+   "stamina": 1,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": -3,
+   "stamina": 1,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": -3,
+   "stamina": 0,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": -3,
+   "stamina": 0,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": -3,
+   "stamina": -1,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": -3,
+   "stamina": -1,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": -1,
+   "stamina": 10,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": -1,
+   "stamina": 10,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": -1,
+   "stamina": 1,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": -1,
+   "stamina": 1,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": -1,
+   "stamina": 0,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": -1,
+   "stamina": 0,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": -1,
+   "stamina": -1,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": -1,
+   "stamina": -1,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": 0,
+   "stamina": 10,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": 0,
+   "stamina": 10,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": 0,
+   "stamina": 1,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": 0,
+   "stamina": 1,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": 0,
+   "stamina": 0,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": 0,
+   "stamina": 0,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": 0,
+   "stamina": -1,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": 0,
+   "stamina": -1,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": 1,
+   "stamina": 10,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "value": 1,
+   "stamina": 10,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "value": 1,
+   "stamina": 1,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "value": 1,
+   "stamina": 1,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "value": 1,
+   "stamina": 0,
+   "kind": 0,
+   "expected": 0
+  },
+  {
+   "value": 1,
+   "stamina": 0,
+   "kind": 2,
+   "expected": 0
+  },
+  {
+   "value": 1,
+   "stamina": -1,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "value": 1,
+   "stamina": -1,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "value": 2,
+   "stamina": 10,
+   "kind": 0,
+   "expected": 2
+  },
+  {
+   "value": 2,
+   "stamina": 10,
+   "kind": 2,
+   "expected": 2
+  },
+  {
+   "value": 2,
+   "stamina": 1,
+   "kind": 0,
+   "expected": 2
+  },
+  {
+   "value": 2,
+   "stamina": 1,
+   "kind": 2,
+   "expected": 2
+  },
+  {
+   "value": 2,
+   "stamina": 0,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "value": 2,
+   "stamina": 0,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "value": 2,
+   "stamina": -1,
+   "kind": 0,
+   "expected": 2
+  },
+  {
+   "value": 2,
+   "stamina": -1,
+   "kind": 2,
+   "expected": 2
+  },
+  {
+   "value": 3,
+   "stamina": 10,
+   "kind": 0,
+   "expected": 3
+  },
+  {
+   "value": 3,
+   "stamina": 10,
+   "kind": 2,
+   "expected": 3
+  },
+  {
+   "value": 3,
+   "stamina": 1,
+   "kind": 0,
+   "expected": 3
+  },
+  {
+   "value": 3,
+   "stamina": 1,
+   "kind": 2,
+   "expected": 3
+  },
+  {
+   "value": 3,
+   "stamina": 0,
+   "kind": 0,
+   "expected": 1
+  },
+  {
+   "value": 3,
+   "stamina": 0,
+   "kind": 2,
+   "expected": 1
+  },
+  {
+   "value": 3,
+   "stamina": -1,
+   "kind": 0,
+   "expected": 3
+  },
+  {
+   "value": 3,
+   "stamina": -1,
+   "kind": 2,
+   "expected": 3
+  },
+  {
+   "value": 7,
+   "stamina": 10,
+   "kind": 0,
+   "expected": 7
+  },
+  {
+   "value": 7,
+   "stamina": 10,
+   "kind": 2,
+   "expected": 7
+  },
+  {
+   "value": 7,
+   "stamina": 1,
+   "kind": 0,
+   "expected": 7
+  },
+  {
+   "value": 7,
+   "stamina": 1,
+   "kind": 2,
+   "expected": 7
+  },
+  {
+   "value": 7,
+   "stamina": 0,
+   "kind": 0,
+   "expected": 3
+  },
+  {
+   "value": 7,
+   "stamina": 0,
+   "kind": 2,
+   "expected": 3
+  },
+  {
+   "value": 7,
+   "stamina": -1,
+   "kind": 0,
+   "expected": 7
+  },
+  {
+   "value": 7,
+   "stamina": -1,
+   "kind": 2,
+   "expected": 7
   }
  ],
  "roll_attack": [

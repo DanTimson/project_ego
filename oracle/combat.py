@@ -459,10 +459,37 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
     t.base = base
     value = float(base)
 
+    # R6: the three effective-attack functions do NOT share entry semantics.
+    #
+    # Melee (004D1890) and counterattack (004D1660) test modifier 0x26
+    # «Не сражается» first and return zero outright. The final minimum-one clamp
+    # is never reached on that path.
+    if kind in (AttackKind.MELEE, AttackKind.COUNTER) and u.has_flag("Не сражается"):
+        t.step("modifier 0x26 «Не сражается»", value, 0.0, "cannot attack")
+        t.result = 0.0
+        return 0.0, t
+
     if u.attack_bonus:
         nv = value + u.attack_bonus
         t.step("additive bonuses", value, nv)
         value = nv
+
+    # R6: ranged attack (004D14A0) branches at 004D14D2 after adding ONLY the
+    # definition base, persistent-instance modifiers and intrinsic modifiers. A
+    # zero sum returns immediately, BEFORE runtime-node modifiers, commander
+    # aura, wound/stamina, morale and the clamp — so a ranged-zero unit stays at
+    # zero rather than being lifted to 1 by the clamp.
+    #
+    # ASSUMPTION: this engine does not yet separate persistent-instance and
+    # intrinsic providers from runtime-node and aura providers, so the guard is
+    # placed after the additive bonuses and before the STAT_PASSIVE chain, which
+    # is the closest available boundary. If a runtime-node or aura provider ever
+    # raises a zero ranged attack, the two models diverge. OPEN_QUESTIONS 18.
+    if kind is AttackKind.RANGED and _trunc(value) == 0:
+        t.step("ranged zero-sum early return", value, 0.0,
+               "004D14D4: returns before aura, state and clamp")
+        t.result = 0.0
+        return 0.0, t
 
     # STAT_PASSIVE sits INSIDE the multiplier chain: additive before
     # multiplicative is documented and not negotiable.
@@ -488,12 +515,11 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
 
     # result = max(1, pre_morale + trunc0(bonus_percent * pre_morale / 100))
     #
-    # The clamp is UNCONDITIONAL — it is the final line of all three recovered
-    # effective-attack functions, not part of the morale branch — so it applies
-    # at neutral morale too. That matters: 2 Genesis and 22 NH units carry
-    # Attack 0 (siege engines), and an attack of 1 reduced by the stamina-0
-    # halving also truncates to 0. Without the clamp those return 0 here and 1
-    # in the original. See docs/FORMULAS.md 1.4.
+    # The clamp is the shared final tail of all three functions, but it is only
+    # REACHED on the paths above: melee and counterattack skip it entirely under
+    # modifier 0x26, and ranged attack skips it on a zero sum. A single
+    # unconditional clamp for all three kinds is not Genesis-compatible (R6).
+    # On the reached path it does apply at neutral morale.
     pct, note = morale_percent(u)
     pre = _trunc(value)
     raw = pre + _trunc(pct * pre / 100)
@@ -626,13 +652,28 @@ def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
             t.steps.append(step)
         value = nv
 
-    if u.stamina <= 0 and not u.has_flag("Неутомимый"):
-        nv = value * 0.5
-        t.step("exhausted x0.50", value, nv, "stamina 0")
+    # R9: the shared final tail of 004D0820 (defence) and 004D06B0 (ranged
+    # defence) is
+    #
+    #     if current_stamina == 0: value = trunc0(value / 2)
+    #     return max(value, 0)
+    #
+    # Three details, each of which this engine previously had wrong:
+    #
+    #   - the stamina predicate is EQUALITY WITH ZERO, not `<= 0`. Negative
+    #     stamina does not halve defence.
+    #   - modifier 0x12 «Неутомимость» is NOT consulted by either function. The
+    #     exemption belongs to stamina COSTS, not to the defence halving.
+    #   - the signed divide is `CDQ; SUB EAX,EDX; SAR EAX,1`, which truncates
+    #     toward zero. `floor` diverges for negative odd values; the clamp hides
+    #     it here, but the trace should still read correctly.
+    if u.stamina == 0:
+        nv = float(_trunc(value / 2))
+        t.step("exhausted, halved", value, nv, "stamina exactly 0")
         value = nv
 
-    final = max(0, int(math.floor(value)))
+    final = max(0, _trunc(value))
     if final != value:
-        t.step("floor, clamp >= 0", value, final)
+        t.step("clamp >= 0", value, final)
     t.result = final
     return final, t

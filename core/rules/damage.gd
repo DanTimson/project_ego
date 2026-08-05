@@ -82,10 +82,37 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 	t.base = float(base)
 	var value: float = float(base)
 
+	# R6: the three effective-attack functions do NOT share entry semantics.
+	#
+	# Melee (004D1890) and counterattack (004D1660) test modifier 0x26
+	# «Не сражается» first and return zero outright; the final minimum-one clamp
+	# is never reached on that path.
+	if (kind == Combatant.AttackKind.MELEE or kind == Combatant.AttackKind.COUNTER) \
+			and u.has_flag(&"Не сражается"):
+		t.step("modifier 0x26 «Не сражается»", value, 0.0, "cannot attack")
+		t.result = 0.0
+		return [0.0, t]
+
 	if u.attack_bonus != 0:
 		var nv: float = value + float(u.attack_bonus)
 		t.step("additive bonuses", value, nv)
 		value = nv
+
+	# R6: ranged attack (004D14A0) branches at 004D14D2 after adding ONLY the
+	# definition base, persistent-instance and intrinsic modifiers. A zero sum
+	# returns immediately, BEFORE runtime-node modifiers, commander aura,
+	# wound/stamina, morale and the clamp — so a ranged-zero unit stays at zero
+	# rather than being lifted to 1.
+	#
+	# ASSUMPTION: this engine does not yet separate instance/intrinsic providers
+	# from runtime-node/aura providers, so the guard sits after the additive
+	# bonuses and before the STAT_PASSIVE chain — the closest boundary available.
+	# OPEN_QUESTIONS 18.
+	if kind == Combatant.AttackKind.RANGED and int(value) == 0:
+		t.step("ranged zero-sum early return", value, 0.0,
+			"004D14D4: returns before aura, state and clamp")
+		t.result = 0.0
+		return [0.0, t]
 
 	# STAT_PASSIVE sits INSIDE the multiplier chain: additive before
 	# multiplicative is documented and not negotiable.
@@ -138,7 +165,8 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 	return [value, t]
 
 
-## Defence floors, then clamps to a minimum of 0. At stamina 0 both defence
+## Defence halves at exactly zero stamina, then clamps to a minimum of 0 (R9).
+## At stamina 0 both defence
 ## values are halved: «его Защита и Защита от выстрела уменьшаются в 2 раза».
 ## Returns [value: int, trace: Trace].
 static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
@@ -161,14 +189,24 @@ static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
 			t.steps.append(step)
 		value = float(passive[0])
 
-	if Stamina.is_exhausted(u):
-		var nv: float = value * 0.5
-		t.step("exhausted x0.50", value, nv, "stamina 0")
+	# R9: shared final tail of 004D0820 (defence) and 004D06B0 (ranged defence):
+	#
+	#     if current_stamina == 0: value = trunc0(value / 2)
+	#     return max(value, 0)
+	#
+	# Three corrections against the previous implementation:
+	#   - the predicate is EQUALITY WITH ZERO, not "exhausted"/<= 0;
+	#   - modifier 0x12 «Неутомимость» is NOT consulted by either function — the
+	#     exemption belongs to stamina COSTS, not to the defence halving;
+	#   - the signed divide truncates toward zero (CDQ; SUB; SAR), not floors.
+	if u.stamina == 0:
+		var nv: float = float(int(value / 2.0))
+		t.step("exhausted, halved", value, nv, "stamina exactly 0")
 		value = nv
 
-	var final: int = maxi(0, int(floorf(value)))
+	var final: int = maxi(0, int(value))
 	if float(final) != value:
-		t.step("floor, clamp >= 0", value, float(final))
+		t.step("clamp >= 0", value, float(final))
 	t.result = float(final)
 	return [final, t]
 

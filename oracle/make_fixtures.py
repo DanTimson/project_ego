@@ -80,6 +80,8 @@ out = {
     "defence_value": [],
     "multipliers": {"wound": [], "stamina": [], "morale": []},
     "morale_attack": [],
+    "attack_entry": [],
+    "defence_tail": [],
     "roll_attack": [],
     "resolve": [],
 }
@@ -124,6 +126,35 @@ for mo in (0, 1, 2, 3, 4, 5, 6, 10, 15, 16, 17, 18, 20, 21, 24, 25, 29, 30, 35,
 # under, just over, and exactly on an integer boundary.
 # base 0 and 1 exercise the min-1 clamp: 2 Genesis and 22 NH units have
 # Attack 0, and attack 1 under the stamina-0 halving truncates to 0.
+# R6 entry semantics: the three attack kinds differ BEFORE the shared tail.
+# Melee/counter return 0 under modifier 0x26; ranged returns 0 on a zero sum
+# without ever reaching the minimum-one clamp.
+for base in (0, 1, 7):
+    for no_fight in (False, True):
+        for kind in ("melee", "counter", "ranged"):
+            c = make(attack=base, counter_attack=base, ranged_attack=base,
+                     morale=10, morale_base=10)
+            if no_fight:
+                c.flags.add("Не сражается")
+            v, _ = combat.current_attack(c, KIND[kind])
+            out["attack_entry"].append({
+                "base": base, "no_fight": no_fight, "kind": KIND_ORD[kind],
+                "expected": int(v),
+            })
+
+# R9 defence tail: halve at EXACTLY zero stamina, then clamp to zero. Negative
+# and odd values distinguish halve-then-clamp from clamp-then-halve, and
+# stamina -1 checks that the predicate is equality rather than <= 0.
+for value in (-3, -1, 0, 1, 2, 3, 7):
+    for stamina in (10, 1, 0, -1):
+        c = make(defence=value, ranged_defence=value, stamina=stamina)
+        for kind in ("melee", "ranged"):
+            d, _ = combat.current_defence(c, KIND[kind])
+            out["defence_tail"].append({
+                "value": value, "stamina": stamina, "kind": KIND_ORD[kind],
+                "expected": int(d),
+            })
+
 for base in (0, 1, 7, 19, 20, 100):
     for mo in (0, 3, 5, 15, 16, 18, 21, 25, 30, 43, 51, 60):
         c = make(attack=base, counter_attack=base, ranged_attack=base,

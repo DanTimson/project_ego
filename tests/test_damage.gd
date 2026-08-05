@@ -76,6 +76,35 @@ func _init() -> void:
 			"morale: %d" % int(case["morale"]), "got %.4f" % got)
 	# Whole-stat vectors: these catch the integer truncation that a float
 	# multiplier cannot express (100 * 1.15 == 114.999... -> 114, binary 115).
+	# R6: entry semantics differ per attack kind before the shared tail.
+	for case in fx["attack_entry"]:
+		var u := Combatant.new()
+		var b: int = int(case["base"])
+		u.attack = b
+		u.counter_attack = b
+		u.ranged_attack = b
+		u.morale = 10
+		u.morale_base = 10
+		if bool(case["no_fight"]):
+			u.flags[&"Не сражается"] = true
+		var res: Array = Damage.current_attack(u, int(case["kind"]) as Combatant.AttackKind)
+		_check(int(res[0]) == int(case["expected"]),
+			"attack entry: base %d kind %d no_fight %s"
+				% [b, int(case["kind"]), str(case["no_fight"])],
+			"got %d want %d" % [int(res[0]), int(case["expected"])])
+
+	# R9: halve at EXACTLY zero stamina, then clamp to zero.
+	for case in fx["defence_tail"]:
+		var u := Combatant.new()
+		u.defence = int(case["value"])
+		u.ranged_defence = int(case["value"])
+		u.stamina = int(case["stamina"])
+		var res: Array = Damage.current_defence(u, int(case["kind"]) as Combatant.AttackKind)
+		_check(int(res[0]) == int(case["expected"]),
+			"defence tail: value %d stamina %d kind %d"
+				% [int(case["value"]), int(case["stamina"]), int(case["kind"])],
+			"got %d want %d" % [int(res[0]), int(case["expected"])])
+
 	for case in fx["morale_attack"]:
 		var u := Combatant.new()
 		var base: int = int(case["base"])
