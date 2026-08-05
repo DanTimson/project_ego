@@ -10,6 +10,7 @@ participants:
   - binary
   - engine
 verification:
+  - oracle/test_repository_hygiene.py
   - oracle/test_extension_probe.py
   - oracle/test_fixtures_current.py
   - tests/test_auras.gd
@@ -21,6 +22,6 @@ verification:
   - oracle/test_roster.py
 pending:
   - scope a persistence layer before attempting the save-round-trip probe
-  - carry unit_upg.Quantity magnitudes into Action instances so effect actions have something to apply
+  - resolve action magnitudes PER UNIT, not per catalogue entry: the same action name maps to several unit_upg rows with different quantities (Genesis Целительство = 3/4/7 at rows 54/66/94; NH adds 10 and a compound [12,1]), so a magnitude cannot live on the shared Action. It must come from the unit_upg row that unit's Abilityes actually references, resolved at execution time through the roster
   - split persistent-instance/intrinsic from runtime-node/aura providers if OQ 18 requires it
   - decide whether scenario units may name a canonical content definition, instantiating from a pack instead of declaring stats inline
