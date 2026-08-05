@@ -302,6 +302,22 @@ contract and golden vectors, but rewrite from an address-free specification
 before a future public-lineage transfer. Native named-stream RNG remains a
 separate project-authored mode.
 
+### 5.9 Action and melee-secondary public reduction
+
+The NH public snapshot contains exactly fourteen explicit unit-action
+descriptions matching the current action catalogue boundary. Actor-side
+cost/availability coverage exists, but battlefield execution remains separate.
+
+The same source demonstrates the observable battle-action effect families
+without requiring Genesis's dispatcher structure. R16 therefore remains
+`N3_INTERNAL / T3_RESEARCH_ONLY` as a whole-function objective.
+
+For R17, public trigger wording already separates attack, positive-damage, kill,
+defender-reactive, follow-up and attack-replacement semantics. Only the
+non-commutative cells listed in `MELEE_SECONDARY_COVERAGE.csv` remain
+black-box-first. The automatic Genesis branches labelled `0x4F`/`0x50` require a
+reachable source-content mapping before any further binary work.
+
 ## 6. Remaining binary queue after the audit
 
 | request | audit result | next action |

@@ -39,6 +39,20 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 | D5 | **Death/runtime effects `0x49`, `0x4A`, `0x5A`, `0x5B`.** | Mechanics are recovered; names and source content need `.var`/localization confirmation. |
 | D6 | **Side-wide max-life multiplier source.** | `get_effective_battle_max_life_candidate` reads a per-side percentage; battle-setup source is unknown. |
 
+### Action-dictionary narrowing
+
+`ACTION_SEMANTICS_AUDIT.md` and the three coverage CSVs now separate:
+
+- fourteen explicit unit actions;
+- observable generic battle-action effect families;
+- melee secondary trigger/order cells.
+
+Data-dictionary item D2 is no longer a request to reproduce the original
+eight-clause dispatcher. It is narrowed to the opcode-to-family mapping and
+special field meanings needed by content records that the engine actually
+implements. R17 is similarly narrowed to the observation cells in
+`MELEE_SECONDARY_COVERAGE.csv`.
+
 ## Incomplete systems
 
 - **Timed status container in GDScript.** `core/model/status.gd` is currently

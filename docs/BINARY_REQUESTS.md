@@ -939,6 +939,29 @@ fixture, never the original function structure.
 
 ---
 
+## Public coverage reductions for R16/R17
+
+The public-source audit is recorded in:
+
+- `ACTION_SEMANTICS_AUDIT.md`;
+- `UNIT_ACTION_COVERAGE.csv`;
+- `BATTLE_ACTION_FAMILY_COVERAGE.csv`;
+- `MELEE_SECONDARY_COVERAGE.csv`.
+
+Consequences:
+
+- R16 remains retired. The public corpus already supplies the observable effect
+  families; exact opcode mapping is a consumer-triggered data task, not a
+  dispatcher-reconstruction objective.
+- R17 has no active binary packet. Public trigger wording settles attack,
+  positive-damage, kill, reactive and attack-replacement classes. The remaining
+  non-commutative cells are preregistered in
+  `observations/OBS-R17-MELEE-SECONDARY-PREFLIGHT.md`.
+- Existing `004D9800` evidence may be reduced into neutral fixtures where it
+  already answers a cell. No broad re-export is authorized.
+
+---
+
 ## Deferred, deliberately
 
 `ECON-RECRUIT-001` and `ECON-PROVINCE-001` remain open in the matrix. The engine

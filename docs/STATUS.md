@@ -63,6 +63,14 @@ ready, while aggregate preflight, export and CI work remain dependency-blocked.
 
 R12/R13 controlled-observation preflight is ready. One NH battle can use level-zero Harpy `/31`, Wind Seeker `/122` and Warlord `/111` to distinguish return-anchor lifetime, reselection timing and granted-turn start-effect firing without a new binary packet.
 
+The public action-semantics audit is complete. The supplied NH snapshot contains
+fourteen explicit unit actions matching the current catalogue boundary and at
+least eighteen observable generic battle-action effect families. R16 remains
+retired. R17 is reduced to a finite black-box matrix covering zero-damage
+triggers, follow-up attack order, component damage, trample and instant-death
+placement.
+
+
 When a new checkpoint is produced, update together:
 
 - `eador_runtime.h`;
