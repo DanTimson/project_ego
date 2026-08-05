@@ -978,6 +978,171 @@ def legacy_rng_fixture() -> dict:
     return fx
 
 
+def aura_fixture() -> dict:
+    """Aura vectors for the GDScript port.
+
+    `core/rules/auras.gd` is a 213-line port with no differential coverage, and
+    `tests/scenarios/aura_and_poison.json` is referenced by nothing — the exact
+    tested-but-inert shape the project's own discipline warns about. Auras are
+    the highest-risk place for it, because they are DERIVED on every call from
+    positions, sides, subtypes, liveness and stacking; a port that diverges on
+    any one of those produces a plausible battle rather than an error.
+
+    Each case declares a battlefield, units with positions, and auras projected
+    by named sources, then records what the oracle computes: which aura ids are
+    active per unit, the summed per-round tick, and the unit state after the tick
+    is applied.
+    """
+    import auras as auramod
+
+    SCOPE = {auramod.Scope.ADJACENT: "adjacent",
+             auramod.Scope.BATTLEFIELD: "battlefield",
+             auramod.Scope.SELF: "self"}
+    SIDE = {auramod.Side.ALLY: "ally", auramod.Side.ENEMY: "enemy",
+            auramod.Side.ALL: "all"}
+    STACK = {auramod.Stacking.CUMULATIVE: "cumulative",
+             auramod.Stacking.MAXIMUM: "maximum"}
+
+    cases = []
+
+    def case(label, unit_specs, aura_specs, width=7, height=7):
+        """unit_specs: (name, side, q, r, subtypes, alive, life, stamina)
+        aura_specs:  (source, id, scope, affects, stacking, power, tick,
+                      only_subtypes, except_subtypes)"""
+        field = bfmod.Battlefield(width, height)
+        units, sides = {}, {}
+        for (name, side, q, r, subs, alive, life, stam) in unit_specs:
+            u = combat.Combatant(name=name, life=life, life_base=10,
+                                 stamina=stam, stamina_base=10,
+                                 morale=10, morale_base=10)
+            u.alive = alive
+            for sub in subs:
+                u.subtypes.add(sub)
+            units[name] = u
+            sides[name] = side
+            field.place(u, bfmod.Hex(q, r))
+
+        by_source = {}
+        for (src, aid, scope, affects, stacking, power, tick, only, exc) in aura_specs:
+            a = auramod.Aura(id=aid, name=aid, scope=scope, affects=affects,
+                             stacking=stacking, power=power, tick=dict(tick),
+                             only_subtypes=tuple(only), except_subtypes=tuple(exc),
+                             source=units[src])
+            by_source.setdefault(units[src], []).append(a)
+
+        def side_of(u):
+            return sides[u.name]
+
+        expected = []
+        for name in sorted(units):
+            u = units[name]
+            active = sorted(a.id for a in
+                            auramod.active_for(u, by_source, field, side_of))
+            totals, _ = auramod.tick_for(u, by_source, field, side_of)
+            auramod.apply_tick(u, totals)
+            expected.append({
+                "unit": name,
+                "active": active,
+                "tick": {k: v for k, v in sorted(totals.items())},
+                "after": {"life": u.life, "stamina": u.stamina,
+                          "morale": u.morale, "alive": u.alive},
+            })
+
+        cases.append({
+            "label": label, "width": width, "height": height,
+            "units": [{"name": n, "side": s, "q": q, "r": r,
+                       "subtypes": sorted(subs), "alive": alive,
+                       "life": life, "life_base": 10,
+                       "stamina": stam, "stamina_base": 10,
+                       "morale": 10, "morale_base": 10}
+                      for (n, s, q, r, subs, alive, life, stam) in unit_specs],
+            "auras": [{"source": src, "id": aid, "scope": SCOPE[scope],
+                       "affects": SIDE[affects], "stacking": STACK[stacking],
+                       "power": power, "tick": dict(tick),
+                       "only_subtypes": list(only),
+                       "except_subtypes": list(exc)}
+                      for (src, aid, scope, affects, stacking, power, tick,
+                           only, exc) in aura_specs],
+            "expected": expected,
+        })
+
+    A, B, S, M, C = (auramod.Scope.ADJACENT, auramod.Scope.BATTLEFIELD,
+                     auramod.Scope.SELF, auramod.Stacking.MAXIMUM,
+                     auramod.Stacking.CUMULATIVE)
+    ALLY, ENEMY, ALL = auramod.Side.ALLY, auramod.Side.ENEMY, auramod.Side.ALL
+
+    # 1. adjacency, and the projector is not in its own adjacency
+    case("adjacent reaches neighbours only", [
+        ("leader", "a", 3, 3, [], True, 10, 10),
+        ("near",   "a", 4, 3, [], True, 10, 10),
+        ("far",    "a", 6, 3, [], True, 10, 10),
+    ], [("leader", "valour", A, ALLY, M, 2, {}, [], [])])
+
+    # 2. battlefield scope ignores distance
+    case("battlefield scope reaches everyone", [
+        ("leader", "a", 3, 3, [], True, 10, 10),
+        ("far",    "a", 6, 3, [], True, 10, 10),
+    ], [("leader", "banner", B, ALLY, M, 1, {}, [], [])])
+
+    # 3. side filtering, including Side.ALL
+    case("side filtering", [
+        ("leader", "a", 3, 3, [], True, 10, 10),
+        ("friend", "a", 4, 3, [], True, 10, 10),
+        ("foe",    "b", 2, 3, [], True, 10, 10),
+    ], [("leader", "ally_only", A, ALLY, M, 1, {}, [], []),
+        ("leader", "foe_only",  A, ENEMY, M, 1, {}, [], []),
+        ("leader", "everyone",  A, ALL, M, 1, {}, [], [])])
+
+    # 4. MAXIMUM keeps only the strongest of the same id
+    case("maximum stacking keeps the strongest", [
+        ("l1",     "a", 3, 3, [], True, 10, 10),
+        ("l2",     "a", 3, 4, [], True, 10, 10),
+        ("target", "a", 4, 3, [], True, 10, 10),
+    ], [("l1", "valour", A, ALLY, M, 2, {}, [], []),
+        ("l2", "valour", A, ALLY, M, 5, {}, [], [])])
+
+    # 5. CUMULATIVE keeps both
+    case("cumulative stacking keeps both", [
+        ("l1",     "a", 3, 3, [], True, 10, 10),
+        ("l2",     "a", 3, 4, [], True, 10, 10),
+        ("target", "a", 4, 3, [], True, 10, 10),
+    ], [("l1", "presence", A, ALLY, C, 2, {}, [], []),
+        ("l2", "presence", A, ALLY, C, 5, {}, [], [])])
+
+    # 6. a dead source projects nothing
+    case("a dead source projects nothing", [
+        ("leader", "a", 3, 3, [], False, 10, 10),
+        ("near",   "a", 4, 3, [], True, 10, 10),
+    ], [("leader", "valour", A, ALLY, M, 2, {}, [], [])])
+
+    # 7. subtype filters
+    case("only_subtypes and except_subtypes", [
+        ("leader", "a", 3, 3, [], True, 10, 10),
+        ("undead", "a", 4, 3, ["нежить"], True, 10, 10),
+        ("living", "a", 3, 4, [], True, 10, 10),
+        ("beast",  "a", 2, 3, ["животное"], True, 10, 10),
+    ], [("leader", "undead_only", A, ALLY, M, 1, {}, ["нежить"], []),
+        ("leader", "not_beasts",  A, ALLY, M, 1, {}, [], ["животное"])])
+
+    # 8. opposing ticks SUM rather than one winning, and caps apply
+    case("life and decay ticks sum, then cap", [
+        ("healer",  "a", 3, 3, [], True, 10, 10),
+        ("wither",  "a", 3, 4, [], True, 10, 10),
+        ("wounded", "a", 4, 3, [], True, 4, 3),
+        ("full",    "a", 2, 3, [], True, 10, 10),
+    ], [("healer", "life",  A, ALLY, M, 0, {"life": 3}, [], []),
+        ("wither", "decay", A, ALLY, M, 0, {"stamina": -2}, [], [])])
+
+    # 9. a tick can kill, and stamina floors at zero
+    case("a tick can kill; stamina floors at zero", [
+        ("reaper", "a", 3, 3, [], True, 10, 10),
+        ("dying",  "b", 4, 3, [], True, 2, 1),
+    ], [("reaper", "death", A, ENEMY, M, 0, {"life": -5, "stamina": -4}, [], [])])
+
+    return {"note": "generated by oracle/make_fixtures.py — do not hand-edit",
+            "cases": cases}
+
+
 def rng_fixture() -> dict:
     fx = {
         "note": "generated by oracle/make_fixtures.py — do not hand-edit",
@@ -1016,3 +1181,4 @@ if __name__ == "__main__":
     write(os.path.join(dest, "counter_fixture.json"), counter_fixture())
     write(os.path.join(dest, "status_fixture.json"), status_fixture())
     write(os.path.join(dest, "roster_fixture.json"), roster_fixture())
+    write(os.path.join(dest, "aura_fixture.json"), aura_fixture())

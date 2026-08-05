@@ -10,6 +10,7 @@ participants:
   - binary
   - engine
 verification:
+  - tests/test_auras.gd
   - oracle/test_var_dialect.py
   - core/content/content_id.gd
   - oracle/test_legacy_rng.py
