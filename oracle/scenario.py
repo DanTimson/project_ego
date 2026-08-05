@@ -363,6 +363,28 @@ class Scenario:
                     if not unit.alive:
                         self._fell(unit)
 
+    def _auto_end_phase(self) -> None:
+        """R7: the side toggles on exhaustion as well as on an explicit pass.
+
+        Checked after every unit command, which is where the original scans the
+        roster and finds nothing selectable.
+        """
+        while (not turn.battle_over(self.state)
+               and turn.phase_done(self.state, self.state.active_side)):
+            before = self.state.round_number
+            new_round = turn.end_phase(self.state)
+            if new_round:
+                self.emit("-- round %d, side %d first (both sides exhausted) --"
+                          % (self.state.round_number, self.state.active_side))
+                self._round_upkeep()
+            else:
+                self.emit("-- side %d takes over (no units left to act) --"
+                          % self.state.active_side)
+            if self.state.round_number == before and not new_round:
+                # handed over to the other side; if it can act, stop here
+                if not turn.phase_done(self.state, self.state.active_side):
+                    break
+
     def cmd_end_phase(self) -> None:
         new_round = turn.end_phase(self.state)
         if new_round:
@@ -431,6 +453,8 @@ class Scenario:
             if turn.battle_over(self.state):
                 self.emit("== battle over ==")
                 break
+            # R7: the side may also toggle because nothing is left to act.
+            self._auto_end_phase()
 
         return {"name": self.name, "seed": self.seed,
                 "log": self.log, "final": self.final_state()}

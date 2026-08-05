@@ -416,5 +416,25 @@ def end_phase(state: BattleState) -> bool:
     return False
 
 
+def auto_end_phase_if_exhausted(state: BattleState) -> bool:
+    """R7's second transition path: exhaustion, not only an explicit pass.
+
+    `004F20AE..004F214D` scans all 37 roster slots and, finding no remaining
+    selectable/actionable unit on the current side, calls the same phase helper
+    with `(1,1)` that the explicit pass input uses. So the toggle has TWO
+    triggers, and this engine previously implemented only the first — a side that
+    ran out of units stayed active until the driver issued a pass.
+
+    Returns True when a new round started, matching `end_phase`.
+    """
+    if state.active_side is None:
+        return False
+    if battle_over(state):
+        return False
+    if not phase_done(state, state.active_side):
+        return False
+    return end_phase(state)
+
+
 def battle_over(state: BattleState) -> bool:
     return any(not s.living() for s in state.sides)

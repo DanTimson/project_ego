@@ -10,6 +10,7 @@ participants:
   - binary
   - engine
 verification:
+  - oracle/test_fixtures_current.py
   - tests/test_auras.gd
   - oracle/test_var_dialect.py
   - core/content/content_id.gd

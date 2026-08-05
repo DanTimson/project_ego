@@ -98,6 +98,23 @@ static func phase_done(state: BattleState, side_id: int) -> bool:
 ## voluntarily or run out of resources. Waiting for resources alone would never
 ## trigger: with free re-entry a unit almost always has leftover movement, so the
 ## sides would trade control indefinitely.
+## R7's second transition path: exhaustion, not only an explicit pass.
+##
+## `004F20AE..004F214D` scans all 37 roster slots and, finding no remaining
+## selectable/actionable unit on the current side, calls the same phase helper
+## with `(1,1)` that the explicit pass input uses. The toggle therefore has TWO
+## triggers; this engine previously implemented only the first, so a side that
+## ran out of units stayed active until the driver passed for it.
+##
+## Returns true when a new round started, matching `end_phase`.
+static func auto_end_phase_if_exhausted(state: BattleState) -> bool:
+	if battle_over(state):
+		return false
+	if not phase_done(state, state.active_side):
+		return false
+	return end_phase(state)
+
+
 static func end_phase(state: BattleState) -> bool:
 	var current: Side = state.side(state.active_side)
 	current.passed = true

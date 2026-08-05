@@ -159,6 +159,43 @@ def test_initiative() -> None:
     check(turn.first_side([a, b]) == 1, "tie goes to whichever side is attacking")
 
 
+def test_auto_end_phase_on_exhaustion() -> None:
+    """R7: the side toggles on exhaustion as well as on an explicit pass.
+
+    `004F20AE..004F214D` scans the roster, finds nothing selectable on the
+    current side, and calls the same phase helper the explicit pass uses. This
+    engine implemented only the explicit trigger, so a side with nothing left to
+    do stayed active until the driver passed for it.
+    """
+    print("\n[8b] the side toggles when nothing is left to act")
+    a = Side(id=0, name="A", leader_initiative=5, is_attacker=True,
+             units=[unit("a1")])
+    b = Side(id=1, name="B", leader_initiative=2, units=[unit("b1")])
+    st = BattleState(sides=[a, b])
+    turn.begin_battle(st)
+
+    check(not turn.auto_end_phase_if_exhausted(st),
+          "a side with units left does not auto-pass")
+    check(st.active_side == 0, "and stays active")
+
+    turn.spend_move(a.units[0], a.units[0].movement_remaining)
+    turn.spend_attack(a.units[0])
+    check(turn.phase_done(st, 0), "A now has nothing selectable")
+
+    started = turn.auto_end_phase_if_exhausted(st)
+    check(not started and st.active_side == 1,
+          "control passes to B with no explicit pass", "side %s" % st.active_side)
+
+    # Both sides exhausted rolls the round over, exactly as an explicit pass does.
+    turn.spend_move(b.units[0], b.units[0].movement_remaining)
+    turn.spend_attack(b.units[0])
+    before = st.round_number
+    started = turn.auto_end_phase_if_exhausted(st)
+    check(started and st.round_number == before + 1,
+          "both sides exhausted starts a new round",
+          "round %d -> %d" % (before, st.round_number))
+
+
 def test_round_loop() -> None:
     print("\n[8] round loop")
     a = Side(id=0, name="A", leader_initiative=5, is_attacker=True,
@@ -307,6 +344,7 @@ if __name__ == "__main__":
     test_rest()
     test_initiative()
     test_round_loop()
+    test_auto_end_phase_on_exhaustion()
     test_extra_turns()
     test_group_grants()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
