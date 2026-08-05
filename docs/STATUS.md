@@ -6,6 +6,7 @@ This is a coverage map, not a release claim.
 |---|---|---|---|---|
 | attack randomisation and chip damage | published tables + binary | implemented with native stream model | native + `LegacyRng` vector-tested | exact CRT generator and adapters implemented in isolation; end-to-end legacy call ordering pending |
 | stamina and wound multipliers | published tables + binary | implemented | implemented | strong |
+| effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | not assessed | not assessed | R9 closed: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets differ |
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 proves the final clamp is reached differently by melee/counterattack and ranged attack |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | provider coverage incomplete |
 | activated actions | docs, data, binary dispatcher | implemented | `Action` implemented | effect dictionary incomplete |
@@ -39,12 +40,12 @@ The most consequential blockers are:
 2. GDScript timed-status/runtime-effect model;
 3. battle-action effect classification;
 4. porting death, revival, transformation and side-transfer semantics;
-5. conversion of recovered binary rules into executable parity fixtures, including the ranged live-capacity stamina correction.
+5. conversion of recovered binary rules into executable parity fixtures, including the ranged live-capacity stamina correction and effective-defence vectors.
 
 ## Documentation checkpoint
 
 The current binary evidence checkpoint covers `closer_inspection_1` through
-`closer_inspection_11`, closed requests R1–R8, and runtime schema version 14.
+`closer_inspection_11`, closed requests R1–R9, and runtime schema version 14.
 
 When a new checkpoint is produced, update together:
 

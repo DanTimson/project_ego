@@ -8,7 +8,7 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current active request:** R9 — defence halving and clamp order, as vectors. R1–R8 are closed.
+**Current active request:** R11 — modifier `0x12` (`Неутомимый`) consumer list. R1–R9 are closed.
 
 ---
 
@@ -574,26 +574,69 @@ requires correction and a restored-capacity/reselection fixture.
 
 ---
 
-## R9 — OPEN: defence halving and clamp order, as vectors
+## R9 — CLOSED: aggregate, halve at exactly zero stamina, then clamp to zero
 
-**Closes:** `OPEN_QUESTIONS` item 9 · matrix STATS-DEFENCE
-**Method:** decompilation
-**Cost:** small — mechanical once the path is open
+**Closes:** `OPEN_QUESTIONS` item 9 · matrix STATS-DEFENCE-001
+**Evidence:** `EXP-R9-001`; complete `004D0820` and `004D06B0` bodies and callers
 
-**Question.** In the effective-defence path, what is the exact order of clamping
-and the stamina-0 halving, and where does truncation land?
+**Result (2026-08-05).** Ordinary defence and ranged defence use the same final
+state-reduction order:
 
-**Requested form — vectors, not prose.** The morale packet worked because it
-returned specific values, so please answer in the same shape. Base defence
-values of −1, 0, 1, 2, 3 and 7, each at full stamina and at stamina 0, giving the
-final effective defence. Odd values are the ones that distinguish
-halve-then-clamp from clamp-then-halve, and negative and zero distinguish
-whether the clamp is a floor at 0 or at 1.
+```text
+value = aggregate_all_applicable_providers(unit)
 
-**Why it matters.** §1.3 records the halving but not its ordering, and the engine
-currently guesses. Ranged defence should be stated too if it differs — the morale
-work established that attack and defence take different paths, so their orderings
-cannot be assumed to match.
+if unit.current_stamina == 0:
+    value = trunc0(value / 2)
+
+return max(value, 0)
+```
+
+The stamina predicate is exactly equality with zero. The signed divide uses
+`CDQ; SUB EAX,EDX; SAR EAX,1`, so negative odd values truncate toward zero.
+The floor-zero clamp follows the halving and every provider contribution.
+Modifier `0x12` is not consulted by either effective-defence function.
+
+The requested vectors are identical for both functions:
+
+| accumulated value | stamina nonzero | stamina 0 |
+|---:|---:|---:|
+| -1 | 0 | 0 |
+| 0 | 0 | 0 |
+| 1 | 1 | 0 |
+| 2 | 2 | 1 |
+| 3 | 3 | 1 |
+| 7 | 7 | 3 |
+
+The provider sets differ before the shared tail:
+
+- `004D0820` uses modifier ID `4`, UnitDef `+0x2C`, terrain-definition
+  `+0x24`, and terrain-linked modifiers `0x20..0x22` divided by four;
+- `004D06B0` uses modifier ID `5`, UnitDef `+0x30`, terrain-definition
+  `+0x28`, terrain-linked modifiers `0x20..0x22` divided by eight, and a
+  conditional `+3` tactical contribution when `DAT_00520782 != 0` and the
+  battle-unit field at `+0x44` is greater than five; their game-facing meanings
+  remain unnamed.
+
+Both also include persistent instance, intrinsic, runtime-node and eligible
+commander-aura providers before tactical providers and state reduction. The
+tactical block runs only when `DAT_0052E438 == 0` and current life is positive;
+the direct terrain-definition contribution is skipped under effective modifier
+`0x0E`.
+
+Both functions receive the target battle-unit pointer in hidden register `ESI`
+and return the signed effective value in `EAX`; there are no stack arguments and
+each ends with a plain `RET`. Later damage-path modifiers such as `0x27`, `0x11`,
+`0x4C` and `0x4D` operate on the already-returned effective defence and are not
+part of this provider pipeline.
+
+**Rejected alternatives.** Clamp-before-halve, minimum-one clamping,
+floor-like arithmetic right shift for negative odd values, stamina predicates
+other than exactly zero, providers added after halving, and differing ordinary
+versus ranged final reduction order.
+
+**Documentation consequence.** Preserve the provider distinction and the exact
+integer tail in compatibility fixtures. The executable evidence is PROVEN but
+remains not independently observed at runtime.
 
 ---
 
@@ -791,17 +834,17 @@ compatibility enters scope. Neither is true yet.
 
 Two clusters, because they use different tools and can proceed independently.
 
-**One session in the original game closes three items.** R14 (place a giant and
-look), R7 (one battle with a deliberate partial activation), and the observation
-half of R6 (put a ballista adjacent to an enemy). None needs Ghidra, and R7 and
-R14 are the two cheapest high-impact answers on the list.
+**Original-game observation work.** R14 (place a giant and inspect its
+footprint) and the observation half of R6 (put a ranged-only unit adjacent to an
+enemy) remain useful, but they are separate from the binary queue.
 
-**Ghidra work, in rising cost.** R11 (XREF list) and R9 (vectors from a located
-path) are the small ones. R8 has its function already located. R10, R12 and R13
-are medium. R16 and R17 are the large ones and should come last.
+**Ghidra work, in rising cost.** R11 is the remaining small XREF-enumeration
+item. R10, R12 and R13 are medium. R16 and R17 are the large reductions and
+should come last.
 
-If only one thing is done: **R7**. It is the only open question that can
-invalidate committed fixtures rather than merely add to them.
+If only one binary item is done next: **R11**. It is bounded, mechanically
+falsifiable, and resolves whether modifier `0x12` means “skip listed costs” or
+“stamina cannot fall.”
 
 ---
 

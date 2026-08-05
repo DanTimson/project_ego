@@ -38,6 +38,8 @@ address,working_name,subsystem,confidence,summary
 004CEC40,resolve_attack_against_defence_candidate,damage,proven,Randomized power versus defence and chip rule
 004D01C0,get_effective_battle_modifier_candidate,modifiers,proven,"Runtime, persistent, intrinsic and aura resolution"
 004D0560,get_effective_battle_speed_candidate,stats,proven,"Definition speed plus modifier ID 7 providers; stamina thresholds below 5 and 3; floor 1"
+004D06B0,get_effective_battle_ranged_defence_candidate,stats,proven,"Modifier ID 5 providers plus tactical additions; exact-zero stamina trunc0 divide by 2; final floor 0"
+004D0820,get_effective_battle_defence_candidate,stats,proven,"Modifier ID 4 providers plus tactical additions; exact-zero stamina trunc0 divide by 2; final floor 0"
 004D0980,get_effective_battle_max_life_candidate,stats,proven,Persistent max life plus side multiplier
 004D0A70,adjust_battle_unit_morale_candidate,morale,proven,Morale delta and break accumulation
 004D0B40,refresh_battle_unit_status_ui_candidate,presentation,proven,UI refresh only

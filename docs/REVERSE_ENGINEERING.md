@@ -1,6 +1,6 @@
 # Reverse-engineering checkpoint — Eador: Genesis
 
-**Status:** documentation checkpoint after `closer_inspection_1.txt` through `closer_inspection_11.txt` and targeted R1–R8 packets
+**Status:** documentation checkpoint after `closer_inspection_1.txt` through `closer_inspection_11.txt` and targeted R1–R9 packets
 **Canonical runtime schema:** root `eador_runtime.h`, schema version 14
 **Function index:** `docs/FUNCTION_MAP.csv`
 **Scope:** compatibility-relevant runtime layouts, unit progression, tactical combat, battle actions, economy fragments, parser primitives, and open reverse-engineering work.
@@ -218,6 +218,8 @@ Values above 1000 in `effect_type_ids` encode a unit-definition ID as `value - 1
 | `00432E60` | `calculate_unit_gold_upkeep_candidate` | Proven | Base + attachments + percentage/flat modifiers, clamped to zero. |
 | `004D01C0` | `get_effective_battle_modifier_candidate` | Proven | Runtime + persistent + intrinsic + aura with special override rules. |
 | `004D0560` | `get_effective_battle_speed_candidate` | Proven | Definition speed + modifier ID 7 providers, stamina penalties, floor 1. |
+| `004D06B0` | `get_effective_battle_ranged_defence_candidate` | Proven | Modifier ID 5 provider pipeline; exact-zero-stamina trunc0 halving; final floor 0. |
+| `004D0820` | `get_effective_battle_defence_candidate` | Proven | Modifier ID 4 provider pipeline; exact-zero-stamina trunc0 halving; final floor 0. |
 | `004D0980` | `get_effective_battle_max_life_candidate` | Proven | Persistent max life plus side multiplier. |
 | `004CEC40` | `resolve_attack_against_defence_candidate` | Proven | Legacy power variation, defence subtraction, minimum-damage chance. |
 | `004D2DA0` | `calculate_ranged_attack_damage_candidate` | Proven | Ranged power versus ranged defence or resistance. |
@@ -494,7 +496,66 @@ modifiers, commander aura and all wound/stamina/morale arithmetic.
 This is a function-level result. It does not establish whether a ranged-only
 unit is offered a melee command by the tactical command layer.
 
-### 9.3 Melee damage calculator
+### 9.3 Effective ordinary and ranged defence
+
+`004D0820` and `004D06B0` both receive the target battle-unit pointer in hidden
+register `ESI`, return the effective signed value in `EAX`, take no stack
+arguments, and end with a plain `RET`.
+
+Their shared final reduction is proven directly by assembly:
+
+```text
+value = aggregate_all_applicable_providers(unit)
+
+if unit.current_stamina == 0:
+    value = trunc0(value / 2)
+
+return max(value, 0)
+```
+
+The exact-zero test is `CMP [ESI+0x10],0`. Halving uses
+`CDQ; SUB EAX,EDX; SAR EAX,1`, which truncates negative odd values toward zero.
+The negative-value test and return-zero path follow that operation. Therefore
+all provider additions precede halving and the minimum is zero rather than one.
+
+Shared result vectors:
+
+| accumulated value | stamina nonzero | stamina 0 |
+|---:|---:|---:|
+| -1 | 0 | 0 |
+| 0 | 0 | 0 |
+| 1 | 1 | 0 |
+| 2 | 2 | 1 |
+| 3 | 3 | 1 |
+| 7 | 7 | 3 |
+
+Provider differences:
+
+```text
+ordinary defence / 004D0820
+    UnitDef +0x2C
+    modifier ID 4: persistent instance, intrinsic, runtime node, eligible aura
+    terrain-definition +0x24 unless effective modifier 0x0E
+    matching terrain modifier 0x20..0x22 divided by 4 with trunc0
+
+ranged defence / 004D06B0
+    UnitDef +0x30
+    modifier ID 5: persistent instance, intrinsic, runtime node, eligible aura
+    terrain-definition +0x28 unless effective modifier 0x0E
+    conditional +3 when DAT_00520782 != 0 and battle-unit +0x44 > 5
+    matching terrain modifier 0x20..0x22 divided by 8 with trunc0
+```
+
+The tactical block for both functions runs only when `DAT_0052E438 == 0` and
+current life is positive. The raw conditions are proven; the game-facing
+meanings of `DAT_00520782` and the `+0x44 > 5` condition remain unnamed.
+
+Damage-calculator operations after these calls are separate stages. In
+`004D2E60`, modifiers such as `0x27` and `0x4C` can further transform returned
+ordinary defence. In `004D2DA0`, `0x11` and `0x4D` can further transform returned
+ranged defence. Those are not providers inside the effective-defence functions.
+
+### 9.4 Melee damage calculator
 
 Logical inputs:
 
@@ -514,7 +575,7 @@ Notable modifier branches:
 0x35  conditional defensive contribution on target
 ```
 
-### 9.4 Ranged damage calculator
+### 9.5 Ranged damage calculator
 
 Hidden register convention:
 
@@ -1005,6 +1066,7 @@ Before more renaming, add compatibility tests for:
 - upgrade selection with fixed roller state;
 - max-life delta on level-up;
 - power-versus-defence;
+- effective ordinary/ranged defence zero-stamina vectors;
 - melee first strike and retaliation;
 - ranged shot count and stamina cost;
 - damage channels and large-hit morale;

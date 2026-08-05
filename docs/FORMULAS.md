@@ -99,8 +99,55 @@ Speed floors at 1. At stamina 0 the unit is forced to Rest next round, does not
 counterattack, both defence values are halved, and `Оглушающий удар`,
 `Оглушающий выстрел` and `Удар щитом` against it drain an extra point of morale.
 
-Suppressed by `Неутомимый` (undead, mechanisms, some hero artefacts), which
-never loses stamina for any action at all.
+#### Effective defence at zero stamina
+
+`[BIN:004D0820,004D06B0]` · **RECOVERED**
+
+Both effective-defence functions aggregate their complete applicable provider
+set before the stamina branch. Their shared final reduction is:
+
+```text
+value = aggregate_all_applicable_providers(unit)
+
+if unit.current_stamina == 0:
+    value = trunc0(value / 2)
+
+return max(value, 0)
+```
+
+The predicate is exactly `current_stamina == 0`. The signed halving sequence
+corrects an arithmetic shift so negative odd values truncate toward zero. The
+minimum-zero clamp occurs afterward.
+
+| accumulated value | stamina nonzero | stamina 0 |
+|---:|---:|---:|
+| -1 | 0 | 0 |
+| 0 | 0 | 0 |
+| 1 | 1 | 0 |
+| 2 | 2 | 1 |
+| 3 | 3 | 1 |
+| 7 | 7 | 3 |
+
+Provider differences before this shared tail:
+
+| contribution | ordinary defence `004D0820` | ranged defence `004D06B0` |
+|---|---|---|
+| UnitDef field | `+0x2C` | `+0x30` |
+| primary modifier ID | `4` | `5` |
+| persistent/intrinsic/runtime/aura | ID `4` | ID `5` |
+| terrain-definition field | `+0x24` | `+0x28` |
+| matching terrain modifier `0x20..0x22` | `trunc0(value/4)` | `trunc0(value/8)` |
+| extra tactical contribution | none recovered | `+3` when `DAT_00520782 != 0` and battle-unit `+0x44 > 5`; semantics unnamed |
+
+The tactical block runs only when `DAT_0052E438 == 0` and current life is
+positive. Effective modifier `0x0E` suppresses the direct terrain-definition
+contribution. Modifier `0x12` does not gate defence halving; its wider consumer
+scope remains R11.
+
+Published prose describes `Неутомимый` (undead, mechanisms, some hero
+artefacts) as suppressing stamina loss. Binary consumers are only partially
+catalogued; R11 determines whether it skips listed action costs or blocks every
+direct drain/set path.
 
 ### 1.4 MoraleMod
 
