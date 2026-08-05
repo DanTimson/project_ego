@@ -1,0 +1,19 @@
+id: DELIB-0002
+title: public-lineage-boundary
+state: independent_review
+opened: 2026-08-06
+decision:
+owner: human
+supersedes:
+participants:
+  - human
+  - binary
+  - engine
+verification:
+pending:
+  - engine-side independent position
+  - cross-review
+  - human decision
+  - classify remaining implementation files
+  - track immediate stamina correctness fix
+  - open ruleset-profile deliberation after this decision
