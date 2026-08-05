@@ -101,7 +101,22 @@ or publicly documented yet currently implemented incorrectly.
 These labels are planning controls, not conclusions about copyrightability or
 liability.
 
+### 3.3 Transfer-evidence fields
+
+`PUBLIC_LINEAGE_TRANSFER.csv` records two additional distinctions:
+
+| field | values | meaning |
+|---|---|---|
+| `binary_basis_surface` | `none`, `comment_only`, `behavioural_structure`, `research_artifact`, `generated_content`, `mixed` | Where binary-derived knowledge appears in the current artifact. A source citation in a comment is substantially cheaper to sanitize than rule-specific control flow or a research document containing addresses and reductions. |
+| `public_basis_sufficient` | `yes`, `no`, `partial`, `conditional` | Whether public documentation/data alone is sufficient to restate the transferable rule at the precision required by the engine. Independent binary confirmation may remain valuable evidence even when this field is `yes`. |
+
+These fields refine transfer cost without changing the `T0`–`T4` decision.
+
 ## 4. Necessity gate for future binary work
+
+This gate applies prospectively. It does not retroactively invalidate closed
+requests or downgrade cross-source confirmation already recorded in the evidence
+ledger.
 
 A new binary request should proceed only if all of the following are true:
 
@@ -109,8 +124,11 @@ A new binary request should proceed only if all of the following are true:
    target can observe the difference.
 2. **Material:** the difference can reasonably alter an action, outcome,
    persistent state, compatibility result or recurring AI decision.
-3. **Unresolved:** Eadoropedia, public forum material, data files, existing
-   fixtures and controlled black-box observation do not settle the question.
+3. **Unresolved at required precision:** Eadoropedia, public forum material, data
+   files, existing fixtures and controlled black-box observation do not settle
+   the question to the precision the engine needs. A published table that omits
+   integer rounding, trigger order or lifecycle boundaries does not settle those
+   details.
 4. **Ambiguous:** at least two reasonable implementations produce different
    material results.
 5. **Reducible:** the result can be exported as a neutral behavioural rule or
@@ -124,34 +142,30 @@ expanding it.
 The binding per-artifact registry is `PUBLIC_LINEAGE_TRANSFER.csv`. The following
 are the highest-priority findings.
 
-### 5.1 Immediate correctness rewrite marker: stamina penalty exemption
+### 5.1 Resolved correctness issue: stamina penalty exemption
 
-`core/rules/stamina.gd` currently makes `Неутомимый` bypass:
+The initial audit found that `core/rules/stamina.gd` and `oracle/combat.py`
+incorrectly made `Неутомимый` bypass low-stamina penalties. Two additional
+helpers, `Stamina.speed_penalty` and `Stamina.is_exhausted`, contained the same
+wrong exemption but had no call sites.
 
-- the low-stamina attack multiplier;
-- low-stamina speed penalties;
-- exhausted-state detection.
-
-`oracle/combat.py` carries the same attack-multiplier exemption.
-
-R11 established a narrower rule: every recovered tactical stamina mutation is
-locally suppressed by modifier `0x12`, but effective attack, counterattack,
-ranged attack, speed and both defence functions do **not** query it. They derive
-penalties from the live stamina value.
-
-Therefore the present helpers are not merely provenance-sensitive. They encode
-a behavioural contradiction when a unit reaches low stamina through imported,
-scripted, malformed or future mod content. They are marked
-`T2_REIMPLEMENT / immediate_engine_fix`. The engine side owns the actual edit
-and tests.
+The engine side corrected all four sites during independent review. Attack,
+speed, exhaustion and defence consequences now derive from the live stamina
+value. The correct modifier-`0x12` gates at stamina-mutation sites remain
+unchanged, and the oracle test now asserts the recovered rule.
 
 The neutral transferable rule is:
 
 ```text
-Effective modifier 0x12 prevents the recovered tactical stamina mutations.
+Effective modifier 0x12 gates stamina mutation sites only.
 Low- and zero-stamina consequences are determined from the live stamina value
 and do not independently test modifier 0x12.
 ```
+
+The current conventional implementations are therefore reclassified from an
+immediate `T2_REIMPLEMENT` defect to `T1_SANITIZE`: retain their ordinary code
+shape, transfer public/spec tests, and replace private binary-address provenance
+where necessary.
 
 The seventeen-site consumer inventory, addresses and duplicated Genesis control
 flow remain research evidence, not public implementation requirements.
@@ -298,6 +312,7 @@ Rewrite now when:
 
 - current behaviour contradicts established requirements;
 - binary-shaped structure is spreading into additional subsystems;
+- two maintained implementations or the oracle and port disagree about the rule;
 - the neutral specification is already stable;
 - postponement would make later separation significantly more expensive.
 
@@ -320,13 +335,15 @@ distribution, sponsorship or other project-scale expansion:
 2. preserve its history and evidence rather than cosmetically erasing it;
 3. make research-only binary/source materials private where appropriate;
 4. resolve `T4_DELIBERATE` items into named ruleset profiles;
-5. export address-free behavioural specifications and tests;
-6. create a fresh public implementation lineage;
-7. transfer `T0`, sanitize `T1`, independently rewrite `T2`, and exclude `T3`;
-8. record claim-level provenance for transferred rules;
-9. keep original/NH content external and user-supplied unless separately
-   licensed;
-10. reconsider the boundary if explicit source/data licences are obtained.
+5. classify and transfer the public/spec test corpus, synthetic fixtures and
+   address-free golden vectors before rewriting implementation code;
+6. export address-free behavioural specifications;
+7. create a fresh public implementation lineage;
+8. transfer `T0`, sanitize `T1`, independently rewrite `T2`, and exclude `T3`;
+9. record claim-level provenance for transferred rules;
+10. keep original/NH content external and user-supplied unless separately
+    licensed;
+11. reconsider the boundary if explicit source/data licences are obtained.
 
 The gate and rewrite policy require cross-agent and human acceptance through
 `DELIB-0002`.
@@ -339,6 +356,7 @@ legacy fidelity versus NH/native correction. It should cover at minimum:
 - charge semantics;
 - attack stamina cost after capacity restoration;
 - exact legacy RNG;
+- whether scenario units may name a canonical content definition;
 - which observable Genesis quirks deserve a compatibility profile;
 - whether DELIB-0001's exact-fidelity target applies universally or only inside
   an explicit legacy profile.

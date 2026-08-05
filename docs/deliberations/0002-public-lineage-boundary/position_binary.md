@@ -173,3 +173,36 @@ sanitization rather than presuming contamination.
    new neutral stamina-policy interface?
 
 ## Changes after cross-review
+
+After reading the independently prepared engine position, the binary side makes
+the following amendments:
+
+1. **Necessity gate:** accept that the gate is prospective and that “unresolved”
+   means unresolved at the precision the engine requires. Closed cross-source
+   confirmation remains valid evidence and is not retrospectively labelled
+   waste.
+2. **Transfer cost:** accept the measurement that current binary-address
+   references in implementation files are comments rather than copied register
+   layout or decompiler-shaped control flow. Most implementation transfer is
+   therefore `T1_SANITIZE`; reserve `T2_REIMPLEMENT` for narrow rules whose
+   behavioural structure itself depends on binary-only evidence.
+3. **Tests first:** accept that public/spec tests, synthetic fixtures and
+   address-free golden vectors must be classified and transferred before any
+   implementation rewrite begins.
+4. **Immediate rewrite trigger:** add maintained-implementation disagreement,
+   including oracle/port divergence, to the immediate-fix conditions.
+5. **Audit schema:** accept `binary_basis_surface` and
+   `public_basis_sufficient` fields, explicit `T3_RESEARCH_ONLY` rows for the
+   principal evidence documents, and a separate generated-bindings row.
+6. **Stamina issue:** record the engine-side correction as landed. The
+   transferable rule explicitly states that modifier `0x12` gates mutations
+   only, while penalties derive from live stamina.
+7. **Follow-up profile deliberation:** include the unresolved canonical
+   scenario-definition question alongside charge, restored-capacity attack cost
+   and legacy/native RNG.
+8. **Fresh lineage:** no objection was established to the prospective
+   freeze-and-fork boundary. The binary side retains Option C as the converged
+   recommendation.
+
+No further evidence request is required for DELIB-0002. The remaining action is
+human acceptance or rejection of the converged decision.

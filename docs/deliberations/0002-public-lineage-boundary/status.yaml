@@ -1,6 +1,6 @@
 id: DELIB-0002
 title: public-lineage-boundary
-state: independent_review
+state: decision_required
 opened: 2026-08-06
 decision:
 owner: human
@@ -10,9 +10,11 @@ participants:
   - binary
   - engine
 verification:
+  - remaining binary queue reissued under necessity gate
+  - public/spec test transfer inventory exists
+  - public-lineage gate checklist exists
+  - follow-up ruleset-profile deliberation opened
 pending:
-  - cross-review
-  - human decision
-  - classify remaining implementation files
-  - track immediate stamina correctness fix (LANDED: modifier 0x12 no longer exempts the attack multiplier, speed penalty or exhausted detection in either implementation)
-  - open ruleset-profile deliberation after this decision
+  - human acceptance or amendment
+  - classify remaining implementation files before the public-lineage gate
+  - keep populated generated bindings uncommitted until redistribution policy is decided
