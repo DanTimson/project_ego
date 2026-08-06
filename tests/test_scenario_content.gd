@@ -184,9 +184,9 @@ func _init() -> void:
 	missing_definition["sides"][0]["units"][0]["def"] = "synthetic:unit/999"
 	_check("was not found" in _error(missing_definition, provider),
 		"missing definition fails clearly")
-	var namespace: Dictionary = fx["canonical_spec"].duplicate(true)
-	namespace["sides"][0]["units"][0]["def"] = "other:unit/5"
-	_check("namespace mismatch" in _error(namespace, provider),
+	var namespace_spec: Dictionary = fx["canonical_spec"].duplicate(true)
+	namespace_spec["sides"][0]["units"][0]["def"] = "other:unit/5"
+	_check("namespace mismatch" in _error(namespace_spec, provider),
 		"pack namespace mismatch fails clearly")
 
 	for key in ["pack", "version", "build", "fingerprint"]:
