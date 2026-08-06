@@ -1,5 +1,6 @@
 {
   "name": "two swordsmen share a name",
+  "profile": "native",
   "seed": 4242,
   "battlefield": {
     "width": 5,

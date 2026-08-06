@@ -42,6 +42,73 @@ def run(spec=None):
     return scenario.Scenario(json.loads(json.dumps(spec or SPEC))).run()
 
 
+def test_profile_selection() -> None:
+    print("\n[profiles] identity normalization and RNG selection")
+
+    def configured(**overrides):
+        selected = json.loads(json.dumps(SPEC))
+        selected.pop("profile", None)
+        selected.pop("rng", None)
+        selected.update(overrides)
+        return selected
+
+    native = scenario.Scenario(configured(profile=" NATIVE "))
+    check(native.profile == "native", "explicit native identity is normalized")
+    check(type(native.rng).__name__ == "Rng",
+          "explicit native selects named streams", type(native.rng).__name__)
+
+    genesis = scenario.Scenario(configured(profile="genesis"))
+    check(genesis.profile == "genesis", "explicit genesis identity is exposed")
+    check(type(genesis.rng).__name__ == "LegacyRng",
+          "explicit genesis selects LegacyRng", type(genesis.rng).__name__)
+
+    rejected = [
+        ({"profile": "new_horizons"},
+         'scenario profile "new_horizons" is incomplete: minimum rules assignment is not defined',
+         "incomplete new_horizons is rejected"),
+        ({"profile": "future"},
+         'unknown scenario profile "future"',
+         "an unknown profile is rejected"),
+        ({"profile": "native", "rng": "legacy"},
+         'scenario configuration cannot specify both "profile" and legacy "rng"',
+         "profile plus rng is rejected as conflicting configuration"),
+    ]
+    for values, expected, what in rejected:
+        try:
+            scenario.Scenario(configured(**values))
+        except ValueError as exc:
+            check(str(exc) == expected, what, str(exc))
+        else:
+            check(False, what, "configuration was accepted")
+
+    alias = scenario.Scenario(configured(rng=" LEGACY "))
+    check(alias.profile == "genesis" and type(alias.rng).__name__ == "LegacyRng",
+          "omitted profile plus legacy rng maps to genesis")
+
+    fallback = scenario.Scenario(configured())
+    check(fallback.profile == "native" and type(fallback.rng).__name__ == "Rng",
+          "phase-1 omission fallback remains native")
+
+
+def test_committed_native_scenarios_match_fixture() -> None:
+    print("\n[profile outputs] committed native scenarios remain unchanged")
+    fixture_path = os.path.join("tests", "fixtures", "scenario_fixture.json")
+    with open(fixture_path, encoding="utf-8") as fh:
+        fixture = json.load(fh)
+
+    for filename, expected in fixture["scenarios"].items():
+        path = os.path.join("tests", "scenarios", filename)
+        with open(path, encoding="utf-8") as fh:
+            spec = json.load(fh)
+        check(spec.get("profile") == "native",
+              "%s explicitly selects native" % filename)
+        actual = scenario.Scenario(json.loads(json.dumps(spec))).run()
+        check(actual["log"] == expected["log"],
+              "%s combat log is unchanged" % filename)
+        check(actual["final"] == expected["final"],
+              "%s final state is unchanged" % filename)
+
+
 def test_instance_identity() -> None:
     """Battle-instance identity is separate from the display name.
 
@@ -297,6 +364,8 @@ def test_round_upkeep() -> None:
 
 
 if __name__ == "__main__":
+    test_profile_selection()
+    test_committed_native_scenarios_match_fixture()
     test_determinism()
     test_chain()
     test_steps_feed_stamina()

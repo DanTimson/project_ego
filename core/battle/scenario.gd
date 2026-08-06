@@ -18,9 +18,17 @@ extends RefCounted
 ## RNG rolls, which the defence reduces. A scenario that reproduces exactly is
 ## evidence the whole chain agrees.
 
+const PROFILE_GENESIS := "genesis"
+const PROFILE_NEW_HORIZONS := "new_horizons"
+const PROFILE_NATIVE := "native"
+const PROFILE_CONFLICT := "scenario configuration cannot specify both \"profile\" and legacy \"rng\""
+const NEW_HORIZONS_INCOMPLETE := "scenario profile \"new_horizons\" is incomplete: minimum rules assignment is not defined"
+
 var spec: Dictionary = {}
 var scenario_name: String = "unnamed"
 var seed_value: int = 0
+## Normalized rules-profile identity selected at this composition root.
+var profile: String = ""
 var log: Array[String] = []
 ## Either Rng (named streams) or LegacyRng (Genesis compatibility).
 var catalogue: Dictionary = {}
@@ -34,10 +42,50 @@ var state: RoundLoop.BattleState
 var auras_by_source: Dictionary = {}
 
 
+static func profile_configuration(p_spec: Dictionary) -> Dictionary:
+	# This no-key branch is the complete phase-1 fallback. Phase 2 can remove it
+	# without touching profile selection or combat rules.
+	var has_profile := p_spec.has("profile")
+	var has_rng := p_spec.has("rng")
+	if has_profile and has_rng:
+		return {"profile": "", "error": PROFILE_CONFLICT}
+
+	var normalized := ""
+	if has_profile:
+		normalized = String(p_spec["profile"]).strip_edges().to_lower()
+		if normalized != PROFILE_GENESIS \
+				and normalized != PROFILE_NEW_HORIZONS \
+				and normalized != PROFILE_NATIVE:
+			var unknown_profile := 'unknown scenario profile "%s"' % normalized
+			return {"profile": "", "error": unknown_profile}
+	elif has_rng:
+		var legacy_selector := String(p_spec["rng"]).strip_edges().to_lower()
+		if legacy_selector != "legacy":
+			var unknown_rng := 'unknown legacy rng selector "%s"; only "legacy" is supported during migration' % legacy_selector
+			return {"profile": "", "error": unknown_rng}
+		normalized = PROFILE_GENESIS
+	else:
+		# Phase 1 only: old scenarios without either selector remain native.
+		normalized = PROFILE_NATIVE
+
+	if normalized == PROFILE_NEW_HORIZONS:
+		return {"profile": normalized, "error": NEW_HORIZONS_INCOMPLETE}
+	return {"profile": normalized, "error": ""}
+
+
 func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
 	spec = p_spec
 	scenario_name = String(spec.get("name", "unnamed"))
 	seed_value = int(spec.get("seed", 0))
+	var profile_config := profile_configuration(spec)
+	profile = String(profile_config["profile"])
+	var profile_error := String(profile_config["error"])
+	assert(profile_error == "", profile_error)
+	# Assertions are omitted from release builds; keep the same configuration
+	# from falling through to scenario construction there.
+	if profile_error != "":
+		push_error(profile_error)
+		return
 	# Actions available in this battle. A scenario may declare its own so the
 	# file is self-contained; see Action.CATALOGUE.
 	catalogue = Action.CATALOGUE.duplicate()
@@ -45,15 +93,16 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
 		var a := Action.from_dict(entry)
 		catalogue[a.id] = a
 	# THE randomness boundary. Rules never choose a generator and never branch on
-	# mode — they receive whatever is injected here and call roll(x, stream).
+	# profile — they receive whatever is injected here and call roll(x, stream).
 	# Genesis compatibility needs ONE shared LegacyRng because the original
-	# advances a single CRT state across every consumer; native mode keeps
+	# advances a single CRT state across every consumer; native keeps
 	# per-subsystem streams so adding a roll in one place does not invalidate
 	# every stored replay. Those requirements are irreconcilable, which is why
-	# this seam exists and why it is the only general seam in the engine.
+	# this composition-root seam exists and why it is the only general seam in
+	# the engine.
 	if injected_rng != null:
 		rng = injected_rng
-	elif String(spec.get("rng", "")).to_lower() == "legacy":
+	elif profile == PROFILE_GENESIS:
 		rng = LegacyRng.new(seed_value)
 	else:
 		rng = Rng.new(seed_value)

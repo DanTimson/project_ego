@@ -46,21 +46,34 @@ from modifier import Hook, Modifier, Pipeline
 from combat import AttackKind, Combatant, Rng
 
 
+PROFILE_GENESIS = "genesis"
+PROFILE_NEW_HORIZONS = "new_horizons"
+PROFILE_NATIVE = "native"
+_PROFILE_NAMES = {PROFILE_GENESIS, PROFILE_NEW_HORIZONS, PROFILE_NATIVE}
+_PROFILE_CONFLICT = 'scenario configuration cannot specify both "profile" and legacy "rng"'
+_NEW_HORIZONS_INCOMPLETE = (
+    'scenario profile "new_horizons" is incomplete: '
+    'minimum rules assignment is not defined'
+)
+
+
 class Scenario:
     def __init__(self, spec: dict, rng=None):
         self.spec = spec
         self.name = spec.get("name", "unnamed")
         self.seed = int(spec.get("seed", 0))
+        self.profile = self.normalize_profile(spec)
         self.log: list[str] = []
         # THE randomness boundary. Rules never choose a generator and never
-        # branch on mode — they receive whatever is injected here and call
+        # branch on profile — they receive whatever is injected here and call
         # roll(x, stream). Genesis compatibility needs ONE shared LegacyRng
         # because the original advances a single CRT state across every
-        # consumer; native mode keeps per-subsystem streams so that adding a
-        # roll in one place does not invalidate every stored replay. Those two
-        # requirements are irreconcilable, which is why this seam exists and why
-        # it is the only general seam in the engine.
-        self.rng = rng if rng is not None else self._make_rng(spec)
+        # consumer; native keeps per-subsystem streams so that adding a roll in
+        # one place does not invalidate every stored replay. Those two
+        # requirements are irreconcilable, which is why this composition-root
+        # seam exists and why it is the only general seam in the engine.
+        self.rng = (rng if rng is not None
+                    else self._make_rng(self.profile, self.seed, self.name))
         # Actions available in this battle. A scenario may declare its own so
         # the file is self-contained and the GDScript port can build the same
         # catalogue from the same source — the port loads its catalogue from
@@ -81,20 +94,55 @@ class Scenario:
     # -- construction -------------------------------------------------------
 
     @staticmethod
-    def _make_rng(spec: dict):
-        """Composition root: pick a generator from the scenario spec.
+    def _profile_configuration(spec: dict) -> tuple[str, str]:
+        """Return the normalized profile and any configuration error.
 
-        `"rng": "legacy"` selects Genesis compatibility. Anything else, including
-        absence, keeps the named-stream generator, so existing scenarios and
-        fixtures are unaffected.
+        The no-key branch is the complete phase-1 compatibility fallback. Phase
+        2 can remove it without touching profile selection or combat rules.
         """
-        seed = int(spec.get("seed", 0))
-        if str(spec.get("rng", "")).lower() == "legacy":
+        has_profile = "profile" in spec
+        has_rng = "rng" in spec
+        if has_profile and has_rng:
+            return "", _PROFILE_CONFLICT
+
+        if has_profile:
+            profile = str(spec["profile"]).strip().lower()
+            if profile not in _PROFILE_NAMES:
+                return "", 'unknown scenario profile "%s"' % profile
+        elif has_rng:
+            legacy_selector = str(spec["rng"]).strip().lower()
+            if legacy_selector != "legacy":
+                return "", (
+                    'unknown legacy rng selector "%s"; only "legacy" is '
+                    'supported during migration' % legacy_selector
+                )
+            profile = PROFILE_GENESIS
+        else:
+            # Phase 1 only: old scenarios without either selector remain native.
+            profile = PROFILE_NATIVE
+
+        if profile == PROFILE_NEW_HORIZONS:
+            return profile, _NEW_HORIZONS_INCOMPLETE
+        return profile, ""
+
+    @classmethod
+    def normalize_profile(cls, spec: dict) -> str:
+        profile, error = cls._profile_configuration(spec)
+        if error:
+            raise ValueError(error)
+        return profile
+
+    @staticmethod
+    def _make_rng(profile: str, seed: int, name: str):
+        """Composition root: derive the generator from normalized identity."""
+        if profile == PROFILE_GENESIS:
             from legacy_rng import LegacyRng
             r = LegacyRng(seed)
-            r.epoch = "scenario/%s" % spec.get("name", "unnamed")
+            r.epoch = "scenario/%s" % name
             return r
-        return Rng(seed)
+        if profile == PROFILE_NATIVE:
+            return Rng(seed)
+        raise AssertionError("profile was not validated: %s" % profile)
 
     def _build_field(self, spec: dict) -> Battlefield:
         field = Battlefield(int(spec.get("width", 7)), int(spec.get("height", 7)))

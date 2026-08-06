@@ -4,6 +4,7 @@
   "actions.json": {
    "spec": {
     "name": "a defensive stance",
+    "profile": "native",
     "seed": 909,
     "battlefield": {
      "width": 5,
@@ -202,6 +203,7 @@
   "aura_and_poison.json": {
    "spec": {
     "name": "a captain's aura against a poisoner",
+    "profile": "native",
     "seed": 31337,
     "battlefield": {
      "width": 5,
@@ -438,6 +440,7 @@
   "duplicate_instances.json": {
    "spec": {
     "name": "two swordsmen share a name",
+    "profile": "native",
     "seed": 4242,
     "battlefield": {
      "width": 5,
@@ -586,6 +589,7 @@
   "first_strike.json": {
    "spec": {
     "name": "pikeman first strike versus a charging swordsman",
+    "profile": "native",
     "seed": 7,
     "battlefield": {
      "width": 5,
@@ -762,6 +766,7 @@
   "skirmish.json": {
    "spec": {
     "name": "swordsman and archer versus militia",
+    "profile": "native",
     "seed": 20260726,
     "battlefield": {
      "width": 5,

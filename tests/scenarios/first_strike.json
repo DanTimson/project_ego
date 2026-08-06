@@ -1,5 +1,6 @@
 {
  "name": "pikeman first strike versus a charging swordsman",
+ "profile": "native",
  "seed": 7,
  "battlefield": {
   "width": 5,

@@ -33,11 +33,68 @@ func _init() -> void:
 	var fx: Dictionary = JSON.parse_string(f.get_as_text())
 	f.close()
 
+	print("\n[profiles] identity normalization and RNG selection")
+	var base: Dictionary = fx["scenarios"].values()[0]["spec"].duplicate(true)
+
+	var native_spec := base.duplicate(true)
+	native_spec.erase("rng")
+	native_spec["profile"] = " NATIVE "
+	var native := Scenario.new(native_spec)
+	_check(native.profile == "native", "explicit native identity is normalized")
+	_check(native.rng is Rng, "explicit native selects named streams")
+
+	var genesis_spec := base.duplicate(true)
+	genesis_spec.erase("rng")
+	genesis_spec["profile"] = "genesis"
+	var genesis := Scenario.new(genesis_spec)
+	_check(genesis.profile == "genesis", "explicit genesis identity is exposed")
+	_check(genesis.rng is LegacyRng, "explicit genesis selects LegacyRng")
+
+	var incomplete_spec := base.duplicate(true)
+	incomplete_spec.erase("rng")
+	incomplete_spec["profile"] = "new_horizons"
+	var incomplete: Dictionary = Scenario.profile_configuration(incomplete_spec)
+	_check(incomplete["profile"] == "new_horizons"
+			and incomplete["error"] == Scenario.NEW_HORIZONS_INCOMPLETE,
+		"incomplete new_horizons is rejected clearly")
+
+	var unknown_spec := base.duplicate(true)
+	unknown_spec.erase("rng")
+	unknown_spec["profile"] = "future"
+	var unknown: Dictionary = Scenario.profile_configuration(unknown_spec)
+	_check(unknown["profile"] == ""
+			and unknown["error"] == 'unknown scenario profile "future"',
+		"an unknown profile is rejected")
+
+	var conflict_spec := base.duplicate(true)
+	conflict_spec["profile"] = "native"
+	conflict_spec["rng"] = "legacy"
+	var conflict: Dictionary = Scenario.profile_configuration(conflict_spec)
+	_check(conflict["profile"] == ""
+			and conflict["error"] == Scenario.PROFILE_CONFLICT,
+		"profile plus rng is rejected as conflicting configuration")
+
+	var alias_spec := base.duplicate(true)
+	alias_spec.erase("profile")
+	alias_spec["rng"] = " LEGACY "
+	var alias := Scenario.new(alias_spec)
+	_check(alias.profile == "genesis" and alias.rng is LegacyRng,
+		"omitted profile plus legacy rng maps to genesis")
+
+	var fallback_spec := base.duplicate(true)
+	fallback_spec.erase("profile")
+	fallback_spec.erase("rng")
+	var fallback := Scenario.new(fallback_spec)
+	_check(fallback.profile == "native" and fallback.rng is Rng,
+		"phase-1 omission fallback remains native")
+
 	for scenario_file in fx["scenarios"]:
 		var case: Dictionary = fx["scenarios"][scenario_file]
 		print("\n[%s]" % scenario_file)
 
 		var s := Scenario.new(case["spec"])
+		_check(s.profile == "native",
+			"committed scenario declares normalized native profile")
 		var result: Dictionary = s.run()
 		var got: Array = result["log"]
 		var want: Array = case["log"]

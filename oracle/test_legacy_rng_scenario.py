@@ -49,14 +49,23 @@ def spec(**overrides) -> dict:
 
 def test_the_seam_is_selected_by_the_spec() -> None:
     print("\n[1] the composition root selects the generator")
-    native = scenario.Scenario(spec())
-    legacy = scenario.Scenario(spec(rng="legacy"))
-    check(type(native.rng).__name__ == "Rng", "no rng key keeps named streams",
-          type(native.rng).__name__)
-    check(isinstance(legacy.rng, LegacyRng), '"rng": "legacy" selects LegacyRng',
-          type(legacy.rng).__name__)
+    native = scenario.Scenario(spec(profile="native"))
+    legacy = scenario.Scenario(spec(profile="genesis"))
+    check(native.profile == "native" and type(native.rng).__name__ == "Rng",
+          '"profile": "native" selects named streams', type(native.rng).__name__)
+    check(legacy.profile == "genesis" and isinstance(legacy.rng, LegacyRng),
+          '"profile": "genesis" selects LegacyRng', type(legacy.rng).__name__)
+
+    # The only ordinary test of the phase-1 migration alias.
+    migration = spec()
+    migration.pop("profile", None)
+    migration["rng"] = "legacy"
+    alias = scenario.Scenario(migration)
+    check(alias.profile == "genesis" and isinstance(alias.rng, LegacyRng),
+          'omitted profile plus "rng": "legacy" maps to genesis')
+
     injected = LegacyRng(12345)
-    direct = scenario.Scenario(spec(), rng=injected)
+    direct = scenario.Scenario(spec(profile="genesis"), rng=injected)
     check(direct.rng is injected, "direct injection overrides the spec")
 
 
@@ -64,7 +73,7 @@ def test_the_battle_actually_consumes_it() -> None:
     print("\n[2] the battle path really draws from the injected state")
     r = LegacyRng(1)
     before = r.calls
-    result = scenario.Scenario(spec(), rng=r).run()
+    result = scenario.Scenario(spec(profile="genesis"), rng=r).run()
     check(r.calls > before,
           "running a battle advances the injected CRT state",
           "%d advances" % (r.calls - before))
@@ -73,17 +82,17 @@ def test_the_battle_actually_consumes_it() -> None:
 
 def test_legacy_battles_are_reproducible() -> None:
     print("\n[3] same seed, same battle")
-    a = scenario.Scenario(spec(rng="legacy")).run()
-    b = scenario.Scenario(spec(rng="legacy")).run()
+    a = scenario.Scenario(spec(profile="genesis")).run()
+    b = scenario.Scenario(spec(profile="genesis")).run()
     check(a["log"] == b["log"], "identical logs from identical seeds")
-    c = scenario.Scenario(spec(rng="legacy", seed=99)).run()
+    c = scenario.Scenario(spec(profile="genesis", seed=99)).run()
     check(c["log"] != a["log"], "a different seed diverges")
 
 
 def test_legacy_and_native_diverge() -> None:
     print("\n[4] the two generators are genuinely different battles")
-    native = scenario.Scenario(spec()).run()
-    legacy = scenario.Scenario(spec(rng="legacy")).run()
+    native = scenario.Scenario(spec(profile="native")).run()
+    legacy = scenario.Scenario(spec(profile="genesis")).run()
     check(native["log"] != legacy["log"],
           "so compatibility mode is observable at the battle level, "
           "not just in the generator")
@@ -100,16 +109,16 @@ def test_shared_topology_reaches_the_battle() -> None:
     clean = LegacyRng(1)
     disturbed = LegacyRng(1)
     disturbed.below(2)                     # as an added mod subsystem would
-    a = scenario.Scenario(spec(), rng=clean).run()
-    b = scenario.Scenario(spec(), rng=disturbed).run()
+    a = scenario.Scenario(spec(profile="genesis"), rng=clean).run()
+    b = scenario.Scenario(spec(profile="genesis"), rng=disturbed).run()
     check(a["log"] != b["log"],
           "legacy: an unrelated draw changes the battle")
 
     from combat import Rng
-    c = scenario.Scenario(spec(), rng=Rng(1)).run()
+    c = scenario.Scenario(spec(profile="native"), rng=Rng(1)).run()
     d_rng = Rng(1)
     d_rng.roll(2, "loot")                  # a different named stream
-    d = scenario.Scenario(spec(), rng=d_rng).run()
+    d = scenario.Scenario(spec(profile="native"), rng=d_rng).run()
     check(c["log"] == d["log"],
           "native: an unrelated stream does not")
 
@@ -118,7 +127,7 @@ def test_trace_records_the_battle() -> None:
     print("\n[6] the compatibility trace is usable for diffing call order")
     r = LegacyRng(1)
     r.enable_trace(True)
-    scenario.Scenario(spec(), rng=r).run()
+    scenario.Scenario(spec(profile="genesis"), rng=r).run()
     check(r.trace, "a battle produces trace entries", "%d entries" % len(r.trace))
     if r.trace:
         entry = r.trace[0]
