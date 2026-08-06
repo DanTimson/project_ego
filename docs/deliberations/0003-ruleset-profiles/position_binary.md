@@ -116,3 +116,9 @@ prevents silent mixtures and gives fixtures a stable target.
 5. Which RNG settings must be serialized in scenarios and saves?
 
 ## Changes after cross-review
+
+- Genesis R8 is already evidence-closed and implemented.
+- NH observation, not another Genesis extraction, is required for NH assignment.
+- Recovered reseed epochs are Genesis-specific and only partly integrated.
+- Canonical-reference capability is profile-independent but requires declared
+  provenance.

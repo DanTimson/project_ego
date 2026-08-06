@@ -243,4 +243,8 @@ anticipated.
 
 ## Changes after cross-review
 
-_Not yet performed._
+- NH R8 remains unresolved; the earlier proposed inheritance is withdrawn.
+- Adopt the four-part observable, material, neutrally testable and
+  profile-supported preservation threshold.
+- Unassigned NH rule variants must fail loudly rather than inherit by silence.
+- NH RNG inheritance by silence is an unresolved gap.

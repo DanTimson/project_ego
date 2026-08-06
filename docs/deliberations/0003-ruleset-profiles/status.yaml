@@ -1,18 +1,22 @@
 id: DELIB-0003
 title: ruleset-profiles
-state: independent_review
+state: decided
 opened: 2026-08-06
-decision:
-owner: human
+decision: decision.md
+owner: engine
 supersedes:
 participants:
   - human
   - binary
   - engine
 verification:
+  - composition-root profile resolution and explicit scenario/persistence identity
+  - profile-specific Genesis R3 and Genesis/native R8 coverage
+  - Genesis shared-CRT and native named-stream topology coverage
+  - Genesis mid-battle CRT-state and epoch continuation coverage
+  - portable and requires-pack tiers with canonical dependency rejection
 pending:
-  - engine-side independent position
-  - cross-review
-  - human decision
-  - NH charge observation
-  - restored-capacity attack-cost fixture
+  - downstream NH charge observation
+  - downstream NH attack-cost observation covering stamina-driven effective-speed reduction
+  - downstream NH RNG topology observation
+  - original Genesis live-CRT persistence evidence remains open
