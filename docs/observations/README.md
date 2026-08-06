@@ -18,8 +18,12 @@ playthrough remains a hypothesis.
 8. A result may close a binary request only when the competing interpretations
    produce distinct recorded outcomes.
 
-Current packet:
+Current packets:
 
 - `OBS-R12-R13-PREFLIGHT.md`
 - `OBS-R12-HIT-RETURN.csv`
 - `OBS-R13-START-EFFECT.csv`
+- `OBS-R14-LARGE-UNIT-PREFLIGHT.md`
+- `OBS-R14-LARGE-UNIT.csv`
+- `OBS-R17-MELEE-SECONDARY-PREFLIGHT.md`
+- `OBS-R17-MELEE-SECONDARY.csv`

@@ -9,10 +9,10 @@ This is a coverage map, not a release claim.
 | effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | not assessed | not assessed | R9 closed: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets differ |
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 proves the final clamp is reached differently by melee/counterattack and ranged attack |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 closed: `0x3D` conditional contribution is after effective-stat and selected 1.5× processing but before randomisation/defence; explicit fixture pending; wider provider coverage incomplete |
-| activated actions | docs, data, binary dispatcher | implemented | `Action` implemented | effect dictionary incomplete |
+| activated actions | public/data families + selective binary edges | implemented | `Action` catalogue implemented | fourteen explicit NH unit actions and public effect-family matrix catalogued; battlefield execution and consumer-triggered opcode mappings incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
-| level-up selection | data + binary | implemented in part | options implemented | legacy RNG/underfull cases open |
-| battlefield coordinates and adjacency | binary | implemented | implemented | adjacency recovered |
+| level-up selection | data + binary | implemented in part | `core/model/option.gd` and `tests/test_options.gd` empty | ordinary selection is specified; R15 zero-total/underfull edge deferred until an executable consumer and fixture exist |
+| battlefield coordinates and adjacency | binary + controlled observation | implemented | implemented | adjacency recovered; R14 large-unit logical-footprint protocol ready |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
 | round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0` | implemented | implemented | whole-side phases and capacity-preserving reselection proven; explicit order fixture still needed |
 | melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
@@ -58,8 +58,9 @@ will be created only at the community-release gate defined in
 
 Work is divided among human decision ownership, binary/governance authority,
 engine semantic authority and bounded Codex execution. `CODEX_WORK_QUEUE.md`
-opens seven non-semantic repository-conformance tasks; CX-001 through CX-004 are
-ready, while aggregate preflight, export and CI work remain dependency-blocked.
+opens seven non-semantic repository-conformance tasks; CX-001 is accepted,
+CX-002 through CX-004 are ready, and aggregate preflight, export and CI work
+remain dependency-blocked.
 
 R12/R13 controlled-observation preflight is ready. One NH battle can use level-zero Harpy `/31`, Wind Seeker `/122` and Warlord `/111` to distinguish return-anchor lifetime, reselection timing and granted-turn start-effect firing without a new binary packet.
 
@@ -70,6 +71,8 @@ retired. R17 is reduced to a finite black-box matrix covering zero-damage
 triggers, follow-up attack order, component damage, trample and instant-death
 placement.
 
+
+CX-001 passed governance review and is classified `N0_PUBLIC / T0_RETAIN`. R14 now has a five-case giant-footprint observation packet. R15 is formally deferred until a level-up option consumer and synthetic underfull/all-zero fixtures exist. The stale broad dispatcher and melee matrix rows are reconciled with the public-family and finite-observation reductions.
 
 When a new checkpoint is produced, update together:
 

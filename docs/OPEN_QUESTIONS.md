@@ -11,15 +11,22 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 
 | ID | Question | Current evidence | How to close |
 |---|---|---|---|
-| 2 | **Large-unit battlefield footprint.** | The tactical grid and six-neighbour geometry are solved. It is still unclear whether `Гигант` or another category occupies more than one tactical cell in the inspected build. | Inspect placement/collision consumers for unit category and validate in-game. |
-| 6 | **Exhausted level-up pools.** | Selection, prerequisite filtering and removal-by-value are recovered. The behaviour when every surviving weight is zero or a unit has fewer than the requested choices remains unclear. | Construct a save/unit that exhausts its pool, or inspect the caller after an all-zero weighted table. |
+| 2 | **Large-unit battlefield footprint.** | Public NH data identifies `/66 Гигант` as a level-zero giant-class test subject. The logical footprint remains unknown; sprite size is not occupancy evidence. | Run `docs/observations/OBS-R14-LARGE-UNIT-PREFLIGHT.md` and submit `OBS-R14-LARGE-UNIT.csv`; use binary evidence only if UI, pathing and occupancy contradict one another. |
 
 ## Determinism
 
 | ID | Question | Current evidence | How to close |
 |---|---|---|---|
 | 4c | **Residual RNG persistence and conditional reseed boundaries.** | `srand` has a conditional XREF from the battle-outcome path, but the supplied packet does not contain enough of that local expression to freeze it safely. No evidence yet establishes whether save files serialize live CRT `_holdrand` state. | Reduce the battle-outcome call site and inspect save/load code only when a fixture requires continuation inside one reseed epoch. |
-| 6b | **All-zero weighted roller behaviour.** | Normal weighted selection is recovered, including removal by selected value. The normal path assumes a positive total. | Find or construct an all-zero caller state and inspect resulting control flow. |
+
+## Deferred until an executable consumer exists
+
+| ID | Question | Why deferred | Reactivation trigger |
+|---|---|---|---|
+| 6 | **Exhausted level-up pools.** | Ordinary candidate collection is recovered, but `core/model/option.gd` and `tests/test_options.gd` are empty and no parity fixture reaches an underfull caller. Choosing a fallback now would create an unsupported gameplay rule. | Implement the option consumer and synthetic empty/one/fewer-than-requested fixtures; state the target profile; attempt public/black-box evidence before binary work. |
+| 6b | **All-zero weighted roller behaviour.** | The normal path assumes a positive total and `LegacyRng` deliberately raises. The primitive may be unreachable if the future caller guards positive totals. | Demonstrate a reachable all-zero caller after filtering, or prove the caller guard; then ask only for the remaining observable branch. |
+
+See `LEVEL_UP_EDGE_AUDIT.md`.
 
 ## Current-model versus binary conflicts
 
@@ -33,7 +40,7 @@ Confidence and evidence terminology is defined in `AGENTS.md`.
 | ID | Question | Needed result |
 |---|---|---|
 | D1 | **Modifier-ID dictionary.** | Numeric ID, providers, consumers, stacking/override rule, data/localized name, confidence. |
-| D2 | **Battle-action effect-type dictionary.** | All eight-clause dispatcher cases, field use, resistance rule, immediate/runtime behaviour and damage channel. |
+| D2 | **Battle-action effect-type dictionary.** | Map only implemented/reachable content opcodes to the public effect families, fields, resistance rule and observable result. The original eight-clause dispatcher structure is not a requirement. |
 | D3 | **Action-definition flag at `+0x58`.** | Exact distinction between merge/update and always-create runtime effects. |
 | D4 | **Game-facing meanings of damage channels 1 and 2.** | Channel 1 is ordinary ranged; modifier `0x1C` selects channel 2. Their localized/mechanical categories remain unnamed. |
 | D5 | **Death/runtime effects `0x49`, `0x4A`, `0x5A`, `0x5B`.** | Mechanics are recovered; names and source content need `.var`/localization confirmation. |

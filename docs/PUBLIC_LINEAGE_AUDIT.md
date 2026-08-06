@@ -318,6 +318,23 @@ non-commutative cells listed in `MELEE_SECONDARY_COVERAGE.csv` remain
 black-box-first. The automatic Genesis branches labelled `0x4F`/`0x50` require a
 reachable source-content mapping before any further binary work.
 
+### 5.10 Governance validator, R14 and R15 checkpoint
+
+CX-001 is accepted as `N0_PUBLIC / T0_RETAIN` governance tooling. Its validator
+checks registry structure and literal paths but deliberately does not claim
+classification completeness or require optional globs to match.
+
+R14 passes the necessity gate as `N1_BLACKBOX`: footprint is directly observable,
+cheap to test and has a large architectural blast radius. The `/66 Гигант`
+protocol is ready; no binary packet is justified before observation.
+
+R15 is conditionally material but currently fails reachability. The named
+GDScript option model and test are empty and no parity fixture reaches an
+underfull/all-zero caller. It is deferred until an executable consumer exists.
+The zero-total primitive remains `N3_INTERNAL` unless reachability is
+demonstrated; the player-facing underfull policy may later become
+`N2_EXACT_EDGE`.
+
 ## 6. Remaining binary queue after the audit
 
 | request | audit result | next action |
@@ -325,10 +342,12 @@ reachable source-content mapping before any further binary work.
 | R10 conditional attack-bonus placement | `CLOSED / N2_EXACT_EDGE` | Public material established the morale carve-out; existing `EXP-R9-001` already proved the remaining placement. Export neutral vectors; no new binary packet. |
 | R12 hit-and-return anchor | `N1_BLACKBOX`, possibly `N2_EXACT_EDGE` | Observation protocol ready: NH Harpy `/31`, same-phase reselection and Warlord-granted second turn; no binary packet unless a decisive case is unreachable. |
 | R13 start-of-turn lifecycle | `N1_BLACKBOX` and high materiality | Observation protocol ready: NH Wind Seeker `/122` supplies a +2 start effect and Warlord `/111` supplies a direct +2 plus second-turn control; binary only for an inaccessible remaining boundary. |
-| R16 action dispatcher | mostly `N3_INTERNAL` | Retire as whole-function reconstruction. Replace with player-facing action-semantics coverage matrix. |
-| R17 melee secondary effects | selective `N2_EXACT_EDGE` | Replace with finite trigger/order matrix; inspect only unresolved material cells. |
+| R14 large-unit footprint | `N1_BLACKBOX`, cheap/high blast radius | Observation protocol ready with NH `/66 Гигант`; close from logical selection/occupancy/pathing results before binary work. |
+| R15 all-zero/underfull level-up edge | conditional `N2_EXACT_EDGE`; zero-total primitive may be `N3_INTERNAL` | Deferred until an executable option consumer and synthetic edge fixtures exist; do not invent fallback behaviour. |
+| R16 action dispatcher | `N3_INTERNAL / RETIRED` | Public effect-family coverage exists; implement only consumer-triggered observable mappings, not original dispatcher structure. |
+| R17 melee secondary effects | selective `N2_EXACT_EDGE` | Public trigger matrix and controlled-observation packet are ready; inspect only a surviving inaccessible non-commutative cell. |
 
-Broad binary progression should pause until this triage is accepted or amended.
+No binary packet is active. R12, R13, R14 and R17 are observation-first; R15 is consumer-deferred.
 
 ## 7. Rewrite timing
 

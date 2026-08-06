@@ -21,7 +21,7 @@ priority.
 
 | ID | class | title | owner/reviewer | state | dependencies |
 |---|---|---|---|---|---|
-| CX-001 | `NON_SEMANTIC_TOOLING` | validate public-lineage registries | binary/governance | `REVIEW` | none |
+| CX-001 | `NON_SEMANTIC_TOOLING` | validate public-lineage registries | binary/governance | `DONE` | none |
 | CX-002 | `NON_SEMANTIC_TOOLING` | inventory unclassified tests and fixtures | binary/governance | `READY` | none |
 | CX-003 | `NON_SEMANTIC_TOOLING` | scan transfer candidates for research-only tokens | binary/governance | `READY` | none |
 | CX-004 | `NON_SEMANTIC_TOOLING` | guard populated generated bindings | binary/governance | `READY` | none |
@@ -33,9 +33,8 @@ Task contracts live in `docs/codex/tasks/`.
 
 ## Assignment rule
 
-The first assignment should be CX-001. CX-002 through CX-004 may proceed in
-parallel only when each receives a separate worktree or branch and returns an
-independent patch.
+CX-001 is accepted. CX-002 through CX-004 may proceed in parallel only when
+each receives a separate worktree or branch and returns an independent patch.
 
 Do not combine the first four tasks into one broad “implement the governance
 tooling” prompt. Separate contracts keep review and rollback cheap.

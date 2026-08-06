@@ -8,9 +8,9 @@ add detail.
 Priority order below is by *what unblocks implementation*, which is not the same
 as what is most interesting in the binary.
 
-**Current binary extraction:** none. R1–R11 are closed. R12, R13, R15 and the
-reduced R17 questions must pass the DELIB-0002 necessity gate before a new
-extraction packet is issued. R16 is retired as structural reconstruction.
+**Current binary extraction:** none. R1–R11 are closed. R12, R13 and the
+reduced R17 questions remain black-box/necessity-gated. R14 is observation-ready,
+R15 is deferred until a consumer exists, and R16 is retired.
 
 ---
 
@@ -844,48 +844,64 @@ yield and re-entry, showing whether it fires again.
 
 ---
 
-## R14 — OPEN: does any unit occupy more than one tactical cell?
+## R14 — OBSERVATION READY: does any unit occupy more than one tactical cell?
 
-**Closes:** `OPEN_QUESTIONS` item 2
-**Method:** observation is decisive and cheap
+**Closes:** `OPEN_QUESTIONS` item 2 · matrix `FOOTPRINT-001`
+**Method:** controlled observation
 **Cost:** very small
+**Public subject:** NH `/66 Гигант`
+**Protocol:** `docs/observations/OBS-R14-LARGE-UNIT-PREFLIGHT.md`
+**Results:** `docs/observations/OBS-R14-LARGE-UNIT.csv`
+**New binary extraction:** none
 
-**Question.** Does `Гигант` — or any category — occupy more than one hex in the
-inspected build?
+The engine models every unit as single-cell. A wrong answer would affect
+placement, adjacency, movement blocking, area effects and aura reach, but the
+question is directly visible in play.
 
-**Why it is worth asking despite looking settled.** The engine models every unit
-as single-cell. If that is right, this closes permanently and the battlefield
-geometry is finished. If it is wrong, placement, adjacency, movement blocking,
-area effects and aura reach all change at once. It is a cheap question with an
-expensive wrong answer, and it can be settled by placing a giant on the field and
-looking at it.
+The preregistered protocol compares a normal unit and a giant-class unit across:
 
-**Minimum sufficient answer.** Yes or no, plus the footprint shape if yes.
+- selection/hover association;
+- all six neighbour occupancy checks;
+- pathing through visual sprite overlap;
+- melee adjacency;
+- one-hex movement and optional radius-one preview.
+
+**Minimum sufficient answer.** One logical cell, or the exact multi-cell
+footprint shape for even and odd rows. Sprite size alone does not count.
+
+Binary work is authorized only if selection, pathing and occupancy observations
+contradict one another.
 
 ---
 
-## R15 — OPEN: all-zero weighted table and exhausted level-up pools
+## R15 — DEFERRED UNTIL CONSUMER: all-zero weighted table and exhausted level-up pools
 
-**Closes:** `OPEN_QUESTIONS` items 6 and 6b together
+**Questions:** `OPEN_QUESTIONS` items 6 and 6b
 **Ledger:** weighted roller `00454E80`
-**Method:** constructed state, or the caller's guard
-**Cost:** small
+**Audit:** `docs/LEVEL_UP_EDGE_AUDIT.md`
+**Disposition:** `DEFERRED_UNTIL_CONSUMER`
+**New binary extraction:** none
 
-**Question.** Two halves of one situation. (a) What does the weighted roller do
-when every surviving weight is zero? (b) What does the level-up path do when a
-unit's pool is exhausted, or offers fewer choices than requested?
+R15 combines a possibly internal weighted-primitive edge with a player-facing
+caller policy. The ordinary candidate collection, prerequisites, weighting and
+selected-value removal are recovered, but the edge has no current executable
+parity consumer:
 
-**Current engine behaviour, stated so it can be contradicted.** `LegacyRng`
-raises on a zero total rather than returning a value, deliberately, because
-`LEGACY_RNG.md` says compatibility code must not invent a fallback. That is a
-placeholder for the real answer, not a claim about the original. If the original
-returns a sentinel, returns the first entry, or skips the selection entirely,
-the engine should match it.
+- `core/model/option.gd` is empty;
+- `tests/test_options.gd` is empty;
+- no underfull/all-zero level-up fixture reaches the caller;
+- `LegacyRng` deliberately raises on zero total rather than inventing a fallback.
 
-**Minimum sufficient answer.** The control flow after a zero total — whichever
-of return-early, sentinel, or caller-side guard it turns out to be. If the
-caller guarantees a positive total and the roller is never reached in that
-state, that is a complete answer and closes 6b as unreachable.
+The current state therefore fails the DELIB-0002 material-reachability gate. A
+small binary question is still unnecessary when nothing consumes the answer.
+
+R15 reactivates only after an option consumer and synthetic empty/underfull/zero
+weight fixtures exist, a profile needs exact behaviour, and public or black-box
+evidence cannot settle the remaining branch.
+
+Do not generalize an eventual primitive result into caller policy: a caller guard
+may make zero-total rolling unreachable while still returning fewer choices or an
+explicit exhausted state.
 
 ---
 
@@ -985,8 +1001,8 @@ There is currently no active Ghidra batch.
 **Original-game observation.** R12 and R13 lifecycle matrices; R14 footprint;
 the remaining R6 ranged-only adjacency observation.
 
-**Consumer-triggered only.** R15 when level-up implementation reaches a
-zero-total or exhausted-pool state.
+**Deferred until consumer.** R15 is inactive until the option model and synthetic
+underfull/all-zero fixtures reach a real caller.
 
 **Retired/reframed.** R16 is closed as structural reconstruction. R17 begins as
 an observable ability-interaction matrix and may yield narrow binary cells later.
