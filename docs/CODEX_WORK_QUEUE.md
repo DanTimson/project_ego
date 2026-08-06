@@ -24,7 +24,7 @@ priority.
 | CX-001 | `NON_SEMANTIC_TOOLING` | validate public-lineage registries | binary/governance | `DONE` | none |
 | CX-002 | `NON_SEMANTIC_TOOLING` | inventory unclassified tests and fixtures | binary/governance | `DONE` | none |
 | CX-003 | `NON_SEMANTIC_TOOLING` | scan transfer candidates for research-only tokens | binary/governance | `DONE` | none |
-| CX-004 | `NON_SEMANTIC_TOOLING` | guard populated generated bindings | binary/governance | `READY` | none |
+| CX-004 | `NON_SEMANTIC_TOOLING` | guard populated generated bindings | binary/governance | `DONE` | none |
 | CX-005 | `NON_SEMANTIC_TOOLING` | aggregate public-lineage preflight report | binary/governance | `BLOCKED` | CX-001, CX-003, CX-004 |
 | CX-006 | `NON_SEMANTIC_TOOLING` | dry-run public-lineage exporter | binary/governance | `BLOCKED` | CX-001, CX-002, CX-003, CX-005 and explicit manifest |
 | CX-007 | `NON_SEMANTIC_TOOLING` | repository-governance CI integration | binary/governance | `BLOCKED` | CX-001 through CX-005 accepted |
