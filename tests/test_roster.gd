@@ -105,7 +105,7 @@ func _init() -> void:
 		var case: Dictionary = fx["built"][content_id]
 		var built := r.build(String(content_id))
 		var want_mods: Array = case["modifiers"]
-		var ok := built.unit.modifiers.size() == want_mods.size()
+		var ok: bool = built.unit.modifiers.size() == want_mods.size()
 		var detail := "%d/%d modifiers" % [built.unit.modifiers.size(),
 			want_mods.size()]
 		if ok:
@@ -159,7 +159,7 @@ func _init() -> void:
 	print("\n[6] building is deterministic and unshared")
 	var a := r.build("Мечник")
 	var b := r.build("Мечник")
-	var same := a.unit.modifiers.size() == b.unit.modifiers.size()
+	var same: bool = a.unit.modifiers.size() == b.unit.modifiers.size()
 	if same:
 		for i in a.unit.modifiers.size():
 			if a.unit.modifiers[i].ability != b.unit.modifiers[i].ability:

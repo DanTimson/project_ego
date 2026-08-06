@@ -40,7 +40,7 @@ class Tile extends RefCounted:
 	func passable() -> bool:
 		return move_cost != IMPASSABLE
 
-	func free() -> bool:
+	func is_free() -> bool:
 		return passable() and occupant == null
 
 
@@ -266,7 +266,7 @@ func reachable(start: Vector2i, budget: int, ignore_occupants: bool = false) -> 
 
 func place(unit: Variant, h: Vector2i) -> bool:
 	var t: Tile = tiles.get(h)
-	if t == null or not t.free():
+	if t == null or not t.is_free():
 		return false
 	t.occupant = unit
 	return true

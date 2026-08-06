@@ -42,7 +42,7 @@ static func _canonical_json_value(value: Variant) -> Variant:
 		TYPE_DICTIONARY:
 			var object: Dictionary = {}
 			for key in value:
-				object[String(key)] = _canonical_json_value(value[key])
+				object[str(key)] = _canonical_json_value(value[key])
 			return object
 		TYPE_ARRAY:
 			var array: Array = []
@@ -59,18 +59,18 @@ static func _canonical_json_value(value: Variant) -> Variant:
 static func canonical_fingerprint(value: Variant) -> String:
 	# JSON sorts dictionary keys recursively, so insertion/enumeration order and
 	# filesystem order cannot affect the digest.
-	var normalized := _canonical_json_value(value)
-	var encoded := JSON.stringify(normalized, "", true, true).to_utf8_buffer()
-	var context := HashingContext.new()
+	var normalized: Variant = _canonical_json_value(value)
+	var encoded: PackedByteArray = JSON.stringify(normalized, "", true, true).to_utf8_buffer()
+	var context: HashingContext = HashingContext.new()
 	context.start(HashingContext.HASH_SHA256)
 	context.update(encoded)
 	return "sha256:" + context.finish().hex_encode()
 
 
 func content_provenance() -> Dictionary:
-	var observed := canonical_fingerprint(snapshot_payload())
+	var observed: String = canonical_fingerprint(snapshot_payload())
 	fingerprint = observed
-	var out := {"pack": pack_id, "fingerprint": observed}
+	var out: Dictionary = {"pack": pack_id, "fingerprint": observed}
 	if version != "":
 		out["version"] = version
 	if build != "":

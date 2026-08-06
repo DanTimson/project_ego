@@ -49,9 +49,9 @@ enum Stacking {
 class Aura extends RefCounted:
 	var id: StringName = &""
 	var name: String = ""
-	var scope: Scope = Scope.ADJACENT
-	var affects: Side = Side.ALLY
-	var stacking: Stacking = Stacking.MAXIMUM
+	var scope: Auras.Scope = Auras.Scope.ADJACENT
+	var affects: Auras.Side = Auras.Side.ALLY
+	var stacking: Auras.Stacking = Auras.Stacking.MAXIMUM
 	var power: int = 0
 	## Modifiers granted to each affected unit.
 	var modifiers: Array = []
@@ -68,7 +68,7 @@ class Aura extends RefCounted:
 			field: Battlefield) -> bool:
 		if source != null and not source.alive:
 			return false
-		if target == source and scope != Scope.SELF:
+		if target == source and scope != Auras.Scope.SELF:
 			# «все дружественные воины ВОКРУГ» — the projector is not in its own
 			# adjacency. Whether it benefits from its own battlefield-wide aura is
 			# not stated; excluded for consistency. OPEN_QUESTIONS item 19.
@@ -83,9 +83,9 @@ class Aura extends RefCounted:
 		for s in except_subtypes:
 			if target.has_subtype(s):
 				return false
-		if scope == Scope.BATTLEFIELD:
+		if scope == Auras.Scope.BATTLEFIELD:
 			return true
-		if scope == Scope.SELF:
+		if scope == Auras.Scope.SELF:
 			return target == source
 		if field == null or not field.contains(source_hex) \
 				or not field.contains(target_hex):
@@ -95,10 +95,10 @@ class Aura extends RefCounted:
 
 static func _side_matches(aura: Aura, source_side: Variant,
 		target_side: Variant) -> bool:
-	if aura.affects == Side.ALL:
+	if aura.affects == Auras.Side.ALL:
 		return true
 	var same: bool = source_side != null and source_side == target_side
-	return same if aura.affects == Side.ALLY else not same
+	return same if aura.affects == Auras.Side.ALLY else not same
 
 
 ## Every aura reaching `unit` right now.
@@ -138,7 +138,7 @@ static func _resolve_stacking(list: Array) -> Array:
 	var out: Array = []
 	for key in by_id:
 		var group: Array = by_id[key]
-		if group[0].stacking == Stacking.CUMULATIVE:
+		if group[0].stacking == Auras.Stacking.CUMULATIVE:
 			out.append_array(group)
 		else:
 			var strongest: Aura = group[0]

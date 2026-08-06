@@ -533,7 +533,7 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	var best_dest := Vector2i.ZERO
 	var best_path: Array[Vector2i] = []
 	for h in field.neighbours(there):
-		if not (field.tile(h) as Battlefield.Tile).free():
+		if not (field.tile(h) as Battlefield.Tile).is_free():
 			continue
 		var p := field.path(here, h, false, unit.movement_remaining)
 		if p.is_empty():
@@ -710,6 +710,25 @@ func cmd_end_phase() -> void:
 		emit("-- side %d --" % state.active_side)
 
 
+## R7: exhaustion hands control over just like an explicit pass. Check after
+## every unit command, matching the oracle and the recovered roster scan.
+func _auto_end_phase() -> void:
+	while not RoundLoop.battle_over(state) \
+			and RoundLoop.phase_done(state, state.active_side):
+		var before: int = state.round_number
+		var new_round: bool = RoundLoop.end_phase(state)
+		if new_round:
+			emit("-- round %d, side %d first (both sides exhausted) --"
+				% [state.round_number, state.active_side])
+			_round_upkeep()
+		else:
+			emit("-- side %d takes over (no units left to act) --"
+				% state.active_side)
+		if state.round_number == before and not new_round \
+				and not RoundLoop.phase_done(state, state.active_side):
+			break
+
+
 # -- run ---------------------------------------------------------------------
 
 ## Install the pipeline AND the environment, then run.
@@ -769,6 +788,7 @@ func _run() -> Dictionary:
 		if RoundLoop.battle_over(state):
 			emit("== battle over ==")
 			break
+		_auto_end_phase()
 
 	return {"name": scenario_name, "seed": seed_value,
 			"log": log, "final": final_state()}

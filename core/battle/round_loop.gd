@@ -36,13 +36,13 @@ class BattleState extends RefCounted:
 	var active_side: int = 0
 	var log: Array[String] = []
 
-	func side(sid: int) -> Side:
+	func side(sid: int) -> RoundLoop.Side:
 		for s in sides:
 			if s.id == sid:
 				return s
 		return null
 
-	func other(sid: int) -> Side:
+	func other(sid: int) -> RoundLoop.Side:
 		for s in sides:
 			if s.id != sid:
 				return s
@@ -53,8 +53,8 @@ class BattleState extends RefCounted:
 ## инициатива равна, первым ходит атакующий.» Army-level, one comparison at
 ## battle start — not a per-unit stat.
 static func first_side(sides: Array) -> int:
-	var a: Side = sides[0]
-	var b: Side = sides[1]
+	var a: RoundLoop.Side = sides[0]
+	var b: RoundLoop.Side = sides[1]
 	if a.leader_initiative != b.leader_initiative:
 		return a.id if a.leader_initiative > b.leader_initiative else b.id
 	return a.id if a.is_attacker else b.id
@@ -116,9 +116,9 @@ static func auto_end_phase_if_exhausted(state: BattleState) -> bool:
 
 
 static func end_phase(state: BattleState) -> bool:
-	var current: Side = state.side(state.active_side)
+	var current: RoundLoop.Side = state.side(state.active_side)
 	current.passed = true
-	var other: Side = state.other(state.active_side)
+	var other: RoundLoop.Side = state.other(state.active_side)
 	if other.passed or phase_done(state, other.id):
 		begin_new_round(state)
 		return true

@@ -71,7 +71,10 @@ func _init() -> void:
 		push_error("fixture not found: %s" % FIXTURE)
 		quit(1)
 		return
-	var fx: Dictionary = JSON.parse_string(file.get_as_text())
+	# Godot 4.3 compares nested Dictionary/Array numbers by Variant type. Match
+	# Python's JSON integer semantics before direct fixture equality checks.
+	var fx: Dictionary = ScenarioContentProvider._canonical_json_value(
+		JSON.parse_string(file.get_as_text())) as Dictionary
 	file.close()
 	var provider := _provider(fx)
 	_check(provider.fingerprint == fx["provider"]["fingerprint"],

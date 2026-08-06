@@ -113,6 +113,10 @@ var alive: bool = true
 ## not refill it, or Кровавое безумие would chain without bound.
 var once_per_round: Dictionary = {}
 
+## Innate/content modifiers. Timed effects contribute additional modifiers
+## through `statuses`; both sources are combined by Damage.effective_modifiers.
+var modifiers: Array = []
+
 ## Timed effects. They contribute Modifiers through the same pipeline as
 ## everything else, so a status never computes a number itself.
 var statuses: Array = []

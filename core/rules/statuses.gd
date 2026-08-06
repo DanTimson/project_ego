@@ -173,7 +173,7 @@ static func reduce_duration(unit: Combatant, amount: int,
 				continue
 		if e.duration == PERMANENT:
 			continue
-		var before := e.duration
+		var before: int = e.duration
 		e.duration = maxi(0, e.duration - amount)
 		t.step(e.name if e.name != "" else String(e.id),
 			float(before), float(e.duration))
@@ -218,7 +218,7 @@ static func tick_round(unit: Combatant) -> Trace:
 	for e in unit.statuses.duplicate():
 		if e.duration == PERMANENT:
 			continue
-		var before := e.duration
+		var before: int = e.duration
 		e.duration -= 1 + decay_from_stats(e, unit)
 		if e.duration != before - 1:
 			t.step("%s decays faster" % (e.name if e.name != "" else String(e.id)),
