@@ -13,10 +13,11 @@ the same HP. The log catches the divergence at the step where it happens, which
 is the difference between a five-minute fix and an afternoon of bisection.
 
 THIS IS THE INTEGRATION POINT. Everything the project has built meets here:
-battlefield pathfinding feeds steps_this_round, which sets the stamina charge,
-which feeds StaminaMod, which scales the attack, which the RNG rolls, which the
-defence reduces. A scenario that reproduces exactly is evidence the whole chain
-agrees — far stronger than any subsystem test.
+battlefield pathfinding updates live capacity and command-entry coordinates;
+the composed profile rule resolves primary-melee charge; stamina scales the
+ordinary attack; the RNG rolls it; defence reduces it; then charge is added.
+A scenario that reproduces exactly is evidence the whole chain agrees — far stronger than any
+subsystem test.
 
 Command set, deliberately small:
 
@@ -34,6 +35,7 @@ import json
 
 import battlefield as bfmod
 import auras
+import charge
 import combat
 import content
 import handlers
@@ -50,7 +52,14 @@ PROFILE_GENESIS = "genesis"
 PROFILE_NEW_HORIZONS = "new_horizons"
 PROFILE_NATIVE = "native"
 _PROFILE_NAMES = {PROFILE_GENESIS, PROFILE_NEW_HORIZONS, PROFILE_NATIVE}
-_PROFILE_CONFLICT = 'scenario configuration cannot specify both "profile" and legacy "rng"'
+_PROFILE_REQUIRED = (
+    'scenario configuration requires explicit "profile"; '
+    'the omitted-profile native fallback was removed'
+)
+_RNG_REMOVED = (
+    'scenario configuration key "rng" was removed; use explicit "profile" '
+    '("genesis" for LegacyRng or "native" for named streams)'
+)
 _NEW_HORIZONS_INCOMPLETE = (
     'scenario profile "new_horizons" is incomplete: '
     'minimum rules assignment is not defined'
@@ -74,6 +83,15 @@ class Scenario:
         # seam exists and why it is the only general seam in the engine.
         self.rng = (rng if rng is not None
                     else self._make_rng(self.profile, self.seed, self.name))
+        # The second profile seam. Battle commands ask one injected callable for
+        # a resolved primary-melee charge; ordinary damage arithmetic never
+        # branches on profile. Native injects no R3 consumer so its established
+        # zero-charge/overkill behaviour remains untouched; New Horizons has
+        # already been rejected above.
+        self._attack_command_charge = (
+            self._genesis_attack_command_charge
+            if self.profile == PROFILE_GENESIS else self._no_attack_command_charge
+        )
         # Actions available in this battle. A scenario may declare its own so
         # the file is self-contained and the GDScript port can build the same
         # catalogue from the same source — the port loads its catalogue from
@@ -97,29 +115,19 @@ class Scenario:
     def _profile_configuration(spec: dict) -> tuple[str, str]:
         """Return the normalized profile and any configuration error.
 
-        The no-key branch is the complete phase-1 compatibility fallback. Phase
-        2 can remove it without touching profile selection or combat rules.
+        Serialized scenario configuration is strict: profile identity is
+        explicit, and the removed ``rng`` selector is never interpreted as a
+        rules axis. Direct ``Scenario(..., rng=obj)`` dependency injection is a
+        constructor concern and remains independent of this parser.
         """
-        has_profile = "profile" in spec
-        has_rng = "rng" in spec
-        if has_profile and has_rng:
-            return "", _PROFILE_CONFLICT
+        if "rng" in spec:
+            return "", _RNG_REMOVED
+        if "profile" not in spec:
+            return "", _PROFILE_REQUIRED
 
-        if has_profile:
-            profile = str(spec["profile"]).strip().lower()
-            if profile not in _PROFILE_NAMES:
-                return "", 'unknown scenario profile "%s"' % profile
-        elif has_rng:
-            legacy_selector = str(spec["rng"]).strip().lower()
-            if legacy_selector != "legacy":
-                return "", (
-                    'unknown legacy rng selector "%s"; only "legacy" is '
-                    'supported during migration' % legacy_selector
-                )
-            profile = PROFILE_GENESIS
-        else:
-            # Phase 1 only: old scenarios without either selector remain native.
-            profile = PROFILE_NATIVE
+        profile = str(spec["profile"]).strip().lower()
+        if profile not in _PROFILE_NAMES:
+            return "", 'unknown scenario profile "%s"' % profile
 
         if profile == PROFILE_NEW_HORIZONS:
             return profile, _NEW_HORIZONS_INCOMPLETE
@@ -267,6 +275,27 @@ class Scenario:
                 return s
         return None
 
+    # -- profile-composed primary-melee charge --------------------------------
+
+    @staticmethod
+    def _no_attack_command_charge(unit: Combatant, attacker_xy: tuple[int, int],
+                                  target_xy: tuple[int, int],
+                                  movement_requested: bool) -> None:
+        return None
+
+    @staticmethod
+    def _genesis_attack_command_charge(unit: Combatant,
+                                      attacker_xy: tuple[int, int],
+                                      target_xy: tuple[int, int],
+                                      movement_requested: bool) -> int:
+        # 0x25 is the accepted Genesis evidence identity. Query the effective
+        # modifier set here, at the composition/battle seam, rather than teaching
+        # damage rules about either profile names or pack opcodes.
+        if not any(m.ability == 0x25 for m in combat.effective_modifiers(unit)):
+            return 0
+        return charge.command_entry_charge(attacker_xy, target_xy,
+                                          movement_requested)
+
     # -- commands -----------------------------------------------------------
 
     def cmd_move(self, unit: Combatant, col: int, row: int) -> None:
@@ -324,14 +353,15 @@ class Scenario:
         self.emit("%s falls" % unit.label())
 
     def _strike(self, unit: Combatant, target: Combatant, kind: AttackKind,
-                action=None) -> None:
+                action=None, primary_melee_charge: int | None = None) -> None:
         """One exchange: the attack and any retaliation, in the right order.
 
         Melee is answered; a shot is not. `Первый удар` moves the retaliation
         ahead of the blow that caused it, so a defender can kill an attacker
         before the attack lands.
         """
-        ex = ca.resolve(unit, target, self.rng, kind, action)
+        ex = ca.resolve(unit, target, self.rng, kind, action,
+                        primary_melee_charge=primary_melee_charge)
         turn.spend_attack(unit)
 
         for what, damage in ex.order:
@@ -361,10 +391,20 @@ class Scenario:
         if unit.action_spent:
             self.emit("%s has already acted" % unit.label())
             return
+        # Resolve both R3 applicability and distance before automatic approach
+        # mutates battlefield occupancy or the environment-derived modifier set.
+        attacker_entry_h = self.field.find(unit)
+        target_entry_h = self.field.find(target)
+        attacker_entry = bfmod.axial_to_offset(attacker_entry_h)
+        target_entry = bfmod.axial_to_offset(target_entry_h)
+        movement_requested = attacker_entry_h.distance(target_entry_h) != 1
+        primary_melee_charge = self._attack_command_charge(
+            unit, attacker_entry, target_entry, movement_requested)
         if not self._approach(unit, target):
             self.emit("%s cannot reach %s" % (unit.label(), target.label()))
             return
-        self._strike(unit, target, AttackKind.MELEE)
+        self._strike(unit, target, AttackKind.MELEE,
+                     primary_melee_charge=primary_melee_charge)
 
     def cmd_shoot(self, unit: Combatant, target: Combatant) -> None:
         if not target.alive:

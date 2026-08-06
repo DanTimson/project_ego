@@ -222,8 +222,9 @@ class Combatant:
     ## Cleared by begin_round and by NOTHING else — an extra turn must not
     ## refill it, or Кровавое безумие would chain without bound.
     once_per_round: set = field(default_factory=set)
-    ## Cumulative path length this round — NOT displacement. Feeds Атака с
-    ## разгона; its `> 0` test is the stamina -2/-1 discriminator.
+    ## Cumulative path length this round — NOT displacement. Retained as
+    ## trace-visible movement history; Genesis charge and R8 stamina cost do not
+    ## consume it.
     steps_this_round: int = 0
 
     def label(self) -> str:
@@ -614,7 +615,7 @@ def negative_damage_hits(damage: int, rng: Rng, stream: str = "chip") -> bool:
 
 def resolve_attack(attacker: Combatant, defender: Combatant,
                    kind: AttackKind, rng: Rng) -> tuple[int, list]:
-    """Full pipeline. Returns (damage_dealt, [traces])."""
+    """Full ordinary-damage pipeline. Returns (damage_dealt, [traces])."""
     atk_value, atk_trace = current_attack(attacker, kind)
 
     # PIPELINE NOTE / ASSUMPTION.

@@ -178,9 +178,9 @@ const _BIG := 1 << 30
 
 ## Cheapest path by MoveCost, or an empty array when unreachable.
 ##
-## Returns the hexes AFTER `start`, so size() is the number of steps — which is
-## what feeds steps_this_round, and therefore Атака с разгона and the stamina
-## -2/-1 discriminator.
+## Returns the hexes AFTER `start`, so size() is the number of steps recorded in
+## trace-visible `steps_this_round`. Charge and attack stamina use command-entry
+## coordinates and live capacity respectively.
 ##
 ## Ties break on the fixed NEIGHBOURS order via an insertion counter, not on
 ## sort accident: equal-cost routes must resolve the same way every run.

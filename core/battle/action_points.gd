@@ -99,10 +99,9 @@ static func begin_round(u: Combatant) -> Trace:
 ## decision. When true this also serves a pending forced rest, so such a spell
 ## can rescue an exhausted unit.
 ##
-## `reset_steps` — UNKNOWN (OPEN_QUESTIONS item 17). Left false so that
-## Атака с разгона keeps accumulating across both turns of the same round,
-## consistent with charge counting cumulative movement rather than displacement.
-## Resetting would silently nerf cavalry that is given an extra turn.
+## `reset_steps` is retained for callers that explicitly need to clear the
+## diagnostic path counter. It defaults false because an extra turn is not a
+## round boundary. Genesis charge recomputes from each command's entry coordinates.
 ##
 ## Never clears once_per_round, and never clears `resting`: a rest already taken
 ## is not undone by being handed another turn.
@@ -181,8 +180,9 @@ static func can_move(u: Combatant, tiles: int = 1) -> Refusal:
 ## resolved from bf_object — hills and swamp cost 1 unless the unit has the
 ## matching Знание; flyers pay nothing.
 ##
-## Steps ACCUMULATE as path length. A unit pacing back to its starting tile has
-## still moved, for both charge distance and the attack stamina discriminator.
+## Steps ACCUMULATE as trace-visible path history. A unit pacing back to its
+## starting tile still records every step, but neither Genesis charge nor the R8
+## attack stamina cost consumes this counter.
 static func spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> Trace:
 	var t := Trace.new("%s.move" % u.name)
 	t.base = float(u.movement_remaining)
@@ -214,7 +214,7 @@ static func spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> T
 ## agree on the common path and diverge whenever capacity is restored: effect
 ## type 7 can raise `+0x04` back to effective speed, and a non-movement command
 ## increments it by one, while ordinary selection and reselection do not touch it
-## at all. `steps_this_round` remains correct for «Атака с разгона».
+## at all. `steps_this_round` remains available as diagnostic movement history.
 static func attack_stamina_cost(u: Combatant) -> int:
 	return 2 if u.movement_remaining < int(effective_speed(u)[0]) else 1
 

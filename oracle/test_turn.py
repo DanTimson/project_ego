@@ -238,7 +238,7 @@ def test_extra_turns() -> None:
     check(u.movement_remaining == 3, "full movement restored",
           "%d" % u.movement_remaining)
     check(u.steps_this_round == 3,
-          "steps do NOT reset — charge keeps accumulating across both turns",
+          "steps do NOT reset — diagnostic movement history survives both turns",
           "steps %d" % u.steps_this_round)
     # R8: the discriminator is live capacity, not movement history. Рывок has
     # just restored movement_remaining to the full effective speed, so capacity

@@ -116,7 +116,7 @@ static func strikes_first(defender: Combatant, attacker: Combatant) -> bool:
 ## shows only when the counter is lethal.
 static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
 		kind: Combatant.AttackKind = Combatant.AttackKind.MELEE,
-		action: Variant = null) -> Exchange:
+		action: Variant = null, primary_melee_charge: Variant = null) -> Exchange:
 	var ex := Exchange.new()
 	ex.reason = why_no_counter(defender, attacker, kind, action)
 	ex.countered = ex.reason == NoCounter.NONE
@@ -125,9 +125,9 @@ static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
 	if ex.counter_first:
 		_do_counter(ex, attacker, defender, rng)
 		if not ex.attacker_died:
-			_do_attack(ex, attacker, defender, rng, kind)
+			_do_attack(ex, attacker, defender, rng, kind, primary_melee_charge)
 	else:
-		_do_attack(ex, attacker, defender, rng, kind)
+		_do_attack(ex, attacker, defender, rng, kind, primary_melee_charge)
 		if ex.countered and defender.alive:
 			_do_counter(ex, attacker, defender, rng)
 		elif ex.countered:
@@ -137,12 +137,31 @@ static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
 
 
 static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
-		rng: Rng, kind: Combatant.AttackKind) -> void:
+		rng: Rng, kind: Combatant.AttackKind,
+		primary_melee_charge: Variant = null) -> void:
+	# Resolve the ordinary strike completely before consuming R3 charge. The
+	# combined capped value feeds the exchange accumulator/order before life
+	# subtraction. Retaliation has its own charge-free path below.
 	var result: Array = Damage.resolve_attack(attacker, defender, kind, rng)
-	ex.attack_damage = int(result[0])
+	var ordinary_damage := int(result[0])
+	var damage := ordinary_damage
+	if kind == Combatant.AttackKind.MELEE and primary_melee_charge != null:
+		var charge := maxi(0, int(primary_melee_charge))
+		var combined := ordinary_damage + charge
+		damage = mini(combined, maxi(0, defender.life))
+		var combined_trace := Trace.new("primary melee combined damage")
+		combined_trace.base = float(ordinary_damage)
+		combined_trace.step("+ command-entry charge", float(ordinary_damage),
+			float(combined), "flat post-defence, unrandomized, undefended")
+		if damage != combined:
+			combined_trace.step("target-life cap", float(combined), float(damage),
+				"current target life")
+		combined_trace.result = float(damage)
+		result[1].append(combined_trace)
+	ex.attack_damage = damage
 	ex.traces.append_array(result[1])
-	ex.order.append(["attack", ex.attack_damage])
-	defender.life -= ex.attack_damage
+	ex.order.append(["attack", damage])
+	defender.life -= damage
 	if defender.life <= 0 and defender.alive:
 		defender.alive = false
 		ex.defender_died = true

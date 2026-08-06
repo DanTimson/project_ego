@@ -85,8 +85,8 @@ var ammo: int = 0
 # ROUND_START, never on activation.
 
 ## Cumulative path length this round — NOT displacement. A unit pacing back and
-## forth accrues every step. Feeds Атака с разгона directly; its `> 0` test is
-## the stamina -2/-1 discriminator.
+## forth accrues every step. Retained as trace-visible movement history; Genesis
+## charge and R8 attack stamina cost do not consume it.
 var steps_this_round: int = 0
 
 ## Set when an action consuming the activation has been used this round.

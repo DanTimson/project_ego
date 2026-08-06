@@ -50,6 +50,66 @@ func _unit(spec: Dictionary) -> Combatant:
 class _SuppressingAction extends RefCounted:
 	var suppresses_counterattack: bool = true
 
+
+func _test_primary_melee_charge_consumption() -> void:
+	print("\n[5] command-entry charge is flat post-defence melee damage")
+
+	# Defence drives ordinary damage to zero. Every old attack-power insertion
+	# point is absorbed; only post-defence consumption inflicts all six charge.
+	var ordinary := Counterattack.resolve(
+		_unit({"attack": 3}),
+		_unit({"counter_attack": 0, "defence": 20, "life": 30}), Rng.new(1))
+	var charged_defender := _unit(
+		{"counter_attack": 0, "defence": 20, "life": 30})
+	var charged := Counterattack.resolve(
+		_unit({"attack": 3}), charged_defender, Rng.new(1),
+		Combatant.AttackKind.MELEE, null, 6)
+	_check(ordinary.attack_damage == 0,
+		"the distinguishing vector resolves ordinary damage to zero",
+		str(ordinary.attack_damage))
+	_check(charged.attack_damage == ordinary.attack_damage + 6,
+		"defence does not absorb flat post-defence charge",
+		"%d = %d + 6" % [charged.attack_damage, ordinary.attack_damage])
+
+	# The exact combined capped value reaches the existing accumulator/order
+	# consumer path and life subtraction.
+	var capped_defender := _unit(
+		{"counter_attack": 0, "defence": 0, "life": 5})
+	var capped := Counterattack.resolve(
+		_unit({"attack": 3}), capped_defender, Rng.new(1),
+		Combatant.AttackKind.MELEE, null, 6)
+	_check(capped.attack_damage == 5
+			and String(capped.order[0][0]) == "attack"
+			and int(capped.order[0][1]) == 5,
+		"combined capped damage reaches accounting and attack consumers",
+		"accumulator %d, order %s" % [capped.attack_damage, str(capped.order)])
+	_check(capped_defender.life == 0 and capped.defender_died,
+		"life subtraction consumes the same combined capped damage")
+
+	var plain_exchange := Counterattack.resolve(
+		_unit({"attack": 3, "life": 50}),
+		_unit({"counter_attack": 7, "defence": 0, "life": 50}), Rng.new(7))
+	var charged_exchange := Counterattack.resolve(
+		_unit({"attack": 3, "life": 50}),
+		_unit({"counter_attack": 7, "defence": 0, "life": 50}), Rng.new(7),
+		Combatant.AttackKind.MELEE, null, 2)
+	_check(charged_exchange.counter_damage == plain_exchange.counter_damage,
+		"retaliation remains charge-free and RNG-identical",
+		"%d vs %d" % [charged_exchange.counter_damage,
+			plain_exchange.counter_damage])
+
+	var ranged_plain := Counterattack.resolve(
+		_unit({"ranged_attack": 3}),
+		_unit({"counter_attack": 0, "ranged_defence": 0, "life": 30}),
+		Rng.new(9), Combatant.AttackKind.RANGED)
+	var ranged_with_charge := Counterattack.resolve(
+		_unit({"ranged_attack": 3}),
+		_unit({"counter_attack": 0, "ranged_defence": 0, "life": 30}),
+		Rng.new(9), Combatant.AttackKind.RANGED, null, 20)
+	_check(ranged_with_charge.attack_damage == ranged_plain.attack_damage,
+		"ranged attacks ignore primary-melee charge")
+
+
 func _init() -> void:
 	var f := FileAccess.open(FIXTURE, FileAccess.READ)
 	if f == null:
@@ -108,7 +168,9 @@ func _init() -> void:
 				bool(case["expected"])],
 			"got %s" % got)
 
-	print("\n[5] determinism")
+	_test_primary_melee_charge_consumption()
+
+	print("\n[6] determinism")
 	var first: Array = []
 	for i in 10:
 		var a := _unit({})

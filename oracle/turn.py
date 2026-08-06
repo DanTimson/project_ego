@@ -10,9 +10,9 @@ That single property drives everything here:
 
   * Per-round state lives on the Combatant and resets once, at ROUND_START.
     Anything reset per activation could be farmed by yielding and reselecting.
-  * `steps_this_round` is cumulative PATH LENGTH, not displacement. One counter
-    feeds Атака с разгона directly and, via `> 0`, the stamina -2/-1 attack
-    discriminator.
+  * `steps_this_round` is cumulative PATH LENGTH, not displacement. It remains
+    trace-visible movement history; Genesis charge uses command-entry
+    coordinates and R8 stamina cost uses live remaining capacity.
   * An attack command carries an implicit move: issuing an attack against a
     reachable target auto-paths the unit into position out of the same pool.
     The `Удар и возврат` anchor is therefore captured on the COMMAND.
@@ -136,10 +136,10 @@ def refresh_for_extra_turn(u: Combatant, *, fire_round_start: bool = False,
     than a decision. When True this also serves a pending forced rest, which
     means such a spell can rescue an exhausted unit.
 
-    `reset_steps` — UNKNOWN (OPEN_QUESTIONS item 17). Left False so that
-    `Атака с разгона` keeps accumulating across both turns of the same round,
-    consistent with charge counting cumulative movement rather than
-    displacement. Resetting would silently nerf cavalry given an extra turn.
+    `reset_steps` — retained for callers that explicitly need to clear the
+    diagnostic path counter. It defaults to False because an extra turn is not a
+    round boundary. Genesis charge does not consume this counter: each attack
+    recomputes from that command's entry coordinates.
 
     Never clears `once_per_round`, and never clears `resting`: a rest already
     taken is not undone by being handed another turn.
@@ -219,8 +219,9 @@ def spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> Trace:
     already resolved from bf_object (hills and swamp cost 1 unless the unit has
     the matching Знание; flyers pay nothing).
 
-    Steps ACCUMULATE. A unit pacing back and forth to its starting tile has
-    still moved, for both charge distance and the attack stamina discriminator.
+    Steps ACCUMULATE as trace-visible path history. A unit pacing back and
+    forth to its starting tile still records every step, but neither Genesis
+    charge nor the R8 attack stamina cost consumes this counter.
     """
     t = Trace(f"{u.name}.move")
     t.base = u.movement_remaining
@@ -258,7 +259,8 @@ def attack_stamina_cost(u: Combatant) -> int:
     have capacity restored, be deselected and reselected, and still pay 1 — where
     a movement-history discriminator would wrongly charge 2.
 
-    `steps_this_round` remains correct for «Атака с разгона» and is untouched.
+    `steps_this_round` remains available as diagnostic movement history and is
+    untouched.
     """
     return 2 if u.movement_remaining < effective_speed(u)[0] else 1
 

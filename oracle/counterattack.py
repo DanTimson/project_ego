@@ -116,7 +116,8 @@ class Exchange:
 
 
 def resolve(attacker: Combatant, defender: Combatant, rng,
-            kind: AttackKind = AttackKind.MELEE, action=None) -> Exchange:
+            kind: AttackKind = AttackKind.MELEE, action=None,
+            primary_melee_charge: int | None = None) -> Exchange:
     """Resolve an attack and any retaliation, in the correct order.
 
     ASSUMPTION (OPEN_QUESTIONS item 18): if a first-strike retaliation kills the
@@ -131,7 +132,26 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
     ex.counter_first = ex.countered and strikes_first(defender, attacker)
 
     def do_attack() -> None:
-        damage, traces = combat.resolve_attack(attacker, defender, kind, rng)
+        # Resolve the ordinary strike completely before consuming R3 charge.
+        # The combined capped value then feeds the exchange accumulator/order
+        # before life subtraction. Retaliation has its own charge-free path.
+        ordinary_damage, traces = combat.resolve_attack(
+            attacker, defender, kind, rng)
+        damage = ordinary_damage
+        if kind is AttackKind.MELEE and primary_melee_charge is not None:
+            charge = max(0, int(primary_melee_charge))
+            combined = ordinary_damage + charge
+            damage = min(combined, max(0, defender.life))
+            combined_trace = Trace("primary melee combined damage")
+            combined_trace.base = ordinary_damage
+            combined_trace.step("+ command-entry charge", ordinary_damage,
+                                combined,
+                                "flat post-defence, unrandomized, undefended")
+            if damage != combined:
+                combined_trace.step("target-life cap", combined, damage,
+                                    "current target life")
+            combined_trace.result = damage
+            traces.append(combined_trace)
         ex.attack_damage = damage
         ex.traces.extend(traces)
         ex.order.append(("attack", damage))

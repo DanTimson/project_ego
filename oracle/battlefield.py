@@ -168,9 +168,9 @@ class Battlefield:
              max_cost: int | None = None):
         """Cheapest path by MoveCost, or None.
 
-        Returns the hexes AFTER `start`, so len(path) is the number of steps —
-        which is what feeds steps_this_round, and therefore Атака с разгона and
-        the stamina -2/-1 discriminator.
+        Returns the hexes AFTER `start`, so len(path) is the number of steps
+        recorded in trace-visible `steps_this_round`. Charge and attack stamina
+        use command-entry coordinates and live capacity respectively.
 
         Ties are broken by the fixed NEIGHBOURS order, not by heap accident:
         the frontier is keyed on (cost, insertion) so equal-cost paths resolve

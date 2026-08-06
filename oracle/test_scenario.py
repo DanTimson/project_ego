@@ -2,11 +2,12 @@
 """
 test_scenario.py — the integration point.
 
-A scenario runs the whole chain: pathfinding feeds steps_this_round, which sets
-the stamina charge, which feeds StaminaMod, which scales the attack, which the
-RNG rolls, which the defence reduces. Reproducing a scenario exactly is far
-stronger evidence than any subsystem test, because a disagreement anywhere in
-that chain shows up as a diverging log line.
+A scenario runs the whole chain: pathfinding updates live capacity and captures
+command-entry position, the composed profile supplies primary-melee charge;
+stamina scales the ordinary attack, the RNG rolls it, defence reduces it, then
+charge is added. Reproducing
+a scenario exactly is far stronger evidence than any subsystem test, because a
+disagreement anywhere in that chain shows up as a diverging log line.
 
 Run: python3 test_scenario.py
 """
@@ -18,7 +19,9 @@ import os
 import json
 import sys
 
+import charge
 import scenario
+from combat import Rng
 
 FAILS: list[str] = []
 
@@ -42,8 +45,68 @@ def run(spec=None):
     return scenario.Scenario(json.loads(json.dumps(spec or SPEC))).run()
 
 
+def profile_combat_spec(profile="genesis", attacker_at=(0, 0),
+                        target_at=(4, 0), *, charge_modifier=True) -> dict:
+    attacker = {
+        "name": "attacker", "at": list(attacker_at),
+        "attack": 10, "ranged_attack": 10, "shooting_range": 8,
+        "ammo": 3, "counter_attack": 0, "defence": 0,
+        "ranged_defence": 0, "life": 100, "stamina": 10,
+        "stamina_base": 10, "morale": 10, "speed": 8,
+    }
+    if charge_modifier:
+        # The handler is deliberately inert: 0x25 applicability is resolved at
+        # the Genesis composition seam, not by a generic damage hook.
+        attacker["modifiers"] = [{
+            "ability": 0x25, "handler": "genesis_charge",
+            "hook": "DAMAGE_VS_TARGET", "source": "charge",
+        }]
+    target = {
+        "name": "target", "at": list(target_at),
+        "attack": 0, "counter_attack": 0, "defence": 0,
+        "ranged_defence": 0, "life": 100, "stamina": 10,
+        "morale": 10, "speed": 1,
+    }
+    return {
+        "name": "combat profile integration", "profile": profile, "seed": 1,
+        "battlefield": {"width": 8, "height": 3, "tiles": []},
+        "sides": [
+            {"id": 0, "is_attacker": True, "leader_initiative": 1,
+             "units": [attacker]},
+            {"id": 1, "leader_initiative": 0, "units": [target]},
+        ],
+        "commands": [{"op": "attack", "unit": "attacker",
+                      "target": "target"}],
+    }
+
+
+def run_profile_combat(spec: dict) -> dict:
+    # One injected named-stream generator isolates profile charge policy from
+    # the independently profile-selected RNG topology.
+    return scenario.Scenario(json.loads(json.dumps(spec)), rng=Rng(123)).run()
+
+
+def with_charge_aura(spec: dict, source_at: tuple[int, int]) -> dict:
+    """Grant 0x25 only while the attacker is adjacent to an aura source."""
+    spec["sides"][0]["units"].append({
+        "name": "charge aura source", "at": list(source_at),
+        "attack": 0, "counter_attack": 0, "defence": 0,
+        "ranged_defence": 0, "life": 100, "stamina": 10,
+        "stamina_base": 10, "morale": 10, "speed": 0,
+        "auras": [{
+            "id": "charge-aura", "scope": "ADJACENT", "affects": "ALLY",
+            "stacking": "MAXIMUM",
+            "modifiers": [{
+                "ability": 0x25, "handler": "genesis_charge",
+                "hook": "DAMAGE_VS_TARGET",
+            }],
+        }],
+    })
+    return spec
+
+
 def test_profile_selection() -> None:
-    print("\n[profiles] identity normalization and RNG selection")
+    print("\n[profiles] strict identity and RNG selection")
 
     def configured(**overrides):
         selected = json.loads(json.dumps(SPEC))
@@ -63,15 +126,21 @@ def test_profile_selection() -> None:
           "explicit genesis selects LegacyRng", type(genesis.rng).__name__)
 
     rejected = [
+        ({},
+         'scenario configuration requires explicit "profile"; the omitted-profile native fallback was removed',
+         "missing profile is rejected"),
+        ({"rng": "legacy"},
+         'scenario configuration key "rng" was removed; use explicit "profile" ("genesis" for LegacyRng or "native" for named streams)',
+         "old rng key is rejected with migration guidance"),
+        ({"profile": "native", "rng": "legacy"},
+         'scenario configuration key "rng" was removed; use explicit "profile" ("genesis" for LegacyRng or "native" for named streams)',
+         "rng is rejected even alongside a profile"),
         ({"profile": "new_horizons"},
          'scenario profile "new_horizons" is incomplete: minimum rules assignment is not defined',
          "incomplete new_horizons is rejected"),
         ({"profile": "future"},
          'unknown scenario profile "future"',
          "an unknown profile is rejected"),
-        ({"profile": "native", "rng": "legacy"},
-         'scenario configuration cannot specify both "profile" and legacy "rng"',
-         "profile plus rng is rejected as conflicting configuration"),
     ]
     for values, expected, what in rejected:
         try:
@@ -81,13 +150,10 @@ def test_profile_selection() -> None:
         else:
             check(False, what, "configuration was accepted")
 
-    alias = scenario.Scenario(configured(rng=" LEGACY "))
-    check(alias.profile == "genesis" and type(alias.rng).__name__ == "LegacyRng",
-          "omitted profile plus legacy rng maps to genesis")
-
-    fallback = scenario.Scenario(configured())
-    check(fallback.profile == "native" and type(fallback.rng).__name__ == "Rng",
-          "phase-1 omission fallback remains native")
+    injected = object()
+    direct = scenario.Scenario(configured(profile="genesis"), rng=injected)
+    check(direct.rng is injected,
+          "direct RNG dependency injection remains supported")
 
 
 def test_committed_native_scenarios_match_fixture() -> None:
@@ -191,9 +257,8 @@ def test_chain() -> None:
 
 
 def test_steps_feed_stamina() -> None:
-    """The single most important integration: a path's LENGTH becomes the
-    stamina charge on the attack that follows it."""
-    print("\n[3] path length -> steps_this_round -> attack stamina cost")
+    """The common movement path lowers live capacity before an attack."""
+    print("\n[3] movement capacity -> attack stamina cost")
     spec = json.loads(json.dumps(SPEC))
     spec["commands"] = [
         {"op": "attack", "unit": "Ополченец", "target": "Мечник"},
@@ -210,6 +275,151 @@ def test_steps_feed_stamina() -> None:
     check("closes to" not in "\n".join(r["log"]), "adjacent means no approach")
     check(r["final"]["Ополченец"]["stamina"] == 9,
           "attacking in place costs 1", str(r["final"]["Ополченец"]["stamina"]))
+
+
+def test_genesis_command_entry_charge() -> None:
+    print("\n[R3] Genesis command-entry charge")
+
+    adjacent = profile_combat_spec(attacker_at=(3, 0), target_at=(4, 0))
+    adjacent_plain = profile_combat_spec(
+        attacker_at=(3, 0), target_at=(4, 0), charge_modifier=False)
+    no_move = run_profile_combat(adjacent)
+    no_move_plain = run_profile_combat(adjacent_plain)
+    check(no_move["final"]["target"]["life"]
+          == no_move_plain["final"]["target"]["life"],
+          "a no-movement attack receives zero charge")
+
+    ordinary = profile_combat_spec(attacker_at=(0, 0), target_at=(4, 0))
+    ordinary_plain = profile_combat_spec(
+        attacker_at=(0, 0), target_at=(4, 0), charge_modifier=False)
+    charged = run_profile_combat(ordinary)
+    plain = run_profile_combat(ordinary_plain)
+    check(charge.command_entry_charge((0, 0), (4, 0), True) == 2,
+          "ordinary command-entry distance computes max(L1 - 2, 0)")
+    check("closes to" in "\n".join(charged["log"]),
+          "the charged command performs automatic approach movement")
+    check(charged["final"]["target"]["life"]
+          < plain["final"]["target"]["life"],
+          "the pre-approach coordinates survive into the primary attack",
+          "%d vs %d" % (charged["final"]["target"]["life"],
+                         plain["final"]["target"]["life"]))
+
+    # Existing adjacency-aura machinery makes applicability change across the
+    # automatic approach without a production-only test hook.
+    entry_aura_spec = with_charge_aura(profile_combat_spec(
+        attacker_at=(0, 0), target_at=(4, 0), charge_modifier=False), (0, 1))
+    entry_aura = scenario.Scenario(
+        json.loads(json.dumps(entry_aura_spec)), rng=Rng(123))
+    entry_attacker = entry_aura.units["attacker"]
+    check(any(m.ability == 0x25 for m in entry_aura.environment(entry_attacker)),
+          "0x25 is effective at command entry through an adjacent aura")
+    entry_result = entry_aura.run()
+    check(not any(m.ability == 0x25
+                  for m in entry_aura.environment(entry_attacker)),
+          "the entry aura is no longer effective after automatic approach")
+    check(entry_result["final"]["target"]["life"]
+          == charged["final"]["target"]["life"],
+          "entry-only 0x25 still supplies charge before movement",
+          "%d vs charged control %d" % (
+              entry_result["final"]["target"]["life"],
+              charged["final"]["target"]["life"]))
+
+    exit_aura_spec = with_charge_aura(profile_combat_spec(
+        attacker_at=(0, 0), target_at=(4, 0), charge_modifier=False), (3, 1))
+    exit_aura = scenario.Scenario(
+        json.loads(json.dumps(exit_aura_spec)), rng=Rng(123))
+    exit_attacker = exit_aura.units["attacker"]
+    check(not any(m.ability == 0x25
+                  for m in exit_aura.environment(exit_attacker)),
+          "0x25 is absent at command entry in the inverse aura vector")
+    exit_result = exit_aura.run()
+    check(any(m.ability == 0x25 for m in exit_aura.environment(exit_attacker)),
+          "0x25 becomes effective only after automatic approach")
+    check(exit_result["final"]["target"]["life"]
+          == plain["final"]["target"]["life"],
+          "post-approach-only 0x25 cannot retroactively supply charge",
+          "%d vs plain control %d" % (
+              exit_result["final"]["target"]["life"],
+              plain["final"]["target"]["life"]))
+
+    prior = profile_combat_spec(attacker_at=(1, 0), target_at=(4, 0))
+    prior["commands"] = [
+        {"op": "move", "unit": "attacker", "to": [0, 0]},
+        {"op": "move", "unit": "attacker", "to": [1, 0]},
+        {"op": "attack", "unit": "attacker", "target": "target"},
+    ]
+    prior_result = run_profile_combat(prior)
+    same_entry = run_profile_combat(
+        profile_combat_spec(attacker_at=(1, 0), target_at=(4, 0)))
+    check(prior_result["final"]["attacker"]["steps_this_round"]
+          > same_entry["final"]["attacker"]["steps_this_round"],
+          "move-away-and-back accumulates diagnostic path steps")
+    check(prior_result["final"]["target"]["life"]
+          == same_entry["final"]["target"]["life"],
+          "but prior path length does not accumulate Genesis charge")
+
+    split = profile_combat_spec(attacker_at=(0, 0), target_at=(5, 0))
+    split["commands"] = [
+        {"op": "move", "unit": "attacker", "to": [1, 0]},
+        {"op": "extra_turn", "unit": "attacker"},
+        {"op": "attack", "unit": "attacker", "target": "target"},
+    ]
+    split_result = run_profile_combat(split)
+    split_control = run_profile_combat(
+        profile_combat_spec(attacker_at=(1, 0), target_at=(5, 0)))
+    check(split_result["final"]["attacker"]["steps_this_round"]
+          > split_control["final"]["attacker"]["steps_this_round"],
+          "split activation preserves diagnostic prior movement")
+    check(split_result["final"]["target"]["life"]
+          == split_control["final"]["target"]["life"],
+          "split activation recomputes charge from its command-entry tile")
+
+    native = profile_combat_spec(
+        profile="native", attacker_at=(0, 0), target_at=(4, 0))
+    native_result = run_profile_combat(native)
+    check(native_result["final"]["target"]["life"]
+          == plain["final"]["target"]["life"],
+          "the native counterpart receives no charge")
+
+
+def test_genesis_r8_live_capacity_integration() -> None:
+    print("\n[R8] Genesis live-capacity attack stamina")
+    spec = profile_combat_spec(
+        attacker_at=(0, 0), target_at=(4, 0), charge_modifier=False)
+    attacker = spec["sides"][0]["units"][0]
+    attacker.update({"speed": 4, "stamina": 5, "stamina_base": 5})
+    spec["battlefield"]["tiles"] = [
+        {"col": 1, "row": 0, "stam_cost": 2}]
+    spec["commands"] = [
+        {"op": "move", "unit": "attacker", "to": [1, 0]},
+        {"op": "shoot", "unit": "attacker", "target": "target"},
+    ]
+    result = run_profile_combat(spec)
+    final = result["final"]["attacker"]
+    check(final["steps_this_round"] == 1,
+          "the R8 vector has movement history")
+    check(final["movement_remaining"] == 3,
+          "movement leaves capacity equal to stamina-reduced effective speed")
+    check(final["stamina"] == 2,
+          "strict live-capacity comparison charges 1, not history-based 2",
+          "final stamina %d (history rule would leave 1)" % final["stamina"])
+
+    restored = profile_combat_spec(
+        attacker_at=(0, 0), target_at=(4, 0), charge_modifier=False)
+    restored_attacker = restored["sides"][0]["units"][0]
+    restored_attacker.update({"speed": 4, "stamina": 10,
+                              "stamina_base": 10})
+    restored["commands"] = [
+        {"op": "move", "unit": "attacker", "to": [1, 0]},
+        {"op": "extra_turn", "unit": "attacker"},
+        {"op": "shoot", "unit": "attacker", "target": "target"},
+    ]
+    restored_result = run_profile_combat(restored)["final"]["attacker"]
+    check(restored_result["steps_this_round"] == 1
+          and restored_result["movement_remaining"] == 4,
+          "existing extra-turn helper expresses restored live capacity")
+    check(restored_result["stamina"] == 9,
+          "restored capacity costs 1 despite nonzero movement history")
 
 
 def test_terrain_matters() -> None:
@@ -369,6 +579,8 @@ if __name__ == "__main__":
     test_determinism()
     test_chain()
     test_steps_feed_stamina()
+    test_genesis_command_entry_charge()
+    test_genesis_r8_live_capacity_integration()
     test_terrain_matters()
     test_phase_passing()
     test_illegal_commands()

@@ -56,13 +56,17 @@ def test_the_seam_is_selected_by_the_spec() -> None:
     check(legacy.profile == "genesis" and isinstance(legacy.rng, LegacyRng),
           '"profile": "genesis" selects LegacyRng', type(legacy.rng).__name__)
 
-    # The only ordinary test of the phase-1 migration alias.
     migration = spec()
     migration.pop("profile", None)
     migration["rng"] = "legacy"
-    alias = scenario.Scenario(migration)
-    check(alias.profile == "genesis" and isinstance(alias.rng, LegacyRng),
-          'omitted profile plus "rng": "legacy" maps to genesis')
+    try:
+        scenario.Scenario(migration)
+    except ValueError as exc:
+        check("rng" in str(exc) and "removed" in str(exc),
+              'serialized "rng" selector is rejected with migration guidance',
+              str(exc))
+    else:
+        check(False, 'serialized "rng" selector is rejected with migration guidance')
 
     injected = LegacyRng(12345)
     direct = scenario.Scenario(spec(profile="genesis"), rng=injected)

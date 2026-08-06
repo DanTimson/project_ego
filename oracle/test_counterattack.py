@@ -162,6 +162,63 @@ def test_ranged_is_free() -> None:
     check(len(ex.order) == 1, "one blow only", str(ex.order))
 
 
+def test_primary_melee_charge_consumption() -> None:
+    print("\n[8] command-entry charge is flat post-defence melee damage")
+
+    # Defence drives ordinary damage to zero. A pre-randomisation, pre-defence,
+    # conditional-power, or multiplier-stage insertion is absorbed here; only
+    # the required post-defence insertion inflicts all six charge damage.
+    ordinary = ca.resolve(
+        unit("a", attack=3),
+        unit("d", counter_attack=0, defence=20, life=30), Rng(1))
+    charged_defender = unit("d", counter_attack=0, defence=20, life=30)
+    charged = ca.resolve(unit("a", attack=3), charged_defender, Rng(1),
+                         primary_melee_charge=6)
+    check(ordinary.attack_damage == 0,
+          "the distinguishing vector resolves ordinary damage to zero",
+          str(ordinary.attack_damage))
+    check(charged.attack_damage == ordinary.attack_damage + 6,
+          "defence does not absorb flat post-defence charge",
+          "%d = %d + 6" % (charged.attack_damage, ordinary.attack_damage))
+
+    # The current-life cap applies to the sum, and the exact capped number is
+    # what the existing exchange accumulator/order path publishes and subtracts.
+    capped_defender = unit("d", counter_attack=0, defence=0, life=5)
+    capped = ca.resolve(unit("a", attack=3), capped_defender, Rng(1),
+                        primary_melee_charge=6)
+    check(capped.attack_damage == 5 and capped.order[0] == ("attack", 5),
+          "combined capped damage reaches accounting and attack consumers",
+          "accumulator %d, order %s" % (capped.attack_damage, capped.order))
+    check(capped_defender.life == 0 and capped.defender_died,
+          "life subtraction consumes the same combined capped damage")
+
+    # Adding post-resolution charge neither consumes RNG nor changes the
+    # retaliation resolver. Compare the same ordinary exchange with and without
+    # a nonlethal charge contribution.
+    plain_exchange = ca.resolve(
+        unit("a", attack=3, life=50),
+        unit("d", counter_attack=7, defence=0, life=50), Rng(7))
+    charged_exchange = ca.resolve(
+        unit("a", attack=3, life=50),
+        unit("d", counter_attack=7, defence=0, life=50), Rng(7),
+        primary_melee_charge=2)
+    check(charged_exchange.counter_damage == plain_exchange.counter_damage,
+          "retaliation remains charge-free and RNG-identical",
+          "%d vs %d" % (charged_exchange.counter_damage,
+                         plain_exchange.counter_damage))
+
+    ranged_plain = ca.resolve(
+        unit("a", ranged_attack=3),
+        unit("d", counter_attack=0, ranged_defence=0, life=30), Rng(9),
+        kind=AttackKind.RANGED)
+    ranged_with_charge = ca.resolve(
+        unit("a", ranged_attack=3),
+        unit("d", counter_attack=0, ranged_defence=0, life=30), Rng(9),
+        kind=AttackKind.RANGED, primary_melee_charge=20)
+    check(ranged_with_charge.attack_damage == ranged_plain.attack_damage,
+          "ranged attacks ignore the primary-melee charge parameter")
+
+
 def test_morale_share() -> None:
     print("\n[8] a kill by counterattack is worth half the morale")
     check(ca.morale_kill_share(AttackKind.MELEE) == 1.0, "melee kill: full")
@@ -197,6 +254,7 @@ if __name__ == "__main__":
     test_dead_defender_does_not_answer()
     test_counter_uses_its_own_stat()
     test_ranged_is_free()
+    test_primary_melee_charge_consumption()
     test_morale_share()
     test_rider_suppression()
     test_determinism()

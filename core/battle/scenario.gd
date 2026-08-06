@@ -13,15 +13,16 @@ extends RefCounted
 ## about when stamina is charged, can still land the same unit on the same hex
 ## with the same HP. The log catches the divergence at the step where it happens.
 ##
-## THIS IS THE INTEGRATION POINT. Pathfinding feeds steps_this_round, which sets
-## the stamina charge, which feeds StaminaMod, which scales the attack, which the
-## RNG rolls, which the defence reduces. A scenario that reproduces exactly is
-## evidence the whole chain agrees.
+## THIS IS THE INTEGRATION POINT. Pathfinding updates live capacity and
+## command-entry coordinates; the composed profile rule resolves primary-melee
+## charge; stamina scales the ordinary attack; the RNG rolls it; defence reduces
+## it; then charge is added. Reproduction is evidence the whole chain agrees.
 
 const PROFILE_GENESIS := "genesis"
 const PROFILE_NEW_HORIZONS := "new_horizons"
 const PROFILE_NATIVE := "native"
-const PROFILE_CONFLICT := "scenario configuration cannot specify both \"profile\" and legacy \"rng\""
+const PROFILE_REQUIRED := "scenario configuration requires explicit \"profile\"; the omitted-profile native fallback was removed"
+const RNG_REMOVED := "scenario configuration key \"rng\" was removed; use explicit \"profile\" (\"genesis\" for LegacyRng or \"native\" for named streams)"
 const NEW_HORIZONS_INCOMPLETE := "scenario profile \"new_horizons\" is incomplete: minimum rules assignment is not defined"
 
 var spec: Dictionary = {}
@@ -34,6 +35,9 @@ var log: Array[String] = []
 var catalogue: Dictionary = {}
 
 var rng: Variant
+## Profile-composed primary-melee charge. Ordinary damage rules never receive
+## it and never branch on profile identity.
+var _attack_command_charge: Callable
 var field: Battlefield
 var units: Dictionary = {}          ## name -> Combatant
 var state: RoundLoop.BattleState
@@ -43,35 +47,23 @@ var auras_by_source: Dictionary = {}
 
 
 static func profile_configuration(p_spec: Dictionary) -> Dictionary:
-	# This no-key branch is the complete phase-1 fallback. Phase 2 can remove it
-	# without touching profile selection or combat rules.
-	var has_profile := p_spec.has("profile")
-	var has_rng := p_spec.has("rng")
-	if has_profile and has_rng:
-		return {"profile": "", "error": PROFILE_CONFLICT}
+	# Serialized configuration is strict. The constructor's injected_rng
+	# argument remains a separate dependency-injection seam for tests.
+	if p_spec.has("rng"):
+		return {"profile": "", "error": RNG_REMOVED}
+	if not p_spec.has("profile"):
+		return {"profile": "", "error": PROFILE_REQUIRED}
 
-	var normalized := ""
-	if has_profile:
-		normalized = String(p_spec["profile"]).strip_edges().to_lower()
-		if normalized != PROFILE_GENESIS \
-				and normalized != PROFILE_NEW_HORIZONS \
-				and normalized != PROFILE_NATIVE:
-			var unknown_profile := 'unknown scenario profile "%s"' % normalized
-			return {"profile": "", "error": unknown_profile}
-	elif has_rng:
-		var legacy_selector := String(p_spec["rng"]).strip_edges().to_lower()
-		if legacy_selector != "legacy":
-			var unknown_rng := 'unknown legacy rng selector "%s"; only "legacy" is supported during migration' % legacy_selector
-			return {"profile": "", "error": unknown_rng}
-		normalized = PROFILE_GENESIS
-	else:
-		# Phase 1 only: old scenarios without either selector remain native.
-		normalized = PROFILE_NATIVE
+	var normalized := String(p_spec["profile"]).strip_edges().to_lower()
+	if normalized != PROFILE_GENESIS \
+			and normalized != PROFILE_NEW_HORIZONS \
+			and normalized != PROFILE_NATIVE:
+		var unknown_profile := 'unknown scenario profile "%s"' % normalized
+		return {"profile": "", "error": unknown_profile}
 
 	if normalized == PROFILE_NEW_HORIZONS:
 		return {"profile": normalized, "error": NEW_HORIZONS_INCOMPLETE}
 	return {"profile": normalized, "error": ""}
-
 
 func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
 	spec = p_spec
@@ -106,6 +98,13 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
 		rng = LegacyRng.new(seed_value)
 	else:
 		rng = Rng.new(seed_value)
+	# Resolve the charge policy once at the same composition seam as RNG. Native
+	# injects no R3 consumer so established zero-charge/overkill behaviour remains
+	# untouched; New Horizons was rejected before construction reached this point.
+	if profile == PROFILE_GENESIS:
+		_attack_command_charge = Callable(self, "_genesis_attack_command_charge")
+	else:
+		_attack_command_charge = Callable(self, "_no_attack_command_charge")
 	field = _build_field(spec.get("battlefield", {}))
 	state = RoundLoop.BattleState.new()
 	state.sides = _build_sides(spec.get("sides", []))
@@ -290,6 +289,24 @@ func _path_stamina(path: Array) -> int:
 	return c
 
 
+# -- profile-composed primary-melee charge -----------------------------------
+
+func _no_attack_command_charge(_unit: Combatant, _attacker_xy: Vector2i,
+		_target_xy: Vector2i, _movement_requested: bool) -> Variant:
+	return null
+
+
+func _genesis_attack_command_charge(unit: Combatant, attacker_xy: Vector2i,
+		target_xy: Vector2i, movement_requested: bool) -> int:
+	# 0x25 is the accepted Genesis evidence identity. Query it at the battle
+	# seam rather than teaching Damage about a profile or pack opcode.
+	for modifier in Damage.effective_modifiers(unit):
+		if (modifier as Modifier).ability == 0x25:
+			return Charge.command_entry_charge(
+				attacker_xy, target_xy, movement_requested)
+	return 0
+
+
 # -- commands ----------------------------------------------------------------
 
 func cmd_move(unit: Combatant, col: int, row: int) -> void:
@@ -354,8 +371,9 @@ func _fell(unit: Combatant) -> void:
 ## the blow that caused it, so a defender can kill an attacker before the attack
 ## lands.
 func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
-		action: Variant = null) -> void:
-	var ex := Counterattack.resolve(unit, target, rng, kind, action)
+		action: Variant = null, primary_melee_charge: Variant = null) -> void:
+	var ex := Counterattack.resolve(
+		unit, target, rng, kind, action, primary_melee_charge)
 	ActionPoints.spend_attack(unit)
 
 	for entry in ex.order:
@@ -385,10 +403,21 @@ func cmd_attack(unit: Combatant, target: Combatant) -> void:
 	if unit.action_spent:
 		emit("%s has already acted" % unit.label())
 		return
+	# Resolve both R3 applicability and distance before automatic approach
+	# mutates battlefield occupancy or the environment-derived modifier set.
+	var attacker_entry_h := field.find_unit(unit)
+	var target_entry_h := field.find_unit(target)
+	var attacker_entry := Battlefield.axial_to_offset(attacker_entry_h)
+	var target_entry := Battlefield.axial_to_offset(target_entry_h)
+	var movement_requested := Battlefield.distance(
+		attacker_entry_h, target_entry_h) != 1
+	var primary_melee_charge: Variant = _attack_command_charge.call(
+		unit, attacker_entry, target_entry, movement_requested)
 	if not _approach(unit, target):
 		emit("%s cannot reach %s" % [unit.label(), target.label()])
 		return
-	_strike(unit, target, Combatant.AttackKind.MELEE)
+	_strike(unit, target, Combatant.AttackKind.MELEE, null,
+		primary_melee_charge)
 
 
 func cmd_shoot(unit: Combatant, target: Combatant) -> void:

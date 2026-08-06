@@ -5,8 +5,8 @@ Two properties matter more than the rest:
 
   * DETERMINISM. Pathfinding ties are broken by insertion order, not by heap
     accident, so equal-cost routes resolve identically every run. A path that
-    flips between runs desynchronises steps_this_round, and with it charge
-    distance and the stamina -2/-1 discriminator.
+    flips between runs desynchronises path traces, remaining capacity and the
+    command-entry tile used by later attacks.
   * BOUNDS. Width and height are parameters. Nothing may assume the original's
     field size, because mods will change it.
 
