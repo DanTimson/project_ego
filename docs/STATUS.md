@@ -58,9 +58,9 @@ will be created only at the community-release gate defined in
 
 Work is divided among human decision ownership, binary/governance authority,
 engine semantic authority and bounded Codex execution. `CODEX_WORK_QUEUE.md`
-opens seven non-semantic repository-conformance tasks; CX-001 is accepted,
-CX-002 through CX-004 are ready, and aggregate preflight, export and CI work
-remain dependency-blocked.
+records CX-001 through CX-004 as reviewed and accepted. CX-005 remains blocked
+pending an explicit task-local activation; the exporter and CI tasks remain
+dependency-blocked.
 
 R12/R13 controlled-observation preflight is ready. One NH battle can use level-zero Harpy `/31`, Wind Seeker `/122` and Warlord `/111` to distinguish return-anchor lifetime, reselection timing and granted-turn start-effect firing without a new binary packet.
 

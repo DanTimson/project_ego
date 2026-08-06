@@ -33,11 +33,13 @@ Task contracts live in `docs/codex/tasks/`.
 
 ## Assignment rule
 
-CX-001 is accepted. CX-002 through CX-004 may proceed in parallel only when
-each receives a separate worktree or branch and returns an independent patch.
+CX-001 through CX-004 are accepted and complete. Their task-local review
+records identify the accepted files, commands, results and remaining findings.
 
-Do not combine the first four tasks into one broad “implement the governance
-tooling” prompt. Separate contracts keep review and rollback cheap.
+CX-005 remains `BLOCKED` in this reconciliation. Its declared dependencies are
+now reviewed, but activating it also requires changing its own task-local state;
+`docs/codex/tasks/CX-005.md` is deliberately outside this patch's allowed paths.
+CX-006 and CX-007 therefore remain blocked as well.
 
 ## Engine-directed Codex work
 
