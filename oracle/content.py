@@ -23,11 +23,89 @@ says so, rather than either crashing or pretending.
 
 from __future__ import annotations
 
+import copy
+import hashlib
 import json
 import os
 
 import identity
 from dataclasses import dataclass, field
+
+
+def _canonical_json_value(value):
+    """Normalize JSON values shared with Godot before hashing.
+
+    Godot's JSON parser represents every number as a float, while Python keeps
+    integral JSON numbers as ``int``.  Treat mathematically integral floats as
+    integers so both loaders fingerprint the same serialized pack snapshot.
+    """
+    if isinstance(value, dict):
+        return {str(key): _canonical_json_value(item)
+                for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_canonical_json_value(item) for item in value]
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return value
+
+
+def canonical_fingerprint(value) -> str:
+    """Return a deterministic identity for JSON-compatible content.
+
+    The digest identifies a local snapshot only.  It does not establish legal
+    transferability or rules compatibility.
+    """
+    payload = json.dumps(_canonical_json_value(value), ensure_ascii=False,
+                         sort_keys=True, separators=(",", ":"), allow_nan=False)
+    return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+class ScenarioContentProvider:
+    """Small in-memory provider for portable synthetic tests and callers.
+
+    ``ContentDb`` implements the same two-method seam for locally loaded packs;
+    this container is not a second pack parser or registry.  A caller-supplied
+    fingerprint is an assertion, never a substitute for observing the current
+    canonical snapshot.
+    """
+
+    def __init__(self, pack: str, definitions: dict, *, version: str = "",
+                 build: str = "", fingerprint: str = ""):
+        self.pack_id = str(pack)
+        self.version = str(version)
+        self.build = str(build)
+        self._definitions = copy.deepcopy(definitions)
+        self.asserted_fingerprint = str(fingerprint)
+
+    def snapshot_payload(self) -> dict:
+        return {
+            "pack": self.pack_id,
+            "version": self.version,
+            "build": self.build,
+            "definitions": self._definitions,
+        }
+
+    @property
+    def fingerprint(self) -> str:
+        return canonical_fingerprint(self.snapshot_payload())
+
+    def content_provenance(self) -> dict:
+        observed = self.fingerprint
+        if (self.asserted_fingerprint
+                and self.asserted_fingerprint != observed):
+            raise ValueError(
+                "content fingerprint assertion mismatch: expected %r, observed %r"
+                % (self.asserted_fingerprint, observed))
+        out = {"pack": self.pack_id, "fingerprint": observed}
+        if self.version:
+            out["version"] = self.version
+        if self.build:
+            out["build"] = self.build
+        return out
+
+    def resolve_definition(self, content_id: str):
+        definition = self._definitions.get(content_id)
+        return copy.deepcopy(definition) if definition is not None else None
 
 
 class AbilityRegistry:
@@ -122,6 +200,12 @@ class ContentPack:
         self.bindings: dict = {}      # opcode -> Binding
         self.tables: dict = {}        # table name -> {index: record}
         self.loaded_from: str = ""
+        # Optional source metadata carried by a local pack manifest.  A missing
+        # version/build is not guessed; the deterministic snapshot fingerprint
+        # remains available as the reproducibility discriminator.
+        self.version: str = ""
+        self.build: str = ""
+        self.declared_fingerprint: str = ""
 
     # -- loading ------------------------------------------------------------
 
@@ -139,6 +223,9 @@ class ContentPack:
         if payload.get("pack") != self.id:
             errors.append("bindings declare pack %r, loaded as %r"
                           % (payload.get("pack"), self.id))
+        self.version = str(payload.get("version", "") or "")
+        self.build = str(payload.get("build", "") or "")
+        self.declared_fingerprint = str(payload.get("fingerprint", "") or "")
 
         for key, entry in (payload.get("abilities") or {}).items():
             try:
@@ -186,6 +273,39 @@ class ContentPack:
         rep.orphaned = sorted(registry.names() - used_handlers)
         return rep
 
+    def snapshot_payload(self) -> dict:
+        """Canonical, machine-independent inputs to the local snapshot hash."""
+        bindings = {}
+        for opcode, binding in self.bindings.items():
+            bindings[str(opcode)] = {
+                "name": binding.name,
+                "hook": binding.hook,
+                "handler": binding.handler,
+                "params": binding.params,
+                "uses": binding.uses,
+            }
+        return {
+            "pack": self.id,
+            "version": self.version,
+            "build": self.build,
+            "bindings": bindings,
+            "tables": self.tables,
+        }
+
+    def provenance(self) -> dict:
+        observed = canonical_fingerprint(self.snapshot_payload())
+        if (self.declared_fingerprint
+                and self.declared_fingerprint != observed):
+            raise ValueError(
+                "content pack fingerprint assertion mismatch: expected %r, observed %r"
+                % (self.declared_fingerprint, observed))
+        out = {"pack": self.id, "fingerprint": observed}
+        if self.version:
+            out["version"] = self.version
+        if self.build:
+            out["build"] = self.build
+        return out
+
     # -- lookup -------------------------------------------------------------
 
     def binding(self, opcode: int) -> Binding | None:
@@ -225,3 +345,60 @@ class ContentDb:
         if b is None or not b.is_bound or not self.registry.has(b.handler):
             return None, {}
         return b.handler, b.params
+
+    # Scenario composition seam.  Keeping this on the constructed ContentDb
+    # reuses the existing pack/roster loader instead of creating a parallel pack
+    # model for scenarios.
+    def content_provenance(self) -> dict:
+        return self.pack.provenance()
+
+    def resolve_definition(self, content_id: str):
+        """Return one fresh, normalized scenario construction record.
+
+        Local `.var` records are normalized by the existing Roster.  The
+        temporary roster result is copied into plain data before Scenario owns
+        or mutates it, and an incomplete definition is rejected rather than
+        silently dropping unresolved abilities.
+        """
+        from roster import Roster
+
+        built = Roster(self).build(content_id)
+        if built is None:
+            return None
+        if not built.complete:
+            reasons = "; ".join(str(item) for item in built.unresolved[:3])
+            raise ValueError("canonical definition %r is incomplete: %s"
+                             % (content_id, reasons))
+        unit = built.unit
+        record = {
+            "name": unit.name,
+            "attack": unit.attack,
+            "counter_attack": unit.counter_attack,
+            "ranged_attack": unit.ranged_attack,
+            "shooting_range": unit.shooting_range,
+            "defence": unit.defence,
+            "ranged_defence": unit.ranged_defence,
+            "resist": unit.resist,
+            "life": unit.life,
+            "life_base": unit.life_base,
+            "stamina": unit.stamina,
+            "stamina_base": unit.stamina_base,
+            "morale": unit.morale,
+            "morale_base": unit.morale_base,
+            "speed": unit.speed,
+            "ammo": unit.ammo,
+            "attack_bonus": unit.attack_bonus,
+            "defence_bonus": unit.defence_bonus,
+            "conditional_bonus": unit.conditional_bonus,
+            "flags": sorted(unit.flags),
+            "subtypes": sorted(unit.subtypes),
+            "modifiers": [{
+                "ability": modifier.ability,
+                "handler": modifier.handler,
+                "hook": modifier.hook.name,
+                "power": modifier.power,
+                "params": copy.deepcopy(modifier.params),
+                "source": modifier.source,
+            } for modifier in unit.modifiers],
+        }
+        return copy.deepcopy(record)

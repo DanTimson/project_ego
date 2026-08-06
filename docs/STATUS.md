@@ -20,8 +20,8 @@ This is a coverage map, not a release claim.
 | damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
 | battle actions and target legality | public/data descriptions + selective binary evidence | partial | content model only | R16 whole-dispatcher reconstruction retired; observable action-semantics coverage matrix required |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
-| scenario format and traces | Project EGO design | implemented | implemented | usable |
-| content packs and bindings | data analysis | implemented | canonical IDs implemented | content-ID propagation and battle-instance identity remain incomplete |
+| scenario format and traces | Project EGO design | inline and canonical-definition units implemented | inline and canonical-definition units implemented | portable synthetic parity fixture covers provenance, merge and identity |
+| content packs and bindings | data analysis | implemented; `ContentDb` is a scenario provider | implemented; `ContentDb` is a scenario provider | canonical content ID, battle-instance ID and display name remain separate; actual content requires a verified local pack snapshot |
 | `.var` lexical parser | binary | tools exist | n/a | record schemas incomplete |
 | unit upkeep/recruitment | binary | not normalized | not implemented | evidence available |
 | province income/economy | binary | not normalized | not implemented | evidence available |
@@ -33,6 +33,20 @@ This is a coverage map, not a release claim.
 The repository can already express deterministic combat scenarios and compare
 Python/GDScript rule paths. It does **not** yet reproduce a complete original
 battle end to end.
+
+Content-backed scenarios now verify an explicit pack plus version/build and/or
+observed canonical fingerprint before resolving canonical unit definitions.
+Providers always recompute SHA-256 provenance from their current canonical
+metadata/content snapshot; supplied or declared fingerprints are assertions and
+stale assertions fail. Resolution reuses the injected `ContentDb`/roster path,
+explicit overrides are closed and deep-copied, and inline scenarios remain
+pack-free. Canonical `def` and scenario `id` exclusively own content and instance
+identity; inline input cannot serialize either runtime identity field. The
+default corpus uses only project-authored synthetic content; the separately
+named `requires-pack` tests skip when local `packs/<id>/data` is unavailable.
+Canonical scenarios are not pack-independent: callers must supply the declared
+compatible snapshot, and a fingerprint identifies that snapshot without
+asserting legal transferability or rules compatibility.
 
 The most consequential blockers are:
 

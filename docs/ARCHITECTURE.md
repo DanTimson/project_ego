@@ -152,6 +152,55 @@ numeric opcode → pack binding → stable handler name → implementation
 A missing binding or handler must be reported explicitly. It must not fall
 through to a plausible default.
 
+## Scenario profiles and content dependencies
+
+Rules-profile identity and content-pack identity are orthogonal. A scenario
+selects exactly one `profile` (`native` or a supported compatibility profile),
+while an optional scenario-level `content` declaration selects and verifies a
+pack snapshot. A canonical scenario uses:
+
+```json
+{"content":{"pack":"genesis","version":"...","fingerprint":"sha256:..."}}
+```
+
+`pack` is required, as is at least one of `version`, `build` or `fingerprint`;
+every supplied discriminator is checked. Selecting `genesis` rules does not
+select Genesis content, and `native` rules may consume any compatible injected
+pack.
+
+Inline scenario units remain complete portable snapshots and do not consult
+content. A canonical unit instead has the closed envelope:
+
+```json
+{"id":"attacker-1","def":"genesis:unit/5","at":[0,0],
+ "overrides":{"stamina":4}}
+```
+
+`def` is content-definition identity, `id` is battle-instance identity, `at` is
+battle placement, and `name` in the resolved definition is presentation. The
+composition-root `Scenario` receives a small content provider. It verifies the
+scenario's declared pack plus every supplied version, build and/or `sha256:`
+fingerprint, resolves definitions before constructing combatants, deep-copies
+the definition, applies explicit overrides, and finally applies scenario-owned
+identity and placement. `ContentDb` implements this seam through the existing
+pack and roster loader; rule code never loads a pack or branches on pack ID.
+
+A fingerprint identifies the exact local metadata/content snapshot used. Each
+provider computes it from canonical JSON with SHA-256 when provenance is
+requested; a fingerprint declared by pack metadata or supplied to a synthetic
+provider is only an assertion, is rejected if stale, and is never returned in
+place of the observed digest. The snapshot excludes paths, timestamps,
+enumeration order and machine state. It does not establish legal transferability
+or semantic compatibility. Portable synthetic scenario fixtures run on a fresh
+clone. Actual locally extracted pack checks are isolated in the `requires-pack`
+tier and skip clearly when `packs/<id>/data` is absent.
+
+Serialized identity has one owner per field: canonical `def` supplies
+`Combatant.content_id`, while scenario `id` supplies
+`Combatant.instance_id`. Inline units cannot serialize either runtime field;
+they remain pack-free, receive an empty `content_id`, and take instance identity
+from `id` (or the established display-name fallback when `id` is absent).
+
 ## Resolution pipeline
 
 Modifiers are not actions.

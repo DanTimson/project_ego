@@ -36,3 +36,57 @@ func resolve(opcode: int) -> Array:
 	if b == null or not b.is_bound() or not registry.has(b.handler):
 		return [&"", {}]
 	return [b.handler, b.params]
+
+
+## Scenario composition seam.  This adapts the existing pack and roster loader;
+## rules never load or branch on pack identity.
+func content_provenance() -> Dictionary:
+	return pack.provenance()
+
+
+func resolve_definition(content_id: String) -> Variant:
+	var built: Roster.Built = Roster.new(self).build(content_id)
+	if built == null:
+		return null
+	if not built.complete():
+		var reasons: PackedStringArray = []
+		for unresolved in built.unresolved.slice(0, 3):
+			reasons.append(str(unresolved))
+		push_error("canonical definition '%s' is incomplete: %s"
+			% [content_id, "; ".join(reasons)])
+		return null
+	var unit := built.unit
+	var modifiers: Array = []
+	for modifier in unit.modifiers:
+		modifiers.append({
+			"ability": modifier.ability,
+			"handler": String(modifier.handler),
+			"hook": Modifier.Hook.keys()[modifier.hook],
+			"power": modifier.power,
+			"params": modifier.params.duplicate(true),
+			"source": modifier.source,
+		})
+	return {
+		"name": unit.name,
+		"attack": unit.attack,
+		"counter_attack": unit.counter_attack,
+		"ranged_attack": unit.ranged_attack,
+		"shooting_range": unit.shooting_range,
+		"defence": unit.defence,
+		"ranged_defence": unit.ranged_defence,
+		"resist": unit.resist,
+		"life": unit.life,
+		"life_base": unit.life_base,
+		"stamina": unit.stamina,
+		"stamina_base": unit.stamina_base,
+		"morale": unit.morale,
+		"morale_base": unit.morale_base,
+		"speed": unit.speed,
+		"ammo": unit.ammo,
+		"attack_bonus": unit.attack_bonus,
+		"defence_bonus": unit.defence_bonus,
+		"conditional_bonus": unit.conditional_bonus,
+		"flags": unit.flags.keys(),
+		"subtypes": unit.subtypes.keys(),
+		"modifiers": modifiers,
+	}.duplicate(true)

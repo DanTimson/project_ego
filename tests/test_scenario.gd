@@ -105,6 +105,21 @@ func _test_genesis_command_entry_charge() -> void:
 			== no_move_plain["final"]["target"]["life"],
 		"a no-movement attack receives zero charge")
 
+	# A resolved Genesis value of zero still selects the combined-damage/current-
+	# life-cap path. Native supplies null and preserves ordinary accounting.
+	var genesis_cap := _profile_combat_spec(
+		"genesis", Vector2i(3, 0), Vector2i(4, 0), true)
+	genesis_cap["sides"][1]["units"][0]["life"] = 3
+	var native_uncapped := _profile_combat_spec(
+		"native", Vector2i(3, 0), Vector2i(4, 0), true)
+	native_uncapped["sides"][1]["units"][0]["life"] = 3
+	var genesis_cap_result := _run_profile_combat(genesis_cap)
+	var native_uncapped_result := _run_profile_combat(native_uncapped)
+	_check("hits target for 3" in "\n".join(genesis_cap_result["log"]),
+		"resolved zero charge still uses Genesis combined/current-life cap")
+	_check("hits target for 9" in "\n".join(native_uncapped_result["log"]),
+		"native zero-charge absence retains ordinary uncapped accounting")
+
 	var ordinary := _profile_combat_spec(
 		"genesis", Vector2i(0, 0), Vector2i(4, 0), true)
 	var ordinary_plain := _profile_combat_spec(

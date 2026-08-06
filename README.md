@@ -93,6 +93,18 @@ godot --headless --script tests/test_damage.gd
 
 Each `tests/test_*.gd` file is an independently runnable `SceneTree` test.
 
+Portable scenario/content tests use only synthetic committed fixtures and run on
+a fresh clone. The actual local-content tier uses the existing
+`packs/<id>/data` convention and skips clearly when extracted tables are absent:
+
+```sh
+python3 -m pytest -q -m requires_pack
+godot --headless --script tests/test_scenario_requires_pack.gd
+```
+
+Generate local tables with the existing pack builder; original content remains
+untracked and is never copied into scenario fixtures.
+
 ## Data and compatibility policy
 
 Project EGO does not redistribute original game assets or `.var` content.

@@ -72,6 +72,9 @@ var id: String = ""
 var bindings: Dictionary = {}    # opcode:int -> Binding
 var tables: Dictionary = {}      # table name -> {index:int -> record}
 var loaded_from: String = ""
+var version: String = ""
+var build: String = ""
+var declared_fingerprint: String = ""
 
 
 func _init(p_id: String = "") -> void:
@@ -98,6 +101,9 @@ func load_bindings(path: String) -> Array[String]:
 	if String(payload.get("pack", "")) != id:
 		errors.append("bindings declare pack '%s', loaded as '%s'"
 			% [payload.get("pack", ""), id])
+	version = String(payload.get("version", ""))
+	build = String(payload.get("build", ""))
+	declared_fingerprint = String(payload.get("fingerprint", ""))
 
 	var abilities: Dictionary = payload.get("abilities", {})
 	for key in abilities:
@@ -159,6 +165,41 @@ func report(registry: AbilityRegistry, errors: Array = []) -> LoadReport:
 			rep.orphaned.append(String(n))
 	rep.orphaned.sort()
 	return rep
+
+
+func snapshot_payload() -> Dictionary:
+	var serialized_bindings: Dictionary = {}
+	for opcode in bindings:
+		var entry: Binding = bindings[opcode]
+		serialized_bindings[str(opcode)] = {
+			"name": entry.name,
+			"hook": entry.hook,
+			"handler": String(entry.handler),
+			"params": entry.params,
+			"uses": entry.uses,
+		}
+	return {
+		"pack": id,
+		"version": version,
+		"build": build,
+		"bindings": serialized_bindings,
+		"tables": tables,
+	}
+
+
+func provenance() -> Dictionary:
+	var observed := ScenarioContentProvider.canonical_fingerprint(snapshot_payload())
+	var out := {"pack": id, "fingerprint": observed}
+	if version != "":
+		out["version"] = version
+	if build != "":
+		out["build"] = build
+	if declared_fingerprint != "" and declared_fingerprint != observed:
+		out["error"] = (
+			"content pack fingerprint assertion mismatch: expected '%s', observed '%s'"
+			% [declared_fingerprint, observed]
+		)
+	return out
 
 
 func binding(opcode: int) -> Binding:

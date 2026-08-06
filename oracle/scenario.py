@@ -31,7 +31,9 @@ Command set, deliberately small:
 
 from __future__ import annotations
 
+import copy
 import json
+import re
 
 import battlefield as bfmod
 import auras
@@ -39,6 +41,7 @@ import charge
 import combat
 import content
 import handlers
+import identity
 import counterattack as ca
 import statuses as st
 import actions as actionsmod
@@ -65,13 +68,33 @@ _NEW_HORIZONS_INCOMPLETE = (
     'minimum rules assignment is not defined'
 )
 
+# Canonical units deliberately have a closed envelope.  Sibling fields are not
+# silently interpreted as overrides, and override keys must map to construction
+# fields rather than battle identity, placement or provenance.
+_CANONICAL_UNIT_KEYS = {"id", "def", "at", "overrides"}
+_SPECIAL_UNIT_FIELDS = {"name", "flags", "subtypes", "modifiers", "auras"}
+_SETTABLE_UNIT_FIELDS = (
+    set(Combatant.__dataclass_fields__) | _SPECIAL_UNIT_FIELDS
+) - {"instance_id", "content_id", "statuses"}
+_RESOLVED_CONTENT_ID = "__scenario_resolved_content_id"
+_SERIALIZED_IDENTITY_FIELDS = {"content_id", "instance_id", _RESOLVED_CONTENT_ID}
+_FORBIDDEN_OVERRIDE_FIELDS = {
+    "id", "def", "at", "overrides", "instance_id", "content_id",
+    _RESOLVED_CONTENT_ID,
+    "content", "pack", "version", "build", "fingerprint", "provenance",
+}
+_FINGERPRINT_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+
 
 class Scenario:
-    def __init__(self, spec: dict, rng=None):
+    def __init__(self, spec: dict, rng=None, content_provider=None):
         self.spec = spec
         self.name = spec.get("name", "unnamed")
         self.seed = int(spec.get("seed", 0))
         self.profile = self.normalize_profile(spec)
+        # Resolve and verify all canonical dependencies before constructing a
+        # battlefield or a Combatant. Inline scenarios never touch the provider.
+        self._side_specs = self.prepare_content(spec, content_provider)
         self.log: list[str] = []
         # THE randomness boundary. Rules never choose a generator and never
         # branch on profile — they receive whatever is injected here and call
@@ -103,13 +126,138 @@ class Scenario:
             self.catalogue[action.id] = action
         self.field = self._build_field(spec.get("battlefield", {}))
         self.units: dict[str, Combatant] = {}
-        self.sides = self._build_sides(spec.get("sides", []))
+        self.sides = self._build_sides(self._side_specs)
         self.state = turn.BattleState(sides=self.sides)
         ## unit -> its projected auras. Passive, so it is built once; which units
         ## an aura REACHES is recomputed on every query.
-        self.auras_by_source = self._build_auras(spec.get("sides", []))
+        self.auras_by_source = self._build_auras(self._side_specs)
 
     # -- construction -------------------------------------------------------
+
+    @staticmethod
+    def prepare_content(spec: dict, provider=None) -> list:
+        """Validate provenance and return side specs with definitions merged."""
+        sides = spec.get("sides", [])
+        references = []
+        for side in sides:
+            for unit in side.get("units", []):
+                if "def" in unit:
+                    references.append(unit)
+                    continue
+                spoofed = sorted(set(unit) & _SERIALIZED_IDENTITY_FIELDS)
+                if spoofed:
+                    raise ValueError(
+                        "inline unit %r cannot contain serialized identity fields: %s"
+                        % (unit.get("id", unit.get("name", "?")),
+                           ", ".join(spoofed)))
+        if not references:
+            return sides
+
+        declaration = spec.get("content")
+        if not isinstance(declaration, dict):
+            raise ValueError('scenario units using "def" require a scenario-level "content" object')
+        allowed_provenance = {"pack", "version", "build", "fingerprint"}
+        unknown_provenance = sorted(set(declaration) - allowed_provenance)
+        if unknown_provenance:
+            raise ValueError("unknown scenario content provenance fields: %s"
+                             % ", ".join(unknown_provenance))
+        pack = declaration.get("pack")
+        if not isinstance(pack, str) or not pack:
+            raise ValueError('scenario content provenance requires non-empty "pack"')
+        discriminators = [key for key in ("version", "build", "fingerprint")
+                          if declaration.get(key) not in (None, "")]
+        if not discriminators:
+            raise ValueError("scenario content provenance requires version, build, and/or fingerprint")
+        for key in discriminators:
+            if not isinstance(declaration[key], str):
+                raise ValueError('scenario content provenance field "%s" must be a string' % key)
+        if "fingerprint" in discriminators and not _FINGERPRINT_RE.match(declaration["fingerprint"]):
+            raise ValueError('scenario content fingerprint must use "sha256:" plus 64 lowercase hex digits')
+        if provider is None:
+            raise ValueError("scenario canonical definitions require an injected content provider")
+        provenance_fn = getattr(provider, "content_provenance", None)
+        resolve_fn = getattr(provider, "resolve_definition", None)
+        if not callable(provenance_fn) or not callable(resolve_fn):
+            raise ValueError("content provider must report provenance and resolve canonical definitions")
+        observed = provenance_fn()
+        if not isinstance(observed, dict):
+            raise ValueError("content provider returned malformed provenance")
+        if observed.get("error"):
+            raise ValueError("content provider provenance error: %s"
+                             % observed["error"])
+        for key in ("pack", *discriminators):
+            expected = str(declaration.get(key, ""))
+            actual = str(observed.get(key, ""))
+            if actual != expected:
+                raise ValueError("content provenance mismatch for %s: expected %r, observed %r"
+                                 % (key, expected, actual or "<missing>"))
+
+        prepared = copy.deepcopy(sides)
+        seen_instance_ids = set()
+        for side in prepared:
+            for index, unit in enumerate(side.get("units", [])):
+                if "def" not in unit:
+                    inline_id = str(unit.get("id") or unit.get("name", ""))
+                    if inline_id in seen_instance_ids:
+                        raise ValueError("duplicate unit instance id %r" % inline_id)
+                    seen_instance_ids.add(inline_id)
+                    continue
+                extra = sorted(set(unit) - _CANONICAL_UNIT_KEYS)
+                if extra:
+                    raise ValueError("canonical unit %r mixes undeclared inline fields: %s; use overrides"
+                                     % (unit.get("id", "?"), ", ".join(extra)))
+                instance_id = unit.get("id")
+                if not isinstance(instance_id, str) or not instance_id:
+                    raise ValueError('canonical unit requires a non-empty battle-instance "id"')
+                if instance_id in seen_instance_ids:
+                    raise ValueError("duplicate unit instance id %r" % instance_id)
+                seen_instance_ids.add(instance_id)
+                content_id = unit.get("def")
+                cid = identity.ContentId.parse(content_id) if isinstance(content_id, str) else None
+                if cid is None or cid.kind != "unit":
+                    raise ValueError("canonical unit definition id is malformed: %r" % content_id)
+                if cid.pack != pack:
+                    raise ValueError("canonical definition namespace mismatch: %r uses pack %r, scenario declares %r"
+                                     % (content_id, cid.pack, pack))
+                at = unit.get("at")
+                if not isinstance(at, list) or len(at) != 2:
+                    raise ValueError('canonical unit %r requires battle placement \"at\"' % instance_id)
+                overrides = unit.get("overrides", {})
+                if not isinstance(overrides, dict):
+                    raise ValueError("canonical unit %r overrides must be an object" % instance_id)
+                forbidden = sorted(set(overrides) & _FORBIDDEN_OVERRIDE_FIELDS)
+                if forbidden:
+                    raise ValueError("canonical unit %r overrides forbidden fields: %s"
+                                     % (instance_id, ", ".join(forbidden)))
+                unknown = sorted(set(overrides) - _SETTABLE_UNIT_FIELDS)
+                if unknown:
+                    raise ValueError("canonical unit %r overrides unknown or non-settable fields: %s"
+                                     % (instance_id, ", ".join(unknown)))
+                definition = resolve_fn(content_id)
+                if definition is None:
+                    raise ValueError("canonical definition %r was not found in content pack %r"
+                                     % (content_id, pack))
+                if not isinstance(definition, dict):
+                    raise ValueError("canonical definition %r did not resolve to an object" % content_id)
+                definition = copy.deepcopy(definition)
+                reserved = sorted(set(definition) & _FORBIDDEN_OVERRIDE_FIELDS)
+                if reserved:
+                    raise ValueError("canonical definition %r contains scenario-owned fields: %s"
+                                     % (content_id, ", ".join(reserved)))
+                unknown_definition = sorted(set(definition) - _SETTABLE_UNIT_FIELDS)
+                if unknown_definition:
+                    raise ValueError("canonical definition %r contains unknown construction fields: %s"
+                                     % (content_id, ", ".join(unknown_definition)))
+                merged = definition
+                for key, value in overrides.items():
+                    merged[key] = copy.deepcopy(value)
+                if not isinstance(merged.get("name"), str) or not merged["name"]:
+                    raise ValueError("canonical definition %r has no display name" % content_id)
+                merged["id"] = instance_id
+                merged["at"] = copy.deepcopy(at)
+                merged[_RESOLVED_CONTENT_ID] = content_id
+                side["units"][index] = merged
+        return prepared
 
     @staticmethod
     def _profile_configuration(spec: dict) -> tuple[str, str]:
@@ -184,9 +332,11 @@ class Scenario:
                 unit.instance_id = str(u.get("id") or u["name"])
                 for key, value in u.items():
                     if key in ("name", "id", "at", "flags", "subtypes",
-                               "modifiers", "auras"):
+                               "modifiers", "auras", "content_id",
+                               "instance_id", _RESOLVED_CONTENT_ID):
                         continue
                     setattr(unit, key, value)
+                unit.content_id = str(u.get(_RESOLVED_CONTENT_ID, ""))
                 unit.flags = set(u.get("flags", []))
                 for m in u.get("modifiers", []) or []:
                     unit.modifiers.append(Modifier(
@@ -224,7 +374,7 @@ class Scenario:
                 declared = u.get("auras") or []
                 if not declared:
                     continue
-                unit = self.units[u["name"]]
+                unit = self.units[str(u.get("id") or u["name"])]
                 built = []
                 for a in declared:
                     aura = auras.Aura(

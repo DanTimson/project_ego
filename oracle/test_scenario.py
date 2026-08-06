@@ -289,6 +289,22 @@ def test_genesis_command_entry_charge() -> None:
           == no_move_plain["final"]["target"]["life"],
           "a no-movement attack receives zero charge")
 
+    # Zero is still a RESOLVED Genesis charge value, not absence of the R3
+    # consumer. Its combined-damage path caps the ordinary blow to current life;
+    # native supplies None and retains its uncapped ordinary-damage accounting.
+    genesis_cap = profile_combat_spec(
+        profile="genesis", attacker_at=(3, 0), target_at=(4, 0))
+    genesis_cap["sides"][1]["units"][0]["life"] = 3
+    native_uncapped = profile_combat_spec(
+        profile="native", attacker_at=(3, 0), target_at=(4, 0))
+    native_uncapped["sides"][1]["units"][0]["life"] = 3
+    genesis_cap_result = run_profile_combat(genesis_cap)
+    native_uncapped_result = run_profile_combat(native_uncapped)
+    check("hits target for 3" in "\n".join(genesis_cap_result["log"]),
+          "resolved zero charge still uses Genesis combined/current-life cap")
+    check("hits target for 9" in "\n".join(native_uncapped_result["log"]),
+          "native zero-charge absence retains ordinary uncapped accounting")
+
     ordinary = profile_combat_spec(attacker_at=(0, 0), target_at=(4, 0))
     ordinary_plain = profile_combat_spec(
         attacker_at=(0, 0), target_at=(4, 0), charge_modifier=False)

@@ -54,11 +54,10 @@ def require(pack: str) -> None:
         return
     msg = ("packs/%s/data is missing. Generate it from a local game install:\n"
            "    python3 tools/extract/build_pack.py <path-to>/var %s" % (pack, pack))
-    try:
+    if "PYTEST_CURRENT_TEST" in os.environ:
         import pytest
-    except ImportError:
-        raise PackUnavailable(msg)
-    pytest.skip(msg)
+        pytest.skip(msg)
+    raise PackUnavailable(msg)
 
 
 def load(pack: str) -> roster.Roster:

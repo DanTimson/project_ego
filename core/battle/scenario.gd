@@ -24,12 +24,38 @@ const PROFILE_NATIVE := "native"
 const PROFILE_REQUIRED := "scenario configuration requires explicit \"profile\"; the omitted-profile native fallback was removed"
 const RNG_REMOVED := "scenario configuration key \"rng\" was removed; use explicit \"profile\" (\"genesis\" for LegacyRng or \"native\" for named streams)"
 const NEW_HORIZONS_INCOMPLETE := "scenario profile \"new_horizons\" is incomplete: minimum rules assignment is not defined"
+const CANONICAL_UNIT_KEYS := {"id": true, "def": true, "at": true, "overrides": true}
+const RESOLVED_CONTENT_ID := "__scenario_resolved_content_id"
+const SERIALIZED_IDENTITY_FIELDS := {
+	"content_id": true, "instance_id": true,
+	"__scenario_resolved_content_id": true,
+}
+const FORBIDDEN_OVERRIDE_FIELDS := {
+	"id": true, "def": true, "at": true, "overrides": true,
+	"instance_id": true, "content_id": true,
+	"__scenario_resolved_content_id": true, "content": true,
+	"pack": true, "version": true, "build": true, "fingerprint": true,
+	"provenance": true,
+}
+const SETTABLE_UNIT_FIELDS := {
+	"name": true, "attack": true, "counter_attack": true,
+	"ranged_attack": true, "shooting_range": true, "defence": true,
+	"ranged_defence": true, "resist": true, "life_base": true,
+	"life": true, "stamina_base": true, "stamina": true,
+	"morale_base": true, "morale": true, "speed": true,
+	"attack_bonus": true, "defence_bonus": true, "conditional_bonus": true,
+	"modifiers": true, "flags": true, "subtypes": true, "auras": true,
+	"ammo": true, "action_spent": true, "movement_remaining": true,
+	"forced_rest": true, "resting": true, "stamina_recovery": true,
+	"alive": true, "once_per_round": true, "steps_this_round": true,
+}
 
 var spec: Dictionary = {}
 var scenario_name: String = "unnamed"
 var seed_value: int = 0
 ## Normalized rules-profile identity selected at this composition root.
 var profile: String = ""
+var construction_error: String = ""
 var log: Array[String] = []
 ## Either Rng (named streams) or LegacyRng (Genesis compatibility).
 var catalogue: Dictionary = {}
@@ -44,6 +70,7 @@ var state: RoundLoop.BattleState
 ## unit -> its projected auras. Passive, so built once; which units an aura
 ## REACHES is recomputed on every query.
 var auras_by_source: Dictionary = {}
+var _side_specs: Array = []
 
 
 static func profile_configuration(p_spec: Dictionary) -> Dictionary:
@@ -65,7 +92,165 @@ static func profile_configuration(p_spec: Dictionary) -> Dictionary:
 		return {"profile": normalized, "error": NEW_HORIZONS_INCOMPLETE}
 	return {"profile": normalized, "error": ""}
 
-func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
+static func prepare_content(p_spec: Dictionary, provider: Variant = null) -> Dictionary:
+	var sides: Array = p_spec.get("sides", [])
+	var has_references := false
+	for side in sides:
+		for unit in side.get("units", []):
+			if unit.has("def"):
+				has_references = true
+				continue
+			for field in SERIALIZED_IDENTITY_FIELDS:
+				if unit.has(field):
+					return {"sides": [], "error":
+						"inline unit '%s' cannot contain serialized identity field: %s"
+						% [unit.get("id", unit.get("name", "?")), field]}
+	if not has_references:
+		return {"sides": sides, "error": ""}
+
+	var declaration: Variant = p_spec.get("content")
+	if typeof(declaration) != TYPE_DICTIONARY:
+		return {"sides": [],
+			"error": 'scenario units using "def" require a scenario-level "content" object'}
+	var declared: Dictionary = declaration
+	for key in declared:
+		if String(key) not in ["pack", "version", "build", "fingerprint"]:
+			return {"sides": [], "error": "unknown scenario content provenance field: %s" % key}
+	var pack_v: Variant = declared.get("pack")
+	if typeof(pack_v) != TYPE_STRING or String(pack_v) == "":
+		return {"sides": [], "error": 'scenario content provenance requires non-empty "pack"'}
+	var pack := String(pack_v)
+	var discriminators: Array[String] = []
+	for key in ["version", "build", "fingerprint"]:
+		if declared.get(key) != null and String(declared.get(key)) != "":
+			if typeof(declared[key]) != TYPE_STRING:
+				return {"sides": [], "error": 'scenario content provenance field "%s" must be a string' % key}
+			discriminators.append(key)
+	if discriminators.is_empty():
+		return {"sides": [],
+			"error": "scenario content provenance requires version, build, and/or fingerprint"}
+	if "fingerprint" in discriminators:
+		var fingerprint_re := RegEx.new()
+		fingerprint_re.compile("^sha256:[0-9a-f]{64}$")
+		if fingerprint_re.search(String(declared["fingerprint"])) == null:
+			return {"sides": [],
+				"error": 'scenario content fingerprint must use "sha256:" plus 64 lowercase hex digits'}
+	if provider == null:
+		return {"sides": [],
+			"error": "scenario canonical definitions require an injected content provider"}
+	if typeof(provider) != TYPE_OBJECT:
+		return {"sides": [], "error": "content provider must be an object"}
+	var provider_capable: bool = provider.has_method("content_provenance") \
+		and provider.has_method("resolve_definition")
+	if not provider_capable:
+		return {"sides": [],
+			"error": "content provider must report provenance and resolve canonical definitions"}
+	var observed_v: Variant = provider.call("content_provenance")
+	if typeof(observed_v) != TYPE_DICTIONARY:
+		return {"sides": [], "error": "content provider returned malformed provenance"}
+	var observed: Dictionary = observed_v
+	if String(observed.get("error", "")) != "":
+		return {"sides": [], "error": "content provider provenance error: %s"
+			% observed["error"]}
+	var verified: Array[String] = ["pack"]
+	verified.append_array(discriminators)
+	for key in verified:
+		var expected := String(declared.get(key, ""))
+		var actual := String(observed.get(key, ""))
+		if actual != expected:
+			if actual == "":
+				actual = "<missing>"
+			return {"sides": [], "error":
+				"content provenance mismatch for %s: expected '%s', observed '%s'"
+				% [key, expected, actual]}
+
+	var prepared: Array = sides.duplicate(true)
+	var seen_instance_ids: Dictionary = {}
+	for side in prepared:
+		var side_units: Array = side.get("units", [])
+		for index in side_units.size():
+			var unit: Dictionary = side_units[index]
+			if not unit.has("def"):
+				var inline_id := String(unit.get("id", unit.get("name", "")))
+				if seen_instance_ids.has(inline_id):
+					return {"sides": [], "error": "duplicate unit instance id '%s'" % inline_id}
+				seen_instance_ids[inline_id] = true
+				continue
+			for key in unit:
+				if not CANONICAL_UNIT_KEYS.has(String(key)):
+					return {"sides": [], "error":
+						"canonical unit '%s' mixes undeclared inline field '%s'; use overrides"
+						% [unit.get("id", "?"), key]}
+			var instance_v: Variant = unit.get("id")
+			if typeof(instance_v) != TYPE_STRING or String(instance_v) == "":
+				return {"sides": [], "error": 'canonical unit requires a non-empty battle-instance "id"'}
+			var instance_id := String(instance_v)
+			if seen_instance_ids.has(instance_id):
+				return {"sides": [], "error": "duplicate unit instance id '%s'" % instance_id}
+			seen_instance_ids[instance_id] = true
+			var content_id := String(unit.get("def", ""))
+			var cid := ContentId.parse(content_id)
+			if cid == null or cid.kind != "unit":
+				return {"sides": [], "error": "canonical unit definition id is malformed: '%s'" % content_id}
+			if cid.pack != pack:
+				return {"sides": [], "error":
+					"canonical definition namespace mismatch: '%s' uses pack '%s', scenario declares '%s'"
+					% [content_id, cid.pack, pack]}
+			var at: Variant = unit.get("at")
+			if typeof(at) != TYPE_ARRAY or (at as Array).size() != 2:
+				return {"sides": [], "error":
+					'canonical unit "%s" requires battle placement "at"' % instance_id}
+			var overrides_v: Variant = unit.get("overrides", {})
+			if typeof(overrides_v) != TYPE_DICTIONARY:
+				return {"sides": [], "error": "canonical unit '%s' overrides must be an object" % instance_id}
+			var overrides: Dictionary = overrides_v
+			for key in overrides:
+				var field := String(key)
+				if FORBIDDEN_OVERRIDE_FIELDS.has(field):
+					return {"sides": [], "error":
+						"canonical unit '%s' overrides forbidden field: %s"
+						% [instance_id, field]}
+				if not SETTABLE_UNIT_FIELDS.has(field):
+					return {"sides": [], "error":
+						"canonical unit '%s' overrides unknown or non-settable field: %s"
+						% [instance_id, field]}
+			var definition_v: Variant = provider.call("resolve_definition", content_id)
+			if definition_v == null:
+				return {"sides": [], "error":
+					"canonical definition '%s' was not found in content pack '%s'"
+					% [content_id, pack]}
+			if typeof(definition_v) != TYPE_DICTIONARY:
+				return {"sides": [], "error":
+					"canonical definition '%s' did not resolve to an object" % content_id}
+			var definition: Dictionary = definition_v.duplicate(true)
+			for key in definition:
+				var field := String(key)
+				if FORBIDDEN_OVERRIDE_FIELDS.has(field):
+					return {"sides": [], "error":
+						"canonical definition '%s' contains scenario-owned field: %s"
+						% [content_id, field]}
+				if not SETTABLE_UNIT_FIELDS.has(field):
+					return {"sides": [], "error":
+						"canonical definition '%s' contains unknown construction field: %s"
+						% [content_id, field]}
+			for key in overrides:
+				var override_value: Variant = overrides[key]
+				definition[key] = override_value.duplicate(true) \
+					if typeof(override_value) in [TYPE_ARRAY, TYPE_DICTIONARY] \
+					else override_value
+			if typeof(definition.get("name")) != TYPE_STRING or String(definition.get("name")) == "":
+				return {"sides": [], "error": "canonical definition '%s' has no display name" % content_id}
+			definition["id"] = instance_id
+			definition["at"] = (at as Array).duplicate(true)
+			definition[RESOLVED_CONTENT_ID] = content_id
+			side_units[index] = definition
+		# Preserve replacement if a caller supplied a non-reference Array.
+		side["units"] = side_units
+	return {"sides": prepared, "error": ""}
+
+
+func _init(p_spec: Dictionary, injected_rng: Variant = null,
+		injected_content_provider: Variant = null) -> void:
 	spec = p_spec
 	scenario_name = String(spec.get("name", "unnamed"))
 	seed_value = int(spec.get("seed", 0))
@@ -73,11 +258,19 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
 	profile = String(profile_config["profile"])
 	var profile_error := String(profile_config["error"])
 	assert(profile_error == "", profile_error)
-	# Assertions are omitted from release builds; keep the same configuration
-	# from falling through to scenario construction there.
+	# Assertions are omitted from release builds; keep invalid configuration
+	# from falling through to battle construction there.
 	if profile_error != "":
+		construction_error = profile_error
 		push_error(profile_error)
 		return
+	var prepared := prepare_content(spec, injected_content_provider)
+	construction_error = String(prepared["error"])
+	assert(construction_error == "", construction_error)
+	if construction_error != "":
+		push_error(construction_error)
+		return
+	_side_specs = prepared["sides"]
 	# Actions available in this battle. A scenario may declare its own so the
 	# file is self-contained; see Action.CATALOGUE.
 	catalogue = Action.CATALOGUE.duplicate()
@@ -107,8 +300,8 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null) -> void:
 		_attack_command_charge = Callable(self, "_no_attack_command_charge")
 	field = _build_field(spec.get("battlefield", {}))
 	state = RoundLoop.BattleState.new()
-	state.sides = _build_sides(spec.get("sides", []))
-	auras_by_source = _build_auras(spec.get("sides", []))
+	state.sides = _build_sides(_side_specs)
+	auras_by_source = _build_auras(_side_specs)
 
 
 func _build_field(s: Dictionary) -> Battlefield:
@@ -145,9 +338,11 @@ func _build_sides(specs: Array) -> Array:
 				var k := String(key)
 				if k == "id":
 					continue
-				if k in ["name", "at", "flags", "subtypes", "modifiers", "auras"]:
+				if k in ["name", "at", "flags", "subtypes", "modifiers", "auras",
+						"content_id", "instance_id", RESOLVED_CONTENT_ID]:
 					continue
 				unit.set(k, u[key])
+			unit.content_id = String(u.get(RESOLVED_CONTENT_ID, ""))
 			for f in u.get("flags", []):
 				unit.set_flag(StringName(String(f)))
 			for m in u.get("modifiers", []):
