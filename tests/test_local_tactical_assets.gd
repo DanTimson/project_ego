@@ -35,6 +35,8 @@ func _run() -> void:
 		return
 	var scenario := Scenario.new(spec)
 	var loaded := 0
+	var shadow_loaded := 0
+	var portrait_loaded := 0
 	for unit in scenario.units.values():
 		var key := resolver.logical_key_for_unit(unit)
 		if key == "":
@@ -46,8 +48,16 @@ func _run() -> void:
 			quit(1)
 			return
 		loaded += 1
+		if resolver.texture_for_shadow(unit) != null:
+			shadow_loaded += 1
+		if resolver.texture_for_portrait(unit) != null:
+			portrait_loaded += 1
 	if loaded == 0:
 		print("FAIL local mapping contains no playable battle instance/content mapping")
+		quit(1)
+		return
+	if shadow_loaded == 0:
+		print("FAIL no mapped real shadow loads for a playable unit")
 		quit(1)
 		return
 	var packed := load("res://game/tactical/tactical_main.tscn") as PackedScene
@@ -64,7 +74,26 @@ func _run() -> void:
 		controller.queue_free()
 		quit(1)
 		return
-	print(("PASS local-real-assets: loaded %d mapped real texture(s); "
-		+ "%d reached the playable battlefield draw path") % [loaded, displayed])
+	if controller.battlefield_view.facing_scale_x_for_side(0) \
+			== controller.battlefield_view.facing_scale_x_for_side(1):
+		print("FAIL opposing side facing is not mirrored")
+		controller.queue_free()
+		quit(1)
+		return
+	if controller.battlefield_view.terrain_source() != "local" \
+			or controller.battlefield_view._decoration_textures.is_empty():
+		print("FAIL real terrain/decoration did not reach battlefield rendering")
+		controller.queue_free()
+		quit(1)
+		return
+	controller.select_unit("azure-vanguard-01")
+	if controller.panel_texture.texture == null and controller.portrait_rect.texture == null:
+		print("FAIL no mapped real interface or portrait reached the right panel")
+		controller.queue_free()
+		quit(1)
+		return
+	print(("PASS local-real-assets: units=%d displayed=%d shadows=%d portraits=%d; "
+		+ "terrain/decor and right-panel visual reached the playable scene") % [
+		loaded, displayed, shadow_loaded, portrait_loaded])
 	controller.queue_free()
 	quit(0)

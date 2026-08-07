@@ -9,10 +9,12 @@ writes a deterministic Project EGO local index.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import struct
 import subprocess
 import sys
 from typing import Any, Iterable
@@ -157,6 +159,54 @@ def build_index(exports: Iterable[tuple[str, Path]], output: Path) -> dict[str, 
     return {"version": 1, "assets": assets}
 
 
+def read_bmp_dimensions(path: Path) -> tuple[int, int] | None:
+    """Read dimensions from an exported BMP without adding an image dependency."""
+    try:
+        header = path.read_bytes()[:26]
+    except OSError:
+        return None
+    if len(header) < 26 or header[:2] != b"BM":
+        return None
+    width, height = struct.unpack_from("<ii", header, 18)
+    if width <= 0 or height == 0:
+        return None
+    return width, abs(height)
+
+
+def build_observation_report(index: dict[str, Any], output: Path) -> dict[str, Any]:
+    """Summarize local exports; callers decide whether and where to retain it."""
+    root = output.resolve().parent
+    grouped: dict[str, dict[str, Any]] = {}
+    for entry in index["assets"]:
+        archive = entry["archive"]
+        group = grouped.setdefault(
+            archive, {"objects": 0, "images": 0, "raw": 0, "dimensions": Counter()}
+        )
+        group["objects"] += 1
+        group["images" if entry["type"] == "image" else "raw"] += 1
+        if entry["type"] == "image":
+            dimensions = read_bmp_dimensions(root / entry["path"])
+            if dimensions is not None:
+                group["dimensions"][f"{dimensions[0]}x{dimensions[1]}"] += 1
+    archives: list[dict[str, Any]] = []
+    for archive in sorted(grouped):
+        group = grouped[archive]
+        dimension_rows = [
+            {"size": size, "count": count}
+            for size, count in sorted(group["dimensions"].items())
+        ]
+        archives.append(
+            {
+                "archive": archive,
+                "objects": group["objects"],
+                "images": group["images"],
+                "raw": group["raw"],
+                "dimensions": dimension_rows,
+            }
+        )
+    return {"version": 1, "archives": archives}
+
+
 def write_index(index: dict[str, Any], output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = output.with_name(output.name + ".tmp")
@@ -207,6 +257,10 @@ def make_parser() -> argparse.ArgumentParser:
         "--output", type=Path, default=DEFAULT_OUTPUT,
         help=f"index destination (default: {DEFAULT_OUTPUT})",
     )
+    parser.add_argument(
+        "--report", action="store_true",
+        help="print a local JSON archive/dimension observation report",
+    )
     return parser
 
 
@@ -228,6 +282,8 @@ def main(argv: list[str] | None = None) -> int:
         write_index(index, output)
         image_count = sum(entry["type"] == "image" for entry in index["assets"])
         print(f"Prepared {len(index['assets'])} assets ({image_count} images) in {output}")
+        if args.report:
+            print(json.dumps(build_observation_report(index, output), indent=2, sort_keys=True))
         return 0
     except AssetPreparationError as exc:
         print(f"error: {exc}", file=sys.stderr)

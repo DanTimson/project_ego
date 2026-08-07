@@ -131,17 +131,38 @@ Optional original presentation assets remain outside both core and rules:
 ```text
 user DAT -> explicit local EGOgrabber -> ignored archive exports
          -> tools/prepare_tactical_assets.py -> ignored namespaced index
-         -> explicit content/instance presentation mapping
-         -> TacticalAssetResolver -> texture or project-authored placeholder
+         -> explicit categorized local visual mapping
+         -> TacticalAssetResolver -> keyed texture or authored fallback
+         -> TacticalBattlefieldView / tactical right panel
 ```
 
 Project EGO never parses DAT. The preparation tool treats EGOgrabber manifests
 as untrusted, preserves archive namespace, rejects duplicate/traversing/missing
-entries, and emits only sorted relative runtime paths. The resolver independently
-contains every path below the configured index root. Canonical content mapping
-has priority over battle-instance mapping; display name and guessed numeric
-relationships are never identity. No local file is required and generated
-tokens remain the fallback.
+entries, emits only sorted relative runtime paths, and can print a local BMP
+inventory/dimension report. The resolver independently contains every path
+below the configured index root.
+
+The Slice-3 visual mapping separates `units`, `shadows`, `portraits`, `terrain`,
+`decorations`, and `ui`. Unit-like categories may bind canonical content or an
+explicit battle instance; named field/UI categories bind only an explicit
+presentation slot. Canonical content has priority within an identity category.
+Display name and guessed numeric relationships are never identity. Version-1
+Slice-2 mappings remain unit-only compatibility input.
+
+Inspected sprite-like exports use exact RGB magenta as a reserved matte. The
+resolver clears only that exact value at runtime; original files and ignored
+exports are untouched. This treatment is presentation-only and does not pretend
+to recover discarded partial alpha.
+
+`TacticalBattlefieldView` encodes the visual order rather than relying on scene
+insertion: terrain, variation, decoration, grid, all shadows, all unit sprites,
+bars, then target/selection overlays. Side 0's left deployment retains the
+inspected natural rightward sprite facing; side 1 uses a negative horizontal
+render scale. The transform is reset before overlays. UI is a separate fixed
+right-side Control layer. All input continues through
+`TacticalCoordinateAdapter`, so scale and facing cannot change a model cell or
+hit test. No local file is required: authored terrain, directional tokens,
+portrait initials, panels, and buttons form the complete fallback.
 
 ### `tests/`
 

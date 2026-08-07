@@ -1,244 +1,219 @@
-# Playable Tactical Slice 2
+# Playable Tactical Slice 3
 
-This slice is a project-authored tactical hot-seat battle. It uses the existing
-deterministic `Scenario`, `Battlefield`, combat commands, and `RoundLoop`; it is
-not a visual- or content-parity claim for the original game.
+This project-authored hot-seat battle uses the existing deterministic `Scenario`,
+`Battlefield`, combat commands, and `ManualBattleSession`. Slice 3 changes only
+presentation and optional ignored local-asset integration; it is not a combat
+formula, terrain-rule, canonical-content, or pixel-parity claim.
 
 ## Launch and controls
 
-From the repository root with Godot 4.3:
+With Godot 4.3, the ordinary entry point remains:
 
 ```bash
 godot --path .
 ```
 
-Ordinary launch opens `game/tactical/tactical_main.tscn`, never an asset viewer.
-The controls remain:
+The battle supports the same manual play:
 
-- select a highlighted active-side unit with left click;
-- click a green empty hex to move;
-- click an orange enemy for automatic-approach melee;
-- press `R` or the Ranged button, then click a magenta enemy to shoot;
-- press `Space` or Pass to finish the active side;
-- right-click, `Escape`, or Cancel to clear selection;
+- select an active-side unit;
+- click a green hex to move or an orange enemy for automatic-approach melee;
+- use `R`/Ranged and click a magenta enemy to shoot;
+- use `Space`/Pass to finish the side;
+- use right-click, `Escape`, or Cancel to clear selection;
 - use Restart Battle after victory.
 
-The selection ring, side-colored ring, and life bar are presentation overlays.
-They remain independent of an optional sprite, and sprite dimensions never
-define model coordinates or hit boxes.
+The narrow right column now contains selected visual identity, combat/state
+values, ammunition, only the actions the slice implements, effects/status,
+round/side feedback, recent events, and victory/restart. The battlefield still
+occupies model cells through `TacticalCoordinateAdapter`; texture bounds, visual
+scale, shadows, and horizontal mirroring never define a hit box.
 
-## Authoritative command results
+## Authoritative execution boundary
 
-`Scenario.execute_command()` is the single execution gate used by
-`ManualBattleSession.issue_command()`. Its compact result is:
+`ManualBattleSession.issue_command()` continues to use
+`Scenario.execute_command()`. The structured result exposes `accepted`, the
+normalized command, refusal `reason`, new `events`, and `state_changed`.
+Highlights use the corresponding neutral queries, but execution is authority.
+No visual function computes or changes combat outcomes.
+
+## Stable presentation layers and facing
+
+`TacticalBattlefieldView` encodes this order explicitly:
 
 ```text
+base terrain < tile variation < decoration < hex grid
+             < unit shadows < unit sprites < health/status bars
+             < target/selection overlays < right-side UI
+```
+
+Direct inspection of the 71 extracted `Units.dat` images found that the ordinary
+figure set is naturally oriented toward screen-right (some individual figures
+are frontal, but the consistently directional weapons/poses use the rightward
+set). In the synthetic scenario side 0 deploys on the left and retains the
+natural facing. Side 1 deploys on the right and receives render-state scale
+`x = -1`. One unit mapping therefore remains one asset. Its mapped shadow is
+mirrored in the same local sprite transform; rings and bars are drawn only after
+the transform is reset. Placeholder arrow-shaped units apply the same side
+rule. Model coordinates and hit tests are unchanged.
+
+## Shadow findings
+
+All matching `Unit01`…`Unit71` entries in `Units`, `Unit_shadow`, and
+`Unit_shadowf` have exactly matching canvas dimensions (35 dimension families,
+most commonly 64×80). Direct paired-image inspection shows:
+
+- neither shadow archive is an alternate left/right-facing sprite set;
+- both contain black, unit-specific, ground-projected silhouettes on exact
+  magenta matte, already positioned within the same canvas as the unit;
+- `Unit_shadow` is generally the broader/taller flattened projection (for the
+  first samples its occupied region begins around y=46–58);
+- `Unit_shadowf` is a more compact, lower projection (first samples begin around
+  y=55–61);
+- both preserve the source's rightward geometry, so a mapped shadow must be
+  mirrored with an opposing sprite rather than selected as an opposing-facing
+  archive.
+
+The suffix alone does not establish a gameplay mode. The local synthetic demo
+explicitly maps `Unit_shadow`; the resolver can map either archive, but Project
+EGO does not infer a flying/stance rule for `Unit_shadowf`. Missing shadows are
+simply omitted. Shadows are rendered at reduced opacity and have no model role.
+
+## Real battlefield reconnaissance
+
+The following counts come from successful local EGOgrabber exports. Each archive
+also has one raw `GrabberInfo` object.
+
+| archive | objects | images | dimension families | repeated families / direct visual observations |
+|---|---:|---:|---:|---|
+| `Battlefield` | 113 | 112 | 74 | 100×100 (9), 50×50 (6); the contact sheet shows 100×100 grass/stone floors, a 104×120 hex graphic, narrow wall/hole pieces, small props, target/selection marks, and a 140×768 segmented battle panel |
+| `Nature` | 325 | 324 | 154 | 29×31 (15), 31×31 (11), 42×63 (10); direct inspection shows 100×100 ground images plus isolated trees, plants, stones, puddles, structures and corresponding dark shadow-like images |
+
+Names are sequential descriptive strings, for example `03Grass01`,
+`74Stone1`, `000Grass`, `052Leaf_tree_1_1`, and many repeated tree/plant groups.
+These names help a human make an explicit presentation mapping but do not grant
+terrain mechanics. Visually paired base/shadow and multi-image tree groups are
+present, but EGOgrabber exports no frame/group property beyond each object name.
+
+The real local profile uses a mapped 100×100 grass image as a tiled base, three
+mapped ground variations at low opacity, and an explicitly chosen deterministic
+set of flowers/stone/tree/grass decorations. Selection uses a stable cell hash;
+it does not consume gameplay RNG and does not claim that a decorated cell is a
+forest, swamp, obstacle, or terrain effect. Existing model passability still
+only controls the dark tile overlay. Without mappings, a complete
+project-authored green patterned field and readable hex grid are drawn.
+
+## Transparency and matte handling
+
+EGOgrabber emits bottom-up 24-bit BMP and discards a source fourth channel.
+Inspection found an exact `RGB(255, 0, 255)` key:
+
+- every unit and both matching shadow sets has the key at the canvas edge;
+- 323/324 `Nature` images and 97/112 `Battlefield` images have it at a corner;
+- keyed interface assets also use the exact value, while opaque floors,
+  portraits, icons, and many panels do not.
+
+At runtime the resolver converts a loaded image to RGBA and clears **only**
+pixels exactly equal to `(255, 0, 255)`, including matte islands disconnected by
+sprite geometry. It does not use a tolerance: near-magenta artwork and all other
+interior colors remain. A synthetic test covers both disconnected exact matte
+and retained `(254, 0, 255)`. This reconstructs the demonstrated color key but
+cannot recover discarded partial alpha; antialiasing against the original matte
+can still leave a one-pixel color fringe.
+
+## Tactical interface reconnaissance
+
+| archive | objects | images | main size families / directly visible organization |
+|---|---:|---:|---|
+| `Interface` | 142 | 141 | 88 families; 512×768 (14), 1024×768 (10), 312×470 (7), 52×52 (5); contact sheets show full-screen backdrops, parchment/dialog frames, segmented inventory/info panels and slots |
+| `Buttons` | 382 | 381 | 15 families; 51×37 (174), 52×52 (48), 57×32 (44), 53×39 (35); repeated adjacent `N/A/P/I`-suffixed images visibly form normal/highlight/pressed/disabled-like state groups |
+| `Portraits` | 38 | 37 | all 130×150; painted hero-scale portraits |
+| `SmallPort` | 38 | 37 | 35 at 52×52 plus one each at 52×51 and 52×53; cropped versions of the same portrait subjects |
+| `Unit_icons` | 72 | 71 | all 64×80; framed visuals matching the corresponding local `Unit01`…`Unit71` images |
+| `Ability` | 138 | 137 | all 52×52; framed stat/action/effect-like icons visible in contact sheets |
+| `Items` | 411 | 410 | all 52×52; repeated equipment/icon families |
+| `Spells` | 78 | 77 | all 52×52; repeated spell-icon frames |
+
+The extracted `Battlefield:02Panel` is directly recognizable as the original
+narrow segmented battle column and is used, when mapped, as a translucent panel
+backdrop. Explicit local UI slots also use directly recognizable attack/ranged,
+hourglass/end, and X/cancel visuals. Project-authored Godot controls remain on
+top so current supported actions stay legible; no legacy slot or button is
+assigned an unsupported gameplay meaning.
+
+`Portraits` and `SmallPort` depict hero subjects, not the four synthetic unit
+instances. For this battle the local profile therefore maps the corresponding
+`Unit_icons` object as selected-unit visual identity. That is an explicit
+instance presentation choice, not a claim that `Unit01` is a canonical content
+ID. Unmapped selection shows a project-authored initial tile.
+
+## Local index and visual mapping
+
+Original files, exports, the generated index/mapping, reports, screenshots, and
+movies stay below ignored `.local/eador_assets/`. The deterministic index remains
+version 1 and archive-qualified. Slice 3 mapping version 2 separates meanings:
+
+```json
 {
-  accepted: bool,
-  command: "move" | "melee" | "ranged" | "rest" | "pass",
-  reason: String,
-  events: Array,
-  state_changed: bool
+  "version": 2,
+  "units": {"content": [], "instances": [{"id": "battle-id", "asset": "Units:Unit01"}]},
+  "shadows": {"content": [], "instances": [{"id": "battle-id", "asset": "Unit_shadow:Unit01"}]},
+  "portraits": {"content": [], "instances": [{"id": "battle-id", "asset": "Unit_icons:Unit01"}]},
+  "terrain": [{"id": "base", "asset": "Battlefield:03Grass01"}],
+  "decorations": [{"id": "tree", "asset": "Nature:052Leaf_tree_1_1"}],
+  "ui": [{"id": "panel", "asset": "Battlefield:02Panel"}]
 }
 ```
 
-The Slice 1 `ok`, `message`, and `log` aliases remain during migration. Refused
-commands contain a stable reason, report no state change, emit no new event, and
-mutate no command resource. Accepted commands contain only the new core log
-entries emitted by that execution. `TacticalController` reads `accepted`,
-`reason`, and `events`; it does not search free-form logs to decide success.
+Identity categories retain canonical-content priority over battle-instance
+mapping. Named categories use explicit presentation slots. All categories
+require known indexed images and reject duplicates, malformed slots, raw data,
+unknown keys, and traversal. Slice-2 version-1 `content`/`instances` mappings
+remain accepted as the `units` category; every new category then falls back.
+No real mapping is committed.
 
-`Scenario.query_command()` uses the same movement plan, melee approach plan,
-and ranged eligibility checks as execution. `ManualBattleSession` uses those
-queries for green/orange/magenta highlights. A highlight is advisory: state can
-change after it is drawn, so execution is always authoritative.
+## Exact local preparation workflow
 
-`Damage` still has legacy process-global bindings. A manual session therefore
-binds its own pipeline and `Scenario.environment` only for a command or neutral
-damage query and clears both before returning. Two manual sessions can be
-alternated without retaining one another's aura/environment. This is scoped
-isolation, not a new global service architecture.
-
-## Optional local Eador presentation assets
-
-A fresh clone requires no DAT or local file. Generated colored tokens are the
-fallback. Original files and all generated real-data artifacts remain ignored
-below:
-
-```text
-.local/eador_assets/
-  exports/
-    Units/manifest.json, images/, raw/
-    Unit_icons/manifest.json, images/, raw/
-    Unit_shadow/manifest.json, images/, raw/
-    Unit_shadowf/manifest.json, images/, raw/
-  index.json
-  mapping.json
-.local/tools/eador_dat
-```
-
-The resolver auto-detects `res://.local/eador_assets/index.json` and
-`mapping.json`. `EGO_ASSET_INDEX` and `EGO_ASSET_MAPPING` can explicitly select
-other paths. Missing, malformed, unreadable, unsafe, raw, or unmapped assets
-produce useful resolver status and fall back to placeholders. Restart reloads
-the index/mapping.
-
-### Actual EGOgrabber checkout
-
-The inspected clean checkout is revision
-`ca2df7001427266c07201cb22569d32a663f77e0` on `main...origin/main`. It has no
-build files or README. The verified local build and CLI are:
-
-```bash
-g++ -std=c++17 -O2 -Wall -Wextra \
-  -I"$EGOGRABBER_REPO/src" "$EGOGRABBER_REPO/src/main.cpp" \
-  -o .local/tools/eador_dat
-.local/tools/eador_dat list "$EADOR_DAT_ROOT/Units.dat"
-.local/tools/eador_dat extract "$EADOR_DAT_ROOT/Units.dat" \
-  .local/eador_assets/exports/Units
-```
-
-Source and real-corpus behavior establish these capabilities and limitations:
-
-- wrappers accepted by the reader are big-endian `slh!` (`0x736c6821`, packed
-  LZSS) and `slh ` (`0x736c6820`, unpacked), followed by `ALL.`; the comments
-  still label the wrapper constants placeholders, while all four inspected
-  corpus files successfully used `slh!`;
-- a negative per-object uncompressed size invokes Allegro-style LZSS; a
-  nonnegative size is kept unpacked;
-- `FILE` payloads are recursively parsed and extracted, with nested `NAME`
-  segments joined by `/`; the four inspected tactical archives had no nested
-  `FILE` groups;
-- `BMP ` payloads are decoded only for signed depths `24`, `32`, and `-32`;
-  8/15/16-bit and malformed payloads become raw files;
-- decoded images are always written as bottom-up 24-bit BGR BMP. For 32/-32
-  input the fourth byte is discarded, so exported BMP has no alpha channel;
-  no palette is read or emitted;
-- output is `images/<nested-id>.bmp` or `raw/<nested-id>.<fourcc>.bin`, plus a
-  version-1 manifest with `root` and array entries `{id,type,path}`;
-- `NAME` is used verbatim; missing `NAME` becomes `obj_<index>`. EGOgrabber does
-  not reject duplicate IDs: duplicate output paths can overwrite while
-  duplicate manifest entries remain;
-- the manifest writer does not JSON-escape values;
-- it emits no frame timing, animation, palette, alpha, or arbitrary property
-  metadata. Nested `FILE` IDs retain grouping only as slash-separated paths;
-- EGOgrabber itself adds no archive namespace, so Project EGO must add one.
-
-EGOgrabber remains read-only and Project EGO never parses DAT.
-
-### Prepare real exports
-
-First prove the destination is ignored:
+First prove ignore coverage:
 
 ```bash
 mkdir -p .local/eador_assets
 git check-ignore -q .local/eador_assets/probe
 ```
 
-Consume ready exports:
+Build the inspected read-only EGOgrabber checkout if necessary:
 
 ```bash
-python3 tools/prepare_tactical_assets.py \
-  --export Units=.local/eador_assets/exports/Units \
-  --export Unit_icons=.local/eador_assets/exports/Unit_icons \
-  --output .local/eador_assets/index.json
+mkdir -p .local/tools
+g++ -std=c++17 -O2 -Wall -Wextra   -I"$EGOGRABBER_REPO/src" "$EGOGRABBER_REPO/src/main.cpp"   -o .local/tools/eador_dat
 ```
 
-Or explicitly invoke a ready EGOgrabber binary on user-selected files (the tool
-never searches the computer):
+The preparation tool never searches for DAT files and never parses DAT. Supply
+each source explicitly; this invocation extracts, indexes, and prints a local
+dimension report:
 
 ```bash
-python3 tools/prepare_tactical_assets.py \
-  --egograbber .local/tools/eador_dat \
-  --dat Units="$EADOR_DAT_ROOT/Units.dat" \
-  --dat Unit_icons="$EADOR_DAT_ROOT/Unit_icons.dat"
+python3 tools/prepare_tactical_assets.py   --egograbber .local/tools/eador_dat   --dat Units="$EADOR_DAT_ROOT/Units.dat"   --dat Unit_shadow="$EADOR_DAT_ROOT/Unit_shadow.dat"   --dat Unit_shadowf="$EADOR_DAT_ROOT/Unit_shadowf.dat"   --dat Unit_icons="$EADOR_DAT_ROOT/Unit_icons.dat"   --dat Battlefield="$EADOR_DAT_ROOT/Battlefield.dat"   --dat Nature="$EADOR_DAT_ROOT/Nature.dat"   --dat Interface="$EADOR_DAT_ROOT/Interface.dat"   --dat Buttons="$EADOR_DAT_ROOT/Buttons.dat"   --dat Portraits="$EADOR_DAT_ROOT/Portraits.dat"   --dat SmallPort="$EADOR_DAT_ROOT/SmallPort.dat"   --dat Ability="$EADOR_DAT_ROOT/Ability.dat"   --output .local/eador_assets/index.json   --report
 ```
 
-The tool validates EGOgrabber version-1 manifests and rejects malformed JSON,
-duplicate JSON keys/asset IDs, unsupported versions/types, missing root/assets,
-absolute or traversing paths (including Windows separators), escaping symlinks,
-and missing files. Existing exports must be under the selected index directory;
-this keeps runtime paths relative and contained.
+Ready exports can instead be passed as repeated `--export ARCHIVE=DIR`. Output
+is sorted, namespaced, relative to the index, traversal-contained, and written
+atomically. `--report` prints object/image/raw counts and BMP dimension families;
+it writes no report artifact unless the user explicitly redirects stdout.
 
-### Project EGO index schema
+## Structural reference comparison and remaining gaps
 
-`index.json` is deterministic, sorted by archive-qualified key, and contains no
-machine-specific source path:
+The current 1152×720 layout allocates 840 pixels (73%) to the field and 312
+pixels (27%) to a fixed right panel, versus Slice 2's roughly 56%/42% split.
+Eight by five large visible hexes use radius 50; a 94-pixel-high unit occupies a
+substantial fraction of the 100-pixel hex height. Textured terrain fills the
+entire field instead of leaving dark unused space. Portrait/stats/actions/effects
+are visibly segmented, and portrait plus state values dominate the upper panel.
+Opposing deployments face inward.
 
-```json
-{
-  "version": 1,
-  "assets": [
-    {
-      "key": "Units:Unit01",
-      "archive": "Units",
-      "source_id": "Unit01",
-      "type": "image",
-      "path": "exports/Units/images/Unit01.bmp"
-    }
-  ]
-}
-```
-
-The array form permits duplicate logical keys to be detected after JSON parsing.
-The resolver revalidates key consistency, type, containment, and file existence.
-Raw assets are indexed but can never be mapped as textures.
-
-### Local presentation mapping
-
-Identity is separate from archive objects. `mapping.json` uses arrays so
-conflicting duplicate mappings are rejected:
-
-```json
-{
-  "version": 1,
-  "content": [
-    {"id": "genesis:unit/5", "asset": "Units:Unit05"}
-  ],
-  "instances": [
-    {"id": "azure-ranger-17", "asset": "Units:Unit12"}
-  ]
-}
-```
-
-Resolution priority is canonical `Combatant.content_id`, explicit battle
-`instance_id`, then placeholder. Display names are never identities. References
-must name known image entries; malformed identities, unknown assets, duplicate
-IDs, raw references, and injection-like keys are rejected.
-
-The real local demonstration maps the four playable instance IDs explicitly.
-Those are **local presentation/demo mappings only**. The inspected `Unit01`…
-`Unit71` names and matching names across sprite/icon/shadow archives do not prove
-which canonical `genesis:unit/N` each depicts. No numeric canonical relationship
-is claimed; that semantic bridge remains unresolved.
-
-### Real tactical archive observations
-
-All four required archives extracted successfully with no failures:
-
-| archive | objects | stable names | images | exported dimensions | format |
-|---|---:|---|---:|---|---|
-| `Units` | 72 | `Unit01`…`Unit71`, `GrabberInfo` | 71 | width 60–103, height 80–130 | 24-bit BMP, no alpha |
-| `Unit_icons` | 72 | same | 71 | 64×80 | 24-bit BMP, no alpha |
-| `Unit_shadow` | 72 | same | 71 | width 60–103, height 80–130 | 24-bit BMP, no alpha |
-| `Unit_shadowf` | 72 | same | 71 | width 60–103, height 80–130 | 24-bit BMP, no alpha |
-
-Each archive also yielded one raw `GrabberInfo.info.bin`. There were no duplicate
-names within an archive. All 72 names collide across every archive pair, which
-is why archive namespace is mandatory. Each named object produced one image;
-no frame groups or animation metadata were present. Shadows are separate
-archives, not alpha layers attached to `Units`.
-
-## Validation
-
-Portable validation is:
-
-```bash
-python3 tools/run_godot_tests.py
-python3 -m pytest -q
-```
-
-`tests/test_local_tactical_assets.gd` clearly skips when the ignored index is
-absent. When local data is configured it validates index/mapping loading, loads
-mapped textures, and proves those textures reach the playable battlefield draw
-path without committing an original-derived fixture.
+This is a structural advance, not pixel parity. Remaining gaps include the
+synthetic scenario's lower hex density than the reference, a proportionally
+wider panel than the legacy 140-pixel asset, static rather than generated
+legacy terrain composition, no animation or recovered partial alpha, no
+canonical unit/portrait/terrain mapping, no authoritative display semantics for
+legacy effect slots, and limited responsive behavior beyond the project's
+canvas stretch.

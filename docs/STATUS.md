@@ -26,38 +26,48 @@ This is a coverage map, not a release claim.
 | unit upkeep/recruitment | binary | not normalized | not implemented | evidence available |
 | province income/economy | binary | not normalized | not implemented | evidence available |
 | tactical AI scoring | decompilation corpus | not consolidated | scaffold only | deferred |
-| presentation | Project EGO slice contract | n/a | playable hot-seat tactical scene + optional ignored local assets | structured command boundary and real EGOgrabber-to-resolver pipeline validated locally; not an original parity target |
+| presentation | Project EGO Slice-3 contract + direct local visual inspection | n/a | playable hot-seat scene with layered field, inward facing, shadows, categorized ignored assets, and narrow tactical panel | real textured field/right panel and full authored fallback GUI-smoked; structural resemblance only, not original parity |
 
 ## Playable tactical slice
 
-Playable Tactical Slice 2 is the ordinary project entry point:
+Playable Tactical Slice 3 is the ordinary project entry point:
 
 ```bash
 godot --path .
 ```
 
-It preserves the synthetic 8×5 hot-seat battle and placeholder-only fresh-clone
-behavior. Manual move, melee, ranged, rest, and pass execution now returns an
-authoritative structured core result with refusal reason, new events, and an
-accurate state-change flag. Advisory highlights query the same movement,
-automatic-approach, and ranged eligibility helpers. `ManualBattleSession` scopes
-legacy `Damage` bindings per call, so alternating sessions do not retain one
-another's environment.
+It preserves the synthetic 8×5 hot-seat battle, authoritative structured command
+boundary, and placeholder-only fresh-clone behavior. Presentation now uses a
+stable terrain/variation/decoration/grid/shadow/unit/overlay order. Direct
+inspection established a naturally rightward `Units` set: the left deployment
+keeps it and the right deployment is mirrored as render state. Health and target
+rings are not mirrored, and coordinate hit-testing remains adapter-based.
 
-The full optional local presentation path has been exercised with the actual
-clean EGOgrabber revision `ca2df7001427266c07201cb22569d32a663f77e0` and the
-user-provided `Units.dat`, `Unit_icons.dat`, `Unit_shadow.dat`, and
-`Unit_shadowf.dat`. Each archive yielded 71 images plus one raw info object; the
-ignored combined index contained 288 archive-qualified assets. Four explicit
-battle-instance demo mappings loaded real textures and reached the playable
-battlefield draw path. Removing the ignored mapping returns the same build to
-placeholders. These instance mappings are presentation choices only: no
-canonical `genesis:unit/N` to `Units:UnitNN` relationship is established.
+The optional real path was exercised against clean EGOgrabber revision
+`ca2df7001427266c07201cb22569d32a663f77e0` and the explicit local DAT corpus.
+The ignored index held 1,953 namespaced objects (1,940 images) from `Units`, both
+shadow archives, `Unit_icons`, `Battlefield`, `Nature`, `Interface`, `Buttons`,
+`Portraits`, `SmallPort`, `Ability`, `Items`, and `Spells`. The demo mapping
+loaded four units, four matched shadows, four unit icons, a tiled real ground,
+three variations, four deterministic decorations, the legacy segmented battle
+panel, and four recognizable UI icons. Runtime exact-magenta keying restores
+binary transparency where demonstrated by the exports.
 
-Portable tests use only project-authored synthetic assets. The local-only real
-asset test skips when `.local/eador_assets/index.json` is absent. Preparation,
-security schema, launch, fallback, and observed archive details are documented
-in `docs/PLAYABLE_TACTICAL_SLICE.md`.
+The 840:312 field/panel layout replaces Slice 2's broad generic HUD. The panel
+has portrait, primary values, ammunition, supported action controls,
+effects/status, compact round/side/feedback, events, and restart. No unsupported
+ability or legacy terrain semantics were added. Instance mappings are explicit
+local presentation choices; no canonical `genesis:unit/N` relationship is
+established.
+
+Portable tests use only project-authored synthetic images and cover mapping
+categories, malformed mappings, exact color keying, inward facing, layer order,
+overlay transforms, real/fallback terrain paths, deterministic decoration,
+right-panel construction, portrait fallback, and coordinate independence. The
+local-only test skips without ignored data and otherwise proves unit, facing,
+shadow, terrain/decor, and interface/portrait routing through the actual scene.
+Detailed preparation and remaining fidelity limits are in
+`docs/PLAYABLE_TACTICAL_SLICE.md`.
 
 ## Current compatibility boundary
 

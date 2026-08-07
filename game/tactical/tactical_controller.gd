@@ -26,6 +26,13 @@ var latest_feedback := "Select a highlighted active-side unit."
 @onready var feedback_label: Label = %FeedbackLabel
 @onready var victory_label: Label = %VictoryLabel
 @onready var events_label: RichTextLabel = %EventsLabel
+@onready var attack_label: Label = %AttackLabel
+@onready var defence_label: Label = %DefenceLabel
+@onready var effects_label: Label = %EffectsLabel
+@onready var portrait_rect: TextureRect = %SelectedPortrait
+@onready var portrait_fallback_label: Label = %PortraitFallbackLabel
+@onready var panel_texture: TextureRect = %PanelTexture
+@onready var command_button: Button = %CommandButton
 @onready var ranged_button: Button = %RangedButton
 @onready var pass_button: Button = %PassButton
 @onready var restart_button: Button = %RestartButton
@@ -35,6 +42,7 @@ var latest_feedback := "Select a highlighted active-side unit."
 func _ready() -> void:
 	battlefield_view.cell_clicked.connect(_on_cell_clicked)
 	battlefield_view.cancel_requested.connect(cancel_selection)
+	command_button.pressed.connect(enter_command_mode)
 	ranged_button.pressed.connect(enter_ranged_mode)
 	pass_button.pressed.connect(pass_side)
 	restart_button.pressed.connect(restart_battle)
@@ -56,6 +64,7 @@ func restart_battle() -> bool:
 	# Reload the ignored local index/mapping so changing presentation assets does
 	# not require an editor restart.
 	asset_resolver.configure()
+	_apply_visual_assets()
 	var scenario_spec := _load_scenario_spec()
 	if scenario_spec.is_empty():
 		latest_feedback = "Could not load the playable scenario."
@@ -129,6 +138,11 @@ func pass_side() -> Dictionary:
 	input_mode = MODE_COMMAND
 	_apply_command_result(result)
 	return result
+
+
+func enter_command_mode() -> void:
+	input_mode = MODE_COMMAND
+	_set_feedback("Command mode: select, move, or click an orange melee target.")
 
 
 func enter_ranged_mode() -> void:
@@ -221,28 +235,58 @@ func _unhandled_input(event: InputEvent) -> void:
 			pass_side()
 
 
+func _apply_visual_assets() -> void:
+	if not is_node_ready():
+		return
+	panel_texture.texture = asset_resolver.texture_for_named(
+		TacticalAssetResolver.CATEGORY_UI, "panel")
+	command_button.icon = asset_resolver.texture_for_named(
+		TacticalAssetResolver.CATEGORY_UI, "command")
+	ranged_button.icon = asset_resolver.texture_for_named(
+		TacticalAssetResolver.CATEGORY_UI, "ranged")
+	pass_button.icon = asset_resolver.texture_for_named(
+		TacticalAssetResolver.CATEGORY_UI, "pass")
+	cancel_button.icon = asset_resolver.texture_for_named(
+		TacticalAssetResolver.CATEGORY_UI, "cancel")
+
+
 func _refresh() -> void:
 	if not is_node_ready() or scenario == null:
 		return
-	round_label.text = "Round: %d" % scenario.state.round_number
-	side_label.text = "Active side: %s (#%d)" % [
+	round_label.text = "R%d" % scenario.state.round_number
+	side_label.text = "Active: %s (#%d)" % [
 		session.side_name(session.active_side_id()), session.active_side_id()]
-	mode_label.text = "Input mode: %s" % input_mode
-	feedback_label.text = "Latest: %s" % latest_feedback
+	mode_label.text = "Mode: %s" % input_mode
+	feedback_label.text = latest_feedback
+	portrait_rect.texture = null
+	portrait_fallback_label.text = "✦"
 	if selected_unit == null:
 		name_label.text = "Selected: —"
 		identity_label.text = "Instance: —"
 		life_label.text = "Life: —"
 		stamina_label.text = "Stamina: —"
 		movement_label.text = "Movement: —"
-		ammo_label.text = "Ammunition: —"
+		ammo_label.text = "Ammo: —"
+		attack_label.text = "Attack: —"
+		defence_label.text = "Defence: —"
+		effects_label.text = "EFFECTS / STATUS\n—"
 	else:
-		name_label.text = "Selected: %s" % selected_unit.name
-		identity_label.text = "Instance: %s" % selected_unit.instance_id
+		name_label.text = selected_unit.name
+		identity_label.text = selected_unit.instance_id
 		life_label.text = "Life: %d / %d" % [maxi(0, selected_unit.life), selected_unit.life_base]
 		stamina_label.text = "Stamina: %d / %d" % [selected_unit.stamina, selected_unit.stamina_base]
-		movement_label.text = "Movement remaining: %d" % selected_unit.movement_remaining
-		ammo_label.text = "Ammunition: %d" % selected_unit.ammo
+		movement_label.text = "Move: %d" % selected_unit.movement_remaining
+		ammo_label.text = "Ammo: %d" % selected_unit.ammo
+		attack_label.text = "Atk: %d / Rng: %d" % [selected_unit.attack, selected_unit.ranged_attack]
+		defence_label.text = "Def: %d / RDef: %d" % [
+			selected_unit.defence, selected_unit.ranged_defence]
+		var effect_names: Array = selected_unit.all_flags()
+		if not selected_unit.statuses.is_empty():
+			effect_names.append("%d timed" % selected_unit.statuses.size())
+		effects_label.text = "EFFECTS / STATUS\n%s" % [
+			", ".join(effect_names) if not effect_names.is_empty() else "None"]
+		portrait_rect.texture = asset_resolver.texture_for_portrait(selected_unit)
+		portrait_fallback_label.text = selected_unit.name.substr(0, 1).to_upper()
 	var winner := session.winning_side_id()
 	victory_label.text = "Victory: %s" % session.side_name(winner) \
 		if winner >= 0 else ""

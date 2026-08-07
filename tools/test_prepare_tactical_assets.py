@@ -7,7 +7,9 @@ import pytest
 from tools.prepare_tactical_assets import (
     AssetPreparationError,
     build_index,
+    build_observation_report,
     load_json,
+    read_bmp_dimensions,
     main,
     normalize_relative_path,
 )
@@ -194,3 +196,24 @@ def test_path_normalizer_rejects_empty_and_injection():
     for value in ("", "..", "a/../b", "/a", "D:/a"):
         with pytest.raises(AssetPreparationError):
             normalize_relative_path(value)
+
+
+def test_local_observation_report_reads_bmp_dimensions(tmp_path: Path):
+    export = make_export(
+        tmp_path,
+        "Nature",
+        [{"id": "SyntheticGrass", "type": "image", "path": "images/grass.bmp"}],
+    )
+    bmp = bytearray(54 + 3 * 4)
+    bmp[0:2] = b"BM"
+    bmp[18:22] = (3).to_bytes(4, "little", signed=True)
+    bmp[22:26] = (-4).to_bytes(4, "little", signed=True)
+    (export / "images/grass.bmp").write_bytes(bmp)
+    output = tmp_path / "index.json"
+    index = build_index([("Nature", export)], output)
+    report = build_observation_report(index, output)
+    assert read_bmp_dimensions(export / "images/grass.bmp") == (3, 4)
+    assert report["archives"] == [{
+        "archive": "Nature", "objects": 1, "images": 1, "raw": 0,
+        "dimensions": [{"size": "3x4", "count": 1}],
+    }]
