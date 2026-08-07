@@ -28,9 +28,9 @@ This is a coverage map, not a release claim.
 | tactical AI scoring | decompilation corpus | not consolidated | scaffold only | deferred |
 | presentation | Project EGO Slice-3 contract + direct local visual inspection | n/a | playable hot-seat scene with layered field, inward facing, shadows, categorized ignored assets, and narrow tactical panel | real textured field/right panel and full authored fallback GUI-smoked; structural resemblance only, not original parity |
 
-## Playable tactical slice and Milestone 0.1 release shell
+## Playable tactical slice and Milestone 0.1.1 release shell
 
-Ordinary project play now opens the Milestone 0.1 demo menu; **Play Demo** enters
+Ordinary project play now opens the Milestone 0.1.1 demo menu; **Play Demo** enters
 the accepted Tactical Visual Slice 3. Developers can still launch
 `game/tactical/tactical_main.tscn` directly. The menu adds no battle semantics.
 
@@ -58,12 +58,17 @@ three variations, four deterministic decorations, the legacy segmented battle
 panel, and four recognizable UI icons. Runtime exact-magenta keying restores
 binary transparency where demonstrated by the exports.
 
-The 840:312 field/panel layout replaces Slice 2's broad generic HUD. The panel
-has portrait, primary values, ammunition, supported action controls,
-effects/status, compact round/side/feedback, events, and restart. No unsupported
-ability or legacy terrain semantics were added. Instance mappings are explicit
-local presentation choices; no canonical `genesis:unit/N` relationship is
-established.
+Milestone 0.1.1 hardens the provisional tactical UI at a 1152×648 default and
+960×540 minimum logical content size. The right panel is an anchored 320-pixel
+region; its portrait, values, actions, status, feedback, events, and restart
+content uses wrapping and bounded scrolling. The battlefield scales uniformly in
+the non-overlapping remainder, while adapter-based hit testing remains unchanged.
+Portable scene tests cover minimum, default, and larger sizes plus representative
+long text. Windows 100%, 125%, 150%, and 200% display scaling remain a documented
+manual exported-build matrix; 150% is a required 0.1.1 release run, not an
+automated claim. No unsupported ability or legacy terrain semantics were added.
+Instance mappings remain explicit local presentation choices; no canonical
+`genesis:unit/N` relationship is established.
 
 Portable tests use only project-authored synthetic images and cover mapping
 categories, malformed mappings, exact color keying, inward facing, layer order,

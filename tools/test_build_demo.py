@@ -1,8 +1,14 @@
 import json
 from pathlib import Path
+import sys
 import zipfile
 
 import pytest
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
 
 from tools.build_demo import (
     BuildError,
@@ -258,3 +264,7 @@ def test_identity_comparison_fails_closed_on_different_engine(tmp_path: Path):
     (private / EXE_NAME).write_bytes(b"different")
     with pytest.raises(BuildError, match="identity mismatch"):
         compare_runtime_with_zip(private, public_zip)
+
+
+if __name__ == "__main__":
+    raise SystemExit(pytest.main([__file__, "-q"]))

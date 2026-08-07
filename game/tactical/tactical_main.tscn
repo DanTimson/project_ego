@@ -3,29 +3,61 @@
 [ext_resource type="Script" path="res://game/tactical/tactical_controller.gd" id="1_controller"]
 [ext_resource type="Script" path="res://game/tactical/tactical_battlefield_view.gd" id="2_view"]
 
-[node name="TacticalMain" type="Node2D"]
+[node name="TacticalMain" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_controller")
 
-[node name="BattlefieldView" type="Node2D" parent="."]
+[node name="BattlefieldRegion" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -320.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+clip_contents = true
+
+[node name="BattlefieldView" type="Node2D" parent="BattlefieldRegion"]
 unique_name_in_owner = true
 script = ExtResource("2_view")
 
-[node name="BattleHint" type="Label" parent="."]
+[node name="BattleHint" type="Label" parent="BattlefieldRegion"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
 offset_left = 18.0
 offset_top = 12.0
-offset_right = 820.0
-offset_bottom = 38.0
+offset_right = -18.0
+offset_bottom = 58.0
+grow_horizontal = 2
+mouse_filter = 2
 theme_override_colors/font_color = Color(0.94, 0.88, 0.68, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 17
 text = "Select unit • green: move • orange: melee • R/magenta: ranged • Space: pass • Esc: cancel"
+autowrap_mode = 3
 
 [node name="RightPanel" type="Control" parent="."]
-offset_left = 840.0
-offset_right = 1152.0
-offset_bottom = 720.0
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -320.0
+grow_horizontal = 0
+grow_vertical = 2
 
 [node name="PanelBackdrop" type="ColorRect" parent="RightPanel"]
 layout_mode = 1
@@ -69,45 +101,52 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="RightPanel/Frame/Margin"]
+[node name="PanelScroll" type="ScrollContainer" parent="RightPanel/Frame/Margin"]
 layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="VBox" type="VBoxContainer" parent="RightPanel/Frame/Margin/PanelScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 5
 
-[node name="Header" type="HBoxContainer" parent="RightPanel/Frame/Margin/VBox"]
+[node name="Header" type="HBoxContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 layout_mode = 2
 
-[node name="HUDTitle" type="Label" parent="RightPanel/Frame/Margin/VBox/Header"]
+[node name="HUDTitle" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.96, 0.84, 0.55, 1)
 theme_override_font_sizes/font_size = 18
 text = "TACTICAL COMMAND"
 
-[node name="RoundLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/Header"]
+[node name="RoundLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "R1"
 
-[node name="SideLabel" type="Label" parent="RightPanel/Frame/Margin/VBox"]
+[node name="SideLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.76, 0.84, 0.92, 1)
 text = "Active: —"
+autowrap_mode = 3
 
-[node name="IdentityRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/VBox"]
+[node name="IdentityRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 142)
 layout_mode = 2
 
-[node name="IdentityHBox" type="HBoxContainer" parent="RightPanel/Frame/Margin/VBox/IdentityRegion"]
+[node name="IdentityHBox" type="HBoxContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PortraitStage" type="Control" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox"]
+[node name="PortraitStage" type="Control" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox"]
 custom_minimum_size = Vector2(104, 132)
 layout_mode = 2
 
-[node name="PortraitFallback" type="ColorRect" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox/PortraitStage"]
+[node name="PortraitFallback" type="ColorRect" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox/PortraitStage"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -120,7 +159,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.16, 0.2, 0.18, 1)
 
-[node name="PortraitFallbackLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox/PortraitStage"]
+[node name="PortraitFallbackLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox/PortraitStage"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -134,7 +173,7 @@ text = "✦"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SelectedPortrait" type="TextureRect" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox/PortraitStage"]
+[node name="SelectedPortrait" type="TextureRect" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox/PortraitStage"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -149,146 +188,166 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="IdentityVBox" type="VBoxContainer" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox"]
+[node name="IdentityVBox" type="VBoxContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="NameLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
+[node name="NameLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "Selected: —"
-autowrap_mode = 2
+autowrap_mode = 3
 
-[node name="IdentityLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
+[node name="IdentityLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.64, 0.62, 0.56, 1)
 theme_override_font_sizes/font_size = 11
 text = "Instance: —"
-autowrap_mode = 2
+autowrap_mode = 3
 
-[node name="LifeLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
+[node name="LifeLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Life: —"
+autowrap_mode = 3
 
-[node name="StaminaLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
+[node name="StaminaLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Stamina: —"
+autowrap_mode = 3
 
-[node name="MovementLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
+[node name="MovementLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/IdentityRegion/IdentityHBox/IdentityVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Movement: —"
+autowrap_mode = 3
 
-[node name="StatsRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/VBox"]
+[node name="StatsRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="StatsGrid" type="GridContainer" parent="RightPanel/Frame/Margin/VBox/StatsRegion"]
+[node name="StatsGrid" type="GridContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox/StatsRegion"]
 layout_mode = 2
 columns = 2
 
-[node name="AttackLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/StatsRegion/StatsGrid"]
+[node name="AttackLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/StatsRegion/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Attack: —"
+autowrap_mode = 3
 
-[node name="DefenceLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/StatsRegion/StatsGrid"]
+[node name="DefenceLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/StatsRegion/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Defence: —"
+autowrap_mode = 3
 
-[node name="AmmoLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/StatsRegion/StatsGrid"]
+[node name="AmmoLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/StatsRegion/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Ammo: —"
+autowrap_mode = 3
 
-[node name="ModeLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/StatsRegion/StatsGrid"]
+[node name="ModeLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox/StatsRegion/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.43, 0.88, 0.91, 1)
 text = "Mode: command"
+autowrap_mode = 3
 
-[node name="ActionRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/VBox"]
+[node name="ActionRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ActionGrid" type="GridContainer" parent="RightPanel/Frame/Margin/VBox/ActionRegion"]
+[node name="ActionGrid" type="GridContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion"]
 layout_mode = 2
 columns = 2
 
-[node name="CommandButton" type="Button" parent="RightPanel/Frame/Margin/VBox/ActionRegion/ActionGrid"]
+[node name="CommandButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 43)
 layout_mode = 2
 size_flags_horizontal = 3
+expand_icon = true
+icon_max_width = 24
 text = "Move / Melee"
 
-[node name="RangedButton" type="Button" parent="RightPanel/Frame/Margin/VBox/ActionRegion/ActionGrid"]
+[node name="RangedButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 43)
 layout_mode = 2
 size_flags_horizontal = 3
+expand_icon = true
+icon_max_width = 24
 text = "Ranged [R]"
 
-[node name="PassButton" type="Button" parent="RightPanel/Frame/Margin/VBox/ActionRegion/ActionGrid"]
+[node name="PassButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 43)
 layout_mode = 2
 size_flags_horizontal = 3
+expand_icon = true
+icon_max_width = 24
 text = "Pass [Space]"
 
-[node name="CancelButton" type="Button" parent="RightPanel/Frame/Margin/VBox/ActionRegion/ActionGrid"]
+[node name="CancelButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 43)
 layout_mode = 2
 size_flags_horizontal = 3
+expand_icon = true
+icon_max_width = 24
 text = "Cancel [Esc]"
 
-[node name="EffectsRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/VBox"]
+[node name="EffectsRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 62)
 layout_mode = 2
 
-[node name="EffectsLabel" type="Label" parent="RightPanel/Frame/Margin/VBox/EffectsRegion"]
+[node name="EffectsLabel" type="RichTextLabel" parent="RightPanel/Frame/Margin/PanelScroll/VBox/EffectsRegion"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.76, 0.62, 1)
+scroll_active = true
+autowrap_mode = 3
 text = "EFFECTS
 —"
-autowrap_mode = 2
 
-[node name="FeedbackLabel" type="Label" parent="RightPanel/Frame/Margin/VBox"]
+[node name="FeedbackLabel" type="RichTextLabel" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.86, 0.72, 1)
+scroll_active = true
+autowrap_mode = 3
 text = "Latest: —"
-autowrap_mode = 2
 
-[node name="VictoryLabel" type="Label" parent="RightPanel/Frame/Margin/VBox"]
+[node name="VictoryLabel" type="Label" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.98, 0.78, 0.2, 1)
 theme_override_font_sizes/font_size = 19
 text = ""
+autowrap_mode = 3
 
-[node name="EventsLabel" type="RichTextLabel" parent="RightPanel/Frame/Margin/VBox"]
+[node name="EventsLabel" type="RichTextLabel" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
 size_flags_vertical = 3
 scroll_active = true
+autowrap_mode = 3
+scroll_following = true
 text = ""
 
-[node name="RestartButton" type="Button" parent="RightPanel/Frame/Margin/VBox"]
+[node name="RestartButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 39)

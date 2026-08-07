@@ -164,10 +164,11 @@ func _run() -> void:
 	root.add_child(controller)
 	await process_frame
 	await process_frame
-	_check(controller.get_node_or_null("RightPanel/Frame/Margin/VBox/IdentityRegion") != null
-		and controller.get_node_or_null("RightPanel/Frame/Margin/VBox/StatsRegion") != null
-		and controller.get_node_or_null("RightPanel/Frame/Margin/VBox/ActionRegion") != null
-		and controller.get_node_or_null("RightPanel/Frame/Margin/VBox/EffectsRegion") != null,
+	var panel_vbox := controller.get_node("RightPanel/Frame/Margin/PanelScroll/VBox")
+	_check(panel_vbox.get_node_or_null("IdentityRegion") != null
+		and panel_vbox.get_node_or_null("StatsRegion") != null
+		and panel_vbox.get_node_or_null("ActionRegion") != null
+		and panel_vbox.get_node_or_null("EffectsRegion") != null,
 		"actual tactical main scene constructs portrait, stats, actions, and effects regions")
 	controller.select_unit("azure-vanguard-01")
 	_check(controller.portrait_rect.texture == null

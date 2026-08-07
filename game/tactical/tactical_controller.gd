@@ -1,6 +1,7 @@
 class_name TacticalController
-extends Node2D
+extends Control
 
+const BATTLEFIELD_LOGICAL_SIZE := Vector2(840.0, 720.0)
 const MODE_COMMAND := "Move / melee"
 const MODE_RANGED := "Ranged"
 
@@ -13,7 +14,9 @@ var input_mode := MODE_COMMAND
 var asset_resolver := TacticalAssetResolver.new()
 var latest_feedback := "Select a highlighted active-side unit."
 
+@onready var battlefield_region: Control = %BattlefieldRegion
 @onready var battlefield_view: TacticalBattlefieldView = %BattlefieldView
+@onready var right_panel: Control = %RightPanel
 @onready var round_label: Label = %RoundLabel
 @onready var side_label: Label = %SideLabel
 @onready var name_label: Label = %NameLabel
@@ -23,12 +26,12 @@ var latest_feedback := "Select a highlighted active-side unit."
 @onready var movement_label: Label = %MovementLabel
 @onready var ammo_label: Label = %AmmoLabel
 @onready var mode_label: Label = %ModeLabel
-@onready var feedback_label: Label = %FeedbackLabel
+@onready var feedback_label: RichTextLabel = %FeedbackLabel
 @onready var victory_label: Label = %VictoryLabel
 @onready var events_label: RichTextLabel = %EventsLabel
 @onready var attack_label: Label = %AttackLabel
 @onready var defence_label: Label = %DefenceLabel
-@onready var effects_label: Label = %EffectsLabel
+@onready var effects_label: RichTextLabel = %EffectsLabel
 @onready var portrait_rect: TextureRect = %SelectedPortrait
 @onready var portrait_fallback_label: Label = %PortraitFallbackLabel
 @onready var panel_texture: TextureRect = %PanelTexture
@@ -40,6 +43,7 @@ var latest_feedback := "Select a highlighted active-side unit."
 
 
 func _ready() -> void:
+	resized.connect(_queue_layout_presentation)
 	battlefield_view.cell_clicked.connect(_on_cell_clicked)
 	battlefield_view.cancel_requested.connect(cancel_selection)
 	command_button.pressed.connect(enter_command_mode)
@@ -48,6 +52,25 @@ func _ready() -> void:
 	restart_button.pressed.connect(restart_battle)
 	cancel_button.pressed.connect(cancel_selection)
 	restart_battle()
+	_layout_presentation.call_deferred()
+
+
+func _queue_layout_presentation() -> void:
+	_layout_presentation.call_deferred()
+
+
+func _layout_presentation() -> void:
+	if not is_node_ready():
+		return
+	var available := battlefield_region.size
+	var presentation_scale := minf(
+		available.x / BATTLEFIELD_LOGICAL_SIZE.x,
+		available.y / BATTLEFIELD_LOGICAL_SIZE.y)
+	presentation_scale = maxf(presentation_scale, 0.01)
+	battlefield_view.scale = Vector2.ONE * presentation_scale
+	battlefield_view.position = Vector2(
+		maxf(0.0, (available.x - BATTLEFIELD_LOGICAL_SIZE.x * presentation_scale) * 0.5),
+		maxf(0.0, (available.y - BATTLEFIELD_LOGICAL_SIZE.y * presentation_scale) * 0.5))
 
 
 func _load_scenario_spec() -> Dictionary:

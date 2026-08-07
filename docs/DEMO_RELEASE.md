@@ -1,6 +1,6 @@
 # Milestone demo releases
 
-Project EGO Milestone 0.1 has one Windows x86-64 engine payload and two package
+Project EGO Milestone 0.1.1 has one Windows x86-64 engine payload and two package
 modes. Release packaging changes presentation and distribution only; it does not
 change combat rules.
 
@@ -27,8 +27,8 @@ x86-64` in `export_presets.cfg`; it exports `Project EGO.exe` plus the external
 From a clean committed revision:
 
 ```bash
-python3 tools/build_demo.py --mode public --milestone 0.1
-python3 tools/build_demo.py --mode private --milestone 0.1 \
+python3 tools/build_demo.py --mode public --milestone 0.1.1
+python3 tools/build_demo.py --mode private --milestone 0.1.1 \
     --asset-root .local/eador_assets
 ```
 
@@ -42,14 +42,52 @@ If the other mode's ZIP already exists, hashes are compared again.
 Output is written to:
 
 ```text
-dist/public/Project-EGO-Milestone-0.1-Windows-x86_64.zip
-dist/private/Project-EGO-Milestone-0.1-private-Windows-x86_64.zip
+dist/public/Project-EGO-Milestone-0.1.1-Windows-x86_64.zip
+dist/private/Project-EGO-Milestone-0.1.1-private-Windows-x86_64.zip
 ```
 
 Each ZIP opens directly at the application files. `BUILD.json`, `BUILD.txt` and
 `demo-info.txt` record Project EGO, milestone, exact commit, Godot version, mode
 and UTC build time. The About dialog reads adjacent `BUILD.json`; development
 runs use an explicit fallback and generate no tracked metadata file.
+
+
+## Window, resizing, and Windows DPI acceptance
+
+Milestone 0.1.1 requests a 1152×648 logical content area and enforces a 960×540
+minimum. This default was selected to leave room for Windows decorations and the
+taskbar on a 1920×1080 desktop at 150% scaling; it is not an arbitrary increase
+to conceal clipping. Below the minimum the OS blocks further resize. Between the
+minimum and default, the battlefield uniformly scales inside its region and the
+right panel remains fixed-width with vertical scrolling. Above the default,
+`expand` aspect handling uses the additional logical area and the battlefield
+continues to fit without crossing the panel.
+
+Godot 4.3 high-DPI support is explicitly enabled. The project uses
+`canvas_items` plus `expand` with the default content scale factor of 1.0, so
+fonts, Controls, battlefield presentation, and optional textures share one
+scaling path. Do not add a Windows compatibility override or a separate font DPI
+multiplier, either of which can double-apply scaling. Pointer input is transformed
+back into `TacticalBattlefieldView` local coordinates before
+`TacticalCoordinateAdapter` hit testing.
+
+Portable tests validate logical layout at 960×540, 1152×648, and 1440×810. They
+do **not** change or simulate the user's Windows display scale. Before a
+Milestone 0.1.1 release, run the exported public and private builds using this
+manual matrix and record the scale shown by **Settings → System → Display →
+Scale**:
+
+| Windows scale | required check |
+|---:|---|
+| 100% | menu, both dialogs, tactical play, minimum/default/larger resize |
+| 125% | same checks; verify text and mapped/fallback artwork scale together |
+| 150% | **required release gate** on 1920×1080; verify the default opens wholly inside the work area |
+| 200% | verify minimum-size usability on an available work area and record any OS work-area limitation |
+
+At every scale verify Play Demo, Controls, About This Build, Quit, selection,
+movement, melee, ranged, pass, cancel, long refusal/event text, scrollbars, panel
+containment, and pointer-to-hex accuracy. A headless logical-size PASS must never
+be reported as a Windows DPI PASS. Do not change the user's scale automatically.
 
 ## Public/private content boundary
 

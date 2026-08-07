@@ -158,11 +158,15 @@ to recover discarded partial alpha.
 insertion: terrain, variation, decoration, grid, all shadows, all unit sprites,
 bars, then target/selection overlays. Side 0's left deployment retains the
 inspected natural rightward sprite facing; side 1 uses a negative horizontal
-render scale. The transform is reset before overlays. UI is a separate fixed
-right-side Control layer. All input continues through
-`TacticalCoordinateAdapter`, so scale and facing cannot change a model cell or
-hit test. No local file is required: authored terrain, directional tokens,
-portrait initials, panels, and buttons form the complete fallback.
+render scale. The transform is reset before overlays. UI is a separate anchored
+320-logical-pixel right-side Control layer. Its textual regions use Containers,
+wrapping, and bounded scrolling; the outer panel scroll keeps every action
+reachable when vertical space is limited. The 840×720 battlefield presentation
+is uniformly scaled and centered inside the remaining clipped region. All input
+continues through `TacticalCoordinateAdapter` and the battlefield node transform,
+so UI/window scale and facing cannot change a model cell or hit test. No local
+file is required: authored terrain, directional tokens, portrait initials,
+panels, and buttons form the complete fallback.
 
 ### `tests/`
 
@@ -181,6 +185,13 @@ The exported composition root is `game/demo/demo_main.tscn`; it is a small
 presentation shell that transitions to the existing tactical scene. Release
 metadata is external to the PCK and is read from `BUILD.json` beside the
 executable, with a development fallback when absent.
+
+The release UI baseline is a 1152×648 logical content area with a 960×540
+minimum. Godot 4.3 high-DPI support remains enabled. `canvas_items` scaling with
+`expand` aspect handling scales Controls, fonts, tactical drawing, and optional
+textures together; the project does not apply a second font-only or DPI factor.
+These settings define logical layout coverage, not proof of a particular Windows
+scale setting. Exported Windows DPI acceptance remains a manual release gate.
 
 `TacticalAssetResolver` treats extracted artwork as optional presentation. An
 explicit tool/test root wins; exported builds next probe executable-adjacent

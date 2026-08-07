@@ -22,11 +22,14 @@ The battle supports the same manual play:
 - use right-click, `Escape`, or Cancel to clear selection;
 - use Restart Battle after victory.
 
-The narrow right column now contains selected visual identity, combat/state
-values, ammunition, only the actions the slice implements, effects/status,
-round/side feedback, recent events, and victory/restart. The battlefield still
-occupies model cells through `TacticalCoordinateAdapter`; texture bounds, visual
-scale, shadows, and horizontal mirroring never define a hit box.
+The right column contains selected visual identity, combat/state values,
+ammunition, only the actions the slice implements, effects/status, round/side
+feedback, recent events, and victory/restart. At Milestone 0.1.1 it is anchored
+and container-driven, with wrapped identity text and scrollable status, feedback,
+events, and whole-panel overflow. The battlefield uniformly fits the remaining
+region and still occupies model cells through `TacticalCoordinateAdapter`;
+texture bounds, visual scale, shadows, and horizontal mirroring never define a
+hit box.
 
 ## Authoritative execution boundary
 
@@ -202,18 +205,34 @@ it writes no report artifact unless the user explicitly redirects stdout.
 
 ## Structural reference comparison and remaining gaps
 
-The current 1152×720 layout allocates 840 pixels (73%) to the field and 312
-pixels (27%) to a fixed right panel, versus Slice 2's roughly 56%/42% split.
-Eight by five large visible hexes use radius 50; a 94-pixel-high unit occupies a
-substantial fraction of the 100-pixel hex height. Textured terrain fills the
-entire field instead of leaving dark unused space. Portrait/stats/actions/effects
-are visibly segmented, and portrait plus state values dominate the upper panel.
-Opposing deployments face inward.
+The current default is 1152×648 logical pixels with a 320-pixel anchored right
+panel; the minimum supported logical content size is 960×540. The 840×720
+battlefield presentation scales uniformly into the remaining clipped region, and
+the panel scrolls vertically rather than allowing controls to escape at the
+minimum. Eight by five large visible hexes still use radius 50; a 94-pixel-high
+unit occupies a substantial fraction of the 100-pixel hex height. Textured
+terrain fills the field. Portrait/stats/actions/effects remain visibly segmented,
+and opposing deployments face inward.
 
-This is a structural advance, not pixel parity. Remaining gaps include the
-synthetic scenario's lower hex density than the reference, a proportionally
-wider panel than the legacy 140-pixel asset, static rather than generated
-legacy terrain composition, no animation or recovered partial alpha, no
-canonical unit/portrait/terrain mapping, no authoritative display semantics for
-legacy effect slots, and limited responsive behavior beyond the project's
-canvas stretch.
+### Deferred Tactical UI Fidelity debt
+
+The current tactical UI is **not** a faithful reconstruction of the legacy
+Eador sidebar. This hardening work is a readability and containment change, not
+a compatibility conclusion. Known deliberate debt includes:
+
+- the current sidebar is considerably wider than the roughly 140-pixel legacy
+  reference;
+- legacy panel artwork functions partly as a backdrop rather than authoritative
+  cell geometry;
+- generic Godot text and widgets overlay the legacy imagery;
+- exact portrait/stat/icon/action/item/effect slot positions, separators, and
+  frames remain unreconstructed;
+- battlefield hex density and some proportions remain different;
+- animation, alpha treatment, and additional visual fidelity remain deferred.
+
+Future Tactical UI Fidelity work must treat the original sidebar as an
+asset-defined interface to reconstruct, not as a decorative texture behind a
+generic new UI. That tranche must recover the original proportions and geometry,
+portrait/stat cells, action/item/effect slots, separators/frames, and bindings of
+current model state into those cells. It must remain separate from combat
+semantics and from this Milestone 0.1.1 hardening tranche.

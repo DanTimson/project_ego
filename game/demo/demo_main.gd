@@ -24,6 +24,8 @@ func _ready() -> void:
 	%QuitButton.pressed.connect(quit_demo)
 	controls_dialog = %ControlsDialog
 	about_dialog = %AboutDialog
+	_prepare_dialog(controls_dialog)
+	_prepare_dialog(about_dialog)
 	controls_dialog.dialog_text = controls_text()
 	about_dialog.dialog_text = about_text(build_metadata)
 	if OS.get_cmdline_user_args().has("--demo-smoke"):
@@ -34,12 +36,18 @@ func play_demo() -> Error:
 	return get_tree().change_scene_to_file(TACTICAL_SCENE)
 
 
+func _prepare_dialog(dialog: AcceptDialog) -> void:
+	var message := dialog.get_label()
+	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	message.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+
 func show_controls() -> void:
-	controls_dialog.popup_centered(Vector2i(660, 360))
+	controls_dialog.popup_centered_clamped(Vector2i(660, 360), 0.85)
 
 
 func show_about() -> void:
-	about_dialog.popup_centered(Vector2i(700, 430))
+	about_dialog.popup_centered_clamped(Vector2i(700, 430), 0.85)
 
 
 func quit_demo() -> void:
