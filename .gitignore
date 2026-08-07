@@ -14,3 +14,4 @@ var.zip
 __pycache__/
 *.patch
 var
+/.local/

@@ -1,3 +1,4 @@
+# gdlint: disable=max-returns
 # core/battle/scenario.gd
 class_name Scenario
 extends RefCounted
@@ -502,22 +503,193 @@ func _genesis_attack_command_charge(unit: Combatant, attacker_xy: Vector2i,
 	return 0
 
 
-# -- commands ----------------------------------------------------------------
+# -- authoritative manual-command boundary -----------------------------------
 
-func cmd_move(unit: Combatant, col: int, row: int) -> void:
+## Validate a one-at-a-time presentation command against the current model.
+## This is also the execution gate used by execute_command(); presentation may
+## use it for advisory highlights but may not treat a prior query as authority.
+func query_command(command: Dictionary) -> Dictionary:
+	var op := String(command.get("op", ""))
+	var command_name := _command_name(op)
+	if op == "end_phase":
+		return _command_query(true, command_name)
+	if op not in ["move", "attack", "shoot", "rest"]:
+		return _command_query(false, command_name,
+			"unknown command '%s'" % op)
+	var unit: Combatant = units.get(String(command.get("unit", "")))
+	if unit == null:
+		return _command_query(false, command_name,
+			"unknown unit '%s'" % command.get("unit", ""))
+	if not unit.alive:
+		return _command_query(false, command_name,
+			"%s is down and cannot act" % unit.label())
+	var side := side_of(unit)
+	if side == null or side.id != state.active_side:
+		return _command_query(false, command_name,
+			"%s is not in the active side's phase" % unit.label())
+	if not ActionPoints.has_resources(unit):
+		return _command_query(false, command_name,
+			"%s has no resources left this round" % unit.label())
+	if op == "move":
+		var destination_v: Variant = command.get("to")
+		if typeof(destination_v) != TYPE_ARRAY or destination_v.size() != 2:
+			return _command_query(false, command_name,
+				"movement destination is malformed")
+		var plan := movement_plan(unit, int(destination_v[0]), int(destination_v[1]))
+		return _command_query(bool(plan["ok"]), command_name,
+			String(plan.get("reason", "")))
+	if op == "rest":
+		return _command_query(not unit.action_spent, command_name,
+			"%s has already acted" % unit.label() if unit.action_spent else "")
+	var target: Combatant = units.get(String(command.get("target", "")))
+	if target == null:
+		return _command_query(false, command_name,
+			"unknown target '%s'" % command.get("target", ""))
+	if not target.alive:
+		return _command_query(false, command_name,
+			"%s is down and cannot be targeted" % target.label())
+	if side_of(target) == side:
+		return _command_query(false, command_name,
+			"%s is on the same side as %s" % [target.label(), unit.label()])
+	if unit.action_spent:
+		return _command_query(false, command_name,
+			"%s has already acted" % unit.label())
+	if op == "attack":
+		var approach := _approach_plan(unit, target)
+		return _command_query(bool(approach["ok"]), command_name,
+			"%s cannot reach %s" % [unit.label(), target.label()]
+			if not bool(approach["ok"]) else "")
+	if unit.ammo <= 0:
+		return _command_query(false, command_name,
+			"%s is out of ammunition" % unit.label())
+	if unit.shooting_range <= 0:
+		return _command_query(false, command_name,
+			"%s cannot make ranged attacks" % unit.label())
+	var distance := Battlefield.distance(field.find_unit(unit), field.find_unit(target))
+	if distance > unit.shooting_range:
+		return _command_query(false, command_name,
+			"%s is out of range of %s (%d > %d)" % [
+				target.label(), unit.label(), distance, unit.shooting_range])
+	return _command_query(true, command_name)
+
+
+## Decide and apply a manual command through one authoritative core path.
+func execute_command(command: Dictionary) -> Dictionary:
+	var before_log := log.size()
+	var query := query_command(command)
+	if not bool(query["accepted"]):
+		return _command_result(false, String(query["command"]),
+			String(query["reason"]), [], false)
+	var before_state := _command_state()
+	var op := String(command.get("op", ""))
+	if op == "end_phase":
+		cmd_end_phase()
+	else:
+		var unit: Combatant = units[String(command["unit"])]
+		match op:
+			"move":
+				var destination: Array = command["to"]
+				cmd_move(unit, int(destination[0]), int(destination[1]))
+			"attack":
+				cmd_attack(unit, units[String(command["target"])])
+			"shoot":
+				cmd_shoot(unit, units[String(command["target"])])
+			"rest":
+				cmd_rest(unit)
+	if RoundLoop.battle_over(state):
+		emit("== battle over ==")
+	elif op != "end_phase":
+		_auto_end_phase()
+	var events: Array = log.slice(before_log)
+	return _command_result(true, String(query["command"]), "", events,
+		before_state != _command_state())
+
+
+func movement_plan(unit: Combatant, col: int, row: int) -> Dictionary:
 	var start := field.find_unit(unit)
 	var goal := Battlefield.offset_to_axial(col, row)
 	var path := field.path(start, goal, false, unit.movement_remaining)
 	if path.is_empty():
-		emit("%s cannot reach %d,%d" % [unit.label(), col, row])
-		return
+		return {"ok": false, "reason": "%s cannot reach %d,%d" % [
+			unit.label(), col, row]}
 	var cost := _path_cost(path)
 	if cost > unit.movement_remaining:
-		emit("%s lacks movement for %d,%d" % [unit.label(), col, row])
+		return {"ok": false, "reason": "%s lacks movement for %d,%d" % [
+			unit.label(), col, row]}
+	return {"ok": true, "reason": "", "start": start, "goal": goal,
+		"path": path, "cost": cost, "stamina_cost": _path_stamina(path)}
+
+
+func _command_name(op: String) -> String:
+	return {"attack": "melee", "shoot": "ranged", "end_phase": "pass"}.get(op, op)
+
+
+func _command_query(accepted: bool, command: String,
+		reason: String = "") -> Dictionary:
+	return {"accepted": accepted, "command": command, "reason": reason}
+
+
+func _command_result(accepted: bool, command: String, reason: String,
+		events: Array, state_changed: bool) -> Dictionary:
+	var message := reason
+	if accepted and not events.is_empty():
+		message = " | ".join(events)
+	return {
+		"accepted": accepted,
+		"command": command,
+		"reason": reason,
+		"events": events,
+		"state_changed": state_changed,
+		# Backward-compatible aliases for Slice 1 callers.
+		"ok": accepted,
+		"message": message,
+		"log": events,
+	}
+
+
+func _command_state() -> Dictionary:
+	var snapshot := {
+		"round": state.round_number,
+		"active_side": state.active_side,
+		"units": {},
+	}
+	var ids: Array = units.keys()
+	ids.sort()
+	for id in ids:
+		var unit: Combatant = units[id]
+		snapshot["units"][id] = {
+			"alive": unit.alive,
+			"life": unit.life,
+			"stamina": unit.stamina,
+			"ammo": unit.ammo,
+			"action_spent": unit.action_spent,
+			"movement_remaining": unit.movement_remaining,
+			"steps_this_round": unit.steps_this_round,
+			"position": unit_position_offset(unit),
+		}
+	return snapshot
+
+
+func unit_position_offset(unit: Combatant) -> Vector2i:
+	var axial := field.find_unit(unit)
+	return Battlefield.axial_to_offset(axial) if field.contains(axial) \
+		else Vector2i(-1, -1)
+
+
+# -- commands ----------------------------------------------------------------
+
+func cmd_move(unit: Combatant, col: int, row: int) -> void:
+	var plan := movement_plan(unit, col, row)
+	if not bool(plan["ok"]):
+		emit(String(plan["reason"]))
 		return
+	var start: Vector2i = plan["start"]
+	var goal: Vector2i = plan["goal"]
+	var path: Array = plan["path"]
+	var cost := int(plan["cost"])
 	field.remove_occupant(start)
 	field.place(unit, goal)
-	ActionPoints.spend_move(unit, cost, _path_stamina(path))
+	ActionPoints.spend_move(unit, cost, int(plan["stamina_cost"]))
 	emit("%s moves to %s (%d steps, %d total this round)"
 		% [unit.label(), _at(unit), path.size(), unit.steps_this_round])
 

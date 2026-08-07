@@ -39,7 +39,6 @@ func _ready() -> void:
 	pass_button.pressed.connect(pass_side)
 	restart_button.pressed.connect(restart_battle)
 	cancel_button.pressed.connect(cancel_selection)
-	asset_resolver.configure()
 	restart_battle()
 
 
@@ -54,6 +53,9 @@ func _load_scenario_spec() -> Dictionary:
 func restart_battle() -> bool:
 	if session != null:
 		session.end()
+	# Reload the ignored local index/mapping so changing presentation assets does
+	# not require an editor restart.
+	asset_resolver.configure()
 	var scenario_spec := _load_scenario_spec()
 	if scenario_spec.is_empty():
 		latest_feedback = "Could not load the playable scenario."
@@ -148,12 +150,23 @@ func cancel_selection() -> void:
 
 func _controller_refusal(message: String) -> Dictionary:
 	_set_feedback(message)
-	return {"ok": false, "message": message, "log": [], "battle_over":
-		session.battle_complete() if scenario != null else false, "winner": -1}
+	return {
+		"accepted": false, "command": "controller", "reason": message,
+		"events": [], "state_changed": false,
+		"ok": false, "message": message, "log": [],
+		"battle_over": session.battle_complete() if scenario != null else false,
+		"winner": -1,
+	}
 
 
 func _apply_command_result(result: Dictionary) -> void:
-	latest_feedback = String(result.get("message", "Command completed."))
+	# Acceptance is a typed core field. Never infer it from event/log text.
+	if bool(result.get("accepted", false)):
+		var events: Array = result.get("events", [])
+		latest_feedback = " | ".join(events) if not events.is_empty() \
+			else "%s accepted." % String(result.get("command", "Command")).capitalize()
+	else:
+		latest_feedback = String(result.get("reason", "Command refused."))
 	if selected_unit != null and not session.can_select(selected_unit):
 		selected_unit = null
 	if session.battle_complete():

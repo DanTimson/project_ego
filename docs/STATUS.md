@@ -26,40 +26,38 @@ This is a coverage map, not a release claim.
 | unit upkeep/recruitment | binary | not normalized | not implemented | evidence available |
 | province income/economy | binary | not normalized | not implemented | evidence available |
 | tactical AI scoring | decompilation corpus | not consolidated | scaffold only | deferred |
-| presentation | Project EGO slice contract | n/a | playable hot-seat tactical scene | synthetic placeholders; not an original parity target |
+| presentation | Project EGO slice contract | n/a | playable hot-seat tactical scene + optional ignored local assets | structured command boundary and real EGOgrabber-to-resolver pipeline validated locally; not an original parity target |
 
 ## Playable tactical slice
 
-Playable Tactical Slice 1 is available as the ordinary project entry point:
+Playable Tactical Slice 2 is the ordinary project entry point:
 
 ```bash
 godot --path .
 ```
 
-It opens one synthetic 8×5 battle with active-side/round HUD, authoritative unit
-inspection, highlighted movement, automatic-approach melee, ranged attacks,
-passing, two-side hot-seat control, roster-based victory, input lock after
-victory, and fresh restart. The presentation owns no combat state: one retained
-`Scenario` is driven one command at a time by `ManualBattleSession`, and the
-existing scripted `Scenario.run()` behavior remains available for fixtures.
+It preserves the synthetic 8×5 hot-seat battle and placeholder-only fresh-clone
+behavior. Manual move, melee, ranged, rest, and pass execution now returns an
+authoritative structured core result with refusal reason, new events, and an
+accurate state-change flag. Advisory highlights query the same movement,
+automatic-approach, and ranged eligibility helpers. `ManualBattleSession` scopes
+legacy `Damage` bindings per call, so alternating sessions do not retain one
+another's environment.
 
-Focused and complete Godot commands are:
+The full optional local presentation path has been exercised with the actual
+clean EGOgrabber revision `ca2df7001427266c07201cb22569d32a663f77e0` and the
+user-provided `Units.dat`, `Unit_icons.dat`, `Unit_shadow.dat`, and
+`Unit_shadowf.dat`. Each archive yielded 71 images plus one raw info object; the
+ignored combined index contained 288 archive-qualified assets. Four explicit
+battle-instance demo mappings loaded real textures and reached the playable
+battlefield draw path. Removing the ignored mapping returns the same build to
+placeholders. These instance mappings are presentation choices only: no
+canonical `genesis:unit/N` to `Units:UnitNN` relationship is established.
 
-```bash
-godot --headless --path . --script tests/test_playable_tactical_slice.gd
-python3 tools/run_godot_tests.py
-```
-
-Generated colored tokens are the supported default. An optional
-presentation-only resolver can read a local EGOgrabber version-1 manifest plus
-an explicit local unit map; original/extracted assets and local configuration
-remain ignored. The inspected EGOgrabber source does not provide a verified
-per-unit semantic mapping, and its pack-magic constants are still marked as
-placeholders, so absence of local images never blocks the slice.
-
-Tactical AI, campaign/strategy flow, save/load, multiplayer, sound, animation,
-complete special actions, incomplete status/death lifecycles, and original HUD
-or visual parity remain out of scope.
+Portable tests use only project-authored synthetic assets. The local-only real
+asset test skips when `.local/eador_assets/index.json` is absent. Preparation,
+security schema, launch, fallback, and observed archive details are documented
+in `docs/PLAYABLE_TACTICAL_SLICE.md`.
 
 ## Current compatibility boundary
 

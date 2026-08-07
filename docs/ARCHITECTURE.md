@@ -105,13 +105,21 @@ mechanic differently.
 
 The playable tactical entry point is `game/tactical/tactical_main.tscn`. Its
 controller constructs one `Scenario`, retains that exact model, and drives it
-through `ManualBattleSession`. The session is a neutral `core/` driver: it binds
-the established rule pipeline, begins the round without consuming the
-scenario's scripted command list, validates and issues one existing command at
-a time, and returns new log entries. Its selection, position, reachability,
-target, and victory queries read the same `Scenario`, `Battlefield`, combatants,
-and `RoundLoop`; it owns no second tactical state. Scripted `Scenario.run()`
-remains the deterministic fixture/replay path.
+through `ManualBattleSession`. `Scenario.execute_command()` returns the
+small structured result (`accepted`, normalized command, refusal reason, new
+events, and whether state changed) from the same core path that decides and
+applies move, melee, ranged, rest, and pass. `Scenario.query_command()` shares
+movement plans, automatic melee approach, and ranged eligibility with that
+execution gate. Presentation highlights are advisory UX; a fresh execution
+result is authority. The controller never parses battle-log prose for success.
+
+The session remains a neutral `core/` facade: it begins a round without
+consuming scripted commands, exposes model queries, and owns no second tactical
+state or formula. Because the legacy `Damage` bindings are process-global, each
+manual command/damage query scopes its own pipeline and `Scenario.environment`
+and clears them before returning. Alternating manual sessions therefore do not
+retain one another's environment. Scripted `Scenario.run()` remains the
+deterministic fixture/replay path.
 
 `TacticalCoordinateAdapter` is the sole model/screen coordinate boundary. It
 maps offset battlefield cells to pointy-top screen polygons and performs the
@@ -121,15 +129,19 @@ arithmetic.
 Optional original presentation assets remain outside both core and rules:
 
 ```text
-original .dat -> local EGOgrabber extraction -> ignored manifest/images
-              -> TacticalAssetResolver -> exact local unit map or placeholder
+user DAT -> explicit local EGOgrabber -> ignored archive exports
+         -> tools/prepare_tactical_assets.py -> ignored namespaced index
+         -> explicit content/instance presentation mapping
+         -> TacticalAssetResolver -> texture or project-authored placeholder
 ```
 
-The resolver consumes EGOgrabber's version-1 asset manifest, indexes stable
-logical archive IDs deterministically, and loads a texture only when a separate
-local exact unit-to-ID map exists. It has no runtime `.dat` parser, no absolute
-paths in gameplay/content identity, and no hard dependency on extracted data.
-Generated tokens are always the fallback.
+Project EGO never parses DAT. The preparation tool treats EGOgrabber manifests
+as untrusted, preserves archive namespace, rejects duplicate/traversing/missing
+entries, and emits only sorted relative runtime paths. The resolver independently
+contains every path below the configured index root. Canonical content mapping
+has priority over battle-instance mapping; display name and guessed numeric
+relationships are never identity. No local file is required and generated
+tokens remain the fallback.
 
 ### `tests/`
 
