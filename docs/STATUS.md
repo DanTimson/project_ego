@@ -26,7 +26,40 @@ This is a coverage map, not a release claim.
 | unit upkeep/recruitment | binary | not normalized | not implemented | evidence available |
 | province income/economy | binary | not normalized | not implemented | evidence available |
 | tactical AI scoring | decompilation corpus | not consolidated | scaffold only | deferred |
-| presentation | original observation | n/a | devtools only | not a current parity target |
+| presentation | Project EGO slice contract | n/a | playable hot-seat tactical scene | synthetic placeholders; not an original parity target |
+
+## Playable tactical slice
+
+Playable Tactical Slice 1 is available as the ordinary project entry point:
+
+```bash
+godot --path .
+```
+
+It opens one synthetic 8×5 battle with active-side/round HUD, authoritative unit
+inspection, highlighted movement, automatic-approach melee, ranged attacks,
+passing, two-side hot-seat control, roster-based victory, input lock after
+victory, and fresh restart. The presentation owns no combat state: one retained
+`Scenario` is driven one command at a time by `ManualBattleSession`, and the
+existing scripted `Scenario.run()` behavior remains available for fixtures.
+
+Focused and complete Godot commands are:
+
+```bash
+godot --headless --path . --script tests/test_playable_tactical_slice.gd
+python3 tools/run_godot_tests.py
+```
+
+Generated colored tokens are the supported default. An optional
+presentation-only resolver can read a local EGOgrabber version-1 manifest plus
+an explicit local unit map; original/extracted assets and local configuration
+remain ignored. The inspected EGOgrabber source does not provide a verified
+per-unit semantic mapping, and its pack-magic constants are still marked as
+placeholders, so absence of local images never blocks the slice.
+
+Tactical AI, campaign/strategy flow, save/load, multiplayer, sound, animation,
+complete special actions, incomplete status/death lifecycles, and original HUD
+or visual parity remain out of scope.
 
 ## Current compatibility boundary
 

@@ -1,0 +1,126 @@
+{
+  "name": "Playable Tactical Slice 1",
+  "profile": "native",
+  "seed": 20260806,
+  "battlefield": {
+    "width": 8,
+    "height": 5,
+    "tiles": [
+      {
+        "col": 3,
+        "row": 0,
+        "bf_object": 2,
+        "move_cost": 2,
+        "stam_cost": 1
+      },
+      {
+        "col": 4,
+        "row": 4,
+        "bf_object": 2,
+        "move_cost": 2,
+        "stam_cost": 1
+      },
+      {
+        "col": 3,
+        "row": 2,
+        "bf_object": 6,
+        "move_cost": 0
+      },
+      {
+        "col": 4,
+        "row": 2,
+        "bf_object": 6,
+        "move_cost": 0
+      }
+    ]
+  },
+  "sides": [
+    {
+      "id": 0,
+      "name": "Azure Company",
+      "leader_initiative": 5,
+      "is_attacker": true,
+      "units": [
+        {
+          "id": "azure-vanguard-01",
+          "name": "Vanguard",
+          "at": [
+            1,
+            1
+          ],
+          "attack": 10,
+          "counter_attack": 6,
+          "defence": 3,
+          "ranged_defence": 2,
+          "life": 16,
+          "speed": 3,
+          "stamina": 10,
+          "morale": 10
+        },
+        {
+          "id": "azure-ranger-17",
+          "name": "Ranger",
+          "at": [
+            0,
+            3
+          ],
+          "attack": 3,
+          "counter_attack": 2,
+          "ranged_attack": 9,
+          "shooting_range": 6,
+          "ammo": 6,
+          "defence": 1,
+          "ranged_defence": 2,
+          "life": 12,
+          "speed": 3,
+          "stamina": 10,
+          "morale": 10
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Crimson Guard",
+      "leader_initiative": 3,
+      "is_attacker": false,
+      "units": [
+        {
+          "id": "crimson-guard-42",
+          "name": "Guard",
+          "at": [
+            5,
+            1
+          ],
+          "attack": 9,
+          "counter_attack": 6,
+          "defence": 3,
+          "ranged_defence": 3,
+          "life": 16,
+          "speed": 3,
+          "stamina": 10,
+          "morale": 10
+        },
+        {
+          "id": "crimson-marksman-88",
+          "name": "Marksman",
+          "at": [
+            7,
+            3
+          ],
+          "attack": 3,
+          "counter_attack": 2,
+          "ranged_attack": 9,
+          "shooting_range": 6,
+          "ammo": 6,
+          "defence": 1,
+          "ranged_defence": 2,
+          "life": 12,
+          "speed": 3,
+          "stamina": 10,
+          "morale": 10
+        }
+      ]
+    }
+  ],
+  "commands": []
+}

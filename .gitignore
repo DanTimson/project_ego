@@ -9,6 +9,7 @@ docs/hooks
 tools/var/out
 tools/var/var
 var.zip
+/local_assets/
 .venv
 __pycache__/
 *.patch

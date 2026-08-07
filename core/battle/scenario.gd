@@ -524,11 +524,11 @@ func cmd_move(unit: Combatant, col: int, row: int) -> void:
 
 ## Attack commands carry an implicit move: issuing an attack against a reachable
 ## target auto-paths the unit into contact, drawing from the same pool.
-func _approach(unit: Combatant, target: Combatant) -> bool:
+func _approach_plan(unit: Combatant, target: Combatant) -> Dictionary:
 	var here := field.find_unit(unit)
 	var there := field.find_unit(target)
 	if Battlefield.distance(here, there) == 1:
-		return true
+		return {"ok": true, "already_adjacent": true}
 	var best_cost := 1 << 30
 	var best_dest := Vector2i.ZERO
 	var best_path: Array[Vector2i] = []
@@ -545,13 +545,31 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 		best_dest = h
 		best_path = p
 	if best_path.is_empty():
-		return false
-	field.remove_occupant(here)
-	field.place(unit, best_dest)
-	ActionPoints.spend_move(unit, best_cost, _path_stamina(best_path))
-	emit("%s closes to %s (%d steps)" % [unit.label(), _at(unit), best_path.size()])
-	return true
+		return {"ok": false}
+	return {
+		"ok": true,
+		"already_adjacent": false,
+		"cost": best_cost,
+		"destination": best_dest,
+		"path": best_path,
+	}
 
+
+func _approach(unit: Combatant, target: Combatant) -> bool:
+	var plan := _approach_plan(unit, target)
+	if not bool(plan["ok"]):
+		return false
+	if bool(plan["already_adjacent"]):
+		return true
+	var here := field.find_unit(unit)
+	var destination: Vector2i = plan["destination"]
+	var path: Array = plan["path"]
+	var cost := int(plan["cost"])
+	field.remove_occupant(here)
+	field.place(unit, destination)
+	ActionPoints.spend_move(unit, cost, _path_stamina(path))
+	emit("%s closes to %s (%d steps)" % [unit.label(), _at(unit), path.size()])
+	return true
 
 func _fell(unit: Combatant) -> void:
 	var h := field.find_unit(unit)

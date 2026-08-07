@@ -103,6 +103,34 @@ Presentation:
 Presentation may display or animate a result, but it must not recompute the
 mechanic differently.
 
+The playable tactical entry point is `game/tactical/tactical_main.tscn`. Its
+controller constructs one `Scenario`, retains that exact model, and drives it
+through `ManualBattleSession`. The session is a neutral `core/` driver: it binds
+the established rule pipeline, begins the round without consuming the
+scenario's scripted command list, validates and issues one existing command at
+a time, and returns new log entries. Its selection, position, reachability,
+target, and victory queries read the same `Scenario`, `Battlefield`, combatants,
+and `RoundLoop`; it owns no second tactical state. Scripted `Scenario.run()`
+remains the deterministic fixture/replay path.
+
+`TacticalCoordinateAdapter` is the sole model/screen coordinate boundary. It
+maps offset battlefield cells to pointy-top screen polygons and performs the
+inverse hit lookup. Input and drawing code do not duplicate projection
+arithmetic.
+
+Optional original presentation assets remain outside both core and rules:
+
+```text
+original .dat -> local EGOgrabber extraction -> ignored manifest/images
+              -> TacticalAssetResolver -> exact local unit map or placeholder
+```
+
+The resolver consumes EGOgrabber's version-1 asset manifest, indexes stable
+logical archive IDs deterministically, and loads a texture only when a separate
+local exact unit-to-ID map exists. It has no runtime `.dat` parser, no absolute
+paths in gameplay/content identity, and no hard dependency on extracted data.
+Generated tokens are always the fallback.
+
 ### `tests/`
 
 Two kinds of proof are required:

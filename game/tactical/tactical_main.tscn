@@ -1,0 +1,169 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/tactical/tactical_controller.gd" id="1_controller"]
+[ext_resource type="Script" path="res://game/tactical/tactical_battlefield_view.gd" id="2_view"]
+
+[node name="TacticalMain" type="Node2D"]
+script = ExtResource("1_controller")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1152.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.047, 0.071, 0.105, 1)
+
+[node name="Title" type="Label" parent="."]
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 620.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0.88, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "Project EGO — Tactical Hot-Seat Battle"
+
+[node name="Instructions" type="Label" parent="."]
+offset_left = 26.0
+offset_top = 49.0
+offset_right = 625.0
+offset_bottom = 73.0
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+text = "Click unit → green move / orange melee | R: ranged | Space: pass | Esc/right-click: cancel"
+
+[node name="BattlefieldView" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(20, 86)
+script = ExtResource("2_view")
+
+[node name="Legend" type="Label" parent="."]
+offset_left = 28.0
+offset_top = 610.0
+offset_right = 625.0
+offset_bottom = 690.0
+theme_override_colors/font_color = Color(0.72, 0.78, 0.86, 1)
+text = "Azure / Crimson: sides    Green: reachable    Orange: melee target
+Magenta: ranged target    Cyan ring: selected    Dark cell: impassable"
+
+[node name="HUD" type="PanelContainer" parent="."]
+offset_left = 648.0
+offset_top = 18.0
+offset_right = 1135.0
+offset_bottom = 702.0
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="HUDTitle" type="Label" parent="HUD/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "BATTLE STATUS"
+
+[node name="RoundLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Round: 1"
+
+[node name="SideLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Active side: —"
+
+[node name="Separator1" type="HSeparator" parent="HUD/Margin/VBox"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Selected: —"
+
+[node name="IdentityLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Instance: —"
+
+[node name="LifeLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Life: —"
+
+[node name="StaminaLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Stamina: —"
+
+[node name="MovementLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Movement: —"
+
+[node name="AmmoLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Ammunition: —"
+
+[node name="ModeLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.91, 0.98, 1)
+text = "Input mode: Move / melee"
+
+[node name="Buttons" type="HBoxContainer" parent="HUD/Margin/VBox"]
+layout_mode = 2
+
+[node name="RangedButton" type="Button" parent="HUD/Margin/VBox/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ranged [R]"
+
+[node name="PassButton" type="Button" parent="HUD/Margin/VBox/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Pass [Space]"
+
+[node name="CancelButton" type="Button" parent="HUD/Margin/VBox/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="FeedbackLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+autowrap_mode = 2
+text = "Latest: —"
+
+[node name="VictoryLabel" type="Label" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.8, 0.22, 1)
+theme_override_font_sizes/font_size = 22
+text = ""
+
+[node name="EventsTitle" type="Label" parent="HUD/Margin/VBox"]
+layout_mode = 2
+text = "RECENT EVENTS"
+
+[node name="EventsLabel" type="RichTextLabel" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+scroll_active = true
+text = ""
+
+[node name="RestartButton" type="Button" parent="HUD/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Restart Battle"
