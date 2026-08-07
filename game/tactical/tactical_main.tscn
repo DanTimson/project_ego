@@ -10,6 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_controller")
 
 [node name="BattlefieldRegion" type="Control" parent="."]
@@ -21,7 +22,7 @@ anchor_bottom = 1.0
 offset_right = -320.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 1
+mouse_filter = 2
 clip_contents = true
 
 [node name="BattlefieldView" type="Node2D" parent="BattlefieldRegion"]
