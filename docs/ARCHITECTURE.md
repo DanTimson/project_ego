@@ -175,6 +175,27 @@ Two kinds of proof are required:
 A matching final state can hide a different random call, path tie-break or
 status-expiry order. Ordered traces expose the first divergence.
 
+## Distributable demo boundary
+
+The exported composition root is `game/demo/demo_main.tscn`; it is a small
+presentation shell that transitions to the existing tactical scene. Release
+metadata is external to the PCK and is read from `BUILD.json` beside the
+executable, with a development fallback when absent.
+
+`TacticalAssetResolver` treats extracted artwork as optional presentation. An
+explicit tool/test root wins; exported builds next probe executable-adjacent
+`local_assets/`, while editor development probes ignored
+`res://.local/eador_assets/`. Failure at every probe leaves the authored fallback
+path intact. These paths never define `ContentId` or model identity.
+
+`tools/build_demo.py` is the single public/private release pipeline. It rejects
+tracked changes, exports a `git archive HEAD` staging tree, and uses one cached
+executable/PCK payload per commit and Godot version. Public packaging never
+consults a local asset root. Private packaging adds only the strict mapped-image
+closure after export and regenerates a self-contained runtime index. Both
+staging and final artifacts are ignored; detailed prerequisites, hygiene gates
+and recipient workflow are in `docs/DEMO_RELEASE.md`.
+
 ## Evidence flow
 
 Reverse-engineering artifacts are evidence, not runtime dependencies.

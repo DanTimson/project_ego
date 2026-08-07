@@ -28,15 +28,20 @@ This is a coverage map, not a release claim.
 | tactical AI scoring | decompilation corpus | not consolidated | scaffold only | deferred |
 | presentation | Project EGO Slice-3 contract + direct local visual inspection | n/a | playable hot-seat scene with layered field, inward facing, shadows, categorized ignored assets, and narrow tactical panel | real textured field/right panel and full authored fallback GUI-smoked; structural resemblance only, not original parity |
 
-## Playable tactical slice
+## Playable tactical slice and Milestone 0.1 release shell
 
-Playable Tactical Slice 3 is the ordinary project entry point:
+Ordinary project play now opens the Milestone 0.1 demo menu; **Play Demo** enters
+the accepted Tactical Visual Slice 3. Developers can still launch
+`game/tactical/tactical_main.tscn` directly. The menu adds no battle semantics.
 
-```bash
-godot --path .
-```
+The tracked Windows x86-64 export preset and `tools/build_demo.py` establish a
+tracked-HEAD-only public/private packaging pipeline. Public output is fallback
+only. Private output adds an exact, validated mapping-reference closure under
+executable-adjacent `local_assets/` while reusing byte-identical executable/PCK
+payloads. Metadata and hygiene are external package gates. See
+`docs/DEMO_RELEASE.md`.
 
-It preserves the synthetic 8×5 hot-seat battle, authoritative structured command
+Tactical Slice 3 preserves the synthetic 8×5 hot-seat battle, authoritative structured command
 boundary, and placeholder-only fresh-clone behavior. Presentation now uses a
 stable terrain/variation/decoration/grid/shadow/unit/overlay order. Direct
 inspection established a naturally rightward `Units` set: the left deployment

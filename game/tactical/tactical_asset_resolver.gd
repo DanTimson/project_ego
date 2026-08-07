@@ -2,8 +2,12 @@
 class_name TacticalAssetResolver
 extends RefCounted
 
-const DEFAULT_INDEX := "res://.local/eador_assets/index.json"
-const DEFAULT_MAPPING := "res://.local/eador_assets/mapping.json"
+const DEVELOPMENT_ROOT := "res://.local/eador_assets"
+const EXTERNAL_DIRECTORY := "local_assets"
+const INDEX_FILENAME := "index.json"
+const MAPPING_FILENAME := "mapping.json"
+const DEFAULT_INDEX := DEVELOPMENT_ROOT + "/" + INDEX_FILENAME
+const DEFAULT_MAPPING := DEVELOPMENT_ROOT + "/" + MAPPING_FILENAME
 const CATEGORY_UNITS := "units"
 const CATEGORY_SHADOWS := "shadows"
 const CATEGORY_PORTRAITS := "portraits"
@@ -29,22 +33,45 @@ var _texture_cache: Dictionary = {}
 
 func configure(p_index_path: String = "", p_mapping_path: String = "") -> bool:
 	status_messages.clear()
-	var requested_index := p_index_path
-	if requested_index == "":
-		requested_index = OS.get_environment("EGO_ASSET_INDEX")
-	if requested_index == "":
-		requested_index = DEFAULT_INDEX
-	var loaded := load_index(requested_index)
-	var requested_mapping := p_mapping_path
-	if requested_mapping == "":
-		requested_mapping = OS.get_environment("EGO_ASSET_MAPPING")
-	if requested_mapping == "":
-		requested_mapping = DEFAULT_MAPPING
+	var paths := discovery_paths(p_index_path, p_mapping_path)
+	var loaded := load_index(String(paths["index"]))
 	if loaded:
-		load_mapping(requested_mapping)
+		load_mapping(String(paths["mapping"]))
 	else:
 		_clear_mapping()
 	return loaded
+
+
+func discovery_paths(p_index_path: String = "", p_mapping_path: String = "") -> Dictionary:
+	# Explicit file paths remain the test/tool seam. EGO_ASSET_ROOT is the
+	# supported root-level equivalent; legacy per-file variables remain usable.
+	var requested_index := p_index_path
+	var requested_mapping := p_mapping_path
+	if requested_index == "":
+		requested_index = OS.get_environment("EGO_ASSET_INDEX")
+	if requested_mapping == "":
+		requested_mapping = OS.get_environment("EGO_ASSET_MAPPING")
+	var explicit_root := OS.get_environment("EGO_ASSET_ROOT")
+	if requested_index == "" and explicit_root != "":
+		requested_index = explicit_root.path_join(INDEX_FILENAME)
+	if requested_mapping == "" and explicit_root != "":
+		requested_mapping = explicit_root.path_join(MAPPING_FILENAME)
+	var default_root := runtime_asset_root()
+	if requested_index == "":
+		requested_index = default_root.path_join(INDEX_FILENAME)
+	if requested_mapping == "":
+		requested_mapping = default_root.path_join(MAPPING_FILENAME)
+	return {"root": default_root, "index": requested_index, "mapping": requested_mapping}
+
+
+func runtime_asset_root(executable_path: String = "", exported: Variant = null) -> String:
+	var is_exported := not OS.has_feature("editor") if exported == null else bool(exported)
+	if is_exported:
+		var executable := executable_path
+		if executable == "":
+			executable = OS.get_executable_path()
+		return executable.get_base_dir().path_join(EXTERNAL_DIRECTORY).simplify_path()
+	return DEVELOPMENT_ROOT
 
 
 func load_index(path: String) -> bool:

@@ -10,6 +10,8 @@ tools/var/out
 tools/var/var
 var.zip
 /local_assets/
+/dist/
+/.release_staging/
 .venv
 __pycache__/
 *.patch

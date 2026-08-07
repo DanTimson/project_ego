@@ -1,0 +1,95 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/demo/demo_main.gd" id="1_demo"]
+
+[node name="DemoMain" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_demo")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.055, 0.073, 0.086, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(520, 480)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 54
+theme_override_constants/margin_top = 42
+theme_override_constants/margin_right = 54
+theme_override_constants/margin_bottom = 42
+
+[node name="Buttons" type="VBoxContainer" parent="Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Center/Panel/Margin/Buttons"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.78, 0.39, 1)
+theme_override_font_sizes/font_size = 38
+text = "Project EGO"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Center/Panel/Margin/Buttons"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.78, 0.82, 1)
+theme_override_font_sizes/font_size = 18
+text = "Tactical Prototype — Milestone 0.1"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Center/Panel/Margin/Buttons"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="PlayButton" type="Button" parent="Center/Panel/Margin/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Play Demo"
+
+[node name="ControlsButton" type="Button" parent="Center/Panel/Margin/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+text = "Controls"
+
+[node name="AboutButton" type="Button" parent="Center/Panel/Margin/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+text = "About This Build"
+
+[node name="QuitButton" type="Button" parent="Center/Panel/Margin/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+text = "Quit"
+
+[node name="ControlsDialog" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+title = "Controls"
+
+[node name="AboutDialog" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+title = "About This Build"

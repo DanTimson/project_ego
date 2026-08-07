@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="ProjectEGO"
-run/main_scene="res://game/tactical/tactical_main.tscn"
+config/name="Project EGO"
+run/main_scene="res://game/demo/demo_main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
