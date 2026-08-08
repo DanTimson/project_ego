@@ -121,6 +121,14 @@ and clears them before returning. Alternating manual sessions therefore do not
 retain one another's environment. Scripted `Scenario.run()` remains the
 deterministic fixture/replay path.
 
+Unit-command eligibility is model-owned by `ActionPoints.action_spent` and
+`ActionPoints.has_resources()`. Partial movement leaves the activation open and
+may survive deselection/reselection; after a successful turn-consuming action,
+`action_spent` closes only that actor's activation even if capacity remains.
+Round start and accepted extra-turn refreshes reopen it. Generic active actions
+use `Action.resolved_consumes_action(actor)`, so an explicitly non-consuming
+resolved action remains eligible rather than bypassing this boundary in UI code.
+
 `TacticalCoordinateAdapter` is the sole model/screen coordinate boundary. It
 maps offset battlefield cells to pointy-top screen polygons and performs the
 inverse hit lookup. Input and drawing code do not duplicate projection

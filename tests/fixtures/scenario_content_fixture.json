@@ -242,7 +242,8 @@
    "  [trace] Synthetic vanguard.attack_cost | live-capacity stamina discriminator: 2 -> 2 # effective speed 3; strict capacity < speed is true; selected base cost 2",
    "  [trace] Synthetic vanguard.attack_cost | attack stamina mutation: 4 -> 2 # selected base cost 2",
    "Synthetic vanguard(attacker-1) hits Synthetic target(target-1) for 5 (Synthetic target(target-1) at 25/30, stamina 2)",
-   "  (Synthetic target(target-1) does not counter: no counterattack value)"
+   "  (Synthetic target(target-1) does not counter: no counterattack value)",
+   "-- side 1 takes over (no units left to act) --"
   ],
   "final": {
    "attacker-1": {
@@ -275,7 +276,8 @@
    "  [trace] Synthetic vanguard.attack_cost | live-capacity stamina discriminator: 2 -> 2 # effective speed 3; strict capacity < speed is true; selected base cost 2",
    "  [trace] Synthetic vanguard.attack_cost | attack stamina mutation: 4 -> 2 # selected base cost 2",
    "Synthetic vanguard(attacker-1) hits Synthetic target(target-1) for 5 (Synthetic target(target-1) at 25/30, stamina 2)",
-   "  (Synthetic target(target-1) does not counter: no counterattack value)"
+   "  (Synthetic target(target-1) does not counter: no counterattack value)",
+   "-- side 1 takes over (no units left to act) --"
   ],
   "inline_final": {
    "attacker-1": {

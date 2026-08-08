@@ -114,20 +114,23 @@ func _init() -> void:
 		"round 1, higher-initiative side active")
 	_check(RoundLoop.activatable(st, 0).size() == 2, "both A units selectable")
 
-	# partial spend, then confirm the unit is still selectable
+	# Partial movement permits re-entry until a terminal action succeeds.
 	ActionPoints.spend_move(a.units[0], 1)
 	_check(RoundLoop.activatable(st, 0).size() == 2,
 		"a partially-spent unit remains selectable")
 	_check(a.units[0].movement_remaining == 3,
 		"movement carries across the yield", "%d" % a.units[0].movement_remaining)
-
-	for u in a.units:
-		ActionPoints.spend_move(u, u.movement_remaining)
-		ActionPoints.spend_attack(u)
-	_check(RoundLoop.phase_done(st, 0), "A's phase ends when nothing is selectable")
+	ActionPoints.spend_attack(a.units[0])
+	_check(a.units[0].movement_remaining == 3
+			and ActionPoints.can_move(a.units[0]) == ActionPoints.Refusal.ACTION_SPENT
+			and not ActionPoints.has_resources(a.units[0]),
+		"leftover capacity cannot reopen a terminal melee activation")
+	_check(RoundLoop.activatable(st, 0) == [a.units[1]] and st.active_side == 0,
+		"the same side may activate its other unit")
+	ActionPoints.spend_attack(a.units[1])
+	_check(RoundLoop.phase_done(st, 0), "A's phase ends when every activation is spent")
 	_check(not RoundLoop.end_phase(st) and st.active_side == 1, "control passes to B")
 
-	ActionPoints.spend_move(b.units[0], b.units[0].movement_remaining)
 	ActionPoints.spend_attack(b.units[0])
 	_check(RoundLoop.end_phase(st) and st.round_number == 2,
 		"a new round begins when neither side can act", "round %d" % st.round_number)

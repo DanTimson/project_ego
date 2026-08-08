@@ -521,9 +521,12 @@ func query_command(command: Dictionary) -> Dictionary:
 	if side == null or side.id != state.active_side:
 		return _command_query(false, command_name,
 			"%s is not in the active side's phase" % unit.label())
+	if unit.action_spent:
+		return _command_query(false, command_name,
+			"%s has already acted" % unit.label())
 	if not ActionPoints.has_resources(unit):
 		return _command_query(false, command_name,
-			"%s has no resources left this round" % unit.label())
+			"%s has no resources left this activation" % unit.label())
 	if op == "move":
 		var destination_v: Variant = command.get("to")
 		if typeof(destination_v) != TYPE_ARRAY or destination_v.size() != 2:
@@ -545,9 +548,6 @@ func query_command(command: Dictionary) -> Dictionary:
 	if side_of(target) == side:
 		return _command_query(false, command_name,
 			"%s is on the same side as %s" % [target.label(), unit.label()])
-	if unit.action_spent:
-		return _command_query(false, command_name,
-			"%s has already acted" % unit.label())
 	if op == "attack":
 		var approach := _approach_plan(unit, target)
 		return _command_query(bool(approach["ok"]), command_name,
@@ -602,7 +602,7 @@ func execute_command(command: Dictionary) -> Dictionary:
 func movement_plan(unit: Combatant, col: int, row: int) -> Dictionary:
 	var start := field.find_unit(unit)
 	var goal := Battlefield.offset_to_axial(col, row)
-	var path := field.path(start, goal, false, unit.movement_remaining)
+	var path := [] if unit.action_spent else field.path(start, goal, false, unit.movement_remaining)
 	if path.is_empty():
 		return {"ok": false, "reason": "%s cannot reach %d,%d" % [
 			unit.label(), col, row]}
@@ -824,6 +824,9 @@ func cmd_shoot(unit: Combatant, target: Combatant) -> void:
 
 
 func cmd_rest(unit: Combatant) -> void:
+	if unit.action_spent:
+		emit("%s has already acted" % unit.label())
+		return
 	ActionPoints.rest(unit)
 	emit("%s rests (stamina %d)" % [unit.label(), unit.stamina])
 
@@ -840,15 +843,10 @@ func cmd_extra_turn(unit: Combatant, c: Dictionary) -> void:
 
 ## Invoke a catalogued action.
 ##
-## Executes what the Action model declares — `grants`, applied as timed statuses
-## through the normal status machinery. Everything else is REFUSED EXPLICITLY
-## rather than silently doing nothing, because an action that appears to succeed
-## and changes nothing is worse than one that reports it cannot run yet:
-##
-##   - `is_attack` actions still need target/effect execution. R10 freezes the
-##     selected ordinary 1.5x numeric stage but does not supply that executor;
-##   - target-consuming effects need magnitudes from `unit_upg.Quantity`, which
-##     are not yet carried into Action instances.
+## Executes the Action model's `grants` through normal timed statuses. Other
+## shapes are refused explicitly rather than pretending that an inert action
+## succeeded: `is_attack` still lacks target/effect execution, and target effects
+## still lack magnitudes from `unit_upg.Quantity` in Action instances.
 ##
 ## Log strings mirror oracle/scenario.py exactly; the scenario fixture compares
 ## them line for line.

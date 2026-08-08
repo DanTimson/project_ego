@@ -88,10 +88,12 @@ def test_reentry() -> None:
           "remaining %d" % u.movement_remaining)
     turn.spend_move(u, 1)
     turn.spend_attack(u)
-    check(not u.action_spent is False, "action spent after attacking")
-    check(turn.has_resources(u), "still selectable: 1 movement left after acting")
-    turn.spend_move(u, 1)
-    check(not turn.has_resources(u), "exhausted once movement and action are gone")
+    check(u.action_spent, "action spent after attacking")
+    check(u.movement_remaining == 1, "terminality does not rewrite melee capacity")
+    check(not turn.has_resources(u),
+          "leftover movement does not reopen a terminal activation")
+    check(turn.can_move(u) is turn.Refusal.ACTION_SPENT,
+          "movement is refused after the terminal action")
 
 
 def test_round_trip_still_counts() -> None:
@@ -188,7 +190,6 @@ def test_auto_end_phase_on_exhaustion() -> None:
           "control passes to B with no explicit pass", "side %s" % st.active_side)
 
     # Both sides exhausted rolls the round over, exactly as an explicit pass does.
-    turn.spend_move(b.units[0], b.units[0].movement_remaining)
     turn.spend_attack(b.units[0])
     before = st.round_number
     started = turn.auto_end_phase_if_exhausted(st)
@@ -208,15 +209,16 @@ def test_round_loop() -> None:
     check(st.active_side == 0, "higher initiative side is active first")
     check(len(turn.activatable(st, 0)) == 2, "both A units are selectable")
 
-    for u in a.units:
-        turn.spend_move(u, u.movement_remaining)
-        turn.spend_attack(u)
-    check(turn.phase_done(st, 0), "A's phase ends when nothing is selectable")
+    turn.spend_move(a.units[0], 1)
+    turn.spend_attack(a.units[0])
+    check(turn.activatable(st, 0) == [a.units[1]] and st.active_side == 0,
+          "one terminal actor leaves the same side's other unit selectable")
+    turn.spend_attack(a.units[1])
+    check(turn.phase_done(st, 0), "A's phase ends when every activation is spent")
 
     started_new = turn.end_phase(st)
     check(not started_new and st.active_side == 1, "control passes to B")
 
-    turn.spend_move(b.units[0], b.units[0].movement_remaining)
     turn.spend_attack(b.units[0])
     started_new = turn.end_phase(st)
     check(started_new and st.round_number == 2,

@@ -475,7 +475,8 @@ class Scenario:
     def cmd_move(self, unit: Combatant, col: int, row: int) -> None:
         start = self.field.find(unit)
         goal = bfmod.offset_to_axial(col, row)
-        path = self.field.path(start, goal, max_cost=unit.movement_remaining)
+        path = (None if unit.action_spent else
+                self.field.path(start, goal, max_cost=unit.movement_remaining))
         if not path:
             self.emit("%s cannot reach %d,%d" % (unit.label(), col, row))
             return
@@ -627,6 +628,9 @@ class Scenario:
         self._strike(unit, target, AttackKind.RANGED)
 
     def cmd_rest(self, unit: Combatant) -> None:
+        if unit.action_spent:
+            self.emit("%s has already acted" % unit.label())
+            return
         turn.rest(unit)
         self.emit("%s rests (stamina %d)" % (unit.label(), unit.stamina))
 

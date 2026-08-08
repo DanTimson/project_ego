@@ -9,12 +9,12 @@ This is a coverage map, not a release claim.
 | effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | implemented | implemented | R9 fixture-covered: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets remain distinct |
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 early-provider cutoff and distinct melee/counter minimum handling are fixture-covered |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 numeric placement is fixture-covered after effective-stat/selected 1.5× processing and before randomisation/defence; target applicability and wider provider coverage remain incomplete |
-| activated actions | public/data families + selective binary edges | implemented | `Action` catalogue implemented | fourteen explicit NH unit actions and public effect-family matrix catalogued; battlefield execution and consumer-triggered opcode mappings incomplete |
+| activated actions | public/data families + selective binary edges | implemented | `Action` catalogue + generic grants executor implemented | resolved action-consumption policy now controls activation terminality; fourteen explicit NH unit actions and public effect-family matrix catalogued; wider battlefield effects and consumer-triggered opcode mappings remain incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
 | level-up selection | data + binary | implemented in part | `core/model/option.gd` and `tests/test_options.gd` empty | ordinary selection is specified; R15 zero-total/underfull edge deferred until an executable consumer and fixture exist |
 | battlefield coordinates and adjacency | binary + controlled observation | implemented | implemented | adjacency recovered; R14 large-unit logical-footprint protocol ready |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
-| round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0` | implemented | implemented | whole-side phases and capacity-preserving reselection proven; explicit order fixture still needed |
+| round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0`; owner-confirmed terminality | implemented | implemented | whole-side phases and pre-action capacity-preserving reselection remain; successful consuming commands close only their actor's activation; explicit order fixture still needed |
 | melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
 | ranged execution | binary | partial compatibility model | partial | exact ranged early-provider zero cutoff and live-capacity stamina discriminator are implemented; special modes remain incomplete |
 | damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
@@ -135,6 +135,13 @@ least eighteen observable generic battle-action effect families. R16 remains
 retired. R17 is reduced to a finite black-box matrix covering zero-damage
 triggers, follow-up attack order, component damage, trample and instant-death
 placement.
+
+CX-009 implements the project-owner-confirmed activation rule at the shared
+model/command boundary: successful ordinary melee/ranged and resolved consuming
+active actions close only their actor, while reactions, refusals and resolved
+non-consuming action policy remain non-terminal. Partial movement/reselection
+before the action and existing round/extra-turn refresh semantics are preserved.
+This records implementation status, not new binary verification.
 
 
 CX-001 passed governance review and is classified `N0_PUBLIC / T0_RETAIN`. R14 now has a five-case giant-footprint observation packet. R15 is formally deferred until a level-up option consumer and synthetic underfull/all-zero fixtures exist. The stale broad dispatcher and melee matrix rows are reconciled with the public-family and finite-observation reductions.

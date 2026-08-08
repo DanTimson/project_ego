@@ -21,6 +21,7 @@ import sys
 
 import charge
 import scenario
+import turn
 from combat import Rng
 
 FAILS: list[str] = []
@@ -604,11 +605,138 @@ def test_terrain_matters() -> None:
                         open_ground["final"]["Мечник"]["stamina"]))
 
 
+def test_action_terminality() -> None:
+    print("\n[CX-009] terminal actions close only their actor's activation")
+
+    def fighter(name: str, at: list[int], **overrides) -> dict:
+        unit = {
+            "name": name, "at": at, "attack": 8, "ranged_attack": 8,
+            "shooting_range": 8, "ammo": 2, "counter_attack": 3,
+            "defence": 0, "ranged_defence": 0, "life": 40,
+            "stamina": 10, "stamina_base": 10, "morale": 10, "speed": 5,
+        }
+        unit.update(overrides)
+        return unit
+
+    melee_spec = {
+        "name": "melee terminality", "profile": "native", "seed": 9,
+        "battlefield": {"width": 7, "height": 3, "tiles": []},
+        "sides": [
+            {"id": 0, "is_attacker": True, "leader_initiative": 2,
+             "units": [fighter("actor", [0, 0]), fighter("ally", [0, 2])]},
+            {"id": 1, "leader_initiative": 1,
+             "units": [fighter("defender", [3, 0], attack=1)]},
+        ],
+        "commands": [
+            {"op": "move", "unit": "actor", "to": [1, 0]},
+            {"op": "attack", "unit": "actor", "target": "defender"},
+            {"op": "move", "unit": "actor", "to": [0, 0]},
+            {"op": "attack", "unit": "actor", "target": "defender"},
+        ],
+    }
+    melee = scenario.Scenario(melee_spec)
+    melee_result = melee.run()
+    actor = melee.units["actor"]
+    ally = melee.units["ally"]
+    defender = melee.units["defender"]
+    check(actor.action_spent and actor.movement_remaining > 0
+          and not turn.has_resources(actor),
+          "move -> melee is terminal despite leftover movement")
+    check(melee.state.active_side == 0 and turn.has_resources(ally),
+          "melee ends only its actor; the same side's ally remains eligible")
+    check(not defender.action_spent and turn.has_resources(defender),
+          "the defender's counterattack does not spend its activation")
+    check(sum("actor has already acted" in line for line in melee_result["log"]) == 1
+          and "actor cannot reach 0,0" in "\n".join(melee_result["log"]),
+          "movement and a second attack are refused after terminal melee")
+
+    refused_spec = json.loads(json.dumps(melee_spec))
+    refused_spec["sides"][0]["units"] = [fighter("actor", [0, 0], speed=1),
+                                           fighter("ally", [0, 2])]
+    refused_spec["sides"][1]["units"] = [fighter("defender", [6, 0])]
+    refused_spec["commands"] = [
+        {"op": "attack", "unit": "actor", "target": "defender"}]
+    refused = scenario.Scenario(refused_spec)
+    refused_result = refused.run()
+    check("cannot reach" in "\n".join(refused_result["log"])
+          and not refused.units["actor"].action_spent,
+          "an unreachable melee refusal is non-terminal")
+
+    ranged_spec = json.loads(json.dumps(melee_spec))
+    ranged_spec["name"] = "ranged terminality"
+    ranged_spec["sides"][1]["units"][0]["at"] = [5, 0]
+    ranged_spec["commands"] = [
+        {"op": "move", "unit": "actor", "to": [1, 0]},
+        {"op": "shoot", "unit": "actor", "target": "defender"},
+        {"op": "shoot", "unit": "actor", "target": "defender"},
+        {"op": "move", "unit": "actor", "to": [0, 0]},
+    ]
+    ranged = scenario.Scenario(ranged_spec)
+    ranged_result = ranged.run()
+    ranged_actor = ranged.units["actor"]
+    discriminator = trace_index(ranged_result["log"],
+                                "live-capacity stamina discriminator")
+    capacity_clear = trace_index(ranged_result["log"],
+                                 "ranged activation capacity clear")
+    check(ranged_actor.action_spent and ranged_actor.movement_remaining == 0
+          and ranged_actor.ammo == 1,
+          "move/history -> ranged is terminal and a refused second shot spends no ammo")
+    check(0 <= discriminator < capacity_clear,
+          "R8 evaluates live capacity before ranged terminal clearing")
+    check(sum("actor has already acted" in line for line in ranged_result["log"]) == 1
+          and "actor cannot reach 0,0" in "\n".join(ranged_result["log"]),
+          "shooting and movement are refused after terminal ranged resolution")
+
+    action_spec = {
+        "name": "active action terminality", "profile": "native", "seed": 3,
+        "battlefield": {"width": 5, "height": 3, "tiles": []},
+        "actions": [
+            {"id": "terminal", "name": "Terminal fixture", "target": 0,
+             "consumes_action": True, "grants": [["terminal-effect", 1, 1]]},
+            {"id": "free", "name": "Free fixture", "target": 0,
+             "consumes_action": False, "grants": [["free-effect", 1, 1]]},
+            {"id": "unavailable", "name": "Unavailable fixture", "target": 0,
+             "cost_stamina": 99, "consumes_action": True,
+             "grants": [["unavailable-effect", 1, 1]]},
+        ],
+        "sides": [
+            {"id": 0, "is_attacker": True, "leader_initiative": 2,
+             "units": [fighter("consumer", [0, 0]), fighter("exception", [0, 2])]},
+            {"id": 1, "leader_initiative": 1,
+             "units": [fighter("target", [4, 0])]},
+        ],
+        "commands": [
+            {"op": "move", "unit": "consumer", "to": [1, 0]},
+            {"op": "action", "unit": "consumer", "action": "terminal"},
+            {"op": "move", "unit": "consumer", "to": [0, 0]},
+            {"op": "action", "unit": "consumer", "action": "terminal"},
+            {"op": "action", "unit": "exception", "action": "unavailable"},
+            {"op": "action", "unit": "exception", "action": "free"},
+            {"op": "move", "unit": "exception", "to": [1, 2]},
+        ],
+    }
+    active = scenario.Scenario(action_spec)
+    active_result = active.run()
+    consumer = active.units["consumer"]
+    exception = active.units["exception"]
+    active_log = "\n".join(active_result["log"])
+    check(consumer.action_spent and consumer.movement_remaining > 0
+          and not turn.has_resources(consumer),
+          "resolved consuming Action policy terminates the actor")
+    check("consumer cannot reach 0,0" in active_log
+          and "cannot use Terminal fixture: already acted" in active_log,
+          "ordinary and consuming-action follow-ups are refused")
+    check("cannot use Unavailable fixture: not enough stamina" in active_log
+          and exception.stamina == 10,
+          "an unavailable action refusal is non-terminal and spends nothing")
+    check(not exception.action_spent and exception.steps_this_round == 1
+          and turn.has_resources(exception),
+          "resolved non-consuming Action policy remains a real exception")
+
+
 def test_phase_passing() -> None:
-    """Found by running a scenario, not by reasoning: a phase cannot end on
-    resource exhaustion alone. With free re-entry a unit almost always has
-    leftover movement, so the sides would trade control forever."""
-    print("\n[5] a round ends when both sides pass, not when resources run out")
+    """A voluntary pass remains necessary while eligible units are unspent."""
+    print("\n[5] two voluntary side passes advance a fully unspent round")
     spec = json.loads(json.dumps(SPEC))
     spec["commands"] = [{"op": "end_phase"}, {"op": "end_phase"}]
     r = run(spec)

@@ -41,6 +41,17 @@ func _check(ok: bool, what: String, detail: String = "") -> void:
 		failures += 1
 
 
+func _fighter(unit_name: String, at: Array, overrides: Dictionary = {}) -> Dictionary:
+	var unit := {
+		"name": unit_name, "at": at, "attack": 8, "ranged_attack": 8,
+		"shooting_range": 8, "ammo": 2, "counter_attack": 3,
+		"defence": 0, "ranged_defence": 0, "life": 40,
+		"stamina": 10, "stamina_base": 10, "morale": 10, "speed": 5,
+	}
+	unit.merge(overrides, true)
+	return unit
+
+
 func _profile_combat_spec(profile_name: String = "genesis",
 		attacker_at: Vector2i = Vector2i(0, 0),
 		target_at: Vector2i = Vector2i(4, 0),
@@ -404,6 +415,134 @@ func _test_ranged_numeric_tranche_integration() -> void:
 		"trace shows the accepted early cutoff without resolving the aura")
 
 
+func _test_action_terminality() -> void:
+	print("\n[CX-009] terminal actions close only their actor's activation")
+	var melee_spec := {
+		"name": "melee terminality", "profile": "native", "seed": 9,
+		"battlefield": {"width": 7, "height": 3, "tiles": []},
+		"sides": [
+			{"id": 0, "is_attacker": true, "leader_initiative": 2,
+				"units": [_fighter("actor", [0, 0]), _fighter("ally", [0, 2])]},
+			{"id": 1, "leader_initiative": 1,
+				"units": [_fighter("defender", [3, 0], {"attack": 1})]},
+		],
+		"commands": [
+			{"op": "move", "unit": "actor", "to": [1, 0]},
+			{"op": "attack", "unit": "actor", "target": "defender"},
+			{"op": "move", "unit": "actor", "to": [0, 0]},
+			{"op": "attack", "unit": "actor", "target": "defender"},
+		],
+	}
+	var melee := Scenario.new(melee_spec)
+	var melee_result := melee.run()
+	var actor: Combatant = melee.units["actor"]
+	var ally: Combatant = melee.units["ally"]
+	var defender: Combatant = melee.units["defender"]
+	_check(actor.action_spent and actor.movement_remaining > 0
+			and not ActionPoints.has_resources(actor),
+		"move -> melee is terminal despite leftover movement")
+	_check(melee.state.active_side == 0 and ActionPoints.has_resources(ally),
+		"melee ends only its actor; the same side's ally remains eligible")
+	_check(not defender.action_spent and ActionPoints.has_resources(defender),
+		"the defender's counterattack does not spend its activation")
+	var melee_refusals := 0
+	for line in melee_result["log"]:
+		if "actor has already acted" in String(line):
+			melee_refusals += 1
+	_check(melee_refusals == 1
+			and "actor cannot reach 0,0" in "\n".join(melee_result["log"]),
+		"movement and a second attack are refused after terminal melee")
+
+	var refused_spec: Dictionary = melee_spec.duplicate(true)
+	refused_spec["sides"][0]["units"] = [
+		_fighter("actor", [0, 0], {"speed": 1}), _fighter("ally", [0, 2])]
+	refused_spec["sides"][1]["units"] = [_fighter("defender", [6, 0])]
+	refused_spec["commands"] = [
+		{"op": "attack", "unit": "actor", "target": "defender"}]
+	var refused := Scenario.new(refused_spec)
+	var refused_result := refused.run()
+	_check("cannot reach" in "\n".join(refused_result["log"])
+			and not (refused.units["actor"] as Combatant).action_spent,
+		"an unreachable melee refusal is non-terminal")
+
+	var ranged_spec: Dictionary = melee_spec.duplicate(true)
+	ranged_spec["name"] = "ranged terminality"
+	ranged_spec["sides"][1]["units"][0]["at"] = [5, 0]
+	ranged_spec["commands"] = [
+		{"op": "move", "unit": "actor", "to": [1, 0]},
+		{"op": "shoot", "unit": "actor", "target": "defender"},
+		{"op": "shoot", "unit": "actor", "target": "defender"},
+		{"op": "move", "unit": "actor", "to": [0, 0]},
+	]
+	var ranged := Scenario.new(ranged_spec)
+	var ranged_result := ranged.run()
+	var ranged_actor: Combatant = ranged.units["actor"]
+	var discriminator := _trace_index(
+		ranged_result["log"], "live-capacity stamina discriminator")
+	var capacity_clear := _trace_index(
+		ranged_result["log"], "ranged activation capacity clear")
+	_check(ranged_actor.action_spent and ranged_actor.movement_remaining == 0
+			and ranged_actor.ammo == 1,
+		"move/history -> ranged is terminal and a refused second shot spends no ammo")
+	_check(discriminator >= 0 and discriminator < capacity_clear,
+		"R8 evaluates live capacity before ranged terminal clearing")
+	var ranged_refusals := 0
+	for line in ranged_result["log"]:
+		if "actor has already acted" in String(line):
+			ranged_refusals += 1
+	_check(ranged_refusals == 1
+			and "actor cannot reach 0,0" in "\n".join(ranged_result["log"]),
+		"shooting and movement are refused after terminal ranged resolution")
+
+	var action_spec := {
+		"name": "active action terminality", "profile": "native", "seed": 3,
+		"battlefield": {"width": 5, "height": 3, "tiles": []},
+		"actions": [
+			{"id": "terminal", "name": "Terminal fixture", "target": 0,
+				"consumes_action": true,
+				"grants": [["terminal-effect", 1, 1]]},
+			{"id": "free", "name": "Free fixture", "target": 0,
+				"consumes_action": false, "grants": [["free-effect", 1, 1]]},
+			{"id": "unavailable", "name": "Unavailable fixture", "target": 0,
+				"cost_stamina": 99, "consumes_action": true,
+				"grants": [["unavailable-effect", 1, 1]]},
+		],
+		"sides": [
+			{"id": 0, "is_attacker": true, "leader_initiative": 2,
+				"units": [_fighter("consumer", [0, 0]),
+					_fighter("exception", [0, 2])]},
+			{"id": 1, "leader_initiative": 1,
+				"units": [_fighter("target", [4, 0])]},
+		],
+		"commands": [
+			{"op": "move", "unit": "consumer", "to": [1, 0]},
+			{"op": "action", "unit": "consumer", "action": "terminal"},
+			{"op": "move", "unit": "consumer", "to": [0, 0]},
+			{"op": "action", "unit": "consumer", "action": "terminal"},
+			{"op": "action", "unit": "exception", "action": "unavailable"},
+			{"op": "action", "unit": "exception", "action": "free"},
+			{"op": "move", "unit": "exception", "to": [1, 2]},
+		],
+	}
+	var active := Scenario.new(action_spec)
+	var active_result := active.run()
+	var consumer: Combatant = active.units["consumer"]
+	var exception: Combatant = active.units["exception"]
+	var active_log := "\n".join(active_result["log"])
+	_check(consumer.action_spent and consumer.movement_remaining > 0
+			and not ActionPoints.has_resources(consumer),
+		"resolved consuming Action policy terminates the actor")
+	_check("consumer cannot reach 0,0" in active_log
+			and "cannot use Terminal fixture: already acted" in active_log,
+		"ordinary and consuming-action follow-ups are refused")
+	_check("cannot use Unavailable fixture: not enough stamina" in active_log
+			and exception.stamina == 10,
+		"an unavailable action refusal is non-terminal and spends nothing")
+	_check(not exception.action_spent and exception.steps_this_round == 1
+			and ActionPoints.has_resources(exception),
+		"resolved non-consuming Action policy remains a real exception")
+
+
 func _init() -> void:
 	var f := FileAccess.open(FIXTURE, FileAccess.READ)
 	if f == null:
@@ -476,6 +615,7 @@ func _init() -> void:
 	_test_genesis_r8_live_capacity()
 	_test_melee_numeric_tranche_integration()
 	_test_ranged_numeric_tranche_integration()
+	_test_action_terminality()
 
 	for scenario_file in fx["scenarios"]:
 		var case: Dictionary = fx["scenarios"][scenario_file]

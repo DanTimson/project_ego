@@ -1,15 +1,15 @@
 """
 turn.py — action points and the round loop.
 
-The activation model is free and re-entrant: within its side's phase the player
-(or AI) picks any unit with resources left, spends some of them, and may yield
-and come back to the same unit later in the same round. There is no initiative
-queue within a side and no per-unit turn boundary.
+The activation model is free and re-entrant before a terminal action: within its
+side's phase the player (or AI) may spend some movement, yield, and return to the
+same unit. A successful turn-consuming action closes only that actor's activation
+even when movement capacity remains. There is no initiative queue within a side.
 
-That single property drives everything here:
+Those properties drive everything here:
 
   * Per-round state lives on the Combatant and resets once, at ROUND_START.
-    Anything reset per activation could be farmed by yielding and reselecting.
+    Ordinary yielding and reselecting cannot reset it.
   * `steps_this_round` is cumulative PATH LENGTH, not displacement. It remains
     trace-visible movement history; Genesis charge uses command-entry
     coordinates and R8 stamina cost uses live remaining capacity.
@@ -17,12 +17,9 @@ That single property drives everything here:
     reachable target auto-paths the unit into position out of the same pool.
     The `Удар и возврат` anchor is therefore captured on the COMMAND.
 
-ASSUMPTION, NOT ESTABLISHED (OPEN_QUESTIONS item 16): sides alternate in whole
-PHASES — one side activates all the units it wants to, then the other. The
-alternative is unit-by-unit alternation between sides. The documented initiative
-rule («первый ход в бою получает отряд, у лидера которого выше инициатива»)
-speaks of a side moving first, which fits phases, but does not exclude
-alternation. Settled by watching one battle.
+Battle scheduling uses whole-side phases: ordinary unit commands do not transfer
+control to the opponent. The side changes only on a side pass or exhaustion of
+all current-side activations.
 """
 
 from __future__ import annotations
@@ -209,6 +206,8 @@ def grant_extra_turn_to(units, *, exclude=(), predicate=None, **kw) -> list:
 
 
 def can_move(u: Combatant, tiles: int = 1) -> Refusal:
+    if u.action_spent:
+        return Refusal.ACTION_SPENT
     if u.movement_remaining < tiles:
         return Refusal.NO_MOVEMENT
     return Refusal.OK
@@ -350,10 +349,8 @@ def rest(u: Combatant) -> Trace:
 
 
 def has_resources(u: Combatant) -> bool:
-    """Can this unit still do anything at all this round?"""
-    if not u.alive:
-        return False
-    return u.movement_remaining > 0 or not u.action_spent
+    """Can this unit receive another ordinary command this activation?"""
+    return u.alive and not u.action_spent
 
 
 # ---------------------------------------------------------------------------
@@ -367,11 +364,8 @@ class Side:
     units: list = field(default_factory=list)
     leader_initiative: int = 0
     is_attacker: bool = False
-    ## The side has declared itself finished for this round. Needed because a
-    ## phase does NOT end when resources run out: with free re-entry a unit
-    ## almost always has leftover movement, so without a voluntary "done" the
-    ## two sides hand control back and forth forever and no round ever ends.
-    ## This is the model's equivalent of clicking End Turn.
+    ## The side has declared itself finished for this round. Voluntary pass is
+    ## needed when eligible units remain but the player declines their capacity.
     passed: bool = False
 
     def living(self) -> list:
@@ -437,11 +431,9 @@ def end_phase(state: BattleState) -> bool:
     started.
 
     A new round begins once BOTH sides are finished — each having either passed
-    voluntarily or run out of resources. Waiting for resources alone would never
-    trigger: with free re-entry a unit almost always has leftover movement, so
-    the sides would trade control indefinitely.
+    voluntarily or exhausted all eligible unit activations.
 
-    Whole-phase alternation, not unit-by-unit (user-confirmed).
+    Whole-phase alternation, not unit-by-unit.
     """
     current = state.side(state.active_side)
     current.passed = True

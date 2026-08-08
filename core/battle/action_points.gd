@@ -3,15 +3,14 @@ extends RefCounted
 
 ## Action points and per-round unit state.
 ##
-## Activation is FREE and RE-ENTRANT: within its side's phase the player or AI
-## picks any unit with resources left, spends some, and may yield and return to
-## the same unit later in the same round. There is no queue and no per-unit turn
-## boundary.
+## Activation is FREE and RE-ENTRANT before a terminal action: within its
+## side's phase the player or AI may spend some movement, yield, and return to
+## the same unit. A successful turn-consuming action sets `action_spent` and
+## closes that unit's activation even when movement capacity remains. There is
+## no initiative queue within a side.
 ##
-## Consequence, and the reason every reset below happens in begin_round() and
-## nowhere else: anything reset per activation is farmable. Yield and reselect
-## to collect a start-of-turn bonus twice, or to launder away the "moved this
-## round" attack penalty.
+## Round and accepted extra-turn refreshes are the only activation resets below.
+## Ordinary yield/reselection must not reset path history or per-round limiters.
 
 enum Refusal { OK, NO_MOVEMENT, ACTION_SPENT, EXHAUSTED, NOT_YOUR_PHASE }
 
@@ -173,6 +172,8 @@ static func grant_extra_turn_to(units: Array, exclude: Array = [],
 
 
 static func can_move(u: Combatant, tiles: int = 1) -> Refusal:
+	if u.action_spent:
+		return Refusal.ACTION_SPENT
 	return Refusal.OK if u.movement_remaining >= tiles else Refusal.NO_MOVEMENT
 
 
@@ -296,8 +297,7 @@ static func rest(u: Combatant) -> Trace:
 	return t
 
 
-## Can this unit still do anything at all this round?
+## Can this unit receive another ordinary command in this activation?
+## Leftover movement never reopens an activation after a terminal action.
 static func has_resources(u: Combatant) -> bool:
-	if not u.alive:
-		return false
-	return u.movement_remaining > 0 or not u.action_spent
+	return u.alive and not u.action_spent

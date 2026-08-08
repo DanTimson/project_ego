@@ -156,7 +156,7 @@
    }
   },
   {
-   "label": "act then keep moving",
+   "label": "terminal action preserves leftover capacity state",
    "setup": {
     "speed": 4,
     "stamina": 10,
@@ -171,16 +171,12 @@
     [
      "attack",
      0
-    ],
-    [
-     "move",
-     1
     ]
    ],
    "after": {
     "stamina": 8,
-    "movement_remaining": 2,
-    "steps_this_round": 2,
+    "movement_remaining": 3,
+    "steps_this_round": 1,
     "action_spent": true,
     "forced_rest": false,
     "resting": false

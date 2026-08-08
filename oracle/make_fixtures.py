@@ -360,7 +360,7 @@ def turn_fixture() -> dict:
     seq("move then attack", [("move", 1), ("attack", 0)])
     seq("out and back, then attack", [("move", 2), ("move", 2), ("attack", 0)])
     seq("split movement across a yield", [("move", 1), ("move", 1)])
-    seq("act then keep moving", [("move", 1), ("attack", 0), ("move", 1)])
+    seq("terminal action preserves leftover capacity state", [("move", 1), ("attack", 0)])
     seq("rest with recovery", [("rest", 0)], stamina=4, stamina_recovery=2)
     seq("rest caps at base", [("rest", 0)], stamina=9, stamina_recovery=5)
     seq("Зуд suppresses recovery", [("rest", 0)], stamina=4, stamina_recovery=3,

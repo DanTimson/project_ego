@@ -141,6 +141,17 @@ func _run() -> void:
 	_check(bool(melee_result["accepted"]) and melee_target.life < melee_life
 		and not (melee_result["events"] as Array).is_empty(),
 		"highlighted melee target executes and returns events")
+	_check(melee_actor.action_spent and not melee_session.can_select(melee_actor),
+		"successful melee closes the actor's activation authoritatively")
+	var melee_follow_up := melee_session.issue_command({
+		"op": "move", "unit": melee_actor.instance_id, "to": [0, 0],
+	})
+	_check(not bool(melee_follow_up["accepted"])
+			and not bool(melee_follow_up["state_changed"]),
+		"manual session refuses an ordinary follow-up for the terminal actor")
+	var melee_ally: Combatant = melee_session.scenario.units["azure-ranger-17"]
+	_check(melee_session.active_side_id() == 0 and melee_session.can_select(melee_ally),
+		"manual session keeps the side active and exposes another friendly unit")
 
 	var ranged_session := _fresh_session()
 	var ranger: Combatant = ranged_session.scenario.units["azure-ranger-17"]
@@ -157,6 +168,15 @@ func _run() -> void:
 		and ranger.ammo == ranged_ammo - 1
 		and not (ranged_result["events"] as Array).is_empty(),
 		"highlighted ranged target executes, spends ammo, and returns events")
+	_check(ranger.action_spent and not ranged_session.can_select(ranger),
+		"successful ranged command closes the actor's activation")
+	var ranged_follow_up := ranged_session.issue_command({
+		"op": "shoot", "unit": ranger.instance_id,
+		"target": ranged_target.instance_id,
+	})
+	_check(not bool(ranged_follow_up["accepted"])
+			and ranger.ammo == ranged_ammo - 1,
+		"manual session refuses a second shot without spending more ammo")
 
 	var refusal_session := _fresh_session()
 	var inactive: Combatant = refusal_session.scenario.units["crimson-guard-42"]
@@ -252,6 +272,21 @@ func _run() -> void:
 	_check(controller_source.contains('result.get("accepted"')
 		and not controller_source.contains('result.get("log"'),
 		"TacticalController does not determine acceptance by searching log text")
+
+	controller.restart_battle()
+	_check(controller.select_unit("azure-vanguard-01"),
+		"controller selects the melee actor for terminality integration")
+	var controller_targets := controller.session.legal_melee_targets(
+		controller.selected_unit)
+	var controller_melee := controller.dispatch_melee(
+		(controller_targets[0] as Combatant).instance_id)
+	_check(bool(controller_melee["accepted"]) and controller.selected_unit == null,
+		"controller drops a successfully terminal actor")
+	var controller_follow_up := controller.dispatch_move(Vector2i(0, 0))
+	_check(not bool(controller_follow_up["accepted"]),
+		"controller cannot issue another ordinary command for that actor")
+	_check(controller.select_unit("azure-ranger-17"),
+		"controller can select another eligible unit on the same side")
 
 	controller.restart_battle()
 	var first_side := controller.session.active_side_id()

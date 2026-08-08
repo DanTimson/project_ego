@@ -1,13 +1,12 @@
 class_name RoundLoop
 extends RefCounted
 
-## Round -> side phase -> free interleaved activation.
+## Round -> whole-side phase -> freely ordered unit activations.
 ##
-## ASSUMPTION, NOT ESTABLISHED (OPEN_QUESTIONS item 16): sides alternate in whole
-## PHASES — one side activates every unit it wants to, then the other. The
-## alternative is unit-by-unit alternation between sides. The documented
-## initiative rule speaks of a SIDE moving first, which fits phases, but does
-## not exclude alternation. One observed battle settles it.
+## A side retains control across ordinary unit commands. Partial movement may be
+## yielded and resumed before a terminal action; a successful turn-consuming
+## action closes only its actor's activation. Control changes only on side pass
+## or exhaustion of every current-side unit.
 
 class Side extends RefCounted:
 	var id: int = 0
@@ -15,11 +14,9 @@ class Side extends RefCounted:
 	var units: Array[Combatant] = []
 	var leader_initiative: int = 0
 	var is_attacker: bool = false
-	## The side has declared itself finished for this round. Needed because a
-	## phase does NOT end when resources run out: with free re-entry a unit
-	## almost always has leftover movement, so without a voluntary "done" the
-	## two sides hand control back and forth forever and no round ever ends.
-	## This is the model's equivalent of clicking End Turn.
+	## The side has declared itself finished for this round. A voluntary pass is
+	## still needed when eligible units remain but the player chooses not to use
+	## their remaining movement/action capacity.
 	var passed: bool = false
 
 	func living() -> Array[Combatant]:
@@ -95,9 +92,7 @@ static func phase_done(state: BattleState, side_id: int) -> bool:
 ## The active side declares itself finished. Returns true if a new round started.
 ##
 ## A new round begins once BOTH sides are finished — each having either passed
-## voluntarily or run out of resources. Waiting for resources alone would never
-## trigger: with free re-entry a unit almost always has leftover movement, so the
-## sides would trade control indefinitely.
+## voluntarily or exhausted all eligible unit activations.
 ## R7's second transition path: exhaustion, not only an explicit pass.
 ##
 ## `004F20AE..004F214D` scans all 37 roster slots and, finding no remaining

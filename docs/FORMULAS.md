@@ -505,9 +505,18 @@ against a reachable target auto-paths the unit into position; the player does
 not move and then attack as two separate commands. Auto-path movement draws
 from the same action-point pool.
 
-Activation is free and re-entrant: a unit may spend part of its movement, yield
-control, and be reselected later in the same round to finish acting. There is
-no initiative queue within a side.
+Activation is free and re-entrant **before a terminal action**: a unit may
+spend part of its movement, yield control, and be reselected later in the same
+round to finish moving or take its action. There is no initiative queue within
+a side.
+
+`[OWNER:2026-08-09]` · **STATED** — After successful resolution, ordinary melee
+and ranged attacks, and activated actions whose resolved actor policy consumes
+the action, close only the acting unit's activation. Leftover movement does not
+keep that actor eligible afterward. Reactions and rejected commands do not spend
+their source's activation. An action for which
+`resolved_consumes_action(actor)` is false remains explicitly non-terminal.
+This owner-confirmed rule is not labelled binary-verified.
 
 **Battle scheduling is whole-side.** Initiative chooses the first side once.
 Ordinary unit movement, attacks and actions do not yield control to the enemy.
