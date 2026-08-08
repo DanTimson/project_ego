@@ -5,10 +5,10 @@ This is a coverage map, not a release claim.
 | subsystem | evidence | Python oracle | GDScript core | parity status |
 |---|---|---|---|---|
 | attack randomisation and chip damage | published tables + binary | implemented with native stream model | native + `LegacyRng` vector-tested | exact CRT generator and adapters implemented in isolation; end-to-end legacy call ordering pending |
-| stamina and wound multipliers | published tables + binary; R11 complete `0x12` consumer audit | implemented | implemented | low-stamina penalties recovered; every recovered tactical stamina mutation is locally suppressed by effective modifier `0x12` |
-| effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | not assessed | not assessed | R9 closed: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets differ |
-| morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 proves the final clamp is reached differently by melee/counterattack and ranged attack |
-| modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 closed: `0x3D` conditional contribution is after effective-stat and selected 1.5× processing but before randomisation/defence; explicit fixture pending; wider provider coverage incomplete |
+| stamina and wound multipliers | published tables + binary; R11 complete `0x12` consumer audit | implemented | implemented | low-stamina penalties recovered; implemented tactical stamina mutation sites locally suppress writes under effective modifier `0x12` |
+| effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | implemented | implemented | R9 fixture-covered: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets remain distinct |
+| morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 early-provider cutoff and distinct melee/counter minimum handling are fixture-covered |
+| modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 numeric placement is fixture-covered after effective-stat/selected 1.5× processing and before randomisation/defence; target applicability and wider provider coverage remain incomplete |
 | activated actions | public/data families + selective binary edges | implemented | `Action` catalogue implemented | fourteen explicit NH unit actions and public effect-family matrix catalogued; battlefield execution and consumer-triggered opcode mappings incomplete |
 | timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
 | level-up selection | data + binary | implemented in part | `core/model/option.gd` and `tests/test_options.gd` empty | ordinary selection is specified; R15 zero-total/underfull edge deferred until an executable consumer and fixture exist |
@@ -16,7 +16,7 @@ This is a coverage map, not a release claim.
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
 | round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0` | implemented | implemented | whole-side phases and capacity-preserving reselection proven; explicit order fixture still needed |
 | melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
-| ranged execution | binary | partial compatibility model | partial | special modes and ranged zero-entry guard incomplete; current `steps_this_round` stamina discriminator diverges from live-capacity rule |
+| ranged execution | binary | partial compatibility model | partial | exact ranged early-provider zero cutoff and live-capacity stamina discriminator are implemented; special modes remain incomplete |
 | damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
 | battle actions and target legality | public/data descriptions + selective binary evidence | partial | content model only | R16 whole-dispatcher reconstruction retired; observable action-semantics coverage matrix required |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
@@ -105,7 +105,7 @@ The most consequential blockers are:
 2. GDScript timed-status/runtime-effect model;
 3. battle-action effect classification;
 4. porting death, revival, transformation and side-transfer semantics;
-5. conversion of recovered binary rules into executable parity fixtures, including the ranged live-capacity stamina correction and effective-defence vectors.
+5. conversion of remaining recovered binary rules into executable parity fixtures beyond the implemented CX-008 numeric tranche.
 
 ## Documentation checkpoint
 

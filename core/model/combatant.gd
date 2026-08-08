@@ -62,9 +62,9 @@ var speed: int = 1
 var attack_bonus: int = 0
 var defence_bonus: int = 0
 
-## Additive bonuses applied AFTER the multipliers. Morale demonstrably skips
-## these (Сокрушение зла and similar); whether stamina and wound do too is not
-## documented. See OPEN_QUESTIONS item 7.
+## Already-applicable conditional attack contribution. For modifier 0x3D this
+## is added after effective-stat and selected ordinary 1.5x processing, before
+## attack randomisation; wound, stamina and morale do not scale it (R10).
 var conditional_bonus: int = 0
 
 ## Ability names, e.g. &"Неутомимый". Membership only.
@@ -145,6 +145,19 @@ func has_flag(f: StringName) -> bool:
 	for effect in statuses:
 		for m in effect.modifiers:
 			if m.handler == &"grant_flag" and StringName(String(m.params.get("flag", ""))) == f:
+				return true
+	return false
+
+
+## Numeric modifier membership from the unit and active statuses. Environment
+## providers remain battle-contextual and are added by Damage.has_effective_modifier.
+func has_modifier_id(ability: int) -> bool:
+	for m in modifiers:
+		if int(m.ability) == ability:
+			return true
+	for effect in statuses:
+		for m in effect.modifiers:
+			if int(m.ability) == ability:
 				return true
 	return false
 

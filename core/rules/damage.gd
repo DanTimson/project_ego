@@ -36,20 +36,10 @@ static func bind_environment(provider: Callable) -> void:
 	_environment = provider
 
 
-## EVERY modifier acting on this unit, from every source.
-##
-## There are three, and forgetting one is invisible until something is cast:
-##
-##   u.modifiers              innate abilities, from unit.var via the roster
-##   u.statuses[].modifiers   timed effects — buffs, curses, enchantments
-##   _environment(u)          auras, and terrain when it lands
-##
-## This exists because the damage path used only the first. Statuses passed every
-## test in isolation while a Благословение granting +2 attack did nothing, because
-## nothing merged the sources. has_flag walked all three already, so FLAGS from
-## statuses worked and NUMBERS did not — the most confusing possible failure shape.
-static func effective_modifiers(u: Combatant) -> Array:
-	var out: Array = u.modifiers.duplicate()
+## Runtime/status and environment/aura providers already have distinct storage.
+## Keep that existing distinction available to ordering-sensitive rules (R6).
+static func _later_modifiers(u: Combatant) -> Array:
+	var out: Array = []
 	for effect in u.statuses:
 		out.append_array(effect.modifiers)
 	if _environment.is_valid():
@@ -57,15 +47,43 @@ static func effective_modifiers(u: Combatant) -> Array:
 	return out
 
 
+## Every modifier acting on this unit, from every represented source.
+static func effective_modifiers(u: Combatant) -> Array:
+	var out: Array = u.modifiers.duplicate()
+	out.append_array(_later_modifiers(u))
+	return out
+
+
+## Numeric modifier membership across every currently available provider.
+static func has_effective_modifier(u: Combatant, ability: int) -> bool:
+	for modifier in effective_modifiers(u):
+		if int((modifier as Modifier).ability) == ability:
+			return true
+	return false
+
+
+static func _offensive_disabled(u: Combatant) -> bool:
+	return has_effective_modifier(u, 0x26) or u.has_flag(&"Не сражается")
+
+
 ## Returns [value, trace] or [base, null] when nothing applies.
-static func _run_hook(base: Variant, u: Combatant, hook: int, ctx: Dictionary,
-		label: String) -> Array:
-	if _pipeline == null:
-		return [base, null]
-	var mods: Array = effective_modifiers(u)
-	if mods.is_empty():
+static func _run_hook_for(base: Variant, mods: Array, hook: int,
+		ctx: Dictionary, label: String) -> Array:
+	if _pipeline == null or mods.is_empty():
 		return [base, null]
 	return _pipeline.resolve(base, mods, hook, ctx, label)
+
+
+static func _run_hook(base: Variant, u: Combatant, hook: int, ctx: Dictionary,
+		label: String) -> Array:
+	return _run_hook_for(base, effective_modifiers(u), hook, ctx, label)
+
+
+static func _append_hook_steps(trace: Trace, resolved: Array, before: float) -> float:
+	if resolved[1] != null and float(resolved[0]) != before:
+		for step in (resolved[1] as Trace).steps:
+			trace.steps.append(step)
+	return float(resolved[0])
 
 
 const _STAT_FOR_KIND: Dictionary = {
@@ -84,44 +102,50 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 
 	# R6: the three effective-attack functions do NOT share entry semantics.
 	#
-	# Melee (004D1890) and counterattack (004D1660) test modifier 0x26
+	# Melee and counterattack test modifier 0x26
 	# «Не сражается» first and return zero outright; the final minimum-one clamp
 	# is never reached on that path.
 	if (kind == Combatant.AttackKind.MELEE or kind == Combatant.AttackKind.COUNTER) \
-			and u.has_flag(&"Не сражается"):
+			and _offensive_disabled(u):
 		t.step("modifier 0x26 «Не сражается»", value, 0.0, "cannot attack")
 		t.result = 0.0
 		return [0.0, t]
 
-	if u.attack_bonus != 0:
-		var nv: float = value + float(u.attack_bonus)
-		t.step("additive bonuses", value, nv)
-		value = nv
+	var ctx := {"stat": _STAT_FOR_KIND[kind], "unit": u, "kind": kind}
+	if kind == Combatant.AttackKind.RANGED:
+		# Existing unit modifiers are the represented instance/intrinsic channel.
+		# Resolve them into the accepted early sum before consulting the already
+		# separate status and environment channels.
+		var early := _run_hook_for(value, u.modifiers,
+			Modifier.Hook.STAT_PASSIVE, ctx, "early unit modifiers")
+		value = _append_hook_steps(t, early, value)
+		t.step("ranged early provider total", float(base), value,
+			"definition plus unit modifiers; status/environment not consulted")
+		if int(value) == 0:
+			t.step("ranged zero-sum early return", value, 0.0,
+				"before runtime/status/environment, state and clamp")
+			t.result = 0.0
+			return [0.0, t]
 
-	# R6: ranged attack (004D14A0) branches at 004D14D2 after adding ONLY the
-	# definition base, persistent-instance and intrinsic modifiers. A zero sum
-	# returns immediately, BEFORE runtime-node modifiers, commander aura,
-	# wound/stamina, morale and the clamp — so a ranged-zero unit stays at zero
-	# rather than being lifted to 1.
-	#
-	# ASSUMPTION: this engine does not yet separate instance/intrinsic providers
-	# from runtime-node/aura providers, so the guard sits after the additive
-	# bonuses and before the STAT_PASSIVE chain — the closest boundary available.
-	# OPEN_QUESTIONS 18.
-	if kind == Combatant.AttackKind.RANGED and int(value) == 0:
-		t.step("ranged zero-sum early return", value, 0.0,
-			"004D14D4: returns before aura, state and clamp")
-		t.result = 0.0
-		return [0.0, t]
-
-	# STAT_PASSIVE sits INSIDE the multiplier chain: additive before
-	# multiplicative is documented and not negotiable.
-	var passive: Array = _run_hook(value, u, Modifier.Hook.STAT_PASSIVE,
-		{"stat": _STAT_FOR_KIND[kind], "unit": u, "kind": kind}, "modifiers")
-	if passive[1] != null and float(passive[0]) != value:
-		for step in (passive[1] as Trace).steps:
-			t.steps.append(step)
-		value = float(passive[0])
+		# The scalar shorthand is documented as battle-visible spell/aura input,
+		# so it remains on the later side of the ranged cutoff.
+		if u.attack_bonus != 0:
+			var later_value := value + float(u.attack_bonus)
+			t.step("later additive bonuses", value, later_value)
+			value = later_value
+		var later := _run_hook_for(value, _later_modifiers(u),
+			Modifier.Hook.STAT_PASSIVE, ctx, "status/environment modifiers")
+		value = _append_hook_steps(t, later, value)
+	else:
+		# Preserve the established melee/counter provider behavior: scalar and all
+		# modifier sources still resolve as one combined additive stage.
+		if u.attack_bonus != 0:
+			var nv: float = value + float(u.attack_bonus)
+			t.step("additive bonuses", value, nv)
+			value = nv
+		var passive := _run_hook(value, u, Modifier.Hook.STAT_PASSIVE,
+			ctx, "modifiers")
+		value = _append_hook_steps(t, passive, value)
 
 	# Stamina and wound act inside the x100 scaled domain; morale is applied
 	# LAST, on an integer, as a whole-percent bonus. The order is the binary's,
@@ -189,7 +213,7 @@ static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
 			t.steps.append(step)
 		value = float(passive[0])
 
-	# R9: shared final tail of 004D0820 (defence) and 004D06B0 (ranged defence):
+	# R9: shared accepted final tail for ordinary and ranged defence:
 	#
 	#     if current_stamina == 0: value = trunc0(value / 2)
 	#     return max(value, 0)
@@ -199,14 +223,17 @@ static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
 	#   - modifier 0x12 «Неутомимость» is NOT consulted by either function — the
 	#     exemption belongs to stamina COSTS, not to the defence halving;
 	#   - the signed divide truncates toward zero (CDQ; SUB; SAR), not floors.
+	var path_name := "ranged" if kind == Combatant.AttackKind.RANGED else "ordinary"
+	t.step("defence provider total", value, value,
+		"%s providers complete before stamina handling" % path_name)
 	if u.stamina == 0:
 		var nv: float = float(int(value / 2.0))
-		t.step("exhausted, halved", value, nv, "stamina exactly 0")
+		t.step("zero-stamina defence halving", value, nv,
+			"signed truncation toward zero")
 		value = nv
 
 	var final: int = maxi(0, int(value))
-	if float(final) != value:
-		t.step("clamp >= 0", value, float(final))
+	t.step("final defence clamp", value, float(final), "minimum 0")
 	t.result = float(final)
 	return [final, t]
 
@@ -246,31 +273,57 @@ static func negative_damage_hits(damage: int, rng: Rng, stream: StringName = &"c
 	return rng.roll(20 + damage, stream) >= 10
 
 
-## Full pipeline. Returns [damage: int, traces: Array[Trace]].
-static func resolve_attack(attacker: Combatant, defender: Combatant,
-		kind: Combatant.AttackKind, rng: Rng) -> Array:
+## Final attack power immediately before randomisation (R10).
+##
+## `conditional_bonus` is an already-resolved applicability/provider boundary:
+## callers decide whether modifier 0x3D contributes. This function freezes only
+## its numeric placement and does not infer a target class from presentation.
+## Returns [power: int, trace: Trace].
+static func attack_power_before_randomisation(attacker: Combatant,
+		kind: Combatant.AttackKind, selected_ordinary_1_5x: bool = false) -> Array:
 	var atk: Array = current_attack(attacker, kind)
 	var atk_value: float = atk[0]
 	var atk_trace: Trace = atk[1]
 
-	# ASSUMPTION (OPEN_QUESTIONS item 7): conditional bonuses are added after
-	# all three multipliers. The page states only that MORALE skips them; it is
-	# silent on stamina and wound. Distinguishable by one wounded-unit test.
-	if attacker.conditional_bonus != 0:
+	if kind == Combatant.AttackKind.MELEE and selected_ordinary_1_5x:
+		var branch_add := int(atk_value / 2.0)
+		var branch_value := atk_value + float(branch_add)
+		atk_trace.step("selected ordinary 1.5x branch", atk_value, branch_value,
+			"after finalized effective attack")
+		atk_value = branch_value
+
+	if ((kind == Combatant.AttackKind.MELEE
+			or kind == Combatant.AttackKind.COUNTER)
+			and attacker.conditional_bonus != 0):
 		var nv: float = atk_value + float(attacker.conditional_bonus)
-		atk_trace.step("conditional bonus", atk_value, nv, "ASSUMED outside multipliers")
+		atk_trace.step("conditional attack contribution", atk_value, nv,
+			"already-applicable numeric input; after selected branch; before randomisation")
 		atk_value = nv
-		atk_trace.result = nv
 
-	if attacker.has_flag(&"Не сражается"):
+	atk_trace.result = atk_value
+	return [int(atk_value), atk_trace]
+
+
+## Full pipeline. Returns [damage: int, traces: Array[Trace]].
+static func resolve_attack(attacker: Combatant, defender: Combatant,
+		kind: Combatant.AttackKind, rng: Rng,
+		selected_ordinary_1_5x: bool = false) -> Array:
+	var attack_power := attack_power_before_randomisation(
+		attacker, kind, selected_ordinary_1_5x)
+	var attack_int: int = int(attack_power[0])
+	var atk_trace: Trace = attack_power[1]
+
+	if ((kind == Combatant.AttackKind.MELEE
+			or kind == Combatant.AttackKind.COUNTER)
+			and _offensive_disabled(attacker)):
 		return [0, [atk_trace]]
-
-	var attack_int: int = int(floorf(atk_value))
+	if kind == Combatant.AttackKind.RANGED and attack_int == 0:
+		return [0, [atk_trace]]
 	var rolled_pair: Array = roll_attack(attack_int, rng)
 	var rolled: int = rolled_pair[0]
 	var roll_trace := Trace.new("%s.roll" % attacker.name)
 	roll_trace.base = float(attack_int)
-	roll_trace.step("randomise", float(attack_int), float(rolled), rolled_pair[1])
+	roll_trace.step("attack randomisation", float(attack_int), float(rolled), rolled_pair[1])
 	roll_trace.result = float(rolled)
 
 	var def_pair: Array = current_defence(defender, kind)
@@ -279,7 +332,8 @@ static func resolve_attack(attacker: Combatant, defender: Combatant,
 
 	var dmg_trace := Trace.new("damage")
 	dmg_trace.base = float(rolled)
-	dmg_trace.step("- defence %d" % def_value, float(rolled), float(damage))
+	dmg_trace.step("defence subtraction", float(rolled), float(damage),
+		"effective defence %d" % def_value)
 
 	if damage <= 0:
 		if negative_damage_hits(damage, rng):

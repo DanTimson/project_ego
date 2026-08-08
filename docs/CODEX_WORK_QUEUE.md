@@ -28,6 +28,7 @@ priority.
 | CX-005 | `NON_SEMANTIC_TOOLING` | aggregate public-lineage preflight report | binary/governance | `BLOCKED` | CX-001, CX-003, CX-004 |
 | CX-006 | `NON_SEMANTIC_TOOLING` | dry-run public-lineage exporter | binary/governance | `BLOCKED` | CX-001, CX-002, CX-003, CX-005 and explicit manifest |
 | CX-007 | `NON_SEMANTIC_TOOLING` | repository-governance CI integration | binary/governance | `BLOCKED` | CX-001 through CX-005 accepted |
+| CX-008 | `SPEC_IMPLEMENTATION` | tactical numeric mechanics closure (R3/R6/R8/R9/R10/R11) | engine | `DONE` | accepted R3, R6, R8, R9, R10 and R11 specifications |
 
 Task contracts live in `docs/codex/tasks/`.
 

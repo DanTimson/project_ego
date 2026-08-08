@@ -21,14 +21,14 @@ enum Refusal { OK, NO_MOVEMENT, ACTION_SPENT, EXHAUSTED, NOT_YOUR_PHASE }
 static func effective_speed(u: Combatant) -> Array:
 	var t := Trace.new("%s.speed" % u.name)
 	t.base = float(u.speed)
-	# `004D0560` recovered form (R8):
+	# Recovered effective-speed form (R8):
 	#     if stamina < 5 and speed > 1: speed -= 1
 	#     if stamina < 3 and speed > 1: speed -= 1
 	#     return max(speed, 1)
 	# Two guarded decrements rather than one banded penalty. Numerically
 	# identical for every reachable input, but this is what the binary does.
 	#
-	# ONE BEHAVIOURAL CHANGE: the «Неутомимый» exemption is removed. `004D0560`
+	# ONE BEHAVIOURAL CHANGE: the «Неутомимый» exemption is removed. The recovered effective-speed rule
 	# has no modifier 0x12 check; the exemption was inferred from "such a unit
 	# never loses stamina", which fails when an effect sets stamina directly.
 	# Modifier 0x12 suppresses stamina DEDUCTIONS, not the speed penalty.
@@ -176,6 +176,12 @@ static func can_move(u: Combatant, tiles: int = 1) -> Refusal:
 	return Refusal.OK if u.movement_remaining >= tiles else Refusal.NO_MOVEMENT
 
 
+static func _modifier_0x12_suppresses(u: Combatant,
+		resolved_effective_modifier: bool = false) -> bool:
+	return (resolved_effective_modifier or u.has_modifier_id(0x12)
+		or u.has_flag(&"Неутомимый"))
+
+
 ## Move `tiles` steps. `stamina_cost` is the terrain drain the caller has already
 ## resolved from bf_object — hills and swamp cost 1 unless the unit has the
 ## matching Знание; flyers pay nothing.
@@ -183,7 +189,8 @@ static func can_move(u: Combatant, tiles: int = 1) -> Refusal:
 ## Steps ACCUMULATE as trace-visible path history. A unit pacing back to its
 ## starting tile still records every step, but neither Genesis charge nor the R8
 ## attack stamina cost consumes this counter.
-static func spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> Trace:
+static func spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0,
+		modifier_0x12_effective: bool = false) -> Trace:
 	var t := Trace.new("%s.move" % u.name)
 	t.base = float(u.movement_remaining)
 	u.movement_remaining -= tiles
@@ -196,18 +203,24 @@ static func spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> T
 
 	var extra: int = tiles if int(effective_speed(u)[0]) <= 0 else 0
 	var total: int = stamina_cost + extra
-	if total > 0 and not u.has_flag(&"Неутомимый"):
-		var before: int = u.stamina
-		u.stamina = maxi(0, u.stamina - total)
-		t.step("stamina", float(before), float(u.stamina), "terrain")
+	if total > 0:
+		if _modifier_0x12_suppresses(u, modifier_0x12_effective):
+			t.step("modifier 0x12 stamina mutation suppression",
+				float(u.stamina), float(u.stamina),
+				"movement requested stamina cost %d" % total)
+		else:
+			var before: int = u.stamina
+			u.stamina = maxi(0, u.stamina - total)
+			t.step("movement stamina mutation", float(before), float(u.stamina),
+				"terrain")
 	t.result = float(u.movement_remaining)
 	return t
 
 
 ## 2 when live remaining capacity is BELOW effective speed, else 1 (R8).
 ##
-## `004D7953..004D797D` compares the tactical-unit field at `+0x04` — remaining
-## capacity — against `004D0560`'s effective speed, with a STRICT less-than, so
+## The recovered ranged executor compares live remaining capacity against
+## effective speed, with a STRICT less-than, so
 ## equality and temporary over-capacity both select 1.
 ##
 ## This is NOT `steps_this_round > 0`, which is what this used before. The two
@@ -219,22 +232,48 @@ static func attack_stamina_cost(u: Combatant) -> int:
 	return 2 if u.movement_remaining < int(effective_speed(u)[0]) else 1
 
 
-static func spend_attack(u: Combatant) -> Trace:
-	var t := Trace.new("%s.attack_cost" % u.name)
-	var cost: int = attack_stamina_cost(u)
+static func _spend_attack(u: Combatant, ranged_executor: bool,
+		modifier_0x12_effective: bool = false) -> Trace:
+	var label := "ranged_attack_cost" if ranged_executor else "attack_cost"
+	var t := Trace.new("%s.%s" % [u.name, label])
+	var speed := int(effective_speed(u)[0])
+	var capacity := u.movement_remaining
+	var cost: int = 2 if capacity < speed else 1
 	t.base = float(u.stamina)
-	if not u.has_flag(&"Неутомимый"):
+	t.step("live-capacity stamina discriminator", float(capacity), float(cost),
+		"effective speed %d; strict capacity < speed is %s; selected base cost %d"
+		% [speed, str(capacity < speed), cost])
+	if _modifier_0x12_suppresses(u, modifier_0x12_effective):
+		t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+			"requested attack stamina cost %d" % cost)
+	else:
 		u.stamina = maxi(0, u.stamina - cost)
-		t.step("-%d stamina" % cost, t.base, float(u.stamina),
-			"capacity %d < effective speed %d" % [u.movement_remaining,
-				int(effective_speed(u)[0])] if cost == 2
-				else "capacity at or above effective speed")
+		t.step("attack stamina mutation", t.base, float(u.stamina),
+			"selected base cost %d" % cost)
 	u.action_spent = true
-	if u.stamina <= 0 and not u.has_flag(&"Неутомимый"):
+	if ranged_executor:
+		var before_capacity := u.movement_remaining
+		u.movement_remaining = 0
+		t.step("ranged activation capacity clear", float(before_capacity), 0.0,
+			"ranged executor ends activation")
+	if u.stamina <= 0 and not _modifier_0x12_suppresses(
+			u, modifier_0x12_effective):
 		u.forced_rest = true
-		t.step("exhausted", float(u.stamina), float(u.stamina), "forced Rest next round")
+		t.step("exhausted", float(u.stamina), float(u.stamina),
+			"forced Rest next round")
 	t.result = float(u.stamina)
 	return t
+
+
+static func spend_attack(u: Combatant,
+		modifier_0x12_effective: bool = false) -> Trace:
+	# Existing non-ranged callers retain their established executor boundary.
+	return _spend_attack(u, false, modifier_0x12_effective)
+
+
+static func spend_ranged_attack(u: Combatant,
+		modifier_0x12_effective: bool = false) -> Trace:
+	return _spend_attack(u, true, modifier_0x12_effective)
 
 
 ## Rest or skip: +(2 + Восстановление сил), capped at base. Under Зуд the

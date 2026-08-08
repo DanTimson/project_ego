@@ -187,13 +187,14 @@ class Combatant:
     # (commander auras, spell buffs — the ones visible in the unit panel)
     attack_bonus: int = 0
     defence_bonus: int = 0
-    # additive bonuses applied AFTER the multipliers (see PIPELINE NOTE below)
+    # already-applicable conditional attack contribution; R10 places modifier
+    # 0x3D after effective-stat/selected-branch processing, before randomisation
     conditional_bonus: int = 0
 
-    ## Every Modifier on this unit: innate abilities, level-up perks, item
-    ## enchants, spell buffs, terrain, medals, auras. `attack_bonus` and
-    ## `defence_bonus` above remain as a shorthand for tests and simple
-    ## scenarios; anything content-driven arrives here instead.
+    ## Unit-owned innate/content modifiers: the represented persistent-instance
+    ## and intrinsic channel. Timed effects and environment/auras use the
+    ## separate containers below. `attack_bonus` and `defence_bonus` remain
+    ## shorthand for simple scenarios.
     modifiers: list = field(default_factory=list)
 
     ## Timed effects. They contribute Modifiers through the same pipeline as
@@ -267,6 +268,17 @@ class Combatant:
                 if m.handler == "grant_flag" and m.params.get("flag") == f:
                     return True
         return False
+
+    def has_modifier_id(self, ability: int) -> bool:
+        """Numeric modifier membership from the unit and active statuses.
+
+        Environment providers remain battle-contextual and are added by
+        ``has_effective_modifier`` at the combat seam.
+        """
+        if any(m.ability == ability for m in self.modifiers):
+            return True
+        return any(m.ability == ability
+                   for effect in self.statuses for m in effect.modifiers)
 
     def all_flags(self) -> set:
         """Every flag from every source. For display and for the AI."""
@@ -443,25 +455,9 @@ def bind_environment(provider) -> None:
     _ENVIRONMENT = provider
 
 
-def effective_modifiers(u) -> list:
-    """EVERY modifier acting on this unit, from every source.
-
-    There are three, and forgetting one is invisible until something is cast:
-
-        u.modifiers              innate abilities, from unit.var via the roster
-        u.statuses[].modifiers   timed effects — buffs, curses, enchantments
-        _ENVIRONMENT(u)          auras, and terrain when it lands
-
-    This function exists because the damage path used only the first. Statuses
-    passed every test in isolation while a Благословение granting +2 attack did
-    nothing, because nothing merged the sources. `has_flag` walked all three
-    already, so FLAGS from statuses worked and NUMBERS did not — the most
-    confusing possible failure shape.
-
-    Statuses are read by duck-typing rather than importing the module, since
-    statuses.py imports Trace from here.
-    """
-    out = list(u.modifiers)
+def _later_modifiers(u) -> list:
+    """Runtime/status and environment/aura providers already stored separately."""
+    out = []
     for effect in u.statuses:
         out.extend(effect.modifiers)
     if _ENVIRONMENT is not None:
@@ -469,13 +465,35 @@ def effective_modifiers(u) -> list:
     return out
 
 
-def _run_hook(base, u, hook, ctx, label):
-    if _PIPELINE is None:
-        return base, None
-    mods = effective_modifiers(u)
-    if not mods:
+def effective_modifiers(u) -> list:
+    """Every modifier acting on this unit, from every represented source."""
+    return list(u.modifiers) + _later_modifiers(u)
+
+
+def has_effective_modifier(u, ability: int) -> bool:
+    """Numeric modifier membership across every available provider."""
+    return any(m.ability == ability for m in effective_modifiers(u))
+
+
+def _offensive_disabled(u) -> bool:
+    return has_effective_modifier(u, 0x26) or u.has_flag("Не сражается")
+
+
+def _run_hook_for(base, mods, hook, ctx, label):
+    if _PIPELINE is None or not mods:
         return base, None
     return _PIPELINE.resolve(base, mods, hook, ctx, label)
+
+
+def _run_hook(base, u, hook, ctx, label):
+    return _run_hook_for(base, effective_modifiers(u), hook, ctx, label)
+
+
+def _append_hook_steps(trace, resolved, before):
+    value, subtrace = resolved
+    if subtrace is not None and value != before:
+        trace.steps.extend(subtrace.steps)
+    return value
 
 
 def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
@@ -491,45 +509,50 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
 
     # R6: the three effective-attack functions do NOT share entry semantics.
     #
-    # Melee (004D1890) and counterattack (004D1660) test modifier 0x26
+    # Melee and counterattack test modifier 0x26
     # «Не сражается» first and return zero outright. The final minimum-one clamp
     # is never reached on that path.
-    if kind in (AttackKind.MELEE, AttackKind.COUNTER) and u.has_flag("Не сражается"):
+    if kind in (AttackKind.MELEE, AttackKind.COUNTER) and _offensive_disabled(u):
         t.step("modifier 0x26 «Не сражается»", value, 0.0, "cannot attack")
         t.result = 0.0
         return 0.0, t
 
-    if u.attack_bonus:
-        nv = value + u.attack_bonus
-        t.step("additive bonuses", value, nv)
-        value = nv
-
-    # R6: ranged attack (004D14A0) branches at 004D14D2 after adding ONLY the
-    # definition base, persistent-instance modifiers and intrinsic modifiers. A
-    # zero sum returns immediately, BEFORE runtime-node modifiers, commander
-    # aura, wound/stamina, morale and the clamp — so a ranged-zero unit stays at
-    # zero rather than being lifted to 1 by the clamp.
-    #
-    # ASSUMPTION: this engine does not yet separate persistent-instance and
-    # intrinsic providers from runtime-node and aura providers, so the guard is
-    # placed after the additive bonuses and before the STAT_PASSIVE chain, which
-    # is the closest available boundary. If a runtime-node or aura provider ever
-    # raises a zero ranged attack, the two models diverge. OPEN_QUESTIONS 18.
-    if kind is AttackKind.RANGED and _trunc(value) == 0:
-        t.step("ranged zero-sum early return", value, 0.0,
-               "004D14D4: returns before aura, state and clamp")
-        t.result = 0.0
-        return 0.0, t
-
-    # STAT_PASSIVE sits INSIDE the multiplier chain: additive before
-    # multiplicative is documented and not negotiable.
     from modifier import Hook
     ctx = {"stat": _STAT_FOR_KIND[kind], "unit": u, "kind": kind}
-    nv, sub = _run_hook(value, u, Hook.STAT_PASSIVE, ctx, "modifiers")
-    if sub is not None and nv != value:
-        for step in sub.steps:
-            t.steps.append(step)
-        value = nv
+    if kind is AttackKind.RANGED:
+        # Existing unit modifiers are the represented instance/intrinsic
+        # channel. Resolve them before the separately stored status/environment
+        # channels, which are later providers for the accepted R6 cutoff.
+        early = _run_hook_for(value, u.modifiers, Hook.STAT_PASSIVE, ctx,
+                              "early unit modifiers")
+        value = _append_hook_steps(t, early, value)
+        t.step("ranged early provider total", base, value,
+               "definition plus unit modifiers; "
+               "status/environment not consulted")
+        if _trunc(value) == 0:
+            t.step("ranged zero-sum early return", value, 0.0,
+                   "before runtime/status/environment, state and clamp")
+            t.result = 0.0
+            return 0.0, t
+
+        # The scalar shorthand is documented as battle-visible spell/aura input,
+        # so it remains on the later side of the ranged cutoff.
+        if u.attack_bonus:
+            nv = value + u.attack_bonus
+            t.step("later additive bonuses", value, nv)
+            value = nv
+        later = _run_hook_for(value, _later_modifiers(u), Hook.STAT_PASSIVE,
+                              ctx, "status/environment modifiers")
+        value = _append_hook_steps(t, later, value)
+    else:
+        # Preserve established melee/counter behavior: scalar and all modifier
+        # sources still resolve as one combined additive stage.
+        if u.attack_bonus:
+            nv = value + u.attack_bonus
+            t.step("additive bonuses", value, nv)
+            value = nv
+        passive = _run_hook(value, u, Hook.STAT_PASSIVE, ctx, "modifiers")
+        value = _append_hook_steps(t, passive, value)
 
     # Stamina and wound act inside the x100 scaled domain; morale is applied
     # LAST, on an integer, as a whole-percent bonus. The order is the binary's,
@@ -613,33 +636,53 @@ def negative_damage_hits(damage: int, rng: Rng, stream: str = "chip") -> bool:
     return rng.roll(20 + damage, stream) >= 10
 
 
-def resolve_attack(attacker: Combatant, defender: Combatant,
-                   kind: AttackKind, rng: Rng) -> tuple[int, list]:
-    """Full ordinary-damage pipeline. Returns (damage_dealt, [traces])."""
+def attack_power_before_randomisation(
+        attacker: Combatant, kind: AttackKind,
+        selected_ordinary_1_5x: bool = False) -> tuple[int, Trace]:
+    """Final attack power immediately before randomisation (R10).
+
+    ``conditional_bonus`` is an already-resolved applicability/provider
+    boundary: callers decide whether modifier 0x3D contributes. This function
+    freezes only its numeric placement and does not infer a target class from a
+    presentation name.
+    """
     atk_value, atk_trace = current_attack(attacker, kind)
 
-    # PIPELINE NOTE / ASSUMPTION.
-    # The page says morale «не увеличивает урон от Сокрушения зла и подобных
-    # эффектов, только прямые бонусы на атаки». It does NOT say whether stamina
-    # and wound multipliers skip them too. Applying conditional bonuses after
-    # all three multipliers is the simplest reading consistent with the text.
-    # The alternative — conditional bonuses inside Stamina/Wound but outside
-    # Morale — is distinguishable by one wounded-unit test against a target the
-    # bonus applies to. Flagged, not settled.
-    if attacker.conditional_bonus:
-        nv = atk_value + attacker.conditional_bonus
-        atk_trace.step("conditional bonus", atk_value, nv, "ASSUMED outside multipliers")
-        atk_value = nv
-        atk_trace.result = nv
+    if kind is AttackKind.MELEE and selected_ordinary_1_5x:
+        branch_add = _trunc(atk_value / 2)
+        branch_value = atk_value + branch_add
+        atk_trace.step("selected ordinary 1.5x branch", atk_value, branch_value,
+                       "after finalized effective attack")
+        atk_value = branch_value
 
-    attack_int = int(math.floor(atk_value))
-    if attacker.has_flag("Не сражается"):
+    if (kind in (AttackKind.MELEE, AttackKind.COUNTER)
+            and attacker.conditional_bonus):
+        nv = atk_value + attacker.conditional_bonus
+        atk_trace.step("conditional attack contribution", atk_value, nv,
+                       "already-applicable numeric input; after selected branch; "
+                       "before randomisation")
+        atk_value = nv
+
+    atk_trace.result = atk_value
+    return _trunc(atk_value), atk_trace
+
+
+def resolve_attack(attacker: Combatant, defender: Combatant,
+                   kind: AttackKind, rng: Rng,
+                   selected_ordinary_1_5x: bool = False) -> tuple[int, list]:
+    """Full ordinary-damage pipeline. Returns (damage_dealt, [traces])."""
+    attack_int, atk_trace = attack_power_before_randomisation(
+        attacker, kind, selected_ordinary_1_5x)
+    if (kind in (AttackKind.MELEE, AttackKind.COUNTER)
+            and _offensive_disabled(attacker)):
+        return 0, [atk_trace]
+    if kind is AttackKind.RANGED and attack_int == 0:
         return 0, [atk_trace]
 
     rolled, roll_note = roll_attack(attack_int, rng)
     roll_trace = Trace(f"{attacker.name}.roll")
     roll_trace.base = attack_int
-    roll_trace.step("randomise", attack_int, rolled, roll_note)
+    roll_trace.step("attack randomisation", attack_int, rolled, roll_note)
     roll_trace.result = rolled
 
     def_value, def_trace = current_defence(defender, kind)
@@ -647,7 +690,8 @@ def resolve_attack(attacker: Combatant, defender: Combatant,
 
     dmg_trace = Trace("damage")
     dmg_trace.base = rolled
-    dmg_trace.step(f"- defence {def_value}", rolled, damage)
+    dmg_trace.step("defence subtraction", rolled, damage,
+                   f"effective defence {def_value}")
 
     if damage <= 0:
         if negative_damage_hits(damage, rng):
@@ -682,8 +726,7 @@ def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
             t.steps.append(step)
         value = nv
 
-    # R9: the shared final tail of 004D0820 (defence) and 004D06B0 (ranged
-    # defence) is
+    # R9: the shared accepted final tail of ordinary and ranged defence is
     #
     #     if current_stamina == 0: value = trunc0(value / 2)
     #     return max(value, 0)
@@ -697,13 +740,16 @@ def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
     #   - the signed divide is `CDQ; SUB EAX,EDX; SAR EAX,1`, which truncates
     #     toward zero. `floor` diverges for negative odd values; the clamp hides
     #     it here, but the trace should still read correctly.
+    path_name = "ranged" if kind is AttackKind.RANGED else "ordinary"
+    t.step("defence provider total", value, value,
+           "%s providers complete before stamina handling" % path_name)
     if u.stamina == 0:
         nv = float(_trunc(value / 2))
-        t.step("exhausted, halved", value, nv, "stamina exactly 0")
+        t.step("zero-stamina defence halving", value, nv,
+               "signed truncation toward zero")
         value = nv
 
     final = max(0, _trunc(value))
-    if final != value:
-        t.step("clamp >= 0", value, final)
+    t.step("final defence clamp", value, final, "minimum 0")
     t.result = final
     return final, t

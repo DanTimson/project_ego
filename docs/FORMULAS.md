@@ -105,6 +105,12 @@ The public description supports the morale carve-out. Exact wound, stamina,
 1.5×-mode and randomisation placement comes from the already archived
 `EXP-R9-001` function body. No additional binary extraction was required.
 
+The live engine and oracle accept the already-resolved applicable contribution
+through `conditional_bonus`; this is a numeric stage boundary, not a target-name
+classifier. Address-free fixtures cover attack-power inputs `25`, `20`, `13`,
+`13`, and `35`, plus counterattack inclusion and ranged exclusion. Scenario
+traces expose the already-applicable conditional input before attack randomisation.
+
 ### 1.2 WoundMod
 
 `[GM] Тяжёлые ранения` · **VERIFIED** against the published table
@@ -173,6 +179,11 @@ minimum-zero clamp occurs afterward.
 | 3 | 3 | 1 |
 | 7 | 7 | 3 |
 
+The engine/oracle trace records the complete provider total, any exact-zero
+halving, and the final clamp as separate ordered stages. Deterministic ordinary
+and ranged integration vectors use base `3` plus provider `4`: the trace must
+show `7 -> 3`, so halving before providers fails.
+
 Provider differences before this shared tail:
 
 | contribution | ordinary defence `004D0820` | ranged defence `004D06B0` |
@@ -223,6 +234,11 @@ Exceptions remain guarded but use different accounting:
 AI scoring, movement/path comparison, aggregate construction and
 selection-interface availability also query `0x12` and treat stamina mechanics
 as inapplicable.
+
+The currently executable movement, ordinary/ranged attack-cost and
+activated-action-cost sites perform this local numeric-ID check and emit a
+suppression trace. Missing on-hit, scripted and generic phase-effect executors
+were not manufactured merely to add consumers.
 
 Effective attack, counterattack, ranged attack, speed, ordinary defence and
 ranged defence do **not** query `0x12`. They continue to derive penalties from
@@ -291,6 +307,14 @@ unconditional definition for every possible raw stat:
   zero. This occurs before runtime-node modifiers, commander aura and the
   wound/stamina/morale tail. Only a nonzero early sum reaches the minimum-one
   clamp.
+
+The engine and oracle preserve this cutoff through source containers already in
+the model: definition base plus unit modifiers form the early ranged sum, while
+timed-status and environment/aura providers remain later. A deterministic
+synthetic aura contributes `+6` ranged attack to a unit whose early sum is zero;
+both live paths still return zero without resolving that aura. This implements
+the provider cutoff without assigning new gameplay semantics to modifier source
+text.
 
 The effective-stat functions alone do not prove whether the command layer
 offers melee to a ranged-only unit.
@@ -499,8 +523,9 @@ the opposing phase begins.
 Current Project EGO state:
 
 - `steps_this_round` is cumulative path length, not displacement.
-- the attack stamina cost keys on live remaining capacity versus effective
-  speed (R8), not on prior movement state;
+- the recovered ranged-attack stamina cost keys on live remaining capacity
+  versus effective speed (R8), not on prior movement state; the existing
+  non-ranged cost boundary remains separate;
 - the observed `Удар и возврат` anchor is the tile where the attack command was
   issued;
 - start-of-turn effects currently fire once per round.
@@ -538,8 +563,14 @@ Consequences:
 - a cumulative `steps_this_round` rule is a Project EGO-native alternative, not
   an exact legacy rule.
 
-This does not settle the separate stamina-cost question in `OPEN_QUESTIONS`
-item 12 or the `Удар и возврат` anchor in item 13.
+Only the initiating attacker's primary ordinary melee hit consumes the stored
+integer. It is added after randomized/defended ordinary damage, without another
+randomisation or defence pass, and the combined value is capped to the target's
+current life before central application. Defender first strike, retaliation,
+ranged attacks and actions do not receive it. Command-entry resolution and
+primary-hit consumption are separate ordered trace stages.
+
+The separate `Удар и возврат` anchor remains outside this tranche.
 
 ---
 

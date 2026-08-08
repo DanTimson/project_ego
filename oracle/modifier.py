@@ -86,10 +86,9 @@ class Modifier:
     source: str = ""
     duration: int = -1          # -1 = permanent
 
-    ## Morale demonstrably does not multiply conditional damage (Сокрушение зла
-    ## and similar). Whether stamina and wound skip them too is undocumented;
-    ## see OPEN_QUESTIONS item 7. Modifiers flagged here are applied after all
-    ## three multipliers.
+    ## Already-applicable conditional attack contributions marked here resolve
+    ## after effective-stat multipliers. Modifier 0x3D placement is frozen by
+    ## R10; target applicability remains outside the numeric stage.
     outside_multipliers: bool = False
 
     def describe(self) -> str:

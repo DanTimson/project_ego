@@ -19,6 +19,21 @@ const FIXTURE := "res://tests/fixtures/scenario_fixture.json"
 
 var failures: int = 0
 
+class MaxRollRng extends Rng:
+	func _init() -> void:
+		super(0)
+
+	func roll(x: int, _stream: StringName = &"combat") -> int:
+		return maxi(0, x - 1)
+
+
+func _trace_index(lines: Array, fragment: String) -> int:
+	for i in lines.size():
+		if fragment in String(lines[i]):
+			return i
+	return -1
+
+
 func _check(ok: bool, what: String, detail: String = "") -> void:
 	print("  %s  %s%s" % ["PASS" if ok else "FAIL", what,
 		("  — " + detail) if detail != "" else ""])
@@ -224,10 +239,13 @@ func _test_genesis_r8_live_capacity() -> void:
 		{"op": "move", "unit": "attacker", "to": [1, 0]},
 		{"op": "shoot", "unit": "attacker", "target": "target"},
 	]
-	var final: Dictionary = _run_profile_combat(r8_spec)["final"]["attacker"]
+	var r8_result := _run_profile_combat(r8_spec)
+	var final: Dictionary = r8_result["final"]["attacker"]
 	_check(final["steps_this_round"] == 1, "the R8 vector has movement history")
-	_check(final["movement_remaining"] == 3,
-		"movement leaves capacity equal to stamina-reduced effective speed")
+	_check(final["movement_remaining"] == 0,
+		"the ranged executor clears capacity after comparing live value 3")
+	_check(_trace_index(r8_result["log"], "effective speed 3") >= 0,
+		"the pre-clear capacity/effective-speed comparison is trace-visible")
 	_check(final["stamina"] == 2,
 		"strict live-capacity comparison charges 1, not history-based 2",
 		"final stamina %d (history rule would leave 1)" % final["stamina"])
@@ -246,10 +264,144 @@ func _test_genesis_r8_live_capacity() -> void:
 	var restored_result := _run_profile_combat(restored)
 	var restored_final: Dictionary = restored_result["final"]["attacker"]
 	_check(restored_final["steps_this_round"] == 1
-			and restored_final["movement_remaining"] == 4,
-		"existing extra-turn helper expresses restored live capacity")
+			and restored_final["movement_remaining"] == 0,
+		"restored live capacity is compared, then ranged execution clears it")
+	_check(_trace_index(restored_result["log"], "effective speed 4") >= 0,
+		"restored capacity comparison survives reselection and is traced")
 	_check(restored_final["stamina"] == 9,
 		"restored capacity costs 1 despite nonzero movement history")
+
+
+func _numeric_modifier(ability: int, stat: String = "", power: int = 0) -> Dictionary:
+	var modifier := {
+		"ability": ability, "handler": "modifier_%02x" % ability,
+		"hook": "DAMAGE_VS_TARGET", "power": power,
+		"source": "modifier %02x" % ability,
+	}
+	if stat != "":
+		modifier["handler"] = "stat_delta"
+		modifier["hook"] = "STAT_PASSIVE"
+		modifier["params"] = {"stat": stat}
+	return modifier
+
+
+func _test_melee_numeric_tranche_integration() -> void:
+	print("\n[integration] melee R3/R9/R10 ordering and live state")
+	var spec := {
+		"name": "numeric melee integration", "profile": "genesis", "seed": 1,
+		"battlefield": {"width": 8, "height": 3, "tiles": []},
+		"sides": [
+			{"id": 0, "is_attacker": true, "leader_initiative": 1, "units": [{
+				"name": "attacker", "at": [0, 0], "attack": 9,
+				"counter_attack": 0, "defence": 0, "life": 30,
+				"stamina": 10, "stamina_base": 10, "morale": 10, "speed": 8,
+				"conditional_bonus": 5,
+				"modifiers": [_numeric_modifier(0x25)],
+			}]},
+			{"id": 1, "leader_initiative": 0, "units": [{
+				"name": "target", "at": [4, 0], "attack": 0,
+				"counter_attack": 0, "defence": 3, "life": 30,
+				"stamina": 0, "morale": 10, "speed": 1,
+				"modifiers": [_numeric_modifier(4, "defence", 4)],
+			}]},
+		],
+		"commands": [{"op": "attack", "unit": "attacker", "target": "target"}],
+	}
+	var result := Scenario.new(spec, MaxRollRng.new()).run()
+	var lines: Array = result["log"]
+	var entry := _trace_index(lines, "command-entry charge |")
+	var movement := _trace_index(lines, "closes to")
+	var conditional := _trace_index(lines, "conditional attack contribution")
+	var randomisation := _trace_index(lines, "attack randomisation")
+	var provider := _trace_index(lines, "defence provider total")
+	var halving := _trace_index(lines, "zero-stamina defence halving")
+	var subtraction := _trace_index(lines, "defence subtraction")
+	var consumption := _trace_index(lines, "command-entry charge consumption")
+	_check(result["final"]["target"]["life"] == 19,
+		"exact target life is 30 - (9 resolved + 2 charge) = 19")
+	_check(entry >= 0 and entry < movement,
+		"modifier 0x25 applicability and value are traced before approach")
+	_check(conditional < randomisation and randomisation < provider
+			and provider < halving and halving < subtraction
+			and subtraction < consumption,
+		"R10 -> randomisation -> R9 -> defence -> R3 consumption is trace-visible")
+	_check("value 2" in String(lines[entry]),
+		"command-entry trace records charge value 2")
+
+
+func _ranged_numeric_spec(base_ranged_attack: int = 20,
+		later_environment_provider: bool = false) -> Dictionary:
+	var spec := {
+		"name": "numeric ranged integration", "profile": "genesis", "seed": 1,
+		"battlefield": {"width": 8, "height": 3,
+			"tiles": [{"col": 1, "row": 0, "stam_cost": 2}]},
+		"sides": [
+			{"id": 0, "is_attacker": true, "leader_initiative": 1, "units": [{
+				"name": "shooter", "at": [0, 0], "ranged_attack": base_ranged_attack,
+				"shooting_range": 8, "ammo": 2, "counter_attack": 0,
+				"defence": 0, "life": 30, "stamina": 0, "stamina_base": 10,
+				"morale": 10, "speed": 4, "conditional_bonus": 5,
+				"modifiers": [_numeric_modifier(0x12)],
+			}]},
+			{"id": 1, "leader_initiative": 0, "units": [{
+				"name": "target", "at": [3, 0], "counter_attack": 0,
+				"ranged_defence": 3, "life": 20, "stamina": 0,
+				"morale": 10, "speed": 1,
+				"modifiers": [_numeric_modifier(5, "ranged_defence", 4)],
+			}]},
+		],
+		"commands": [
+			{"op": "move", "unit": "shooter", "to": [1, 0]},
+			{"op": "shoot", "unit": "shooter", "target": "target"},
+		],
+	}
+	if later_environment_provider:
+		spec["sides"][0]["units"][0]["auras"] = [{
+			"id": "later-ranged-provider", "name": "later ranged provider",
+			"scope": "SELF", "affects": "ALLY",
+			"modifiers": [_numeric_modifier(2, "ranged_attack", 6)],
+		}]
+	return spec
+
+
+func _test_ranged_numeric_tranche_integration() -> void:
+	print("\n[integration] ranged R6/R8/R9/R11 ordering and live state")
+	var result := Scenario.new(_ranged_numeric_spec(), MaxRollRng.new()).run()
+	var lines: Array = result["log"]
+	var shooter: Dictionary = result["final"]["shooter"]
+	_check(result["final"]["target"]["life"] == 16,
+		"zero-stamina attack 8 randomises to 7, then R9 defence 3 gives 4 damage")
+	_check(shooter["stamina"] == 0 and shooter["movement_remaining"] == 0
+			and shooter["steps_this_round"] == 1 and shooter["action_spent"],
+		"modifier 0x12 preserves stamina while ranged execution ends activation")
+	var discriminator := _trace_index(lines, "live-capacity stamina discriminator")
+	_check(discriminator >= 0 and "effective speed 2" in String(lines[discriminator])
+			and "selected base cost 2" in String(lines[discriminator]),
+		"R8 traces capacity 1 < effective speed 2 and selects cost 2")
+	_check(_trace_index(lines, "modifier 0x12 stamina mutation suppression") >= 0,
+		"R11 suppression is visible at covered mutation sites")
+	_check(_trace_index(lines, "defence provider total: 7 -> 7") >= 0
+			and _trace_index(lines, "zero-stamina defence halving: 7 -> 3") >= 0,
+		"R9 ranged providers precede exact-zero halving")
+	_check(_trace_index(lines, "conditional attack contribution") == -1,
+		"the conditional numeric stage is excluded from ranged")
+
+	var zero_scenario := Scenario.new(
+		_ranged_numeric_spec(0, true), MaxRollRng.new())
+	var later: Array = zero_scenario.environment(zero_scenario.units["shooter"])
+	var has_positive_later := false
+	for modifier in later:
+		if (modifier as Modifier).power == 6 \
+				and String((modifier as Modifier).params.get("stat", "")) == "ranged_attack":
+			has_positive_later = true
+	_check(has_positive_later,
+		"distinguishing vector has a positive environment/aura provider")
+	var zero := zero_scenario.run()
+	_check(zero["final"]["target"]["life"] == 20,
+		"R6 zero early sum returns before the positive later provider")
+	_check(_trace_index(zero["log"], "ranged early provider total: 0 -> 0") >= 0
+			and _trace_index(zero["log"], "later ranged provider") == -1,
+		"trace shows the accepted early cutoff without resolving the aura")
 
 
 func _init() -> void:
@@ -322,6 +474,8 @@ func _init() -> void:
 
 	_test_genesis_command_entry_charge()
 	_test_genesis_r8_live_capacity()
+	_test_melee_numeric_tranche_integration()
+	_test_ranged_numeric_tranche_integration()
 
 	for scenario_file in fx["scenarios"]:
 		var case: Dictionary = fx["scenarios"][scenario_file]

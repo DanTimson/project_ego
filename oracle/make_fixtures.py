@@ -82,6 +82,7 @@ out = {
     "morale_attack": [],
     "attack_entry": [],
     "defence_tail": [],
+    "conditional_attack_power": [],
     "capacity_cost": [],
     "roll_attack": [],
     "resolve": [],
@@ -158,6 +159,44 @@ for base in (0, 1, 7):
                 "base": base, "no_fight": no_fight, "kind": KIND_ORD[kind],
                 "expected": int(v),
             })
+
+# R10 accepted stage vectors. Expected powers are copied from the frozen
+# compatibility matrix, not generated from current implementation output.
+R10_CASES = [
+    ("healthy", {"attack": 20, "life_base": 100, "life": 100,
+                 "stamina": 10, "morale": 10, "conditional_bonus": 5},
+     "melee", False, 25),
+    ("25 percent life", {"attack": 20, "life_base": 100, "life": 25,
+                         "stamina": 10, "morale": 10,
+                         "conditional_bonus": 5},
+     "melee", False, 20),
+    ("zero stamina", {"attack": 20, "life_base": 100, "life": 100,
+                       "stamina": 0, "morale": 10,
+                       "conditional_bonus": 5},
+     "melee", False, 13),
+    ("zero morale", {"attack": 20, "life_base": 100, "life": 100,
+                      "stamina": 10, "morale": 0,
+                      "conditional_bonus": 5},
+     "melee", False, 13),
+    ("selected ordinary 1.5x", {"attack": 20, "life_base": 100,
+                                 "life": 100, "stamina": 10, "morale": 10,
+                                 "conditional_bonus": 5},
+     "melee", True, 35),
+    ("counterattack", {"counter_attack": 20, "life_base": 100, "life": 100,
+                        "stamina": 10, "morale": 10,
+                        "conditional_bonus": 5},
+     "counter", False, 25),
+    ("ranged exclusion", {"ranged_attack": 20, "life_base": 100, "life": 100,
+                           "stamina": 10, "morale": 10,
+                           "conditional_bonus": 5},
+     "ranged", False, 20),
+]
+for label, unit, kind, selected, expected in R10_CASES:
+    out["conditional_attack_power"].append({
+        "label": label, "unit": unit, "kind": KIND_ORD[kind],
+        "selected_ordinary_1_5x": selected, "expected": expected,
+    })
+
 
 # R9 defence tail: halve at EXACTLY zero stamina, then clamp to zero. Negative
 # and odd values distinguish halve-then-clamp from clamp-then-halve, and

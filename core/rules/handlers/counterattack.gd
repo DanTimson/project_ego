@@ -63,6 +63,8 @@ const COUNTER_SUPPRESSED_RIDERS: Array[StringName] = [&"Смертельное �
 
 class Exchange extends RefCounted:
 	var attack_damage: int = 0
+	var ordinary_attack_damage: int = 0
+	var primary_melee_charge: Variant = null
 	var counter_damage: int = 0
 	var countered: bool = false
 	var counter_first: bool = false
@@ -125,9 +127,9 @@ static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
 	if ex.counter_first:
 		_do_counter(ex, attacker, defender, rng)
 		if not ex.attacker_died:
-			_do_attack(ex, attacker, defender, rng, kind, primary_melee_charge)
+			_do_attack(ex, attacker, defender, rng, kind, action, primary_melee_charge)
 	else:
-		_do_attack(ex, attacker, defender, rng, kind, primary_melee_charge)
+		_do_attack(ex, attacker, defender, rng, kind, action, primary_melee_charge)
 		if ex.countered and defender.alive:
 			_do_counter(ex, attacker, defender, rng)
 		elif ex.countered:
@@ -137,22 +139,28 @@ static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
 
 
 static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
-		rng: Rng, kind: Combatant.AttackKind,
+		rng: Rng, kind: Combatant.AttackKind, action: Variant = null,
 		primary_melee_charge: Variant = null) -> void:
 	# Resolve the ordinary strike completely before consuming R3 charge. The
 	# combined capped value feeds the exchange accumulator/order before life
 	# subtraction. Retaliation has its own charge-free path below.
-	var result: Array = Damage.resolve_attack(attacker, defender, kind, rng)
+	var selected_ordinary_1_5x := (kind == Combatant.AttackKind.MELEE
+		and action != null
+		and is_equal_approx(float(action.get("damage_scale")), 1.5))
+	var result: Array = Damage.resolve_attack(
+		attacker, defender, kind, rng, selected_ordinary_1_5x)
 	var ordinary_damage := int(result[0])
+	ex.ordinary_attack_damage = ordinary_damage
 	var damage := ordinary_damage
 	if kind == Combatant.AttackKind.MELEE and primary_melee_charge != null:
 		var charge := maxi(0, int(primary_melee_charge))
+		ex.primary_melee_charge = charge
 		var combined := ordinary_damage + charge
 		damage = mini(combined, maxi(0, defender.life))
 		var combined_trace := Trace.new("primary melee combined damage")
 		combined_trace.base = float(ordinary_damage)
-		combined_trace.step("+ command-entry charge", float(ordinary_damage),
-			float(combined), "flat post-defence, unrandomized, undefended")
+		combined_trace.step("command-entry charge consumption", float(ordinary_damage),
+			float(combined), "initiating primary melee; flat, unrandomized, undefended")
 		if damage != combined:
 			combined_trace.step("target-life cap", float(combined), float(damage),
 				"current target life")

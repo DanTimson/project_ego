@@ -15,6 +15,7 @@ import os
 import sys
 
 from combat import Combatant
+from modifier import Hook, Modifier
 from actions import CATALOGUE, Cost, Refusal, Target
 
 FAILS: list[str] = []
@@ -159,12 +160,25 @@ def test_interactions() -> None:
           "Удар щитом deals no damage")
 
 
+def test_modifier_0x12_action_payment() -> None:
+    print("\n[R11] numeric modifier 0x12 suppresses action stamina payment")
+    u = actor(stamina=4)
+    u.modifiers.append(Modifier(
+        ability=0x12, handler="modifier_0x12", hook=Hook.STAMINA,
+        source="0x12"))
+    trace = CATALOGUE["forced_march"].pay(u)
+    check(u.stamina == 4, "action-definition stamina cost is suppressed")
+    check(any(step[0] == "modifier 0x12 stamina mutation suppression"
+              for step in trace.steps), "action suppression is trace-visible")
+
+
 if __name__ == "__main__":
     test_catalogue()
     test_surcharge()
     test_conditional_cost()
     test_availability()
     test_payment()
+    test_modifier_0x12_action_payment()
     test_interactions()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
                     % (len(FAILS), ", ".join(FAILS))))

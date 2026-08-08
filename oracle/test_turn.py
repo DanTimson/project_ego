@@ -16,6 +16,7 @@ import os
 import sys
 
 from combat import Combatant
+from modifier import Hook, Modifier
 import turn
 from turn import BattleState, Refusal, Side
 
@@ -56,7 +57,7 @@ def test_effective_speed() -> None:
         check(got == want, "speed 3 at stamina %d -> %d" % (stamina, want), "got %d" % got)
     u = Combatant(speed=1, stamina=0, stamina_base=10)
     check(turn.effective_speed(u)[0] == 1, "speed floors at 1, never 0 or negative")
-    # R8: `004D0560` contains no modifier 0x12 check. The previous expectation
+    # R8: the recovered effective-speed rule has no modifier 0x12 check. The previous expectation
     # here — that «Неутомимый» keeps full speed — was an inference from "such a
     # unit never loses stamina", not evidence, and it fails once an effect sets
     # stamina directly. Modifier 0x12 suppresses stamina DEDUCTIONS, not the
@@ -162,7 +163,7 @@ def test_initiative() -> None:
 def test_auto_end_phase_on_exhaustion() -> None:
     """R7: the side toggles on exhaustion as well as on an explicit pass.
 
-    `004F20AE..004F214D` scans the roster, finds nothing selectable on the
+    The recovered scheduler scans the roster, finds nothing selectable on the
     current side, and calls the same phase helper the explicit pass uses. This
     engine implemented only the explicit trigger, so a side with nothing left to
     do stayed active until the driver passed for it.
@@ -335,8 +336,26 @@ def test_group_grants() -> None:
           "excluding the caster works the same way", "%d" % len(traces))
 
 
+def test_modifier_0x12_stamina_mutations() -> None:
+    print("\n[R11] numeric modifier 0x12 suppresses local stamina mutations")
+    immune = unit(stamina=3, stamina_base=10, speed=3)
+    immune.modifiers.append(Modifier(
+        ability=0x12, handler="modifier_0x12", hook=Hook.STAMINA,
+        source="0x12"))
+    immune.movement_remaining = 3
+    move_trace = turn.spend_move(immune, 1, stamina_cost=2)
+    check(immune.stamina == 3, "movement stamina mutation is suppressed")
+    ranged_trace = turn.spend_ranged_attack(immune)
+    check(immune.stamina == 3 and immune.movement_remaining == 0,
+          "ranged cost is suppressed while the executor still ends activation")
+    check(any(step[0] == "modifier 0x12 stamina mutation suppression"
+              for trace in (move_trace, ranged_trace) for step in trace.steps),
+          "modifier 0x12 suppression is trace-visible")
+
+
 if __name__ == "__main__":
     test_effective_speed()
+    test_modifier_0x12_stamina_mutations()
     test_attack_cost()
     test_reentry()
     test_round_trip_still_counts()

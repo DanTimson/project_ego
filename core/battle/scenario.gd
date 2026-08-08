@@ -50,7 +50,6 @@ const SETTABLE_UNIT_FIELDS := {
 	"forced_rest": true, "resting": true, "stamina_recovery": true,
 	"alive": true, "once_per_round": true, "steps_this_round": true,
 }
-
 var spec: Dictionary = {}
 var scenario_name: String = "unnamed"
 var seed_value: int = 0
@@ -493,14 +492,9 @@ func _no_attack_command_charge(_unit: Combatant, _attacker_xy: Vector2i,
 
 
 func _genesis_attack_command_charge(unit: Combatant, attacker_xy: Vector2i,
-		target_xy: Vector2i, movement_requested: bool) -> int:
-	# 0x25 is the accepted Genesis evidence identity. Query it at the battle
-	# seam rather than teaching Damage about a profile or pack opcode.
-	for modifier in Damage.effective_modifiers(unit):
-		if (modifier as Modifier).ability == 0x25:
-			return Charge.command_entry_charge(
-				attacker_xy, target_xy, movement_requested)
-	return 0
+		target_xy: Vector2i, movement_requested: bool) -> Dictionary:
+	return ScenarioNumericOrdering.genesis_charge(
+		unit, attacker_xy, target_xy, movement_requested)
 
 
 # -- authoritative manual-command boundary -----------------------------------
@@ -689,7 +683,9 @@ func cmd_move(unit: Combatant, col: int, row: int) -> void:
 	var cost := int(plan["cost"])
 	field.remove_occupant(start)
 	field.place(unit, goal)
-	ActionPoints.spend_move(unit, cost, int(plan["stamina_cost"]))
+	var move_trace := ActionPoints.spend_move(unit, cost,
+		int(plan["stamina_cost"]), Damage.has_effective_modifier(unit, 0x12))
+	ScenarioNumericOrdering.append_traces(log, [move_trace])
 	emit("%s moves to %s (%d steps, %d total this round)"
 		% [unit.label(), _at(unit), path.size(), unit.steps_this_round])
 
@@ -739,7 +735,9 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	var cost := int(plan["cost"])
 	field.remove_occupant(here)
 	field.place(unit, destination)
-	ActionPoints.spend_move(unit, cost, _path_stamina(path))
+	var move_trace := ActionPoints.spend_move(unit, cost, _path_stamina(path),
+		Damage.has_effective_modifier(unit, 0x12))
+	ScenarioNumericOrdering.append_traces(log, [move_trace])
 	emit("%s closes to %s (%d steps)" % [unit.label(), _at(unit), path.size()])
 	return true
 
@@ -757,9 +755,8 @@ func _fell(unit: Combatant) -> void:
 ## lands.
 func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
 		action: Variant = null, primary_melee_charge: Variant = null) -> void:
-	var ex := Counterattack.resolve(
-		unit, target, rng, kind, action, primary_melee_charge)
-	ActionPoints.spend_attack(unit)
+	var ex := ScenarioNumericOrdering.resolve_exchange(
+		log, unit, target, rng, kind, action, primary_melee_charge)
 
 	for entry in ex.order:
 		if String(entry[0]) == "attack":
@@ -796,8 +793,10 @@ func cmd_attack(unit: Combatant, target: Combatant) -> void:
 	var target_entry := Battlefield.axial_to_offset(target_entry_h)
 	var movement_requested := Battlefield.distance(
 		attacker_entry_h, target_entry_h) != 1
-	var primary_melee_charge: Variant = _attack_command_charge.call(
+	var charge_decision: Variant = _attack_command_charge.call(
 		unit, attacker_entry, target_entry, movement_requested)
+	var primary_melee_charge: Variant = ScenarioNumericOrdering.charge_value(
+		log, charge_decision, attacker_entry, target_entry, movement_requested)
 	if not _approach(unit, target):
 		emit("%s cannot reach %s" % [unit.label(), target.label()])
 		return
@@ -846,8 +845,8 @@ func cmd_extra_turn(unit: Combatant, c: Dictionary) -> void:
 ## rather than silently doing nothing, because an action that appears to succeed
 ## and changes nothing is worse than one that reports it cannot run yet:
 ##
-##   - `is_attack` actions need the attack pipeline plus `damage_scale`, whose
-##     insertion point is an open question (FORMULAS §1.1);
+##   - `is_attack` actions still need target/effect execution. R10 freezes the
+##     selected ordinary 1.5x numeric stage but does not supply that executor;
 ##   - target-consuming effects need magnitudes from `unit_upg.Quantity`, which
 ##     are not yet carried into Action instances.
 ##
@@ -859,7 +858,8 @@ func cmd_action(unit: Combatant, action_id: String) -> void:
 		return
 	var action: Action = catalogue[StringName(action_id)]
 
-	var refusal: int = action.availability(unit)
+	var modifier_0x12 := Damage.has_effective_modifier(unit, 0x12)
+	var refusal: int = action.availability(unit, modifier_0x12)
 	if refusal != Action.Refusal.OK:
 		emit("%s cannot use %s: %s"
 			% [unit.label(), action.name, Action.REFUSAL_TEXT[refusal]])
@@ -874,7 +874,8 @@ func cmd_action(unit: Combatant, action_id: String) -> void:
 			% [unit.label(), action.name])
 		return
 
-	action.pay(unit)
+	var action_cost_trace := action.pay(unit, modifier_0x12)
+	ScenarioNumericOrdering.append_traces(log, [action_cost_trace])
 	var applied: Array = []
 	for g in action.grants:
 		var ability := String(g[0])

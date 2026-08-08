@@ -16,9 +16,11 @@ import collections
 import math
 import sys
 
+from modifier import Hook, Modifier
 from combat import (
-    AttackKind, Combatant, Rng, current_attack, current_defence,
-    negative_damage_hits, resolve_attack, roll_attack, stamina_mod, wound_mod,
+    AttackKind, Combatant, Rng, attack_power_before_randomisation,
+    current_attack, current_defence, negative_damage_hits, resolve_attack,
+    roll_attack, stamina_mod, wound_mod,
 )
 
 FAILS: list[str] = []
@@ -180,6 +182,71 @@ def test_multiplier_tables() -> None:
           "%.2f" % stamina_mod(u)[0])
 
 
+def test_modifier_0x26_entry_paths() -> None:
+    print("\n[R6] effective modifier 0x26 entry paths")
+    u = Combatant(attack=7, counter_attack=7, ranged_attack=7, morale=10)
+    u.modifiers.append(Modifier(
+        ability=0x26, handler="modifier_0x26", hook=Hook.DAMAGE_VS_TARGET,
+        source="0x26"))
+    melee, _ = current_attack(u, AttackKind.MELEE)
+    counter, _ = current_attack(u, AttackKind.COUNTER)
+    ranged, _ = current_attack(u, AttackKind.RANGED)
+    check((melee, counter, ranged) == (0, 0, 7),
+          "modifier 0x26 disables ordinary/counter but not ranged entry",
+          f"got {melee}/{counter}/{ranged}")
+
+
+def test_conditional_attack_power() -> None:
+    print("\n[R10] modifier 0x3D numeric placement")
+    cases = [
+        ("healthy", dict(attack=20, life_base=100, life=100, stamina=10,
+                         morale=10, conditional_bonus=5), AttackKind.MELEE,
+         False, 25),
+        ("25 percent life", dict(attack=20, life_base=100, life=25,
+                                 stamina=10, morale=10, conditional_bonus=5),
+         AttackKind.MELEE, False, 20),
+        ("zero stamina", dict(attack=20, life_base=100, life=100, stamina=0,
+                              morale=10, conditional_bonus=5),
+         AttackKind.MELEE, False, 13),
+        ("zero morale", dict(attack=20, life_base=100, life=100, stamina=10,
+                             morale=0, conditional_bonus=5),
+         AttackKind.MELEE, False, 13),
+        ("selected ordinary 1.5x",
+         dict(attack=20, life_base=100, life=100, stamina=10, morale=10,
+              conditional_bonus=5), AttackKind.MELEE, True, 35),
+        ("counterattack", dict(counter_attack=20, life_base=100, life=100,
+                               stamina=10, morale=10, conditional_bonus=5),
+         AttackKind.COUNTER, False, 25),
+        ("ranged exclusion", dict(ranged_attack=20, life_base=100, life=100,
+                                  stamina=10, morale=10, conditional_bonus=5),
+         AttackKind.RANGED, False, 20),
+    ]
+    for label, values, kind, selected, expected in cases:
+        got, trace = attack_power_before_randomisation(
+            Combatant(**values), kind, selected)
+        check(got == expected, label, f"got {got}, want {expected}")
+        if selected:
+            sources = [step[0] for step in trace.steps]
+            check(sources.index("selected ordinary 1.5x branch")
+                  < sources.index("conditional attack contribution"),
+                  "selected branch precedes conditional attack contribution")
+
+
+def test_modifier_0x12_stats_remain_live() -> None:
+    print("\n[R11] modifier 0x12 does not bypass live-stamina stat penalties")
+    u = Combatant(attack=20, defence=7, ranged_defence=7, stamina=0,
+                  life_base=20, life=20, morale=10)
+    u.modifiers.append(Modifier(
+        ability=0x12, handler="modifier_0x12", hook=Hook.STAMINA,
+        source="0x12"))
+    attack, _ = current_attack(u, AttackKind.MELEE)
+    ordinary, _ = current_defence(u, AttackKind.MELEE)
+    ranged, _ = current_defence(u, AttackKind.RANGED)
+    check(attack == 8 and ordinary == 3 and ranged == 3,
+          "low/zero stamina still reduces attack and both defences",
+          f"attack {attack}, defence {ordinary}/{ranged}")
+
+
 # --- 5. exhausted defence halving -----------------------------------------
 
 def test_exhausted_defence() -> None:
@@ -214,6 +281,9 @@ if __name__ == "__main__":
     test_roll_range(trials)
     test_simplified_deviation(trials)
     test_multiplier_tables()
+    test_modifier_0x26_entry_paths()
+    test_conditional_attack_power()
+    test_modifier_0x12_stats_remain_live()
     test_exhausted_defence()
     demo()
     print(f"\n{'ALL PASS' if not FAILS else str(len(FAILS)) + ' FAILURES: ' + ', '.join(FAILS)}")

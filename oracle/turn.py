@@ -46,7 +46,7 @@ class Refusal(Enum):
 
 
 def effective_speed(u: Combatant) -> tuple[int, Trace]:
-    """`004D0560` — effective battle speed. Recovered form (R8):
+    """Recovered effective battle speed (R8):
 
         speed = definition speed + modifier 7 from every provider class
         if stamina < 5 and speed > 1: speed -= 1
@@ -60,7 +60,7 @@ def effective_speed(u: Combatant) -> tuple[int, Trace]:
     extend.
 
     ONE BEHAVIOURAL CHANGE: the previous implementation exempted «Неутомимый»
-    from the penalty, reasoning that such a unit never loses stamina. `004D0560`
+    from the penalty, reasoning that such a unit never loses stamina. the recovered effective-speed rule
     contains no modifier `0x12` check, and stamina can also be set directly by an
     effect, so the exemption is removed. Modifier `0x12` suppresses stamina
     DEDUCTIONS (R8, and open question 8), not the speed penalty.
@@ -214,7 +214,14 @@ def can_move(u: Combatant, tiles: int = 1) -> Refusal:
     return Refusal.OK
 
 
-def spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> Trace:
+def _modifier_0x12_suppresses(
+        u: Combatant, resolved_effective_modifier: bool = False) -> bool:
+    return (resolved_effective_modifier or u.has_modifier_id(0x12)
+            or u.has_flag("Неутомимый"))
+
+
+def spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0,
+               modifier_0x12_effective: bool = False) -> Trace:
     """Move `tiles` steps. `stamina_cost` is the terrain drain the caller has
     already resolved from bf_object (hills and swamp cost 1 unless the unit has
     the matching Знание; flyers pay nothing).
@@ -235,10 +242,15 @@ def spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> Trace:
     # Speed reduced to <= 0 costs an extra point per tile.
     extra = tiles if effective_speed(u)[0] <= 0 else 0
     total_stamina = stamina_cost + extra
-    if total_stamina and not u.has_flag("Неутомимый"):
-        before = u.stamina
-        u.stamina = max(0, u.stamina - total_stamina)
-        t.step("stamina", before, u.stamina, "terrain")
+    if total_stamina:
+        if _modifier_0x12_suppresses(u, modifier_0x12_effective):
+            t.step("modifier 0x12 stamina mutation suppression",
+                   u.stamina, u.stamina,
+                   "movement requested stamina cost %d" % total_stamina)
+        else:
+            before = u.stamina
+            u.stamina = max(0, u.stamina - total_stamina)
+            t.step("movement stamina mutation", before, u.stamina, "terrain")
     t.result = u.movement_remaining
     return t
 
@@ -246,8 +258,8 @@ def spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0) -> Trace:
 def attack_stamina_cost(u: Combatant) -> int:
     """2 when live remaining capacity is BELOW effective speed, else 1.
 
-    R8, `004D7953..004D797D`: the executor compares the tactical-unit field at
-    `+0x04` — remaining capacity — against `004D0560`'s effective speed. The
+    R8: the ranged executor compares live remaining capacity against effective
+    speed. The
     branch is strict less-than, so equality and temporary over-capacity both
     select 1.
 
@@ -265,29 +277,53 @@ def attack_stamina_cost(u: Combatant) -> int:
     return 2 if u.movement_remaining < effective_speed(u)[0] else 1
 
 
-def spend_attack(u: Combatant) -> Trace:
-    t = Trace(f"{u.name}.attack_cost")
-    cost = attack_stamina_cost(u)
+def _spend_attack(u: Combatant, *, ranged_executor: bool,
+                  modifier_0x12_effective: bool = False) -> Trace:
+    label = "ranged_attack_cost" if ranged_executor else "attack_cost"
+    t = Trace(f"{u.name}.{label}")
+    speed = effective_speed(u)[0]
+    capacity = u.movement_remaining
+    cost = 2 if capacity < speed else 1
     t.base = u.stamina
-    if not u.has_flag("Неутомимый"):
-        # Modifier 0x12 «Неутомимость» suppresses the deduction itself, not the
-        # cost calculation.
+    t.step("live-capacity stamina discriminator", capacity, cost,
+           "effective speed %d; strict capacity < speed is %s; "
+           "selected base cost %d"
+           % (speed, str(capacity < speed).lower(), cost))
+    if _modifier_0x12_suppresses(u, modifier_0x12_effective):
+        t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+               "requested attack stamina cost %d" % cost)
+    else:
         u.stamina = max(0, u.stamina - cost)
-        t.step(f"-{cost} stamina", t.base, u.stamina,
-               "capacity %d < effective speed %d"
-               % (u.movement_remaining, effective_speed(u)[0]) if cost == 2
-               else "capacity at or above effective speed")
-    # NOTE: R8 records that the RANGED executor clears remaining capacity
-    # (+0x04) as well as the actionable flag (+0x5C). This function is generic
-    # and also serves melee, for which no such evidence exists, so only the
-    # action flag is set here. Wire the capacity clear in when ranged commands
-    # are modelled as a distinct executor.
+        t.step("attack stamina mutation", t.base, u.stamina,
+               "selected base cost %d" % cost)
     u.action_spent = True
-    if u.stamina <= 0 and not u.has_flag("Неутомимый"):
+    if ranged_executor:
+        before_capacity = u.movement_remaining
+        u.movement_remaining = 0
+        t.step("ranged activation capacity clear", before_capacity, 0,
+               "ranged executor ends activation")
+    if (u.stamina <= 0
+            and not _modifier_0x12_suppresses(
+                u, modifier_0x12_effective)):
         u.forced_rest = True
         t.step("exhausted", u.stamina, u.stamina, "forced Rest next round")
     t.result = u.stamina
     return t
+
+
+def spend_attack(u: Combatant,
+                 modifier_0x12_effective: bool = False) -> Trace:
+    """Existing non-ranged callers retain their executor boundary."""
+    return _spend_attack(
+        u, ranged_executor=False,
+        modifier_0x12_effective=modifier_0x12_effective)
+
+
+def spend_ranged_attack(u: Combatant,
+                        modifier_0x12_effective: bool = False) -> Trace:
+    return _spend_attack(
+        u, ranged_executor=True,
+        modifier_0x12_effective=modifier_0x12_effective)
 
 
 def rest(u: Combatant) -> Trace:
@@ -421,7 +457,7 @@ def end_phase(state: BattleState) -> bool:
 def auto_end_phase_if_exhausted(state: BattleState) -> bool:
     """R7's second transition path: exhaustion, not only an explicit pass.
 
-    `004F20AE..004F214D` scans all 37 roster slots and, finding no remaining
+    The recovered scheduler scans all roster slots and, finding no remaining
     selectable/actionable unit on the current side, calls the same phase helper
     with `(1,1)` that the explicit pass input uses. So the toggle has TWO
     triggers, and this engine previously implemented only the first — a side that

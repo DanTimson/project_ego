@@ -105,6 +105,8 @@ class Exchange:
 
     def __init__(self):
         self.attack_damage = 0
+        self.ordinary_attack_damage = 0
+        self.primary_melee_charge = None
         self.counter_damage = 0
         self.countered = False
         self.counter_first = False
@@ -135,18 +137,25 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
         # Resolve the ordinary strike completely before consuming R3 charge.
         # The combined capped value then feeds the exchange accumulator/order
         # before life subtraction. Retaliation has its own charge-free path.
+        selected_ordinary_1_5x = (
+            kind is AttackKind.MELEE and action is not None
+            and abs(float(getattr(action, "damage_scale", 1.0)) - 1.5) < 1e-9)
         ordinary_damage, traces = combat.resolve_attack(
-            attacker, defender, kind, rng)
+            attacker, defender, kind, rng,
+            selected_ordinary_1_5x=selected_ordinary_1_5x)
+        ex.ordinary_attack_damage = ordinary_damage
         damage = ordinary_damage
         if kind is AttackKind.MELEE and primary_melee_charge is not None:
             charge = max(0, int(primary_melee_charge))
+            ex.primary_melee_charge = charge
             combined = ordinary_damage + charge
             damage = min(combined, max(0, defender.life))
             combined_trace = Trace("primary melee combined damage")
             combined_trace.base = ordinary_damage
-            combined_trace.step("+ command-entry charge", ordinary_damage,
+            combined_trace.step("command-entry charge consumption", ordinary_damage,
                                 combined,
-                                "flat post-defence, unrandomized, undefended")
+                                "initiating primary melee; flat, unrandomized, "
+                                "undefended")
             if damage != combined:
                 combined_trace.step("target-life cap", combined, damage,
                                     "current target life")

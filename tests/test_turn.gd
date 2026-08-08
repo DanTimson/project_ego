@@ -211,5 +211,22 @@ func _init() -> void:
 	_check(t3.size() == 4 and not ActionPoints.has_resources(caster),
 		"excluding the caster works the same way", "%d" % t3.size())
 
+	print("\n[R11] numeric modifier 0x12 suppresses local stamina mutations")
+	var immune := _unit({"stamina": 3, "stamina_base": 10, "speed": 3})
+	immune.modifiers.append(Modifier.make(
+		0x12, &"modifier_0x12", Modifier.Hook.STAMINA, 0, {}, "0x12"))
+	immune.movement_remaining = 3
+	var move_trace := ActionPoints.spend_move(immune, 1, 2)
+	_check(immune.stamina == 3, "movement stamina mutation is suppressed")
+	var ranged_trace := ActionPoints.spend_ranged_attack(immune)
+	_check(immune.stamina == 3 and immune.movement_remaining == 0,
+		"ranged cost is suppressed while the executor still ends activation")
+	var suppressed := false
+	for trace in [move_trace, ranged_trace]:
+		for step in (trace as Trace).steps:
+			if String(step["source"]) == "modifier 0x12 stamina mutation suppression":
+				suppressed = true
+	_check(suppressed, "modifier 0x12 suppression is trace-visible")
+
 	print("\n%s" % ("ALL PASS" if failures == 0 else "%d FAILURES" % failures))
 	quit(1 if failures > 0 else 0)

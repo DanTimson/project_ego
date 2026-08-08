@@ -26,6 +26,15 @@ from combat import Rng
 FAILS: list[str] = []
 
 
+class MaxRollRng:
+    def roll(self, x: int, stream: str = "combat") -> int:
+        return max(0, x - 1)
+
+
+def trace_index(lines: list[str], fragment: str) -> int:
+    return next((i for i, line in enumerate(lines) if fragment in line), -1)
+
+
 def check(ok: bool, what: str, detail: str = "") -> None:
     print("  %s  %s%s" % ("PASS" if ok else "FAIL", what,
                           ("  — " + detail) if detail else ""))
@@ -414,8 +423,10 @@ def test_genesis_r8_live_capacity_integration() -> None:
     final = result["final"]["attacker"]
     check(final["steps_this_round"] == 1,
           "the R8 vector has movement history")
-    check(final["movement_remaining"] == 3,
-          "movement leaves capacity equal to stamina-reduced effective speed")
+    check(final["movement_remaining"] == 0,
+          "the ranged executor clears capacity after comparing live value 3")
+    check(trace_index(result["log"], "effective speed 3") >= 0,
+          "the pre-clear capacity/effective-speed comparison is trace-visible")
     check(final["stamina"] == 2,
           "strict live-capacity comparison charges 1, not history-based 2",
           "final stamina %d (history rule would leave 1)" % final["stamina"])
@@ -430,12 +441,144 @@ def test_genesis_r8_live_capacity_integration() -> None:
         {"op": "extra_turn", "unit": "attacker"},
         {"op": "shoot", "unit": "attacker", "target": "target"},
     ]
-    restored_result = run_profile_combat(restored)["final"]["attacker"]
+    restored_run = run_profile_combat(restored)
+    restored_result = restored_run["final"]["attacker"]
     check(restored_result["steps_this_round"] == 1
-          and restored_result["movement_remaining"] == 4,
-          "existing extra-turn helper expresses restored live capacity")
+          and restored_result["movement_remaining"] == 0,
+          "restored live capacity is compared, then ranged execution clears it")
+    check(trace_index(restored_run["log"], "effective speed 4") >= 0,
+          "restored capacity comparison survives reselection and is traced")
     check(restored_result["stamina"] == 9,
           "restored capacity costs 1 despite nonzero movement history")
+
+
+def numeric_modifier(ability: int, stat: str = "", power: int = 0) -> dict:
+    modifier = {
+        "ability": ability, "handler": "modifier_%02x" % ability,
+        "hook": "DAMAGE_VS_TARGET", "power": power,
+        "source": "modifier %02x" % ability,
+    }
+    if stat:
+        modifier.update({"handler": "stat_delta", "hook": "STAT_PASSIVE",
+                         "params": {"stat": stat}})
+    return modifier
+
+
+def test_melee_numeric_tranche_integration() -> None:
+    print("\n[integration] melee R3/R9/R10 ordering and live state")
+    spec = {
+        "name": "numeric melee integration", "profile": "genesis", "seed": 1,
+        "battlefield": {"width": 8, "height": 3, "tiles": []},
+        "sides": [
+            {"id": 0, "is_attacker": True, "leader_initiative": 1,
+             "units": [{
+                 "name": "attacker", "at": [0, 0], "attack": 9,
+                 "counter_attack": 0, "defence": 0, "life": 30,
+                 "stamina": 10, "stamina_base": 10, "morale": 10,
+                 "speed": 8, "conditional_bonus": 5,
+                 "modifiers": [numeric_modifier(0x25)],
+             }]},
+            {"id": 1, "leader_initiative": 0, "units": [{
+                "name": "target", "at": [4, 0], "attack": 0,
+                "counter_attack": 0, "defence": 3, "life": 30,
+                "stamina": 0, "morale": 10, "speed": 1,
+                "modifiers": [numeric_modifier(4, "defence", 4)],
+            }]},
+        ],
+        "commands": [{"op": "attack", "unit": "attacker",
+                      "target": "target"}],
+    }
+    result = scenario.Scenario(spec, rng=MaxRollRng()).run()
+    lines = result["log"]
+    entry = trace_index(lines, "command-entry charge |")
+    movement = trace_index(lines, "closes to")
+    conditional = trace_index(lines, "conditional attack contribution")
+    randomisation = trace_index(lines, "attack randomisation")
+    provider = trace_index(lines, "defence provider total")
+    halving = trace_index(lines, "zero-stamina defence halving")
+    subtraction = trace_index(lines, "defence subtraction")
+    consumption = trace_index(lines, "command-entry charge consumption")
+    check(result["final"]["target"]["life"] == 19,
+          "exact target life is 30 - (9 resolved + 2 charge) = 19")
+    check(0 <= entry < movement,
+          "modifier 0x25 applicability and value are traced before approach")
+    check(conditional < randomisation < provider < halving < subtraction < consumption,
+          "R10 -> randomisation -> R9 -> defence -> R3 consumption is trace-visible")
+    check("value 2" in lines[entry],
+          "command-entry trace records charge value 2")
+
+
+def ranged_numeric_spec(base_ranged_attack: int = 20,
+                        later_environment_provider: bool = False) -> dict:
+    spec = {
+        "name": "numeric ranged integration", "profile": "genesis", "seed": 1,
+        "battlefield": {"width": 8, "height": 3,
+                        "tiles": [{"col": 1, "row": 0, "stam_cost": 2}]},
+        "sides": [
+            {"id": 0, "is_attacker": True, "leader_initiative": 1,
+             "units": [{
+                 "name": "shooter", "at": [0, 0],
+                 "ranged_attack": base_ranged_attack, "shooting_range": 8,
+                 "ammo": 2, "counter_attack": 0, "defence": 0, "life": 30,
+                 "stamina": 0, "stamina_base": 10, "morale": 10, "speed": 4,
+                 "conditional_bonus": 5,
+                 "modifiers": [numeric_modifier(0x12)],
+             }]},
+            {"id": 1, "leader_initiative": 0, "units": [{
+                "name": "target", "at": [3, 0], "counter_attack": 0,
+                "ranged_defence": 3, "life": 20, "stamina": 0,
+                "morale": 10, "speed": 1,
+                "modifiers": [numeric_modifier(5, "ranged_defence", 4)],
+            }]},
+        ],
+        "commands": [
+            {"op": "move", "unit": "shooter", "to": [1, 0]},
+            {"op": "shoot", "unit": "shooter", "target": "target"},
+        ],
+    }
+    if later_environment_provider:
+        spec["sides"][0]["units"][0]["auras"] = [{
+            "id": "later-ranged-provider", "name": "later ranged provider",
+            "scope": "SELF", "affects": "ALLY",
+            "modifiers": [numeric_modifier(2, "ranged_attack", 6)],
+        }]
+    return spec
+
+
+def test_ranged_numeric_tranche_integration() -> None:
+    print("\n[integration] ranged R6/R8/R9/R11 ordering and live state")
+    result = scenario.Scenario(ranged_numeric_spec(), rng=MaxRollRng()).run()
+    lines = result["log"]
+    shooter = result["final"]["shooter"]
+    check(result["final"]["target"]["life"] == 16,
+          "zero-stamina attack 8 randomises to 7, then R9 defence 3 gives 4 damage")
+    check(shooter["stamina"] == 0 and shooter["movement_remaining"] == 0
+          and shooter["steps_this_round"] == 1 and shooter["action_spent"],
+          "modifier 0x12 preserves stamina while ranged execution ends activation")
+    discriminator = trace_index(lines, "live-capacity stamina discriminator")
+    check(discriminator >= 0 and "effective speed 2" in lines[discriminator]
+          and "selected base cost 2" in lines[discriminator],
+          "R8 traces capacity 1 < effective speed 2 and selects cost 2")
+    check(trace_index(lines, "modifier 0x12 stamina mutation suppression") >= 0,
+          "R11 suppression is visible at covered mutation sites")
+    check(trace_index(lines, "defence provider total: 7 -> 7") >= 0
+          and trace_index(lines, "zero-stamina defence halving: 7 -> 3") >= 0,
+          "R9 ranged providers precede exact-zero halving")
+    check(trace_index(lines, "conditional attack contribution") == -1,
+          "the conditional numeric stage is excluded from ranged")
+
+    zero_scenario = scenario.Scenario(
+        ranged_numeric_spec(0, later_environment_provider=True), rng=MaxRollRng())
+    later = zero_scenario.environment(zero_scenario.units["shooter"])
+    check(any(m.power == 6 and m.params.get("stat") == "ranged_attack"
+              for m in later),
+          "distinguishing vector has a positive environment/aura provider")
+    zero = zero_scenario.run()
+    check(zero["final"]["target"]["life"] == 20,
+          "R6 zero early sum returns before the positive later provider")
+    check(trace_index(zero["log"], "ranged early provider total: 0 -> 0") >= 0
+          and trace_index(zero["log"], "later ranged provider") == -1,
+          "trace shows the accepted early cutoff without resolving the aura")
 
 
 def test_terrain_matters() -> None:
@@ -597,6 +740,8 @@ if __name__ == "__main__":
     test_steps_feed_stamina()
     test_genesis_command_entry_charge()
     test_genesis_r8_live_capacity_integration()
+    test_melee_numeric_tranche_integration()
+    test_ranged_numeric_tranche_integration()
     test_terrain_matters()
     test_phase_passing()
     test_illegal_commands()

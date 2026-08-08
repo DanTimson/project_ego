@@ -100,10 +100,10 @@ class Action:
     ## being usable alongside it.
     is_attack: bool = False
 
-    ## Damage multiplier for attack-replacing actions. «в полтора раза большие
-    ## повреждения» = 1.5. OPEN: whether this scales the attack value before
-    ## the roll or the final damage after defence. Those differ, because the
-    ## roll is integer and defence is subtracted afterwards.
+    ## Damage multiplier for attack-replacing actions. For the accepted selected
+    ## ordinary-attack 1.5x branch this adds trunc0(effective attack / 2) before
+    ## conditional contribution, randomisation and defence. Ranged action
+    ## execution remains outside the currently accepted boundary.
     damage_scale: float = 1.0
 
     ## Abilities switched off for the duration of this action.
@@ -123,32 +123,51 @@ class Action:
 
     notes: str = ""
 
-    def availability(self, actor) -> Refusal:
+    def availability(self, actor,
+                     modifier_0x12_effective: bool = False) -> Refusal:
         """Decidable from the actor alone. Target legality is checked by the
         battle layer, which knows what is adjacent and what is dead."""
+        stamina_suppressed = (modifier_0x12_effective
+                              or actor.has_modifier_id(0x12)
+                              or actor.has_flag("Неутомимый"))
         if actor.action_spent and self.cost.resolve(actor).consumes_action:
             return Refusal.ACTION_SPENT
         # At 0 stamina the unit is forced to Rest next round and can do nothing
         # else — «в свой следующий ход принудительно выполняет команду Отдых».
-        if actor.stamina <= 0 and not actor.has_flag("Неутомимый"):
+        if actor.stamina <= 0 and not stamina_suppressed:
             return Refusal.EXHAUSTED
         c = self.cost.resolve(actor)
-        if c.stamina > 0 and not actor.has_flag("Неутомимый") and actor.stamina < c.stamina:
+        if c.stamina > 0 and not stamina_suppressed and actor.stamina < c.stamina:
             return Refusal.NO_STAMINA
         if c.ammo > 0 and actor.ammo < c.ammo:
             return Refusal.NO_AMMO
         return Refusal.OK
 
-    def is_available(self, actor) -> bool:
-        return self.availability(actor) is Refusal.OK
+    def is_available(self, actor,
+                     modifier_0x12_effective: bool = False) -> bool:
+        return self.availability(actor, modifier_0x12_effective) is Refusal.OK
 
-    def pay(self, actor) -> None:
+    def pay(self, actor, modifier_0x12_effective: bool = False):
+        from combat import Trace
         c = self.cost.resolve(actor)
-        if not actor.has_flag("Неутомимый"):
+        t = Trace(f"{actor.name}.action_stamina_cost")
+        t.base = actor.stamina
+        stamina_suppressed = (modifier_0x12_effective
+                              or actor.has_modifier_id(0x12)
+                              or actor.has_flag("Неутомимый"))
+        if c.stamina and stamina_suppressed:
+            t.step("modifier 0x12 stamina mutation suppression",
+                   t.base, t.base,
+                   "requested action stamina cost %d" % c.stamina)
+        elif c.stamina:
             actor.stamina = max(0, actor.stamina - c.stamina)
+            t.step("action stamina mutation", t.base, actor.stamina,
+                   "resolved action cost")
         actor.ammo = max(0, actor.ammo - c.ammo)
         if c.consumes_action:
             actor.action_spent = True
+        t.result = actor.stamina
+        return t
 
 
 # ---------------------------------------------------------------------------

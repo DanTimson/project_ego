@@ -113,6 +113,53 @@ func _init() -> void:
 				% [b, int(case["kind"]), str(case["no_fight"])],
 			"got %d want %d" % [int(res[0]), int(case["expected"])])
 
+	var disabled := Combatant.new()
+	disabled.attack = 7
+	disabled.counter_attack = 7
+	disabled.ranged_attack = 7
+	disabled.morale = 10
+	disabled.modifiers.append(Modifier.make(
+		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET, 0, {}, "0x26"))
+	_check(int(Damage.current_attack(disabled, Combatant.AttackKind.MELEE)[0]) == 0
+			and int(Damage.current_attack(disabled, Combatant.AttackKind.COUNTER)[0]) == 0
+			and int(Damage.current_attack(disabled, Combatant.AttackKind.RANGED)[0]) == 7,
+		"effective modifier 0x26 disables ordinary/counter but not ranged entry")
+
+	# R10: the already-applicable conditional input is outside all
+	# effective-stat multipliers, after the selected ordinary 1.5x branch, and
+	# excluded from ranged attack.
+	for case in fx["conditional_attack_power"]:
+		var u := _build(case["unit"])
+		var res: Array = Damage.attack_power_before_randomisation(
+			u, int(case["kind"]) as Combatant.AttackKind,
+			bool(case["selected_ordinary_1_5x"]))
+		_check(int(res[0]) == int(case["expected"]),
+			"conditional power: %s" % String(case["label"]),
+			"got %d want %d" % [int(res[0]), int(case["expected"])])
+		if bool(case["selected_ordinary_1_5x"]):
+			var sources: Array = []
+			for step in (res[1] as Trace).steps:
+				sources.append(String(step["source"]))
+			_check(sources.find("selected ordinary 1.5x branch")
+					< sources.find("conditional attack contribution"),
+				"selected branch precedes conditional attack contribution")
+
+	# R11: modifier 0x12 suppresses mutations, never live-stamina penalties.
+	var immune := Combatant.new()
+	immune.attack = 20
+	immune.defence = 7
+	immune.ranged_defence = 7
+	immune.life_base = 20
+	immune.life = 20
+	immune.stamina = 0
+	immune.morale = 10
+	immune.modifiers.append(Modifier.make(
+		0x12, &"modifier_0x12", Modifier.Hook.STAMINA, 0, {}, "0x12"))
+	_check(int(Damage.current_attack(immune, Combatant.AttackKind.MELEE)[0]) == 8
+			and int(Damage.current_defence(immune, Combatant.AttackKind.MELEE)[0]) == 3
+			and int(Damage.current_defence(immune, Combatant.AttackKind.RANGED)[0]) == 3,
+		"modifier 0x12 leaves live-stamina attack and defence penalties active")
+
 	# R9: halve at EXACTLY zero stamina, then clamp to zero.
 	for case in fx["defence_tail"]:
 		var u := Combatant.new()

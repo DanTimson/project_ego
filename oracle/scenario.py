@@ -67,6 +67,20 @@ _NEW_HORIZONS_INCOMPLETE = (
     'scenario profile "new_horizons" is incomplete: '
     'minimum rules assignment is not defined'
 )
+_ORDERING_TRACE_SOURCES = {
+    "conditional attack contribution",
+    "attack randomisation",
+    "ranged early provider total",
+    "defence provider total",
+    "zero-stamina defence halving",
+    "final defence clamp",
+    "defence subtraction",
+    "command-entry charge consumption",
+    "live-capacity stamina discriminator",
+    "attack stamina mutation",
+    "modifier 0x12 stamina mutation suppression",
+    "ranged activation capacity clear",
+}
 
 # Canonical units deliberately have a closed envelope.  Sibling fields are not
 # silently interpreted as overrides, and override keys must map to construction
@@ -419,6 +433,18 @@ class Scenario:
     def emit(self, line: str) -> None:
         self.log.append(line)
 
+    def _emit_ordering_traces(self, traces: list) -> None:
+        for trace in traces:
+            if trace is None:
+                continue
+            for source, before, after, note in trace.steps:
+                if source not in _ORDERING_TRACE_SOURCES:
+                    continue
+                tail = " # " + note if note else ""
+                self.emit("  [trace] %s | %s: %s -> %s%s" % (
+                    trace.label, source, combat._fmt(before), combat._fmt(after),
+                    tail))
+
     def _side_of(self, unit: Combatant):
         for s in self.sides:
             if unit in s.units:
@@ -437,14 +463,12 @@ class Scenario:
     def _genesis_attack_command_charge(unit: Combatant,
                                       attacker_xy: tuple[int, int],
                                       target_xy: tuple[int, int],
-                                      movement_requested: bool) -> int:
-        # 0x25 is the accepted Genesis evidence identity. Query the effective
-        # modifier set here, at the composition/battle seam, rather than teaching
-        # damage rules about either profile names or pack opcodes.
-        if not any(m.ability == 0x25 for m in combat.effective_modifiers(unit)):
-            return 0
-        return charge.command_entry_charge(attacker_xy, target_xy,
-                                          movement_requested)
+                                      movement_requested: bool) -> dict:
+        # Applicability and coordinates are resolved together at command entry.
+        applicable = combat.has_effective_modifier(unit, 0x25)
+        value = (charge.command_entry_charge(
+            attacker_xy, target_xy, movement_requested) if applicable else 0)
+        return {"applicable": applicable, "value": value}
 
     # -- commands -----------------------------------------------------------
 
@@ -462,7 +486,10 @@ class Scenario:
         stam = sum(self.field.tile(h).stam_cost for h in path)
         self.field.remove(start)
         self.field.place(unit, goal)
-        turn.spend_move(unit, cost, stamina_cost=stam)
+        move_trace = turn.spend_move(
+            unit, cost, stamina_cost=stam,
+            modifier_0x12_effective=combat.has_effective_modifier(unit, 0x12))
+        self._emit_ordering_traces([move_trace])
         self.emit("%s moves to %s (%d steps, %d total this round)"
                   % (unit.label(), self._at(unit), len(path), unit.steps_this_round))
 
@@ -492,7 +519,10 @@ class Scenario:
         stam = sum(self.field.tile(x).stam_cost for x in path)
         self.field.remove(here)
         self.field.place(unit, dest)
-        turn.spend_move(unit, cost, stamina_cost=stam)
+        move_trace = turn.spend_move(
+            unit, cost, stamina_cost=stam,
+            modifier_0x12_effective=combat.has_effective_modifier(unit, 0x12))
+        self._emit_ordering_traces([move_trace])
         self.emit("%s closes to %s (%d steps)" % (unit.label(), self._at(unit), len(path)))
         return True
 
@@ -512,7 +542,17 @@ class Scenario:
         """
         ex = ca.resolve(unit, target, self.rng, kind, action,
                         primary_melee_charge=primary_melee_charge)
-        turn.spend_attack(unit)
+        modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
+        if kind is AttackKind.RANGED:
+            cost_trace = turn.spend_ranged_attack(
+                unit, modifier_0x12_effective=modifier_0x12)
+        else:
+            # R8 is not generalized here: non-ranged callers retain their
+            # established cost boundary; only ranged clears live capacity.
+            cost_trace = turn.spend_attack(
+                unit, modifier_0x12_effective=modifier_0x12)
+        self._emit_ordering_traces(ex.traces)
+        self._emit_ordering_traces([cost_trace])
 
         for what, damage in ex.order:
             if what == "attack":
@@ -548,8 +588,20 @@ class Scenario:
         attacker_entry = bfmod.axial_to_offset(attacker_entry_h)
         target_entry = bfmod.axial_to_offset(target_entry_h)
         movement_requested = attacker_entry_h.distance(target_entry_h) != 1
-        primary_melee_charge = self._attack_command_charge(
+        charge_decision = self._attack_command_charge(
             unit, attacker_entry, target_entry, movement_requested)
+        primary_melee_charge = None
+        if charge_decision is not None:
+            applicable = bool(charge_decision["applicable"])
+            charge_value = int(charge_decision["value"])
+            self.emit(
+                "  [trace] command-entry charge | modifier 0x25 applicable %s; "
+                "movement requested %s; attacker %d,%d; target %d,%d; value %d"
+                % (str(applicable).lower(), str(movement_requested).lower(),
+                   attacker_entry[0], attacker_entry[1],
+                   target_entry[0], target_entry[1], charge_value))
+            if applicable:
+                primary_melee_charge = charge_value
         if not self._approach(unit, target):
             self.emit("%s cannot reach %s" % (unit.label(), target.label()))
             return
@@ -667,7 +719,8 @@ class Scenario:
             self.emit("unknown action %r" % action_id)
             return
 
-        refusal = action.availability(unit)
+        modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
+        refusal = action.availability(unit, modifier_0x12)
         if refusal is not actionsmod.Refusal.OK:
             self.emit("%s cannot use %s: %s"
                       % (unit.label(), action.name, refusal.value))
@@ -682,7 +735,8 @@ class Scenario:
                       "loaded from unit_upg)" % (unit.label(), action.name))
             return
 
-        action.pay(unit)
+        action_cost_trace = action.pay(unit, modifier_0x12)
+        self._emit_ordering_traces([action_cost_trace])
         applied = []
         for ability, magnitude, duration in action.grants:
             effect = st.StatusEffect(

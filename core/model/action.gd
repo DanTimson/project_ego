@@ -68,10 +68,10 @@ var free_action_for: Array[StringName] = []
 ## ammo collected, defence bonus.
 var magnitude: int = 0
 var is_attack: bool = false
-## «в полтора раза большие повреждения» = 1.5.
-## OPEN: whether this scales the attack value before the roll or the final
-## damage after defence. Those differ — the roll is integer and defence is
-## subtracted afterwards.
+## «в полтора раза большие повреждения» = 1.5. For the accepted selected
+## ordinary-attack branch this adds trunc0(effective attack / 2) before
+## conditional contribution, randomisation and defence. Ranged action execution
+## remains outside the currently accepted boundary.
 var damage_scale: float = 1.0
 var suppresses: Array[StringName] = []
 ## ability name -> factor, applied for the duration of this action
@@ -98,31 +98,48 @@ func resolved_consumes_action(actor: Combatant) -> bool:
 
 ## Decidable from the actor alone. Target legality belongs to the battle layer,
 ## which knows what is adjacent and what is dead.
-func availability(actor: Combatant) -> Refusal:
+func availability(actor: Combatant,
+		modifier_0x12_effective: bool = false) -> Refusal:
+	var stamina_suppressed := (modifier_0x12_effective
+		or actor.has_modifier_id(0x12) or actor.has_flag(&"Неутомимый"))
 	if actor.action_spent and resolved_consumes_action(actor):
 		return Refusal.ACTION_SPENT
 	# At 0 stamina the unit is forced to Rest — «в свой следующий ход
 	# принудительно выполняет команду Отдых» — so nothing else is available.
-	if actor.stamina <= 0 and not actor.has_flag(&"Неутомимый"):
+	if actor.stamina <= 0 and not stamina_suppressed:
 		return Refusal.EXHAUSTED
 	var need: int = resolved_stamina()
-	if need > 0 and not actor.has_flag(&"Неутомимый") and actor.stamina < need:
+	if need > 0 and not stamina_suppressed and actor.stamina < need:
 		return Refusal.NO_STAMINA
 	if cost_ammo > 0 and actor.ammo < cost_ammo:
 		return Refusal.NO_AMMO
 	return Refusal.OK
 
 
-func is_available(actor: Combatant) -> bool:
-	return availability(actor) == Refusal.OK
+func is_available(actor: Combatant,
+		modifier_0x12_effective: bool = false) -> bool:
+	return availability(actor, modifier_0x12_effective) == Refusal.OK
 
 
-func pay(actor: Combatant) -> void:
-	if not actor.has_flag(&"Неутомимый"):
-		actor.stamina = maxi(0, actor.stamina - resolved_stamina())
+func pay(actor: Combatant,
+		modifier_0x12_effective: bool = false) -> Trace:
+	var t := Trace.new("%s.action_stamina_cost" % actor.name)
+	var stamina_suppressed := (modifier_0x12_effective
+		or actor.has_modifier_id(0x12) or actor.has_flag(&"Неутомимый"))
+	var requested := resolved_stamina()
+	t.base = float(actor.stamina)
+	if requested > 0 and stamina_suppressed:
+		t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+			"requested action stamina cost %d" % requested)
+	elif requested > 0:
+		actor.stamina = maxi(0, actor.stamina - requested)
+		t.step("action stamina mutation", t.base, float(actor.stamina),
+			"resolved action cost")
 	actor.ammo = maxi(0, actor.ammo - cost_ammo)
 	if resolved_consumes_action(actor):
 		actor.action_spent = true
+	t.result = float(actor.stamina)
+	return t
 
 
 ## Build from a pack definition dictionary. Actions are CONTENT: which exist and
