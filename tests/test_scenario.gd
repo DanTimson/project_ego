@@ -543,6 +543,75 @@ func _test_action_terminality() -> void:
 		"resolved non-consuming Action policy remains a real exception")
 
 
+func _test_status_runtime_scenario() -> void:
+	print("\n[CX-010] first-class status scenario and no implicit lifecycle")
+	var file := FileAccess.open("res://tests/scenarios/status_runtime.json", FileAccess.READ)
+	if file == null:
+		_check(false, "status scenario fixture loads")
+		return
+	var specification: Dictionary = JSON.parse_string(file.get_as_text())
+	file.close()
+	var active := Scenario.new(specification.duplicate(true)).run()
+	var plain_spec := specification.duplicate(true)
+	plain_spec["sides"][0]["units"][0].erase("statuses")
+	var plain := Scenario.new(plain_spec).run()
+	var actor: Dictionary = active["final"]["status_actor"]
+	_check((actor.get("statuses", []) as Array).size() == 1,
+		"inline synthetic unit statuses are accepted")
+	var status_state: Dictionary = actor["statuses"][0]
+	_check(int(active["final"]["target"]["life"])
+			< int(plain["final"]["target"]["life"]),
+		"status numeric modifier changes real scenario damage",
+		"%d vs %d" % [int(active["final"]["target"]["life"]),
+			int(plain["final"]["target"]["life"])])
+	_check(status_state["id"] == "synthetic_attack"
+			and int(status_state["duration"]) == 2,
+		"status identity and duration survive a full activation boundary")
+	_check(status_state["modifiers"][0]["params"] == {"stat": "attack"},
+		"final state exposes the deterministic modifier payload")
+	var initial_lines := 0
+	for line in active["log"]:
+		if "statuses [Synthetic attack boon (2)]" in String(line):
+			initial_lines += 1
+	_check(initial_lines == 1, "round transition does not auto-tick lifecycle state")
+
+
+func _canonical_status_spec(overrides: Dictionary = {}) -> Dictionary:
+	return {
+		"content": {"pack": "synthetic", "version": "cx-010"},
+		"sides": [{"id": 0, "units": [{
+			"id": "canonical-1", "def": "synthetic:unit/1", "at": [0, 0],
+			"overrides": overrides,
+		}]}],
+	}
+
+
+func _test_status_canonical_schema_boundary() -> void:
+	print("\n[CX-010] status input remains synthetic-scenario-only")
+	var status_data := [{"id": "runtime-only", "name": "Runtime only"}]
+	var cases := [
+		{
+			"definition": {"name": "Canonical", "statuses": status_data},
+			"overrides": {},
+			"what": "canonical content definitions reject statuses",
+			"error": "canonical definition 'synthetic:unit/1' contains unknown construction field: statuses",
+		},
+		{
+			"definition": {"name": "Canonical"},
+			"overrides": {"statuses": status_data},
+			"what": "canonical overrides reject statuses",
+			"error": "canonical unit 'canonical-1' overrides unknown or non-settable field: statuses",
+		},
+	]
+	for case in cases:
+		var provider := ScenarioContentProvider.new(
+			"synthetic", {"synthetic:unit/1": case["definition"]}, "cx-010")
+		var prepared := Scenario.prepare_content(
+			_canonical_status_spec(case["overrides"]), provider)
+		var error := String(prepared["error"])
+		_check(error == case["error"], String(case["what"]), error)
+
+
 func _init() -> void:
 	var f := FileAccess.open(FIXTURE, FileAccess.READ)
 	if f == null:
@@ -616,6 +685,8 @@ func _init() -> void:
 	_test_melee_numeric_tranche_integration()
 	_test_ranged_numeric_tranche_integration()
 	_test_action_terminality()
+	_test_status_runtime_scenario()
+	_test_status_canonical_schema_boundary()
 
 	for scenario_file in fx["scenarios"]:
 		var case: Dictionary = fx["scenarios"][scenario_file]

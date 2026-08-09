@@ -20,6 +20,7 @@ import json
 import sys
 
 import charge
+import content
 import scenario
 import turn
 from combat import Rng
@@ -834,8 +835,8 @@ def test_modifiers_actually_apply() -> None:
                         without["final"]["Ополченец"]["life"]))
 
 
-def test_round_upkeep() -> None:
-    print("\n[9] statuses and auras tick at the top of each round")
+def test_aura_round_upkeep() -> None:
+    print("\n[9] existing aura upkeep remains active")
     spec = json.loads(json.dumps(SPEC))
     # A scenario seeds stamina_base from `stamina` unless told otherwise, so a
     # unit declared with stamina 4 has a CAP of 4 and cannot be restored above
@@ -854,10 +855,76 @@ def test_round_upkeep() -> None:
     check(r["final"]["Мечник"]["stamina"] > 4,
           "and the stamina actually rose", str(r["final"]["Мечник"]["stamina"]))
 
-    # a tick without an aura or status must not emit noise
+    # upkeep without an aura must not emit noise
     bare = run(json.loads(json.dumps(SPEC)))
     check("auras (" not in "\n".join(bare["log"]),
           "and a battle with neither reports nothing")
+
+
+def test_status_runtime_scenario() -> None:
+    print("\n[CX-010] first-class status scenario and no implicit lifecycle")
+    with open("tests/scenarios/status_runtime.json", encoding="utf-8") as handle:
+        spec = json.load(handle)
+    active = run(spec)
+    plain_spec = json.loads(json.dumps(spec))
+    plain_spec["sides"][0]["units"][0].pop("statuses")
+    plain = run(plain_spec)
+    actor = active["final"]["status_actor"]
+    check(len(actor.get("statuses", [])) == 1,
+          "inline synthetic unit statuses are accepted")
+    status_state = actor["statuses"][0]
+    check(active["final"]["target"]["life"] < plain["final"]["target"]["life"],
+          "status numeric modifier changes real scenario damage",
+          "%d vs %d" % (active["final"]["target"]["life"],
+                         plain["final"]["target"]["life"]))
+    check(status_state["id"] == "synthetic_attack"
+          and status_state["duration"] == 2,
+          "status identity and duration survive a full activation boundary")
+    check(status_state["modifiers"][0]["params"] == {"stat": "attack"},
+          "final state exposes the deterministic modifier payload")
+    check(any("statuses [Synthetic attack boon (2)]" in line
+              for line in active["log"]),
+          "initial status state is trace-visible")
+    check(sum("statuses [" in line for line in active["log"]) == 1,
+          "round transition does not auto-tick or re-emit lifecycle state")
+
+
+def test_status_canonical_schema_boundary() -> None:
+    print("\n[CX-010] status input remains synthetic-scenario-only")
+
+    def canonical_spec(overrides=None):
+        return {
+            "content": {"pack": "synthetic", "version": "cx-010"},
+            "sides": [{"id": 0, "units": [{
+                "id": "canonical-1", "def": "synthetic:unit/1", "at": [0, 0],
+                "overrides": overrides or {},
+            }]}],
+        }
+
+    status_data = [{"id": "runtime-only", "name": "Runtime only"}]
+    cases = [
+        (
+            {"name": "Canonical", "statuses": status_data},
+            canonical_spec(),
+            "canonical content definitions reject statuses",
+            "canonical definition 'synthetic:unit/1' contains unknown construction fields: statuses",
+        ),
+        (
+            {"name": "Canonical"},
+            canonical_spec({"statuses": status_data}),
+            "canonical overrides reject statuses",
+            "canonical unit 'canonical-1' overrides unknown or non-settable fields: statuses",
+        ),
+    ]
+    for definition, specification, what, expected in cases:
+        provider = content.ScenarioContentProvider(
+            "synthetic", {"synthetic:unit/1": definition}, version="cx-010")
+        try:
+            scenario.Scenario.prepare_content(specification, provider)
+        except ValueError as exc:
+            check(str(exc) == expected, what, str(exc))
+        else:
+            check(False, what, "statuses were accepted")
 
 
 if __name__ == "__main__":
@@ -875,7 +942,9 @@ if __name__ == "__main__":
     test_illegal_commands()
     test_ammunition()
     test_modifiers_actually_apply()
-    test_round_upkeep()
+    test_aura_round_upkeep()
+    test_status_runtime_scenario()
+    test_status_canonical_schema_boundary()
     test_instance_identity()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
                     % (len(FAILS), ", ".join(FAILS))))

@@ -64,7 +64,366 @@
  ],
  "sequences": [
   {
-   "label": "one round still ticks",
+   "label": "cumulative keeps separate instances",
+   "effects": [
+    {
+     "id": "surge",
+     "duration": 3,
+     "stacking": "CUMULATIVE"
+    },
+    {
+     "id": "surge",
+     "duration": 3,
+     "stacking": "CUMULATIVE"
+    },
+    {
+     "id": "surge",
+     "duration": 3,
+     "stacking": "CUMULATIVE"
+    }
+   ],
+   "reduce_by": 0,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [
+     "surge",
+     "surge",
+     "surge"
+    ],
+    "durations": [
+     3,
+     3,
+     3
+    ],
+    "powers": [
+     0,
+     0,
+     0
+    ],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "maximum keeps the strongest",
+   "effects": [
+    {
+     "id": "squire",
+     "power": 2,
+     "stacking": "MAXIMUM"
+    },
+    {
+     "id": "squire",
+     "power": 5,
+     "stacking": "MAXIMUM"
+    },
+    {
+     "id": "squire",
+     "power": 3,
+     "stacking": "MAXIMUM"
+    }
+   ],
+   "reduce_by": 0,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [
+     "squire"
+    ],
+    "durations": [
+     -1
+    ],
+    "powers": [
+     5
+    ],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "refresh extends without stacking",
+   "effects": [
+    {
+     "id": "bless",
+     "duration": 2,
+     "power": 2,
+     "stacking": "REFRESH"
+    },
+    {
+     "id": "bless",
+     "duration": 5,
+     "power": 4,
+     "stacking": "REFRESH"
+    }
+   ],
+   "reduce_by": 0,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [
+     "bless"
+    ],
+    "durations": [
+     5
+    ],
+    "powers": [
+     4
+    ],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "unique ignores a second application",
+   "effects": [
+    {
+     "id": "mark",
+     "duration": 2,
+     "stacking": "UNIQUE"
+    },
+    {
+     "id": "mark",
+     "duration": 9,
+     "stacking": "UNIQUE"
+    }
+   ],
+   "reduce_by": 0,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [
+     "mark"
+    ],
+    "durations": [
+     2
+    ],
+    "powers": [
+     0
+    ],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "zero duration is resisted",
+   "effects": [
+    {
+     "id": "resisted",
+     "duration": 0,
+     "hostile": true
+    }
+   ],
+   "reduce_by": 0,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [],
+    "durations": [],
+    "powers": [],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "explicit shortening targets hostiles",
+   "effects": [
+    {
+     "id": "curse",
+     "duration": 5,
+     "hostile": true
+    },
+    {
+     "id": "bless",
+     "duration": 5
+    }
+   ],
+   "reduce_by": 2,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [
+     "curse",
+     "bless"
+    ],
+    "durations": [
+     3,
+     5
+    ],
+    "powers": [
+     0,
+     0
+    ],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "tagged shortening is narrow",
+   "effects": [
+    {
+     "id": "poison",
+     "duration": 4,
+     "hostile": true,
+     "tags": [
+      "poison"
+     ]
+    },
+    {
+     "id": "curse",
+     "duration": 4,
+     "hostile": true,
+     "tags": [
+      "curse"
+     ]
+    }
+   ],
+   "reduce_by": 2,
+   "reduce_tags": [
+    "poison",
+    "bleeding"
+   ],
+   "remove_id": "",
+   "after": {
+    "ids": [
+     "poison",
+     "curse"
+    ],
+    "durations": [
+     2,
+     4
+    ],
+    "powers": [
+     0,
+     0
+    ],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "shortening to zero removes",
+   "effects": [
+    {
+     "id": "doom",
+     "duration": 1,
+     "hostile": true
+    }
+   ],
+   "reduce_by": 3,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [],
+    "durations": [],
+    "powers": [],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "explicit group removal removes every instance",
+   "effects": [
+    {
+     "id": "surge",
+     "duration": 3,
+     "stacking": "CUMULATIVE"
+    },
+    {
+     "id": "surge",
+     "duration": 4,
+     "stacking": "CUMULATIVE"
+    },
+    {
+     "id": "other",
+     "duration": 4
+    }
+   ],
+   "reduce_by": 0,
+   "reduce_tags": [],
+   "remove_id": "surge",
+   "after": {
+    "ids": [
+     "other"
+    ],
+    "durations": [
+     4
+    ],
+    "powers": [
+     0
+    ],
+    "removed": 2,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  },
+  {
+   "label": "action prevention remains queryable",
+   "effects": [
+    {
+     "id": "web",
+     "name": "Паутина",
+     "duration": 6,
+     "prevents_action": true,
+     "hostile": true
+    }
+   ],
+   "reduce_by": 0,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [
+     "web"
+    ],
+    "durations": [
+     6
+    ],
+    "powers": [
+     0
+    ],
+    "removed": 0,
+    "can_act": false,
+    "blocked_by": "Паутина"
+   }
+  },
+  {
+   "label": "permanent status cannot be shortened",
+   "effects": [
+    {
+     "id": "innate",
+     "duration": -1
+    }
+   ],
+   "reduce_by": 5,
+   "reduce_tags": [],
+   "remove_id": "",
+   "after": {
+    "ids": [
+     "innate"
+    ],
+    "durations": [
+     -1
+    ],
+    "powers": [
+     0
+    ],
+    "removed": 0,
+    "can_act": true,
+    "blocked_by": ""
+   }
+  }
+ ],
+ "provisional_lifecycle": [
+  {
+   "label": "one step applies payload before expiry",
    "unit": {
     "life": 30
    },
@@ -85,22 +444,20 @@
      ]
     }
    ],
-   "rounds": 1,
-   "reduce_by": 0,
-   "reduce_tags": [],
+   "steps": 1,
    "after": {
     "life": 26,
     "stamina": 8,
     "morale": 8,
     "alive": true,
-    "statuses": 0,
+    "ids": [],
+    "durations": [],
     "can_act": true,
-    "blocked_by": "",
-    "durations": []
+    "blocked_by": ""
    }
   },
   {
-   "label": "three rounds tick three times",
+   "label": "three-step payload reference",
    "unit": {
     "life": 30
    },
@@ -121,22 +478,20 @@
      ]
     }
    ],
-   "rounds": 4,
-   "reduce_by": 0,
-   "reduce_tags": [],
+   "steps": 4,
    "after": {
     "life": 18,
     "stamina": 4,
     "morale": 4,
     "alive": true,
-    "statuses": 0,
+    "ids": [],
+    "durations": [],
     "can_act": true,
-    "blocked_by": "",
-    "durations": []
+    "blocked_by": ""
    }
   },
   {
-   "label": "cumulative stacks",
+   "label": "cumulative payload reference",
    "unit": {
     "life": 40
    },
@@ -187,217 +542,28 @@
      ]
     }
    ],
-   "rounds": 1,
-   "reduce_by": 0,
-   "reduce_tags": [],
+   "steps": 1,
    "after": {
     "life": 28,
     "stamina": 4,
     "morale": 4,
     "alive": true,
-    "statuses": 3,
-    "can_act": true,
-    "blocked_by": "",
+    "ids": [
+     "dark_surge",
+     "dark_surge",
+     "dark_surge"
+    ],
     "durations": [
      2,
      2,
      2
-    ]
-   }
-  },
-  {
-   "label": "maximum keeps the strongest",
-   "unit": {
-    "life": 30
-   },
-   "effects": [
-    {
-     "id": "squire",
-     "power": 2,
-     "stacking": "MAXIMUM"
-    },
-    {
-     "id": "squire",
-     "power": 5,
-     "stacking": "MAXIMUM"
-    },
-    {
-     "id": "squire",
-     "power": 3,
-     "stacking": "MAXIMUM"
-    }
-   ],
-   "rounds": 0,
-   "reduce_by": 0,
-   "reduce_tags": [],
-   "after": {
-    "life": 30,
-    "stamina": 10,
-    "morale": 10,
-    "alive": true,
-    "statuses": 1,
+    ],
     "can_act": true,
-    "blocked_by": "",
-    "durations": [
-     -1
-    ]
+    "blocked_by": ""
    }
   },
   {
-   "label": "refresh extends",
-   "unit": {
-    "life": 30
-   },
-   "effects": [
-    {
-     "id": "bless",
-     "duration": 2,
-     "stacking": "REFRESH"
-    },
-    {
-     "id": "bless",
-     "duration": 5,
-     "stacking": "REFRESH"
-    }
-   ],
-   "rounds": 0,
-   "reduce_by": 0,
-   "reduce_tags": [],
-   "after": {
-    "life": 30,
-    "stamina": 10,
-    "morale": 10,
-    "alive": true,
-    "statuses": 1,
-    "can_act": true,
-    "blocked_by": "",
-    "durations": [
-     5
-    ]
-   }
-  },
-  {
-   "label": "unique ignores the second",
-   "unit": {
-    "life": 30
-   },
-   "effects": [
-    {
-     "id": "mark",
-     "duration": 2,
-     "stacking": "UNIQUE"
-    },
-    {
-     "id": "mark",
-     "duration": 9,
-     "stacking": "UNIQUE"
-    }
-   ],
-   "rounds": 0,
-   "reduce_by": 0,
-   "reduce_tags": [],
-   "after": {
-    "life": 30,
-    "stamina": 10,
-    "morale": 10,
-    "alive": true,
-    "statuses": 1,
-    "can_act": true,
-    "blocked_by": "",
-    "durations": [
-     2
-    ]
-   }
-  },
-  {
-   "label": "shortening hits only hostiles",
-   "unit": {
-    "life": 30
-   },
-   "effects": [
-    {
-     "id": "dark_surge",
-     "name": "Всплеск Тьмы",
-     "duration": 5,
-     "tick": {
-      "life": -4,
-      "stamina": -2,
-      "morale": -2
-     },
-     "stacking": "CUMULATIVE",
-     "hostile": true,
-     "tags": [
-      "curse"
-     ]
-    },
-    {
-     "id": "bless",
-     "name": "Благословение",
-     "duration": 5
-    }
-   ],
-   "rounds": 0,
-   "reduce_by": 2,
-   "reduce_tags": [],
-   "after": {
-    "life": 30,
-    "stamina": 10,
-    "morale": 10,
-    "alive": true,
-    "statuses": 2,
-    "can_act": true,
-    "blocked_by": "",
-    "durations": [
-     3,
-     5
-    ]
-   }
-  },
-  {
-   "label": "tagged shortening",
-   "unit": {
-    "life": 30
-   },
-   "effects": [
-    {
-     "id": "poison",
-     "duration": 4,
-     "hostile": true,
-     "tags": [
-      "poison"
-     ]
-    },
-    {
-     "id": "curse",
-     "duration": 4,
-     "hostile": true,
-     "tags": [
-      "curse"
-     ]
-    }
-   ],
-   "rounds": 0,
-   "reduce_by": 2,
-   "reduce_tags": [
-    "poison",
-    "bleeding"
-   ],
-   "after": {
-    "life": 30,
-    "stamina": 10,
-    "morale": 10,
-    "alive": true,
-    "statuses": 2,
-    "can_act": true,
-    "blocked_by": "",
-    "durations": [
-     2,
-     4
-    ]
-   }
-  },
-  {
-   "label": "web decays against a weak target",
+   "label": "weak stat-decay reference",
    "unit": {
     "life": 30,
     "attack": 5,
@@ -416,24 +582,24 @@
      ]
     }
    ],
-   "rounds": 1,
-   "reduce_by": 0,
-   "reduce_tags": [],
+   "steps": 1,
    "after": {
     "life": 30,
     "stamina": 10,
     "morale": 10,
     "alive": true,
-    "statuses": 1,
-    "can_act": false,
-    "blocked_by": "Паутина",
+    "ids": [
+     "web"
+    ],
     "durations": [
      5
-    ]
+    ],
+    "can_act": false,
+    "blocked_by": "Паутина"
    }
   },
   {
-   "label": "web decays faster against a strong one",
+   "label": "strong stat-decay reference",
    "unit": {
     "life": 30,
     "attack": 25,
@@ -452,24 +618,24 @@
      ]
     }
    ],
-   "rounds": 1,
-   "reduce_by": 0,
-   "reduce_tags": [],
+   "steps": 1,
    "after": {
     "life": 30,
     "stamina": 10,
     "morale": 10,
     "alive": true,
-    "statuses": 1,
-    "can_act": false,
-    "blocked_by": "Паутина",
+    "ids": [
+     "web"
+    ],
     "durations": [
      3
-    ]
+    ],
+    "can_act": false,
+    "blocked_by": "Паутина"
    }
   },
   {
-   "label": "a tick can kill",
+   "label": "lethal payload reference",
    "unit": {
     "life": 3
    },
@@ -490,24 +656,24 @@
      ]
     }
    ],
-   "rounds": 1,
-   "reduce_by": 0,
-   "reduce_tags": [],
+   "steps": 1,
    "after": {
     "life": -1,
     "stamina": 8,
     "morale": 8,
     "alive": false,
-    "statuses": 1,
-    "can_act": true,
-    "blocked_by": "",
+    "ids": [
+     "dark_surge"
+    ],
     "durations": [
      2
-    ]
+    ],
+    "can_act": true,
+    "blocked_by": ""
    }
   },
   {
-   "label": "permanent never ages",
+   "label": "permanent reference",
    "unit": {
     "life": 30
    },
@@ -517,20 +683,20 @@
      "duration": -1
     }
    ],
-   "rounds": 20,
-   "reduce_by": 0,
-   "reduce_tags": [],
+   "steps": 20,
    "after": {
     "life": 30,
     "stamina": 10,
     "morale": 10,
     "alive": true,
-    "statuses": 1,
-    "can_act": true,
-    "blocked_by": "",
+    "ids": [
+     "innate"
+    ],
     "durations": [
      -1
-    ]
+    ],
+    "can_act": true,
+    "blocked_by": ""
    }
   }
  ]

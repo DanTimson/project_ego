@@ -10,7 +10,7 @@ This is a coverage map, not a release claim.
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 early-provider cutoff and distinct melee/counter minimum handling are fixture-covered |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 numeric placement is fixture-covered after effective-stat/selected 1.5× processing and before randomisation/defence; target applicability and wider provider coverage remain incomplete |
 | activated actions | public/data families + selective binary edges | implemented | `Action` catalogue + generic grants executor implemented | resolved action-consumption policy now controls activation terminality; fourteen explicit NH unit actions and public effect-family matrix catalogued; wider battlefield effects and consumer-triggered opcode mappings remain incomplete |
-| timed statuses | docs + binary runtime nodes | implemented in Python | `core/model/status.gd` empty | major gap |
+| runtime statuses | public/project stable policy + unresolved binary lifecycle | stable container, stacking/resistance and explicit manipulation implemented | first-class `Status` model integrated through `Combatant`, later modifier providers and scenarios | stable container/parity fixture implemented; automatic duration tick/expiry and `UNTIL_NEXT_TURN` clock remain open pending R13 |
 | level-up selection | data + binary | implemented in part | `core/model/option.gd` and `tests/test_options.gd` empty | ordinary selection is specified; R15 zero-total/underfull edge deferred until an executable consumer and fixture exist |
 | battlefield coordinates and adjacency | binary + controlled observation | implemented | implemented | adjacency recovered; R14 large-unit logical-footprint protocol ready |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
@@ -102,7 +102,7 @@ asserting legal transferability or rules compatibility.
 The most consequential blockers are:
 
 1. end-to-end use of the recovered shared legacy RNG and exact call ordering;
-2. GDScript timed-status/runtime-effect model;
+2. automatic status duration tick/expiry and `UNTIL_NEXT_TURN` lifecycle boundary (R13);
 3. battle-action effect classification;
 4. porting death, revival, transformation and side-transfer semantics;
 5. conversion of remaining recovered binary rules into executable parity fixtures beyond the implemented CX-008 numeric tranche.
@@ -135,6 +135,22 @@ least eighteen observable generic battle-action effect families. R16 remains
 retired. R17 is reduced to a finite black-box matrix covering zero-damage
 triggers, follow-up attack order, component damage, trample and instant-death
 placement.
+
+
+CX-010 implements the stable runtime-status tranche without selecting the R13
+clock. `Combatant.statuses` now stores first-class, independently copyable
+`Status` instances; per-effect cumulative/maximum/refresh/unique application,
+zero-duration resistance, explicit group removal and explicit duration
+shortening are parity-tested. Status numeric and flag modifiers traverse live
+consumers, and the ranged zero-sum fixture proves they remain later providers
+outside the CX-008 R6 early set. Synthetic scenario input/final state serializes
+status identity, explicit duration and modifier payload. Round, side, selection,
+activation and extra-turn transitions do not advance status duration.
+The pre-existing explicit `tick_round` reference helper and its old vectors are
+retained in a clearly provisional test section, but no battle hook calls it and
+it is not compatibility truth. Automatic expiry, periodic effects,
+`UNTIL_NEXT_TURN`, wake-on-damage and their ordering remain unimplemented rather
+than inferred from the R13 protocol.
 
 CX-009 implements the project-owner-confirmed activation rule at the shared
 model/command boundary: successful ordinary melee/ranged and resolved consuming

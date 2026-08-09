@@ -119,17 +119,18 @@ var modifiers: Array = []
 
 ## Timed effects. They contribute Modifiers through the same pipeline as
 ## everything else, so a status never computes a number itself.
-var statuses: Array = []
+var statuses: Array[Status] = []
 
 ## A flag is DERIVED, not stored.
 ##
 ## `flags` holds flags set directly — by a scenario, a test, or a rule. But a
 ## flag can also come from an ability, and abilities live in the modifier list;
-## and a modifier can come from a status effect, which expires.
+## and a modifier can come from a status effect, whose explicit removal changes
+## the live provider set.
 ##
-## Checking all three sources here means a spell granting Неутомимый for three
-## rounds works with no extra machinery: the modifier appears when the status is
-## applied and vanishes when it expires, and every existing has_flag call site —
+## Checking all three sources means a temporary modifier appears when its status
+## is applied and vanishes when the status is removed. Every existing has_flag
+## call site —
 ## wounds, stamina, counterattack — follows along without knowing statuses exist.
 ##
 ## The alternative was to have the roster run grant_flag at build time and mutate

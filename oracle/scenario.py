@@ -86,7 +86,7 @@ _ORDERING_TRACE_SOURCES = {
 # silently interpreted as overrides, and override keys must map to construction
 # fields rather than battle identity, placement or provenance.
 _CANONICAL_UNIT_KEYS = {"id", "def", "at", "overrides"}
-_SPECIAL_UNIT_FIELDS = {"name", "flags", "subtypes", "modifiers", "auras"}
+_SPECIAL_UNIT_FIELDS = {"name", "flags", "subtypes", "modifiers", "auras", "statuses"}
 _SETTABLE_UNIT_FIELDS = (
     set(Combatant.__dataclass_fields__) | _SPECIAL_UNIT_FIELDS
 ) - {"instance_id", "content_id", "statuses"}
@@ -346,7 +346,7 @@ class Scenario:
                 unit.instance_id = str(u.get("id") or u["name"])
                 for key, value in u.items():
                     if key in ("name", "id", "at", "flags", "subtypes",
-                               "modifiers", "auras", "content_id",
+                               "modifiers", "auras", "statuses", "content_id",
                                "instance_id", _RESOLVED_CONTENT_ID):
                         continue
                     setattr(unit, key, value)
@@ -359,6 +359,8 @@ class Scenario:
                         power=int(m.get("power", 0)),
                         params=m.get("params", {}),
                         source=m.get("source", m["handler"])))
+                for status_spec in u.get("statuses", []) or []:
+                    st.apply(unit, self._build_status(status_spec))
                 unit.subtypes = set(u.get("subtypes", []))
                 # Base values default to the CURRENT value, because the .var
                 # tables carry only one figure per stat. A unit declared with
@@ -380,6 +382,33 @@ class Scenario:
                 side.units.append(unit)
             sides.append(side)
         return sides
+
+    @staticmethod
+    def _build_status(specification: dict) -> st.StatusEffect:
+        status = st.StatusEffect(
+            id=str(specification["id"]),
+            name=str(specification.get("name", "")),
+            source=str(specification.get("source", "")),
+            duration=int(specification.get("duration", st.PERMANENT)),
+            power=int(specification.get("power", 0)),
+            tick=copy.deepcopy(specification.get("tick", {})),
+            decay_per=(tuple(specification["decay_per"])
+                       if specification.get("decay_per") else None),
+            stacking=st.Stacking[specification.get("stacking", "REFRESH")],
+            prevents_action=bool(specification.get("prevents_action", False)),
+            hostile=bool(specification.get("hostile", False)),
+            tags=tuple(specification.get("tags", [])),
+        )
+        for modifier_spec in specification.get("modifiers", []):
+            status.modifiers.append(Modifier(
+                ability=int(modifier_spec.get("ability", 0)),
+                handler=modifier_spec["handler"],
+                hook=getattr(Hook, modifier_spec.get("hook", "STAT_PASSIVE")),
+                power=int(modifier_spec.get("power", 0)),
+                params=copy.deepcopy(modifier_spec.get("params", {})),
+                source=modifier_spec.get("source", status.name),
+            ))
+        return status
 
     def _build_auras(self, specs: list) -> dict:
         out = {}
@@ -645,14 +674,7 @@ class Scenario:
                      unit.movement_remaining, unit.steps_this_round))
 
     def _round_upkeep(self) -> None:
-        """Statuses and auras, at the top of each round.
-
-        ORDER: auras first, then statuses. An aura is a continuous drain from a
-        living source; a status is a stored effect that ages. Ticking statuses
-        first would let an effect expire before an aura that might have killed
-        its source resolves. Nothing documents the order, so it is recorded here
-        rather than left implicit — OPEN_QUESTIONS item 20.
-        """
+        """Existing aura upkeep; automatic status lifecycle is unresolved."""
         for side in self.sides:
             for unit in list(side.units):
                 if not unit.alive:
@@ -668,12 +690,6 @@ class Scenario:
                     if not unit.alive:
                         self._fell(unit)
                         continue
-                if unit.statuses:
-                    names = [e.describe() for e in unit.statuses]
-                    st.tick_round(unit)
-                    self.emit("  %s: %s" % (unit.label(), ", ".join(names)))
-                    if not unit.alive:
-                        self._fell(unit)
 
     def _auto_end_phase(self) -> None:
         """R7: the side toggles on exhaustion as well as on an explicit pass.
@@ -746,7 +762,7 @@ class Scenario:
             effect = st.StatusEffect(
                 id="%s:%s" % (action.id, ability),
                 name=ability, source=action.name,
-                duration=int(duration) if duration else st.PERMANENT,
+                duration=int(duration) if duration is not None else st.PERMANENT,
                 power=int(magnitude or 0),
             )
             st.apply(unit, effect)
@@ -790,6 +806,12 @@ class Scenario:
         self.emit("== %s (seed %d) ==" % (self.name, self.seed))
         self.emit("-- round %d, side %d first --"
                   % (self.state.round_number, self.state.active_side))
+        for unit_id in sorted(self.units):
+            unit = self.units[unit_id]
+            if unit.statuses:
+                descriptions = ", ".join(status.describe()
+                                         for status in unit.statuses)
+                self.emit("  %s: statuses [%s]" % (unit.label(), descriptions))
 
         for c in self.spec.get("commands", []):
             op = c["op"]
@@ -834,11 +856,14 @@ class Scenario:
     def final_state(self) -> dict:
         out = {}
         for name, u in sorted(self.units.items()):
-            out[name] = {
+            unit_state = {
                 "alive": u.alive, "life": max(0, u.life), "stamina": u.stamina,
                 "at": self._at(u), "steps_this_round": u.steps_this_round,
                 "action_spent": u.action_spent, "movement_remaining": u.movement_remaining,
             }
+            if u.statuses:
+                unit_state["statuses"] = [status.to_dict() for status in u.statuses]
+            out[name] = unit_state
         return out
 
 

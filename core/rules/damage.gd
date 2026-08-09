@@ -39,9 +39,9 @@ static func bind_environment(provider: Callable) -> void:
 ## Runtime/status and environment/aura providers already have distinct storage.
 ## Keep that existing distinction available to ordering-sensitive rules (R6).
 static func _later_modifiers(u: Combatant) -> Array:
-	var out: Array = []
-	for effect in u.statuses:
-		out.append_array(effect.modifiers)
+	# CX-008 R6 boundary: status/runtime modifiers enter only here, after the
+	# ranged definition + unit-owned early-provider zero check.
+	var out: Array = Statuses.active_modifiers(u)
 	if _environment.is_valid():
 		out.append_array(_environment.call(u))
 	return out

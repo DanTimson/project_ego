@@ -1,0 +1,97 @@
+{
+ "name": "stable status provider survives an activation boundary",
+ "profile": "native",
+ "seed": 101,
+ "battlefield": {
+  "width": 4,
+  "height": 3
+ },
+ "sides": [
+  {
+   "id": 0,
+   "name": "status side",
+   "leader_initiative": 9,
+   "is_attacker": true,
+   "units": [
+    {
+     "id": "status_actor",
+     "name": "Status actor",
+     "at": [
+      1,
+      1
+     ],
+     "attack": 5,
+     "counter_attack": 0,
+     "defence": 1,
+     "life": 20,
+     "speed": 2,
+     "stamina": 10,
+     "morale": 10,
+     "statuses": [
+      {
+       "id": "synthetic_attack",
+       "name": "Synthetic attack boon",
+       "source": "CX-010 fixture",
+       "duration": 2,
+       "power": 3,
+       "stacking": "REFRESH",
+       "hostile": false,
+       "tags": [
+        "buff"
+       ],
+       "modifiers": [
+        {
+         "ability": 2,
+         "handler": "stat_delta",
+         "hook": "STAT_PASSIVE",
+         "power": 3,
+         "params": {
+          "stat": "attack"
+         },
+         "source": "Synthetic attack boon"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "name": "control side",
+   "leader_initiative": 1,
+   "units": [
+    {
+     "id": "target",
+     "name": "Target",
+     "at": [
+      2,
+      1
+     ],
+     "attack": 0,
+     "counter_attack": 0,
+     "defence": 1,
+     "life": 50,
+     "speed": 1,
+     "stamina": 10,
+     "morale": 10
+    }
+   ]
+  }
+ ],
+ "commands": [
+  {
+   "op": "attack",
+   "unit": "status_actor",
+   "target": "target"
+  },
+  {
+   "op": "end_phase"
+  },
+  {
+   "op": "attack",
+   "unit": "status_actor",
+   "target": "target"
+  }
+ ]
+}

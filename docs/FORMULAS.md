@@ -12,6 +12,7 @@ status. This is the reference; `oracle/combat.py` is the executable form and
 | `[AB]` | Eadoropedia, *Способности* — the game's own tooltip templates (still carry `%d`/`%s`) |
 | `[VAR]` | Derived from the `.var` data directly |
 | `[OBS]` | Established by controlled play observation |
+| `[PROJECT]` | Project EGO policy frozen by an accepted task/fixture |
 | `[BIN]` | Recovered from the inspected 32-bit executable |
 | `[ASSUMED]` | Our reading, not confirmed — see `OPEN_QUESTIONS.md` |
 
@@ -827,6 +828,51 @@ effective maximum life or exceeds 9, except on channel 3.
 ---
 
 ## 13. Runtime effects and death
+
+### Stable Project EGO status operations
+
+`[GM: Сила и длительность заклинаний]` · **STATED**
+`[PROJECT: core/rules/statuses.gd; oracle/statuses.py]` · fixture-covered
+
+For an ordinary duration-bearing application:
+
+```text
+effective_resist = max(0, target_resist - thaumaturgy)
+gain = trunc0(concentration * DurationMod / 100)
+loss = trunc0(effective_resist * ResistDuration / 100)
+duration = max(0, base_duration + gain - loss)
+```
+
+A zero result rejects the application and leaves the target status collection
+unchanged. `0` is not used here to define an `UNTIL_NEXT_TURN` boundary.
+
+Stacking policy is a property of each effect identity/group:
+
+- `CUMULATIVE` keeps a separate runtime instance;
+- `MAXIMUM` retains the strongest-power instance;
+- `REFRESH` retains one instance and takes the maximum current/new duration and
+  power;
+- `UNIQUE` ignores a reapplication while one is present.
+
+Explicit group removal deletes every matching instance. Explicit duration
+reduction subtracts the caller-supplied non-negative amount from matching,
+non-permanent statuses, removes a result of zero, and may be narrowed to hostile
+statuses and tags. These are direct operations, not a battle clock.
+
+A status owns its modifier objects. Provider resolution remains:
+
+```text
+unit-owned/intrinsic modifiers                 # R6 ranged early provider
+status/runtime modifiers + environment/auras  # later providers
+```
+
+No formula in this tranche selects an automatic round/selection/activation/
+extra-turn decrement point, periodic-effect order, or `UNTIL_NEXT_TURN` expiry
+edge. Those remain OPEN pending R13 observation. The pre-existing explicitly
+called `tick_round` reference helper retains its provisional vectors but is not
+wired to battle flow and is not compatibility truth.
+
+### Recovered binary runtime node
 
 `[BIN:004CEC00,004D1D30,004D1BF0]` · **RECOVERED**
 

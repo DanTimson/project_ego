@@ -176,7 +176,6 @@
     "Мечник is not in the active side's phase",
     "Мечник is not in the active side's phase",
     "-- round 2, side 0 first --",
-    "  Мечник: Защита (1), Защита от выстрела (1), Бдительность (1)",
     "Ополченец is not in the active side's phase"
    ],
    "final": {
@@ -187,7 +186,51 @@
      "at": "1,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "statuses": [
+      {
+       "id": "turtle:Защита",
+       "name": "Защита",
+       "source": "Глухая оборона",
+       "duration": 1,
+       "power": 0,
+       "tick": {},
+       "decay_per": [],
+       "stacking": "REFRESH",
+       "prevents_action": false,
+       "hostile": false,
+       "tags": [],
+       "modifiers": []
+      },
+      {
+       "id": "turtle:Защита от выстрела",
+       "name": "Защита от выстрела",
+       "source": "Глухая оборона",
+       "duration": 1,
+       "power": 0,
+       "tick": {},
+       "decay_per": [],
+       "stacking": "REFRESH",
+       "prevents_action": false,
+       "hostile": false,
+       "tags": [],
+       "modifiers": []
+      },
+      {
+       "id": "turtle:Бдительность",
+       "name": "Бдительность",
+       "source": "Глухая оборона",
+       "duration": 1,
+       "power": 1,
+       "tick": {},
+       "decay_per": [],
+       "stacking": "REFRESH",
+       "prevents_action": false,
+       "hostile": false,
+       "tags": [],
+       "modifiers": []
+      }
+     ]
     },
     "Ополченец": {
      "alive": true,
@@ -1071,6 +1114,178 @@
      "at": "-",
      "steps_this_round": 1,
      "action_spent": true,
+     "movement_remaining": 1
+    }
+   }
+  },
+  "status_runtime.json": {
+   "spec": {
+    "name": "stable status provider survives an activation boundary",
+    "profile": "native",
+    "seed": 101,
+    "battlefield": {
+     "width": 4,
+     "height": 3
+    },
+    "sides": [
+     {
+      "id": 0,
+      "name": "status side",
+      "leader_initiative": 9,
+      "is_attacker": true,
+      "units": [
+       {
+        "id": "status_actor",
+        "name": "Status actor",
+        "at": [
+         1,
+         1
+        ],
+        "attack": 5,
+        "counter_attack": 0,
+        "defence": 1,
+        "life": 20,
+        "speed": 2,
+        "stamina": 10,
+        "morale": 10,
+        "statuses": [
+         {
+          "id": "synthetic_attack",
+          "name": "Synthetic attack boon",
+          "source": "CX-010 fixture",
+          "duration": 2,
+          "power": 3,
+          "stacking": "REFRESH",
+          "hostile": false,
+          "tags": [
+           "buff"
+          ],
+          "modifiers": [
+           {
+            "ability": 2,
+            "handler": "stat_delta",
+            "hook": "STAT_PASSIVE",
+            "power": 3,
+            "params": {
+             "stat": "attack"
+            },
+            "source": "Synthetic attack boon"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": 1,
+      "name": "control side",
+      "leader_initiative": 1,
+      "units": [
+       {
+        "id": "target",
+        "name": "Target",
+        "at": [
+         2,
+         1
+        ],
+        "attack": 0,
+        "counter_attack": 0,
+        "defence": 1,
+        "life": 50,
+        "speed": 1,
+        "stamina": 10,
+        "morale": 10
+       }
+      ]
+     }
+    ],
+    "commands": [
+     {
+      "op": "attack",
+      "unit": "status_actor",
+      "target": "target"
+     },
+     {
+      "op": "end_phase"
+     },
+     {
+      "op": "attack",
+      "unit": "status_actor",
+      "target": "target"
+     }
+    ]
+   },
+   "log": [
+    "== stable status provider survives an activation boundary (seed 101) ==",
+    "-- round 1, side 0 first --",
+    "  Status actor(status_actor): statuses [Synthetic attack boon (2)]",
+    "  [trace] Status actor.roll | attack randomisation: 8 -> 7 # uniform [7, 9]",
+    "  [trace] Target.defence | defence provider total: 1 -> 1 # ordinary providers complete before stamina handling",
+    "  [trace] Target.defence | final defence clamp: 1 -> 1 # minimum 0",
+    "  [trace] damage | defence subtraction: 7 -> 6 # effective defence 1",
+    "  [trace] Status actor.attack_cost | live-capacity stamina discriminator: 2 -> 1 # effective speed 2; strict capacity < speed is false; selected base cost 1",
+    "  [trace] Status actor.attack_cost | attack stamina mutation: 10 -> 9 # selected base cost 1",
+    "Status actor(status_actor) hits Target(target) for 6 (Target(target) at 44/50, stamina 9)",
+    "  (Target(target) does not counter: no counterattack value)",
+    "-- side 1 takes over (no units left to act) --",
+    "-- round 2, side 0 first --",
+    "  [trace] Status actor.roll | attack randomisation: 8 -> 7 # uniform [7, 9]",
+    "  [trace] Target.defence | defence provider total: 1 -> 1 # ordinary providers complete before stamina handling",
+    "  [trace] Target.defence | final defence clamp: 1 -> 1 # minimum 0",
+    "  [trace] damage | defence subtraction: 7 -> 6 # effective defence 1",
+    "  [trace] Status actor.attack_cost | live-capacity stamina discriminator: 2 -> 1 # effective speed 2; strict capacity < speed is false; selected base cost 1",
+    "  [trace] Status actor.attack_cost | attack stamina mutation: 9 -> 8 # selected base cost 1",
+    "Status actor(status_actor) hits Target(target) for 6 (Target(target) at 38/50, stamina 8)",
+    "  (Target(target) does not counter: no counterattack value)",
+    "-- side 1 takes over (no units left to act) --"
+   ],
+   "final": {
+    "status_actor": {
+     "alive": true,
+     "life": 20,
+     "stamina": 8,
+     "at": "1,1",
+     "steps_this_round": 0,
+     "action_spent": true,
+     "movement_remaining": 2,
+     "statuses": [
+      {
+       "id": "synthetic_attack",
+       "name": "Synthetic attack boon",
+       "source": "CX-010 fixture",
+       "duration": 2,
+       "power": 3,
+       "tick": {},
+       "decay_per": [],
+       "stacking": "REFRESH",
+       "prevents_action": false,
+       "hostile": false,
+       "tags": [
+        "buff"
+       ],
+       "modifiers": [
+        {
+         "ability": 2,
+         "handler": "stat_delta",
+         "hook": "STAT_PASSIVE",
+         "power": 3,
+         "params": {
+          "stat": "attack"
+         },
+         "source": "Synthetic attack boon"
+        }
+       ]
+      }
+     ]
+    },
+    "target": {
+     "alive": true,
+     "life": 38,
+     "stamina": 10,
+     "at": "2,1",
+     "steps_this_round": 0,
+     "action_spent": false,
      "movement_remaining": 1
     }
    }

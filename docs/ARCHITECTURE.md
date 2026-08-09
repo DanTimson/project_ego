@@ -309,9 +309,27 @@ Modifiers are not actions.
 - A **modifier** passively participates at a defined resolution hook.
 - An **action** is selected, has legality and costs, and can temporarily alter
   which modifiers participate.
-- A **runtime status** has source, magnitude, duration/stack state, visibility
-  and removal rules.
+- A **runtime status** is an address-free `Status` model owned by one
+  `Combatant`. It keeps project-local identity/grouping separate from display
+  text, owns mutable duration/stack state and its `Modifier` instances, and has
+  explicit copy/serialization operations.
 - An **event** records a resolved transition for trace/replay.
+
+Modifier providers remain layered. Unit-owned/intrinsic modifiers are the R6
+ranged early-provider set. Status/runtime modifiers and environment/aura
+modifiers enter only through the later-provider path; a status cannot resurrect
+an early ranged sum of zero. `Statuses` owns the stable apply/stack/reject,
+explicit removal and explicit shortening policy, while `Status` owns instance
+state. No round, side, selection, activation or extra-turn hook owns automatic
+status ageing until the R13 lifecycle boundary is observed and accepted. The
+pre-existing explicit `tick_round` reference helper remains isolated for
+regression disclosure; it is not called by battle flow and does not define that
+boundary.
+
+Synthetic scenarios may declare `statuses` on a unit. Each declaration constructs
+fresh status and modifier objects, and active status state is included in trace
+and final-state output. Status-free scenarios retain their established output
+shape.
 
 Ordering is part of the mechanic. In particular, the recovered melee path
 processes secondary effects before committing the primary life loss.

@@ -270,9 +270,8 @@ def test_derived_flags() -> None:
                             source="Боевое безумие")]))
     check(v.has_flag("Не чувствует боли"), "a status grants it too")
     check(combat.wound_mod(v)[0] == 1.0, "with the same effect")
-    for _ in range(2):
-        st.tick_round(v)
-    check(not v.has_flag("Не чувствует боли"), "and it vanishes when the status expires")
+    st.remove(v, "rage")
+    check(not v.has_flag("Не чувствует боли"), "and it vanishes on explicit removal")
     check(abs(combat.wound_mod(v)[0] - 0.75) < 1e-9,
           "restoring the penalty with no separate bookkeeping")
 

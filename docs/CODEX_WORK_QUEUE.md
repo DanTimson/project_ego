@@ -30,6 +30,7 @@ priority.
 | CX-007 | `NON_SEMANTIC_TOOLING` | repository-governance CI integration | binary/governance | `BLOCKED` | CX-001 through CX-005 accepted |
 | CX-008 | `SPEC_IMPLEMENTATION` | tactical numeric mechanics closure (R3/R6/R8/R9/R10/R11) | engine | `DONE` | accepted R3, R6, R8, R9, R10 and R11 specifications |
 | CX-009 | `SPEC_IMPLEMENTATION` | tactical action terminality | engine | `DONE` | CX-008; human-confirmed action-terminal rule |
+| CX-010 | `SPEC_IMPLEMENTATION` | runtime status container and stable status semantics | engine | `DONE` | CX-009; stable status architecture; R13 lifecycle excluded |
 
 Task contracts live in `docs/codex/tasks/`.
 

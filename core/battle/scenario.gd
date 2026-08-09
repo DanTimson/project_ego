@@ -339,7 +339,7 @@ func _build_sides(specs: Array) -> Array:
 				if k == "id":
 					continue
 				if k in ["name", "at", "flags", "subtypes", "modifiers", "auras",
-						"content_id", "instance_id", RESOLVED_CONTENT_ID]:
+						"statuses", "content_id", "instance_id", RESOLVED_CONTENT_ID]:
 					continue
 				unit.set(k, u[key])
 			unit.content_id = String(u.get(RESOLVED_CONTENT_ID, ""))
@@ -351,6 +351,8 @@ func _build_sides(specs: Array) -> Array:
 					Modifier.Hook[String(m.get("hook", "STAT_PASSIVE"))],
 					int(m.get("power", 0)), m.get("params", {}),
 					String(m.get("source", m["handler"]))))
+			for status_spec in u.get("statuses", []):
+				Statuses.apply(unit, Status.from_dict(status_spec))
 			for st in u.get("subtypes", []):
 				unit.add_subtype(StringName(String(st)))
 			if not u.has("life_base"):
@@ -414,12 +416,8 @@ func environment(unit: Combatant) -> Array:
 		Callable(self, "side_of"))
 
 
-## Statuses and auras, at the top of each round.
-##
-## ORDER: auras first, then statuses. An aura is a continuous drain from a living
-## source; a status is a stored effect that ages. Ticking statuses first would let
-## an effect expire before an aura that might have killed its source resolves.
-## Nothing documents the order — OPEN_QUESTIONS item 20.
+## Existing aura upkeep. Status duration is intentionally absent: its automatic
+## lifecycle clock and ordering remain unresolved pending R13 observation.
 func _round_upkeep() -> void:
 	for side in state.sides:
 		for unit in side.units.duplicate():
@@ -439,14 +437,6 @@ func _round_upkeep() -> void:
 				if not unit.alive:
 					_fell(unit)
 					continue
-			if not unit.statuses.is_empty():
-				var names: Array = []
-				for e in unit.statuses:
-					names.append(e.describe())
-				Statuses.tick_round(unit)
-				emit("  %s: %s" % [unit.label(), ", ".join(names)])
-				if not unit.alive:
-					_fell(unit)
 
 
 # -- helpers -----------------------------------------------------------------
@@ -879,7 +869,7 @@ func cmd_action(unit: Combatant, action_id: String) -> void:
 		var ability := String(g[0])
 		var magnitude: int = int(g[1]) if g[1] != null else 0
 		var duration: int = int(g[2]) if g.size() > 2 and g[2] != null else Statuses.PERMANENT
-		var effect := Statuses.Effect.new()
+		var effect := Status.new()
 		effect.id = StringName("%s:%s" % [action.id, ability])
 		effect.name = ability
 		effect.source = action.name
@@ -942,6 +932,13 @@ func _run() -> Dictionary:
 	RoundLoop.begin_battle(state)
 	emit("== %s (seed %d) ==" % [scenario_name, seed_value])
 	emit("-- round %d, side %d first --" % [state.round_number, state.active_side])
+	var status_units: Array = units.keys()
+	status_units.sort()
+	for unit_id in status_units:
+		var status_unit: Combatant = units[unit_id]
+		if not status_unit.statuses.is_empty():
+			emit("  %s: statuses [%s]" % [
+				status_unit.label(), Statuses.describe_all(status_unit)])
 
 	for c in spec.get("commands", []):
 		var op := String(c["op"])
@@ -989,10 +986,13 @@ func final_state() -> Dictionary:
 	names.sort()
 	for n in names:
 		var u: Combatant = units[n]
-		out[n] = {
+		var unit_state := {
 			"alive": u.alive, "life": maxi(0, u.life), "stamina": u.stamina,
 			"at": _at(u), "steps_this_round": u.steps_this_round,
 			"action_spent": u.action_spent,
 			"movement_remaining": u.movement_remaining,
 		}
+		if not u.statuses.is_empty():
+			unit_state["statuses"] = Statuses.serialize(u)
+		out[n] = unit_state
 	return out
