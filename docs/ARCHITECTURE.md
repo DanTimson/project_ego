@@ -301,6 +301,12 @@ Serialized identity has one owner per field: canonical `def` supplies
 `Combatant.instance_id`. Inline units cannot serialize either runtime field;
 they remain pack-free, receive an empty `content_id`, and take instance identity
 from `id` (or the established display-name fallback when `id` is absent).
+The closed canonical definition/override envelope keeps `ammo_base` and `tier`
+as static definition inputs, but rejects internal `definition_id` plus lifecycle
+instance state (`morale_break_accumulator`, `damage_received`,
+`original_definition`, `battle_owned`, `discarded`, and `last_position`). Inline
+synthetic scenarios may initialize that battle state for deterministic tests;
+this does not widen the authored content schema.
 
 ## Resolution pipeline
 
@@ -331,8 +337,27 @@ fresh status and modifier objects, and active status state is included in trace
 and final-state output. Status-free scenarios retain their established output
 shape.
 
+The tactical received-damage sink owns channel accounting, explicit
+remove-on-damage status removal and life subtraction. On a fatal event it calls
+one battle-contextual `DeathLifecycle` resolver immediately. That resolver owns
+adjacent death morale, runtime-marker scanning/clear, rollback, revival,
+replacement, final living-occupancy removal and side transfer. The sink returns
+`fatal_event` separately from the resolver's final alive state; neither field is
+kill credit, reward, permanent-death policy or an R17 trigger.
+
+`Combatant.original_definition` is a narrow static definition snapshot for
+battle transformation rollback. It excludes current resources, position,
+runtime statuses and activation state. Persistent dead records remain in their
+side roster but outside living occupancy; battle-owned records are removed from
+the active side roster. `last_position` preserves neutral final tactical
+identity without defining a corpse category or presentation rule. Replacement
+uses the injected content-provider seam where canonical content exists; the
+current tactical runtime has no strategy/army writeback object.
+
 Ordering is part of the mechanic. In particular, the recovered melee path
-processes secondary effects before committing the primary life loss.
+processes secondary effects before committing the primary life loss. Fatal
+lifecycle order is death morale, runtime-marker scan with rollback, complete
+status clear, revival/replacement/finalization, then optional side transfer.
 
 ## Determinism policy
 

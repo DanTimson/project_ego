@@ -31,6 +31,7 @@ priority.
 | CX-008 | `SPEC_IMPLEMENTATION` | tactical numeric mechanics closure (R3/R6/R8/R9/R10/R11) | engine | `DONE` | accepted R3, R6, R8, R9, R10 and R11 specifications |
 | CX-009 | `SPEC_IMPLEMENTATION` | tactical action terminality | engine | `DONE` | CX-008; human-confirmed action-terminal rule |
 | CX-010 | `SPEC_IMPLEMENTATION` | runtime status container and stable status semantics | engine | `DONE` | CX-009; stable status architecture; R13 lifecycle excluded |
+| CX-011 | `SPEC_IMPLEMENTATION` | tactical death lifecycle and control transfer | engine | `DONE` | CX-010; mandatory tactical tranche implemented; strategy/corpse/reward/kill-credit/R17 boundaries excluded |
 
 Task contracts live in `docs/codex/tasks/`.
 

@@ -15,9 +15,9 @@ This is a coverage map, not a release claim.
 | battlefield coordinates and adjacency | binary + controlled observation | implemented | implemented | adjacency recovered; R14 large-unit logical-footprint protocol ready |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
 | round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0`; owner-confirmed terminality | implemented | implemented | whole-side phases and pre-action capacity-preserving reselection remain; successful consuming commands close only their actor's activation; explicit order fixture still needed |
-| melee execution | binary | partial compatibility model | counterattack path implemented | execution order and charge source recovered; full legacy lifecycle not yet ported |
-| ranged execution | binary | partial compatibility model | partial | exact ranged early-provider zero cutoff and live-capacity stamina discriminator are implemented; special modes remain incomplete |
-| damage channels and death | binary | partial | partial | revival/transfer lifecycle not ported |
+| melee execution | binary | partial compatibility model | counterattack path plus tactical fatal lifecycle implemented | EXP-CI11 fatal-event sequencing distinguishes first-strike survival from fatal-primary retaliation suppression; R17 secondary ordering remains excluded |
+| ranged execution | binary | partial compatibility model | partial | exact ranged early-provider zero cutoff, live-capacity stamina discriminator and central fatal lifecycle routing are implemented; special modes remain incomplete |
+| damage channels and death | binary | implemented tactical lifecycle | implemented tactical lifecycle | channel accounting, remove-on-damage order, adjacent morale, full status clear, revival, rollback, exact tier replacement, final living occupancy, battle-owned cleanup and opposite-side transfer are parity-covered; hero-wide cohort, strategy writeback, corpses, rewards and R17 remain outside this tranche |
 | battle actions and target legality | public/data descriptions + selective binary evidence | partial | content model only | R16 whole-dispatcher reconstruction retired; observable action-semantics coverage matrix required |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
 | scenario format and traces | Project EGO design | inline and canonical-definition units implemented | inline and canonical-definition units implemented | portable synthetic parity fixture covers provenance, merge and identity |
@@ -104,8 +104,7 @@ The most consequential blockers are:
 1. end-to-end use of the recovered shared legacy RNG and exact call ordering;
 2. automatic status duration tick/expiry and `UNTIL_NEXT_TURN` lifecycle boundary (R13);
 3. battle-action effect classification;
-4. porting death, revival, transformation and side-transfer semantics;
-5. conversion of remaining recovered binary rules into executable parity fixtures beyond the implemented CX-008 numeric tranche.
+4. conversion of remaining recovered binary rules into executable parity fixtures beyond the implemented numeric and tactical-death tranches.
 
 ## Documentation checkpoint
 
@@ -136,6 +135,21 @@ retired. R17 is reduced to a finite black-box matrix covering zero-damage
 triggers, follow-up attack order, component damage, trample and instant-death
 placement.
 
+
+CX-011 implements the frozen tactical death lifecycle. Received damage now
+accounts its channel, removes remove-on-damage statuses before life subtraction,
+and routes a fatal event exactly once through a battle-contextual resolver.
+Adjacent death morale precedes all survival branches; runtime-status-only
+`0x49/0x4A/0x5A/0x5B` markers drive complete status clear, rollback, revival,
+exact tier replacement, final cleanup and transfer in the accepted order.
+Persistent and battle-owned final deaths are distinct, and surviving branches do
+not refresh activation or advance status time. Aura upkeep routes only a newly
+caused living-to-dead transition, so a retained finalized dead record is not
+resolved again on later rounds. EXP-CI11 ordinary-melee sequencing
+keeps `fatal_event` separate from final alive state. Synthetic Python/GDS
+fixtures cover exact IDs and a parity scenario exposes neutral lifecycle events.
+The fixed-slot hero-wide morale cohort, strategy writeback, corpse semantics,
+rewards/statistics, kill credit and R17 remain explicit boundaries.
 
 CX-010 implements the stable runtime-status tranche without selecting the R13
 clock. `Combatant.statuses` now stores first-class, independently copyable

@@ -33,7 +33,7 @@ const SERIALIZED_IDENTITY_FIELDS := {
 }
 const FORBIDDEN_OVERRIDE_FIELDS := {
 	"id": true, "def": true, "at": true, "overrides": true,
-	"instance_id": true, "content_id": true,
+	"instance_id": true, "content_id": true, "definition_id": true,
 	"__scenario_resolved_content_id": true, "content": true,
 	"pack": true, "version": true, "build": true, "fingerprint": true,
 	"provenance": true,
@@ -49,6 +49,7 @@ const SETTABLE_UNIT_FIELDS := {
 	"ammo": true, "action_spent": true, "movement_remaining": true,
 	"forced_rest": true, "resting": true, "stamina_recovery": true,
 	"alive": true, "once_per_round": true, "steps_this_round": true,
+	"ammo_base": true, "tier": true,
 }
 var spec: Dictionary = {}
 var scenario_name: String = "unnamed"
@@ -72,6 +73,7 @@ var state: RoundLoop.BattleState
 var auras_by_source: Dictionary = {}
 var _side_specs: Array = []
 
+var _content_provider: Variant = null
 
 static func profile_configuration(p_spec: Dictionary) -> Dictionary:
 	# Serialized configuration is strict. The constructor's injected_rng
@@ -271,6 +273,7 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null,
 		push_error(construction_error)
 		return
 	_side_specs = prepared["sides"]
+	_content_provider = injected_content_provider
 	# Actions available in this battle. A scenario may declare its own so the
 	# file is self-contained; see Action.CATALOGUE.
 	catalogue = Action.CATALOGUE.duplicate()
@@ -341,7 +344,10 @@ func _build_sides(specs: Array) -> Array:
 				if k in ["name", "at", "flags", "subtypes", "modifiers", "auras",
 						"statuses", "content_id", "instance_id", RESOLVED_CONTENT_ID]:
 					continue
-				unit.set(k, u[key])
+				if k == "damage_received":
+					unit.damage_received.assign(u[key])
+				else:
+					unit.set(k, u[key])
 			unit.content_id = String(u.get(RESOLVED_CONTENT_ID, ""))
 			for f in u.get("flags", []):
 				unit.set_flag(StringName(String(f)))
@@ -361,6 +367,11 @@ func _build_sides(specs: Array) -> Array:
 				unit.stamina_base = unit.stamina
 			if not u.has("morale_base"):
 				unit.morale_base = unit.morale
+			if not u.has("ammo_base"):
+				unit.ammo_base = unit.ammo
+			if not unit.original_definition.is_empty():
+				unit.original_definition = DeathLifecycle.normalize_definition(
+					unit.original_definition)
 			var at: Array = u["at"]
 			field.place(unit, Battlefield.offset_to_axial(int(at[0]), int(at[1])))
 			if units.has(unit.instance_id):
@@ -420,33 +431,16 @@ func environment(unit: Combatant) -> Array:
 ## lifecycle clock and ordering remain unresolved pending R13 observation.
 func _round_upkeep() -> void:
 	for side in state.sides:
+		# A battle-owned final death may erase itself from this roster.
 		for unit in side.units.duplicate():
-			if not unit.alive:
-				continue
-			var result: Array = Auras.tick_for(unit, auras_by_source, field,
-				Callable(self, "side_of"))
-			var totals: Dictionary = result[0]
-			if not totals.is_empty():
-				Auras.apply_tick(unit, totals)
-				var parts: Array = []
-				var keys: Array = totals.keys()
-				keys.sort()
-				for k in keys:
-					parts.append("%s %+d" % [String(k), int(totals[k])])
-				emit("  %s: auras (%s)" % [unit.label(), ", ".join(parts)])
-				if not unit.alive:
-					_fell(unit)
-					continue
-
+			DeathLifecycle.apply_aura_upkeep(unit, auras_by_source, field,
+				Callable(self, "side_of"), Callable(self, "_resolve_fatal_event"),
+				Callable(self, "_fell"), Callable(self, "emit"))
 
 # -- helpers -----------------------------------------------------------------
 
 func _at(unit: Combatant) -> String:
-	var h := field.find_unit(unit)
-	if not field.contains(h):
-		return "-"
-	var o := Battlefield.axial_to_offset(h)
-	return "%d,%d" % [o.x, o.y]
+	return DeathLifecycle.scenario_position(unit, field)
 
 
 func emit(line: String) -> void:
@@ -731,6 +725,9 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	emit("%s closes to %s (%d steps)" % [unit.label(), _at(unit), path.size()])
 	return true
 
+func _resolve_fatal_event(unit: Combatant) -> Dictionary:
+	return DeathLifecycle.resolve_for_scenario(unit, field, state.sides, _content_provider, log)
+
 func _fell(unit: Combatant) -> void:
 	var h := field.find_unit(unit)
 	if field.contains(h):
@@ -745,8 +742,10 @@ func _fell(unit: Combatant) -> void:
 ## lands.
 func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
 		action: Variant = null, primary_melee_charge: Variant = null) -> void:
+	Counterattack.bind_death_resolver(Callable(self, "_resolve_fatal_event"))
 	var ex := ScenarioNumericOrdering.resolve_exchange(
 		log, unit, target, rng, kind, action, primary_melee_charge)
+	Counterattack.bind_death_resolver(Callable())
 
 	for entry in ex.order:
 		if String(entry[0]) == "attack":
@@ -994,5 +993,7 @@ func final_state() -> Dictionary:
 		}
 		if not u.statuses.is_empty():
 			unit_state["statuses"] = Statuses.serialize(u)
+		if DeathLifecycle.has_scenario_final_details(u):
+			unit_state.merge(DeathLifecycle.scenario_final_details(u, _side_of(u)))
 		out[n] = unit_state
 	return out

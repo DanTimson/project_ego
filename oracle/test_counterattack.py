@@ -15,9 +15,14 @@ import os
 
 import sys
 
+import battlefield as bfmod
 import counterattack as ca
+import death_lifecycle as death
+import statuses
+import turn
 from combat import AttackKind, Combatant, Rng
 from counterattack import NoCounter
+from modifier import Hook, Modifier
 
 FAILS: list[str] = []
 
@@ -237,6 +242,61 @@ def test_rider_suppression() -> None:
           "Парализующее касание — «атаки, контратаки и выстрелы»")
 
 
+def test_fatal_event_melee_lifecycle_sequencing() -> None:
+    print("\n[CX-011] fatal event versus final alive sequencing")
+
+    def revive_marker():
+        return statuses.StatusEffect(
+            id="runtime-revive",
+            modifiers=[Modifier(ability=death.REVIVE, handler="add_flat",
+                                hook=Hook.STAT_PASSIVE)])
+
+    def exchange(attacker, defender):
+        field = bfmod.Battlefield(3, 2)
+        sides = [turn.Side(id=0, name="left", units=[attacker]),
+                 turn.Side(id=1, name="right", units=[defender])]
+        field.place(attacker, bfmod.offset_to_axial(0, 0))
+        field.place(defender, bfmod.offset_to_axial(1, 0))
+        ca.bind_death_resolver(
+            lambda casualty: death.resolve(casualty, field, sides))
+        try:
+            return ca.resolve(attacker, defender, Rng(17))
+        finally:
+            ca.bind_death_resolver(None)
+
+    attacker = unit("initiator", attack=30, life=1)
+    attacker.statuses = [revive_marker()]
+    defender = unit("first striker", counter_attack=100, life=30,
+                    flags={"Первый удар"})
+    revived_first = exchange(attacker, defender)
+    check(revived_first.attacker_fatal_event and not revived_first.attacker_died,
+          "lethal first strike records fatal_event separately from final alive")
+    check([entry[0] for entry in revived_first.order] == ["counter", "attack"],
+          "revived initiator still executes its primary")
+
+    attacker = unit("doomed initiator", attack=30, life=1)
+    defender = unit("first striker", counter_attack=100, life=30,
+                    flags={"Первый удар"})
+    final_first = exchange(attacker, defender)
+    check([entry[0] for entry in final_first.order] == ["counter"],
+          "lethal first strike without survival suppresses primary")
+
+    attacker = unit("initiator", attack=100, life=30)
+    defender = unit("revived defender", counter_attack=30, life=1)
+    defender.statuses = [revive_marker()]
+    revived_primary = exchange(attacker, defender)
+    check(revived_primary.defender_fatal_event and not revived_primary.defender_died,
+          "lethal primary can leave defender finally alive")
+    check([entry[0] for entry in revived_primary.order] == ["attack"],
+          "fatal initiating primary suppresses ordinary retaliation after revival")
+
+    attacker = unit("initiator", attack=1, life=30)
+    defender = unit("ordinary defender", counter_attack=30, defence=0, life=50)
+    nonfatal = exchange(attacker, defender)
+    check([entry[0] for entry in nonfatal.order] == ["attack", "counter"],
+          "nonfatal primary control retains ordinary retaliation")
+
+
 def test_determinism() -> None:
     print("\n[10] determinism")
     def once():
@@ -257,6 +317,7 @@ if __name__ == "__main__":
     test_primary_melee_charge_consumption()
     test_morale_share()
     test_rider_suppression()
+    test_fatal_event_melee_lifecycle_sequencing()
     test_determinism()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
                     % (len(FAILS), ", ".join(FAILS))))

@@ -31,6 +31,7 @@ var decay_per: Array = []
 var stacking: Stacking = Stacking.REFRESH
 var prevents_action: bool = false
 var hostile: bool = false
+var remove_on_damage: bool = false
 var tags: Array[StringName] = []
 
 
@@ -47,6 +48,7 @@ static func from_dict(specification: Dictionary) -> Status:
 	status.stacking = Stacking[String(specification.get("stacking", "REFRESH"))]
 	status.prevents_action = bool(specification.get("prevents_action", false))
 	status.hostile = bool(specification.get("hostile", false))
+	status.remove_on_damage = bool(specification.get("remove_on_damage", false))
 	for tag in specification.get("tags", []):
 		status.tags.append(StringName(String(tag)))
 	for modifier_spec in specification.get("modifiers", []):
@@ -77,6 +79,7 @@ func copy() -> Status:
 	out.stacking = stacking
 	out.prevents_action = prevents_action
 	out.hostile = hostile
+	out.remove_on_damage = remove_on_damage
 	out.tags.assign(tags)
 	for modifier in modifiers:
 		out.modifiers.append(_copy_modifier(modifier))
@@ -97,7 +100,7 @@ func to_dict() -> Dictionary:
 	var serialized_tags: Array[String] = []
 	for tag in tags:
 		serialized_tags.append(String(tag))
-	return {
+	var out := {
 		"id": String(id),
 		"name": name,
 		"source": source,
@@ -111,6 +114,9 @@ func to_dict() -> Dictionary:
 		"tags": serialized_tags,
 		"modifiers": serialized_modifiers,
 	}
+	if remove_on_damage:
+		out["remove_on_damage"] = true
+	return out
 
 
 static func _copy_modifier(modifier: Modifier) -> Modifier:

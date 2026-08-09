@@ -250,5 +250,73 @@ func _init() -> void:
 	_check("mixes undeclared inline field" in _error(mixed, provider),
 		"canonical sibling combat fields are not silent overrides")
 
+
+	var lifecycle_inline: Dictionary = fx["inline_spec"].duplicate(true)
+	var lifecycle_unit: Dictionary = lifecycle_inline["sides"][0]["units"][0]
+	lifecycle_unit.merge({
+		"ammo_base": 7, "tier": 3, "definition_id": 900,
+		"morale_break_accumulator": 20, "damage_received": [1, 2, 3, 4],
+		"original_definition": {
+			"name": "original", "definition_id": 5, "tier": 2, "ammo_base": 4,
+		},
+		"battle_owned": true, "discarded": true,
+	}, true)
+	var lifecycle_built: Combatant = Scenario.new(lifecycle_inline).units["attacker-1"]
+	_check(lifecycle_built.ammo_base == 7 and lifecycle_built.tier == 3
+		and lifecycle_built.definition_id == 900
+		and lifecycle_built.morale_break_accumulator == 20
+		and lifecycle_built.damage_received == [1, 2, 3, 4]
+		and lifecycle_built.original_definition["definition_id"] == 5
+		and lifecycle_built.battle_owned and lifecycle_built.discarded,
+		"inline synthetic lifecycle instance state remains accepted",
+		str([lifecycle_built.ammo_base, lifecycle_built.tier,
+			lifecycle_built.definition_id, lifecycle_built.morale_break_accumulator,
+			lifecycle_built.damage_received, lifecycle_built.original_definition,
+			lifecycle_built.battle_owned, lifecycle_built.discarded]))
+
+	var runtime_values := {
+		"morale_break_accumulator": 10,
+		"damage_received": [1, 0, 0, 0],
+		"original_definition": {},
+		"battle_owned": true,
+		"discarded": true,
+		"last_position": [0, 0],
+	}
+	for runtime_field in runtime_values:
+		var changed: Dictionary = fx.duplicate(true)
+		changed["provider"]["definitions"]["synthetic:unit/5"][runtime_field] = \
+			runtime_values[runtime_field]
+		var changed_provider := _provider(changed)
+		var changed_spec: Dictionary = changed["canonical_spec"].duplicate(true)
+		changed_spec["content"] = changed_provider.content_provenance()
+		_check("unknown construction field" in _error(changed_spec, changed_provider),
+			"canonical definition rejects runtime field %s" % runtime_field)
+
+		var runtime_override: Dictionary = fx["canonical_spec"].duplicate(true)
+		runtime_override["sides"][0]["units"][0]["overrides"][runtime_field] = \
+			runtime_values[runtime_field]
+		_check("unknown or non-settable" in _error(runtime_override, provider),
+			"canonical override rejects runtime field %s" % runtime_field)
+
+	var spoofed_definition_id: Dictionary = fx["canonical_spec"].duplicate(true)
+	spoofed_definition_id["sides"][0]["units"][0]["overrides"]["definition_id"] = 999
+	_check("forbidden field: definition_id" in _error(spoofed_definition_id, provider),
+		"canonical override cannot spoof internal definition identity")
+	var changed_identity: Dictionary = fx.duplicate(true)
+	changed_identity["provider"]["definitions"]["synthetic:unit/5"]["definition_id"] = 999
+	var identity_provider := _provider(changed_identity)
+	var identity_spec: Dictionary = changed_identity["canonical_spec"].duplicate(true)
+	identity_spec["content"] = identity_provider.content_provenance()
+	_check("scenario-owned field: definition_id" in _error(identity_spec, identity_provider),
+		"canonical definition cannot compete with canonical content identity")
+
+	var static_override: Dictionary = fx["canonical_spec"].duplicate(true)
+	static_override["sides"][0]["units"][0]["overrides"].merge(
+		{"ammo_base": 6, "tier": 3}, true)
+	var static_unit: Combatant = Scenario.new(
+		static_override, null, provider).units["attacker-1"]
+	_check(static_unit.ammo_base == 6 and static_unit.tier == 3,
+		"ammo_base and tier remain legitimate canonical static fields")
+
 	print("\n%s" % ["ALL PASS" if failures == 0 else "%d FAILURES" % failures])
 	quit(1 if failures else 0)

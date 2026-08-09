@@ -57,6 +57,15 @@ class NoCounter(Enum):
 ## Attacker-side abilities that avoid retaliation entirely.
 EVASIVE = ("Ловкость", "Касание вампира")
 
+# Battle context is scoped by Scenario around one exchange, like the existing
+# Damage pipeline/environment bindings. Direct rule tests may leave it unset.
+_death_resolver = None
+
+
+def bind_death_resolver(resolver) -> None:
+    global _death_resolver
+    _death_resolver = resolver
+
 
 def why_no_counter(defender: Combatant, attacker: Combatant,
                    kind: AttackKind, action=None) -> NoCounter:
@@ -111,6 +120,9 @@ class Exchange:
         self.countered = False
         self.counter_first = False
         self.reason = NoCounter.NONE
+        self.attacker_fatal_event = False
+        self.defender_fatal_event = False
+        # Final post-lifecycle death, deliberately distinct from fatal_event.
         self.attacker_died = False
         self.defender_died = False
         self.traces: list = []
@@ -122,11 +134,9 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
             primary_melee_charge: int | None = None) -> Exchange:
     """Resolve an attack and any retaliation, in the correct order.
 
-    ASSUMPTION (OPEN_QUESTIONS item 18): if a first-strike retaliation kills the
-    attacker, the attack does NOT land. «Прежде, чем его ударит противник» says
-    the retaliation precedes the blow, and a dead unit swinging seems the less
-    likely reading — but the documentation does not settle it, and the
-    difference is visible only in the exact case where the counter is lethal.
+    EXP-CI11 distinguishes fatal_event from final post-lifecycle alive state:
+    a first-strike survivor still attacks, while a fatal initiating primary
+    suppresses ordinary retaliation even if its target survives the lifecycle.
     """
     ex = Exchange()
     ex.reason = why_no_counter(defender, attacker, kind, action)
@@ -164,10 +174,14 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
         ex.attack_damage = damage
         ex.traces.extend(traces)
         ex.order.append(("attack", damage))
-        defender.life -= damage
-        if defender.life <= 0 and defender.alive:
-            defender.alive = False
-            ex.defender_died = True
+        outcome = combat.apply_received_damage(
+            defender, damage,
+            2 if kind is AttackKind.RANGED
+            and combat.has_effective_modifier(attacker, 0x1C)
+            else (1 if kind is AttackKind.RANGED else 0),
+            _death_resolver)
+        ex.defender_fatal_event = outcome["fatal_event"]
+        ex.defender_died = outcome["final_death"]
 
     def do_counter() -> None:
         damage, traces = combat.resolve_attack(
@@ -175,19 +189,23 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
         ex.counter_damage = damage
         ex.traces.extend(traces)
         ex.order.append(("counter", damage))
-        attacker.life -= damage
-        if attacker.life <= 0 and attacker.alive:
-            attacker.alive = False
-            ex.attacker_died = True
+        outcome = combat.apply_received_damage(
+            attacker, damage, 0, _death_resolver)
+        ex.attacker_fatal_event = outcome["fatal_event"]
+        ex.attacker_died = outcome["final_death"]
 
     if ex.counter_first:
         do_counter()
-        if not ex.attacker_died:
+        # A fatal first strike may revive/replace the initiator; resulting life,
+        # not fatal_event, decides whether its primary still occurs.
+        if attacker.alive and attacker.life > 0:
             do_attack()
     else:
         do_attack()
-        # A defender killed by the blow does not answer it.
-        if ex.countered and defender.alive:
+        # A fatal initiating primary remains on the fatal-event branch even if
+        # lifecycle resolution revives/replaces the defender. It receives no
+        # ordinary retaliation in this exchange.
+        if ex.countered and not ex.defender_fatal_event and defender.alive:
             do_counter()
         elif ex.countered:
             ex.countered = False

@@ -292,3 +292,65 @@ def test_generated_cross_language_fixture_matches_python():
     result = canonical_sc.run()
     assert result["log"] == fx["expected"]["log"]
     assert result["final"] == fx["expected"]["final"]
+
+
+
+def test_inline_lifecycle_state_is_accepted_but_canonical_runtime_state_is_closed():
+    inline = copy.deepcopy(fixture()["inline_spec"])
+    unit_spec = inline["sides"][0]["units"][0]
+    unit_spec.update({
+        "ammo_base": 7, "tier": 3, "definition_id": 900,
+        "morale_break_accumulator": 20, "damage_received": [1, 2, 3, 4],
+        "original_definition": {"name": "original", "definition_id": 5,
+                                "tier": 2, "ammo_base": 4},
+        "battle_owned": True, "discarded": True,
+    })
+    built = scenario.Scenario(inline).units["attacker-1"]
+    assert built.ammo_base == 7 and built.tier == 3 and built.definition_id == 900
+    assert built.morale_break_accumulator == 20
+    assert built.damage_received == [1, 2, 3, 4]
+    assert built.original_definition["definition_id"] == 5
+    assert built.battle_owned and built.discarded
+
+    runtime_values = {
+        "morale_break_accumulator": 10,
+        "damage_received": [1, 0, 0, 0],
+        "original_definition": {},
+        "battle_owned": True,
+        "discarded": True,
+        "last_position": [0, 0],
+    }
+    for field, value in runtime_values.items():
+        changed = fixture()
+        changed["provider"]["definitions"]["synthetic:unit/5"][field] = value
+        changed_provider = provider(changed)
+        changed_spec = canonical(changed)
+        changed_spec["content"] = changed_provider.content_provenance()
+        with pytest.raises(ValueError, match="unknown construction field"):
+            scenario.Scenario(changed_spec, content_provider=changed_provider)
+
+        override = canonical()
+        override["sides"][0]["units"][0]["overrides"][field] = value
+        with pytest.raises(ValueError, match="unknown or non-settable"):
+            scenario.Scenario(override, content_provider=provider())
+
+
+def test_canonical_definition_identity_cannot_be_spoofed_but_static_fields_remain_settable():
+    spec = canonical()
+    spec["sides"][0]["units"][0]["overrides"]["definition_id"] = 999
+    with pytest.raises(ValueError, match="forbidden fields: definition_id"):
+        scenario.Scenario(spec, content_provider=provider())
+
+    changed = fixture()
+    changed["provider"]["definitions"]["synthetic:unit/5"]["definition_id"] = 999
+    changed_provider = provider(changed)
+    changed_spec = canonical(changed)
+    changed_spec["content"] = changed_provider.content_provenance()
+    with pytest.raises(ValueError, match="scenario-owned fields: definition_id"):
+        scenario.Scenario(changed_spec, content_provider=changed_provider)
+
+    static_override = canonical()
+    static_override["sides"][0]["units"][0]["overrides"].update(
+        {"ammo_base": 6, "tier": 3})
+    built = scenario.Scenario(static_override, content_provider=provider()).units["attacker-1"]
+    assert built.ammo_base == 6 and built.tier == 3

@@ -344,3 +344,42 @@ static func resolve_attack(attacker: Combatant, defender: Combatant,
 			damage = 0
 	dmg_trace.result = float(damage)
 	return [damage, [atk_trace, roll_trace, def_pair[1], dmg_trace]]
+
+
+# ---------------------------------------------------------------------------
+# Central received-damage sink (CX-011)
+# ---------------------------------------------------------------------------
+
+static func adjust_morale(unit: Combatant, delta: int) -> bool:
+	## Apply recovered modifier-0x13 immunity and morale underflow accounting.
+	if has_effective_modifier(unit, 0x13):
+		return false
+	var after := unit.morale + delta
+	if after < 0:
+		unit.morale_break_accumulator += -after * 10
+		after = 0
+	unit.morale = after
+	return true
+
+
+static func apply_received_damage(unit: Combatant, amount: int,
+		channel: int = 0, death_resolver: Callable = Callable()) -> Dictionary:
+	## Account -> remove-on-damage -> subtract/cap -> exactly one death resolve.
+	## fatal_event deliberately does not mean permanent kill, credit, reward or R17.
+	assert(channel >= 0 and channel < unit.damage_received.size())
+	amount = maxi(0, amount)
+	unit.damage_received[channel] += amount
+	Statuses.remove_on_damage(unit)
+	unit.life = maxi(0, unit.life - amount)
+	var fatal_event := unit.alive and unit.life == 0
+	if fatal_event:
+		if death_resolver.is_valid():
+			death_resolver.call(unit)
+		else:
+			unit.alive = false
+	var final_alive := unit.alive and unit.life > 0
+	return {
+		"fatal_event": fatal_event,
+		"final_alive": final_alive,
+		"final_death": fatal_event and not final_alive,
+	}

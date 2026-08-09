@@ -902,6 +902,58 @@ Established death-time special effects:
 
 These are mechanical descriptions, not confirmed localized names.
 
+### Implemented normalized tactical lifecycle
+
+`[BIN: central damage/death/control summaries]` · `[PROJECT: CX-011]` ·
+**RECOVERED / fixture-covered**
+
+The live damage boundary is:
+
+```text
+account received-damage channel
+remove runtime statuses explicitly marked remove-on-damage
+subtract and floor current life at zero
+if life is zero: resolve one fatal event immediately
+```
+
+`fatal_event` means only that this hit reached zero life and invoked the death
+resolver. It is separate from final post-lifecycle alive state and does not mean
+permanent death, kill credit, reward or an R17 trigger.
+
+For each fatal event, living adjacent allies receive morale `-1` and living
+adjacent opponents receive morale `+1` before any survival branch. Modifier
+`0x13` suppresses the adjustment. Morale underflow floors current morale at zero
+and adds ten break-accumulator points per missing morale point. The wider
+hero-associated fixed-slot allied cohort has no address-free current-model
+equivalent and remains intentionally unimplemented.
+
+Only runtime `Status`-owned modifiers activate the special marker scan:
+
+```text
+remember 0x49 transfer, 0x4A revival and 0x5B replacement
+apply 0x5A original-definition rollback and downward resource clamps
+clear the complete runtime status collection
+if 0x4A: revive to restored/current life maximum
+elif 0x5B: replace by original tier (1->21, 2->37, 3->56, 4->65)
+else: finalize death and remove living occupancy
+apply representable 0x49 side transfer last
+```
+
+Revival clears morale break but preserves stamina, ammunition, morale, movement
+capacity and action terminality. Replacement resets life/stamina/ammunition/
+morale to the replacement maxima and clears morale break, but preserves
+movement capacity, position and `action_spent`. Neither operation grants an
+activation or advances a status clock.
+
+Ordinary melee has two deliberately different continuation gates:
+
+```text
+lethal defender first strike -> resolve lifecycle -> primary occurs iff initiator is finally alive
+lethal initiating primary    -> resolve lifecycle -> no ordinary retaliation, even if defender survives
+```
+
+This does not define secondary/R17 sequencing, kill credit or rewards.
+
 ---
 
 ## 14. Tactical grid

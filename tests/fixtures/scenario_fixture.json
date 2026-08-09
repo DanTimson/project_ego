@@ -510,6 +510,177 @@
     }
    }
   },
+  "death_lifecycle.json": {
+   "spec": {
+    "name": "CX-011 fatal revival trace",
+    "profile": "native",
+    "seed": 41,
+    "battlefield": {
+     "width": 5,
+     "height": 5,
+     "tiles": []
+    },
+    "sides": [
+     {
+      "id": 0,
+      "name": "attackers",
+      "is_attacker": true,
+      "leader_initiative": 1,
+      "units": [
+       {
+        "id": "initiator",
+        "name": "Initiator",
+        "at": [
+         1,
+         2
+        ],
+        "attack": 100,
+        "counter_attack": 0,
+        "defence": 0,
+        "ranged_defence": 0,
+        "life": 20,
+        "stamina": 10,
+        "morale": 5,
+        "speed": 3
+       }
+      ]
+     },
+     {
+      "id": 1,
+      "name": "defenders",
+      "leader_initiative": 0,
+      "units": [
+       {
+        "id": "reviver",
+        "name": "Reviver",
+        "at": [
+         2,
+         2
+        ],
+        "attack": 0,
+        "counter_attack": 30,
+        "defence": 0,
+        "ranged_defence": 0,
+        "life": 1,
+        "life_base": 12,
+        "stamina": 4,
+        "stamina_base": 9,
+        "morale": 7,
+        "morale_base": 11,
+        "ammo": 2,
+        "ammo_base": 5,
+        "speed": 3,
+        "movement_remaining": 2,
+        "statuses": [
+         {
+          "id": "runtime-4a",
+          "name": "Synthetic lifecycle marker",
+          "duration": -1,
+          "modifiers": [
+           {
+            "ability": 74,
+            "handler": "stat_delta",
+            "hook": "STAT_PASSIVE",
+            "power": 0,
+            "params": {
+             "stat": "unused"
+            },
+            "source": "synthetic CX-011 marker"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "id": "ally",
+        "name": "Adjacent ally",
+        "at": [
+         3,
+         2
+        ],
+        "attack": 0,
+        "counter_attack": 0,
+        "defence": 0,
+        "ranged_defence": 0,
+        "life": 10,
+        "stamina": 10,
+        "morale": 5,
+        "speed": 1
+       }
+      ]
+     }
+    ],
+    "commands": [
+     {
+      "op": "attack",
+      "unit": "initiator",
+      "target": "reviver"
+     }
+    ]
+   },
+   "log": [
+    "== CX-011 fatal revival trace (seed 41) ==",
+    "-- round 1, side 0 first --",
+    "  Reviver(reviver): statuses [Synthetic lifecycle marker]",
+    "  [lifecycle] reviver death_started",
+    "  [lifecycle] reviver death_morale applied=true,delta=-1,morale=4,target=ally",
+    "  [lifecycle] reviver death_morale applied=true,delta=1,morale=6,target=initiator",
+    "  [lifecycle] reviver statuses_cleared count=1",
+    "  [lifecycle] reviver revived life=12",
+    "  [trace] Initiator.roll | attack randomisation: 90 -> 96 # uniform [72, 108]",
+    "  [trace] Reviver.defence | defence provider total: 0 -> 0 # ordinary providers complete before stamina handling",
+    "  [trace] Reviver.defence | final defence clamp: 0 -> 0 # minimum 0",
+    "  [trace] damage | defence subtraction: 96 -> 96 # effective defence 0",
+    "  [trace] Initiator.attack_cost | live-capacity stamina discriminator: 3 -> 1 # effective speed 3; strict capacity < speed is false; selected base cost 1",
+    "  [trace] Initiator.attack_cost | attack stamina mutation: 10 -> 9 # selected base cost 1",
+    "Initiator(initiator) hits Reviver(reviver) for 96 (Reviver(reviver) at 12/12, stamina 9)",
+    "-- side 1 takes over (no units left to act) --"
+   ],
+   "final": {
+    "ally": {
+     "alive": true,
+     "life": 10,
+     "stamina": 10,
+     "at": "3,2",
+     "steps_this_round": 0,
+     "action_spent": false,
+     "movement_remaining": 1
+    },
+    "initiator": {
+     "alive": true,
+     "life": 20,
+     "stamina": 9,
+     "at": "1,2",
+     "steps_this_round": 0,
+     "action_spent": true,
+     "movement_remaining": 3
+    },
+    "reviver": {
+     "alive": true,
+     "life": 12,
+     "stamina": 4,
+     "at": "2,2",
+     "steps_this_round": 0,
+     "action_spent": false,
+     "movement_remaining": 2,
+     "side": 1,
+     "definition_id": 0,
+     "content_id": "",
+     "tier": 1,
+     "morale": 7,
+     "ammo": 2,
+     "morale_break_accumulator": 0,
+     "damage_received": [
+      96,
+      0,
+      0,
+      0
+     ],
+     "battle_owned": false,
+     "discarded": false
+    }
+   }
+  },
   "duplicate_instances.json": {
    "spec": {
     "name": "two swordsmen share a name",
@@ -1057,6 +1228,11 @@
     "Мечник counters for 5 (Ополченец at 7/12)",
     "Копейщик moves to 3,0 (1 steps, 1 total this round)",
     "-- side 0 --",
+    "  [lifecycle] Ополченец death_started",
+    "  [lifecycle] Ополченец death_morale applied=true,delta=-1,morale=9,target=Копейщик",
+    "  [lifecycle] Ополченец death_morale applied=true,delta=1,morale=11,target=Мечник",
+    "  [lifecycle] Ополченец statuses_cleared count=0",
+    "  [lifecycle] Ополченец death_finalized battle_owned=false,discarded=false",
     "  [trace] Мечник.roll | attack randomisation: 8 -> 9 # uniform [7, 9]",
     "  [trace] Ополченец.defence | defence provider total: 2 -> 2 # ordinary providers complete before stamina handling",
     "  [trace] Ополченец.defence | final defence clamp: 2 -> 2 # minimum 0",
@@ -1111,10 +1287,25 @@
      "alive": false,
      "life": 0,
      "stamina": 8,
-     "at": "-",
+     "at": "2,1",
      "steps_this_round": 1,
      "action_spent": true,
-     "movement_remaining": 1
+     "movement_remaining": 1,
+     "side": 1,
+     "definition_id": 0,
+     "content_id": "",
+     "tier": 1,
+     "morale": 10,
+     "ammo": 0,
+     "morale_break_accumulator": 0,
+     "damage_received": [
+      12,
+      0,
+      0,
+      0
+     ],
+     "battle_owned": false,
+     "discarded": false
     }
    }
   },

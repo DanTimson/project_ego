@@ -60,6 +60,14 @@ const EVASIVE: Array[StringName] = [&"Ловкость", &"Касание вам
 ## whether an on-hit rider fires during a counter is a property of the rider.
 const COUNTER_SUPPRESSED_RIDERS: Array[StringName] = [&"Смертельное касание"]
 
+## Scoped by Scenario around one exchange, matching Damage's existing battle
+## pipeline/environment bindings. Direct handler tests may leave it invalid.
+static var _death_resolver: Callable = Callable()
+
+
+static func bind_death_resolver(resolver: Callable) -> void:
+	_death_resolver = resolver
+
 
 class Exchange extends RefCounted:
 	var attack_damage: int = 0
@@ -69,6 +77,9 @@ class Exchange extends RefCounted:
 	var countered: bool = false
 	var counter_first: bool = false
 	var reason: int = NoCounter.NONE
+	var attacker_fatal_event: bool = false
+	var defender_fatal_event: bool = false
+	## Final post-lifecycle death, deliberately distinct from fatal_event.
 	var attacker_died: bool = false
 	var defender_died: bool = false
 	var traces: Array = []
@@ -111,11 +122,9 @@ static func strikes_first(defender: Combatant, attacker: Combatant) -> bool:
 
 ## Resolve an attack and any retaliation, in the correct order.
 ##
-## ASSUMPTION (OPEN_QUESTIONS item 18): if a first-strike retaliation kills the
-## attacker, the attack does NOT land. «Прежде, чем его ударит противник» says
-## the retaliation precedes the blow, and a dead unit swinging seems the less
-## likely reading — but the documentation does not settle it, and the difference
-## shows only when the counter is lethal.
+## EXP-CI11 distinguishes fatal_event from final post-lifecycle alive state:
+## a first-strike survivor still attacks, while a fatal initiating primary
+## suppresses ordinary retaliation even if its target survives the lifecycle.
 static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
 		kind: Combatant.AttackKind = Combatant.AttackKind.MELEE,
 		action: Variant = null, primary_melee_charge: Variant = null) -> Exchange:
@@ -126,11 +135,13 @@ static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
 
 	if ex.counter_first:
 		_do_counter(ex, attacker, defender, rng)
-		if not ex.attacker_died:
+		## First-strike continuation uses final post-lifecycle alive state.
+		if attacker.alive and attacker.life > 0:
 			_do_attack(ex, attacker, defender, rng, kind, action, primary_melee_charge)
 	else:
 		_do_attack(ex, attacker, defender, rng, kind, action, primary_melee_charge)
-		if ex.countered and defender.alive:
+		## A fatal primary stays on the fatal-event branch even after survival.
+		if ex.countered and not ex.defender_fatal_event and defender.alive:
 			_do_counter(ex, attacker, defender, rng)
 		elif ex.countered:
 			ex.countered = false
@@ -169,10 +180,13 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 	ex.attack_damage = damage
 	ex.traces.append_array(result[1])
 	ex.order.append(["attack", damage])
-	defender.life -= damage
-	if defender.life <= 0 and defender.alive:
-		defender.alive = false
-		ex.defender_died = true
+	var channel := 0
+	if kind == Combatant.AttackKind.RANGED:
+		channel = 2 if Damage.has_effective_modifier(attacker, 0x1C) else 1
+	var outcome := Damage.apply_received_damage(
+		defender, damage, channel, _death_resolver)
+	ex.defender_fatal_event = bool(outcome["fatal_event"])
+	ex.defender_died = bool(outcome["final_death"])
 
 
 static func _do_counter(ex: Exchange, attacker: Combatant, defender: Combatant,
@@ -182,10 +196,10 @@ static func _do_counter(ex: Exchange, attacker: Combatant, defender: Combatant,
 	ex.counter_damage = int(result[0])
 	ex.traces.append_array(result[1])
 	ex.order.append(["counter", ex.counter_damage])
-	attacker.life -= ex.counter_damage
-	if attacker.life <= 0 and attacker.alive:
-		attacker.alive = false
-		ex.attacker_died = true
+	var outcome := Damage.apply_received_damage(
+		attacker, ex.counter_damage, 0, _death_resolver)
+	ex.attacker_fatal_event = bool(outcome["fatal_event"])
+	ex.attacker_died = bool(outcome["final_death"])
 
 
 ## «При убийстве противника контратакой или выстрелом воин дополнительно

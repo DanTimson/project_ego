@@ -42,6 +42,7 @@ class StatusEffect:
     stacking: Stacking = Stacking.REFRESH
     prevents_action: bool = False
     hostile: bool = False
+    remove_on_damage: bool = False
     tags: tuple = ()
 
     def describe(self) -> str:
@@ -53,7 +54,7 @@ class StatusEffect:
         return copy.deepcopy(self)
 
     def to_dict(self) -> dict:
-        return {
+        out = {
             "id": self.id,
             "name": self.name,
             "source": self.source,
@@ -77,6 +78,9 @@ class StatusEffect:
                 for modifier in self.modifiers
             ],
         }
+        if self.remove_on_damage:
+            out["remove_on_damage"] = True
+        return out
 
 
 def effective_duration(base: int, concentration: int = 0, duration_mod: int = 0,
@@ -131,6 +135,14 @@ def apply(unit, effect: StatusEffect) -> Trace:
     else:
         trace.step("ignored", 1, 1, "already present")
     return trace
+
+
+def remove_on_damage(unit) -> list[StatusEffect]:
+    """Explicit damage-boundary removal; no duration clock is involved."""
+    removed = [effect for effect in unit.statuses if effect.remove_on_damage]
+    unit.statuses[:] = [effect for effect in unit.statuses
+                        if not effect.remove_on_damage]
+    return removed
 
 
 def remove(unit, effect_id: str) -> int:

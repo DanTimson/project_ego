@@ -201,11 +201,26 @@ class Combatant:
     ## everything else, so a status never computes a number itself.
     statuses: list = field(default_factory=list)
 
+    # Address-free definition identity/state needed by the tactical death
+    # lifecycle. ``original_definition`` is a deliberately narrow static
+    # definition snapshot, never a clone of mutable battle state.
+    definition_id: int = 0
+    tier: int = 1
+    original_definition: dict = field(default_factory=dict)
+    battle_owned: bool = False
+    discarded: bool = False
+
     flags: set = field(default_factory=set)
     subtypes: set = field(default_factory=set)
 
     # --- resources and per-round state -------------------------------------
     ammo: int = 0
+    ammo_base: int = 0
+    morale_break_accumulator: int = 0
+    damage_received: list[int] = field(default_factory=lambda: [0, 0, 0, 0])
+    # Final death clears living occupancy but retains this neutral tactical
+    # coordinate for deterministic traces and a future corpse layer.
+    last_position: object | None = None
     ## Set when an action that consumes the activation has been used this round.
     ## Movement is tracked separately, since a unit may move, yield, and return.
     action_spent: bool = False
@@ -227,6 +242,31 @@ class Combatant:
     ## trace-visible movement history; Genesis charge and R8 stamina cost do not
     ## consume it.
     steps_this_round: int = 0
+
+    _DEFINITION_FIELDS = (
+        "name", "content_id", "definition_id", "tier", "attack",
+        "counter_attack", "ranged_attack", "shooting_range", "defence",
+        "ranged_defence", "resist", "life_base", "stamina_base",
+        "morale_base", "speed", "ammo_base", "flags", "subtypes",
+        "modifiers",
+    )
+
+    def definition_snapshot(self) -> dict:
+        """Copy only static definition identity/stat providers.
+
+        Current life/resources, position, activation state, runtime statuses and
+        other mutable tactical fields are intentionally excluded.
+        """
+        import copy
+        return {key: copy.deepcopy(getattr(self, key))
+                for key in self._DEFINITION_FIELDS}
+
+    def restore_definition(self, snapshot: dict) -> None:
+        """Restore the accepted temporary-transformation identity surface."""
+        import copy
+        for key in self._DEFINITION_FIELDS:
+            if key in snapshot:
+                setattr(self, key, copy.deepcopy(snapshot[key]))
 
     def label(self) -> str:
         """Display text for logs and traces.
@@ -753,3 +793,53 @@ def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
     t.step("final defence clamp", value, final, "minimum 0")
     t.result = final
     return final, t
+
+
+# ---------------------------------------------------------------------------
+# Central received-damage sink (CX-011)
+# ---------------------------------------------------------------------------
+
+def adjust_morale(unit: Combatant, delta: int) -> bool:
+    """Apply the recovered morale adjustment, including modifier 0x13.
+
+    Returns False when immunity suppressed the adjustment. Morale underflow is
+    converted into ten-point break-accumulator steps and current morale floors
+    at zero; positive morale remains unbounded because high-morale bands exist.
+    """
+    if has_effective_modifier(unit, 0x13):
+        return False
+    after = unit.morale + int(delta)
+    if after < 0:
+        unit.morale_break_accumulator += -after * 10
+        after = 0
+    unit.morale = after
+    return True
+
+
+def apply_received_damage(unit: Combatant, amount: int, channel: int = 0,
+                          death_resolver=None) -> dict:
+    """Account damage, clear remove-on-damage statuses, subtract/cap life,
+    then invoke exactly one contextual death resolver on a fatal event.
+
+    ``fatal_event`` records that this hit reached zero and entered the lifecycle;
+    it deliberately says nothing about permanent death, credit, rewards or R17.
+    """
+    import statuses as _statuses
+
+    amount = max(0, int(amount))
+    if channel < 0 or channel >= len(unit.damage_received):
+        raise ValueError("received-damage channel must be 0..3")
+    unit.damage_received[channel] += amount
+    _statuses.remove_on_damage(unit)
+    unit.life = max(0, unit.life - amount)
+    fatal_event = bool(unit.alive and unit.life == 0)
+    if fatal_event:
+        if death_resolver is None:
+            unit.alive = False
+        else:
+            death_resolver(unit)
+    return {
+        "fatal_event": fatal_event,
+        "final_alive": bool(unit.alive and unit.life > 0),
+        "final_death": bool(fatal_event and not (unit.alive and unit.life > 0)),
+    }

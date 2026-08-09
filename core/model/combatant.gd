@@ -14,6 +14,14 @@ extends RefCounted
 
 enum AttackKind { MELEE, COUNTER, RANGED }
 
+const DEFINITION_FIELDS: Array[String] = [
+	"name", "content_id", "definition_id", "tier", "attack",
+	"counter_attack", "ranged_attack", "shooting_range", "defence",
+	"ranged_defence", "resist", "life_base", "stamina_base", "morale_base",
+	"speed", "ammo_base", "flags", "subtypes", "modifiers",
+]
+
+
 ## The content DEFINITION this instance was built from, e.g. "genesis:unit/5".
 ## Empty for inline synthetic scenario units, which are battle-local and are NOT
 ## pack content — DELIB-0001 decision item 6 keeps content identity,
@@ -29,6 +37,44 @@ var content_id: String = ""
 ## Defaults to the display name, so a scenario declaring no explicit id behaves
 ## exactly as before.
 var instance_id: String = ""
+
+
+## Address-free content-definition state used by the tactical death lifecycle.
+## `original_definition` is a narrow static definition snapshot for temporary
+## transformation rollback, never a clone of mutable battle state.
+var definition_id: int = 0
+var tier: int = 1
+var original_definition: Dictionary = {}
+var battle_owned: bool = false
+var discarded: bool = false
+
+
+var ammo_base: int = 0
+
+## Recovered morale-underflow state and received-damage channel accounting.
+var morale_break_accumulator: int = 0
+var damage_received: Array[int] = [0, 0, 0, 0]
+
+## Final death clears living occupancy but retains a neutral tactical coordinate
+## for deterministic traces and a future corpse layer.
+var last_position: Variant = null
+
+func definition_snapshot() -> Dictionary:
+	var snapshot: Dictionary = {}
+	for field_name in DEFINITION_FIELDS:
+		var value: Variant = get(field_name)
+		snapshot[field_name] = value.duplicate(true) \
+			if typeof(value) in [TYPE_ARRAY, TYPE_DICTIONARY] else value
+	return snapshot
+
+
+func restore_definition(snapshot: Dictionary) -> void:
+	for field_name in DEFINITION_FIELDS:
+		if not snapshot.has(field_name):
+			continue
+		var value: Variant = snapshot[field_name]
+		set(field_name, value.duplicate(true) \
+			if typeof(value) in [TYPE_ARRAY, TYPE_DICTIONARY] else value)
 
 
 ## Display text for logs and traces. The name alone, unless an explicit instance

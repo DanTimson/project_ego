@@ -110,6 +110,73 @@ func _test_primary_melee_charge_consumption() -> void:
 		"ranged attacks ignore primary-melee charge")
 
 
+func _revive_marker() -> Status:
+	var effect := Status.new()
+	effect.id = &"runtime-revive"
+	effect.modifiers.append(Modifier.make(
+		DeathLifecycle.REVIVE, &"add_flat", Modifier.Hook.STAT_PASSIVE))
+	return effect
+
+
+func _lifecycle_exchange(attacker: Combatant,
+		defender: Combatant) -> Counterattack.Exchange:
+	var field := Battlefield.new(3, 2)
+	var left := RoundLoop.Side.new()
+	left.id = 0
+	left.units = [attacker]
+	var right := RoundLoop.Side.new()
+	right.id = 1
+	right.units = [defender]
+	var sides: Array = [left, right]
+	field.place(attacker, Battlefield.offset_to_axial(0, 0))
+	field.place(defender, Battlefield.offset_to_axial(1, 0))
+	Counterattack.bind_death_resolver(
+		func(casualty: Combatant):
+			return DeathLifecycle.resolve(casualty, field, sides))
+	var exchange := Counterattack.resolve(attacker, defender, Rng.new(17))
+	Counterattack.bind_death_resolver(Callable())
+	return exchange
+
+
+func _test_fatal_event_melee_lifecycle_sequencing() -> void:
+	print("\n[CX-011] fatal event versus final alive sequencing")
+	var attacker := _unit({"name": "initiator", "attack": 30, "life": 1})
+	attacker.statuses.append(_revive_marker())
+	var defender := _unit({"name": "first striker", "counter_attack": 100,
+		"life": 30, "flags": ["Первый удар"]})
+	var revived_first := _lifecycle_exchange(attacker, defender)
+	_check(revived_first.attacker_fatal_event and not revived_first.attacker_died,
+		"lethal first strike records fatal_event separately from final alive")
+	_check([revived_first.order[0][0], revived_first.order[1][0]]
+		== ["counter", "attack"],
+		"revived initiator still executes its primary")
+
+	attacker = _unit({"name": "doomed", "attack": 30, "life": 1})
+	defender = _unit({"name": "first striker", "counter_attack": 100,
+		"life": 30, "flags": ["Первый удар"]})
+	var final_first := _lifecycle_exchange(attacker, defender)
+	_check(final_first.order.size() == 1 and final_first.order[0][0] == "counter",
+		"lethal first strike without survival suppresses primary")
+
+	attacker = _unit({"name": "initiator", "attack": 100, "life": 30})
+	defender = _unit({"name": "revived defender", "counter_attack": 30,
+		"life": 1})
+	defender.statuses.append(_revive_marker())
+	var revived_primary := _lifecycle_exchange(attacker, defender)
+	_check(revived_primary.defender_fatal_event and not revived_primary.defender_died,
+		"lethal primary can leave defender finally alive")
+	_check(revived_primary.order.size() == 1
+		and revived_primary.order[0][0] == "attack",
+		"fatal initiating primary suppresses retaliation after revival")
+
+	attacker = _unit({"name": "initiator", "attack": 1, "life": 30})
+	defender = _unit({"name": "ordinary defender", "counter_attack": 30,
+		"defence": 0, "life": 50})
+	var nonfatal := _lifecycle_exchange(attacker, defender)
+	_check(nonfatal.order.size() == 2 and nonfatal.order[1][0] == "counter",
+		"nonfatal primary control retains ordinary retaliation")
+
+
 func _init() -> void:
 	var f := FileAccess.open(FIXTURE, FileAccess.READ)
 	if f == null:
@@ -169,6 +236,7 @@ func _init() -> void:
 			"got %s" % got)
 
 	_test_primary_melee_charge_consumption()
+	_test_fatal_event_melee_lifecycle_sequencing()
 
 	print("\n[6] determinism")
 	var first: Array = []

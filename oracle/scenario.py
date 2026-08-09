@@ -43,6 +43,7 @@ import content
 import handlers
 import identity
 import counterattack as ca
+import death_lifecycle
 import statuses as st
 import actions as actionsmod
 import turn
@@ -87,14 +88,18 @@ _ORDERING_TRACE_SOURCES = {
 # fields rather than battle identity, placement or provenance.
 _CANONICAL_UNIT_KEYS = {"id", "def", "at", "overrides"}
 _SPECIAL_UNIT_FIELDS = {"name", "flags", "subtypes", "modifiers", "auras", "statuses"}
+_RUNTIME_INSTANCE_FIELDS = {
+    "morale_break_accumulator", "damage_received", "original_definition",
+    "battle_owned", "discarded", "last_position",
+}
 _SETTABLE_UNIT_FIELDS = (
     set(Combatant.__dataclass_fields__) | _SPECIAL_UNIT_FIELDS
-) - {"instance_id", "content_id", "statuses"}
+) - {"instance_id", "content_id", "definition_id", "statuses"} - _RUNTIME_INSTANCE_FIELDS
 _RESOLVED_CONTENT_ID = "__scenario_resolved_content_id"
 _SERIALIZED_IDENTITY_FIELDS = {"content_id", "instance_id", _RESOLVED_CONTENT_ID}
 _FORBIDDEN_OVERRIDE_FIELDS = {
     "id", "def", "at", "overrides", "instance_id", "content_id",
-    _RESOLVED_CONTENT_ID,
+    "definition_id", _RESOLVED_CONTENT_ID,
     "content", "pack", "version", "build", "fingerprint", "provenance",
 }
 _FINGERPRINT_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
@@ -109,6 +114,7 @@ class Scenario:
         # Resolve and verify all canonical dependencies before constructing a
         # battlefield or a Combatant. Inline scenarios never touch the provider.
         self._side_specs = self.prepare_content(spec, content_provider)
+        self._content_provider = content_provider
         self.log: list[str] = []
         # THE randomness boundary. Rules never choose a generator and never
         # branch on profile — they receive whatever is injected here and call
@@ -370,6 +376,10 @@ class Scenario:
                 unit.life_base = u.get("life_base", unit.life)
                 unit.stamina_base = u.get("stamina_base", unit.stamina)
                 unit.morale_base = u.get("morale_base", unit.morale)
+                unit.ammo_base = u.get("ammo_base", unit.ammo)
+                if unit.original_definition:
+                    unit.original_definition = death_lifecycle._normalize_definition(
+                        unit.original_definition)
                 col, row = u["at"]
                 if not self.field.place(unit, bfmod.offset_to_axial(col, row)):
                     raise ValueError("cannot place %s at %s" % (unit.name, u["at"]))
@@ -397,6 +407,7 @@ class Scenario:
             stacking=st.Stacking[specification.get("stacking", "REFRESH")],
             prevents_action=bool(specification.get("prevents_action", False)),
             hostile=bool(specification.get("hostile", False)),
+            remove_on_damage=bool(specification.get("remove_on_damage", False)),
             tags=tuple(specification.get("tags", [])),
         )
         for modifier_spec in specification.get("modifiers", []):
@@ -454,6 +465,8 @@ class Scenario:
 
     def _at(self, unit: Combatant) -> str:
         h = self.field.find(unit)
+        if h is None:
+            h = unit.last_position
         if h is None:
             return "-"
         col, row = bfmod.axial_to_offset(h)
@@ -556,6 +569,50 @@ class Scenario:
         self.emit("%s closes to %s (%d steps)" % (unit.label(), self._at(unit), len(path)))
         return True
 
+    def _emit_lifecycle_event(self, event: dict) -> None:
+        details = ",".join("%s=%s" % (key, str(event[key]).lower()
+                                     if isinstance(event[key], bool)
+                                     else str(event[key]))
+                           for key in sorted(event)
+                           if key not in ("event", "unit"))
+        suffix = " " + details if details else ""
+        self.emit("  [lifecycle] %s %s%s" %
+                  (event["unit"], event["event"], suffix))
+
+    def _resolve_replacement_definition(self, unit: Combatant,
+                                        definition_id: int):
+        if self._content_provider is None:
+            return None
+        source_id = str(unit.original_definition.get("content_id", "")
+                        or unit.content_id)
+        if ":unit/" not in source_id:
+            return None
+        canonical_id = source_id.split(":unit/", 1)[0] + ":unit/" + str(definition_id)
+        definition = self._content_provider.resolve_definition(canonical_id)
+        if definition is not None:
+            definition = copy.deepcopy(definition)
+            definition["content_id"] = canonical_id
+            built_modifiers = []
+            for modifier in definition.get("modifiers", []):
+                if isinstance(modifier, Modifier):
+                    built_modifiers.append(modifier)
+                else:
+                    built_modifiers.append(Modifier(
+                        ability=int(modifier.get("ability", 0)),
+                        handler=modifier["handler"],
+                        hook=getattr(Hook, modifier.get("hook", "STAT_PASSIVE")),
+                        power=int(modifier.get("power", 0)),
+                        params=copy.deepcopy(modifier.get("params", {})),
+                        source=modifier.get("source", modifier["handler"])))
+            definition["modifiers"] = built_modifiers
+        return definition
+
+    def _resolve_fatal_event(self, unit: Combatant) -> dict:
+        return death_lifecycle.resolve(
+            unit, self.field, self.sides,
+            self._resolve_replacement_definition,
+            self._emit_lifecycle_event)
+
     def _fell(self, unit: Combatant) -> None:
         h = self.field.find(unit)
         if h is not None:
@@ -570,8 +627,12 @@ class Scenario:
         ahead of the blow that caused it, so a defender can kill an attacker
         before the attack lands.
         """
-        ex = ca.resolve(unit, target, self.rng, kind, action,
-                        primary_melee_charge=primary_melee_charge)
+        ca.bind_death_resolver(self._resolve_fatal_event)
+        try:
+            ex = ca.resolve(unit, target, self.rng, kind, action,
+                            primary_melee_charge=primary_melee_charge)
+        finally:
+            ca.bind_death_resolver(None)
         modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
         if kind is AttackKind.RANGED:
             cost_trace = turn.spend_ranged_attack(
@@ -679,17 +740,19 @@ class Scenario:
             for unit in list(side.units):
                 if not unit.alive:
                     continue
+                was_alive = unit.alive
                 totals, _ = auras.tick_for(unit, self.auras_by_source,
                                            self.field, self.side_of)
                 if totals:
-                    before = unit.life
                     auras.apply_tick(unit, totals)
                     parts = ", ".join("%s %+d" % (k, v)
                                       for k, v in sorted(totals.items()))
                     self.emit("  %s: auras (%s)" % (unit.label(), parts))
-                    if not unit.alive:
-                        self._fell(unit)
-                        continue
+                    # A retained persistent dead record is not a new fatal event.
+                    if was_alive and not unit.alive:
+                        lifecycle = self._resolve_fatal_event(unit)
+                        if not lifecycle["final_alive"]:
+                            self._fell(unit)
 
     def _auto_end_phase(self) -> None:
         """R7: the side toggles on exhaustion as well as on an explicit pass.
@@ -863,6 +926,22 @@ class Scenario:
             }
             if u.statuses:
                 unit_state["statuses"] = [status.to_dict() for status in u.statuses]
+            if (u.definition_id or u.tier != 1 or u.battle_owned or u.discarded
+                    or u.morale_break_accumulator
+                    or u.last_position is not None):
+                side = self._side_of(u)
+                unit_state.update({
+                    "side": side.id if side is not None else None,
+                    "definition_id": u.definition_id,
+                    "content_id": u.content_id,
+                    "tier": u.tier,
+                    "morale": u.morale,
+                    "ammo": u.ammo,
+                    "morale_break_accumulator": u.morale_break_accumulator,
+                    "damage_received": list(u.damage_received),
+                    "battle_owned": u.battle_owned,
+                    "discarded": u.discarded,
+                })
             out[name] = unit_state
         return out
 

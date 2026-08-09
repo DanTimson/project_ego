@@ -74,6 +74,19 @@ static func apply(unit: Combatant, effect: Status) -> Trace:
 
 
 ## Remove every instance sharing the established effect identity/group.
+static func remove_on_damage(unit: Combatant) -> Array[Status]:
+	## Explicit damage-boundary removal; no duration clock is involved.
+	var removed: Array[Status] = []
+	var kept: Array[Status] = []
+	for effect in unit.statuses:
+		if effect.remove_on_damage:
+			removed.append(effect)
+		else:
+			kept.append(effect)
+	unit.statuses = kept
+	return removed
+
+
 static func remove(unit: Combatant, effect_id: StringName) -> int:
 	var before: int = unit.statuses.size()
 	var kept: Array[Status] = []
