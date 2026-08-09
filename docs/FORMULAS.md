@@ -813,6 +813,54 @@ record ranged kill
 spend stamina and end activation
 ```
 
+The current ordinary `cmd_shoot` producer represents exactly one shot. Its live
+Python/GDScript path consumes one ammunition, resolves once through the central
+received-damage sink, selects the R8 stamina cost from live capacity before
+clearing capacity, and then applies CX-009 terminality. The represented two-shot
+producer is the Extra Shot attack-replacement action; that action-family executor
+is not implemented, so the two-shot portion of `RANGED-EXEC-001` remains open.
+
+### Ranged damage calculator
+
+`[RECOVERED complete ranged-calculator body]` · `[PROJECT: CX-012]` ·
+fixture-covered
+
+```text
+attack_power = effective ranged attack
+
+if effective_modifier(attacker, 0x1C) != 0:
+    defence_input = effective_resistance(target)
+                    - effective_modifier(attacker, 0x5F)
+    damage = resolve_attack_against_defence(attack_power, defence_input)
+    received_damage_channel = 2
+else:
+    defence_input = effective_ranged_defence(target)
+    if effective_modifier(attacker, 0x11) != 0:
+        defence_input = trunc0(defence_input / 2)
+    defence_input -= effective_modifier(attacker, 0x4D)
+    damage = resolve_attack_against_defence(attack_power, defence_input)
+
+    modifier_0x3C = effective_modifier(attacker, 0x3C)
+    target_resistance = effective_resistance(target)
+    if target_resistance < modifier_0x3C:
+        damage += modifier_0x3C - target_resistance
+    received_damage_channel = 1
+```
+
+`effective_resistance(target)` completes the represented persistent, intrinsic,
+runtime and eligible-aura provider pipeline, truncates that provider total to an
+integer, and then returns `max(provider_total, 0)`. Defence stamina-halving does
+not apply to resistance. The trace records the provider total separately from
+this final zero clamp.
+
+`0x1C` returns after the resistance resolver: `0x11`, `0x4D`, and the
+post-resolver `0x3C` excess tail are non-resistance-path operations only. The
+`0x11` division uses exact integer-only signed truncation toward zero and
+precedes `0x4D`. Deterministic Python/GDScript vectors distinguish all eight
+branch/control cases plus provider contribution, final resistance clamping and
+both clamped-resistance consumers, without selecting an end-to-end legacy RNG
+call sequence.
+
 ### Received-damage channels
 
 ```text
@@ -823,7 +871,10 @@ spend stamina and end activation
 ```
 
 The large-hit morale test is reached when damage is at least one quarter of
-effective maximum life or exceeds 9, except on channel 3.
+effective maximum life or exceeds 9, except on channel 3. The exact signed morale
+delta and modifier-`0x19` branch are not yet reduced at the normalized accepted
+layer, so `DAMAGE-MORALE-001` remains deferred rather than implemented from a
+candidate result.
 
 ---
 

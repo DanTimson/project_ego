@@ -32,6 +32,7 @@ priority.
 | CX-009 | `SPEC_IMPLEMENTATION` | tactical action terminality | engine | `DONE` | CX-008; human-confirmed action-terminal rule |
 | CX-010 | `SPEC_IMPLEMENTATION` | runtime status container and stable status semantics | engine | `DONE` | CX-009; stable status architecture; R13 lifecycle excluded |
 | CX-011 | `SPEC_IMPLEMENTATION` | tactical death lifecycle and control transfer | engine | `DONE` | CX-010; mandatory tactical tranche implemented; strategy/corpse/reward/kill-credit/R17 boundaries excluded |
+| CX-012 | `SPEC_IMPLEMENTATION` | ranged damage branch parity closure | engine | `DONE` | CX-011; DAMAGE-RANGED-001 plus one-shot channel integration accepted; two-shot producer and DAMAGE-MORALE deferred |
 
 Task contracts live in `docs/codex/tasks/`.
 

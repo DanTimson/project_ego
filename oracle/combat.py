@@ -515,6 +515,12 @@ def has_effective_modifier(u, ability: int) -> bool:
     return any(m.ability == ability for m in effective_modifiers(u))
 
 
+def effective_modifier_value(u, ability: int) -> int:
+    """Signed numeric total for one modifier ID across represented providers."""
+    return sum(int(m.power) for m in effective_modifiers(u)
+               if m.ability == ability)
+
+
 def _offensive_disabled(u) -> bool:
     return has_effective_modifier(u, 0x26) or u.has_flag("Не сражается")
 
@@ -707,32 +713,22 @@ def attack_power_before_randomisation(
     return _trunc(atk_value), atk_trace
 
 
-def resolve_attack(attacker: Combatant, defender: Combatant,
-                   kind: AttackKind, rng: Rng,
-                   selected_ordinary_1_5x: bool = False) -> tuple[int, list]:
-    """Full ordinary-damage pipeline. Returns (damage_dealt, [traces])."""
-    attack_int, atk_trace = attack_power_before_randomisation(
-        attacker, kind, selected_ordinary_1_5x)
-    if (kind in (AttackKind.MELEE, AttackKind.COUNTER)
-            and _offensive_disabled(attacker)):
-        return 0, [atk_trace]
-    if kind is AttackKind.RANGED and attack_int == 0:
-        return 0, [atk_trace]
-
+def _resolve_attack_against_defence(attack_int: int, atk_trace: Trace,
+                                      attacker_name: str, defence_input: int,
+                                      defence_trace: Trace, rng: Rng,
+                                      defence_note: str = "effective defence") -> tuple[int, list]:
+    """Existing randomized resolver with an already-selected defensive input."""
     rolled, roll_note = roll_attack(attack_int, rng)
-    roll_trace = Trace(f"{attacker.name}.roll")
+    roll_trace = Trace(f"{attacker_name}.roll")
     roll_trace.base = attack_int
     roll_trace.step("attack randomisation", attack_int, rolled, roll_note)
     roll_trace.result = rolled
 
-    def_value, def_trace = current_defence(defender, kind)
-    damage = rolled - def_value
-
+    damage = rolled - defence_input
     dmg_trace = Trace("damage")
     dmg_trace.base = rolled
     dmg_trace.step("defence subtraction", rolled, damage,
-                   f"effective defence {def_value}")
-
+                   f"{defence_note} {defence_input}")
     if damage <= 0:
         if negative_damage_hits(damage, rng):
             dmg_trace.step("chip roll", damage, 1, "negative-damage rule succeeded")
@@ -741,7 +737,105 @@ def resolve_attack(attacker: Combatant, defender: Combatant,
             dmg_trace.step("chip roll", damage, 0, "negative-damage rule failed")
             damage = 0
     dmg_trace.result = damage
-    return damage, [atk_trace, roll_trace, def_trace, dmg_trace]
+    return damage, [atk_trace, roll_trace, defence_trace, dmg_trace]
+
+
+def trunc0_half(value: int) -> int:
+    """Exact signed division by two toward zero for the frozen damage branch."""
+    value = int(value)
+    half = value >> 1
+    return half + 1 if value < 0 and (value & 1) else half
+
+
+def resolve_ranged_attack(attacker: Combatant, defender: Combatant,
+                          rng: Rng) -> tuple[int, list, int]:
+    """Frozen DAMAGE-RANGED-001 calculator: damage, traces, sink channel."""
+    attack_int, atk_trace = attack_power_before_randomisation(
+        attacker, AttackKind.RANGED)
+    modifier_0x1c = effective_modifier_value(attacker, 0x1C)
+    channel = 2 if modifier_0x1c != 0 else 1
+    if attack_int == 0:
+        channel_trace = Trace("ranged channel")
+        channel_trace.step("ranged received-damage channel", channel, channel,
+                           "modifier 0x1C nonzero" if channel == 2
+                           else "ordinary ranged branch")
+        channel_trace.result = channel
+        return 0, [atk_trace, channel_trace], channel
+
+    if modifier_0x1c != 0:
+        defence_input, defence_trace = current_resistance(defender)
+        defence_trace.step("ranged resistance branch", defence_input, defence_input,
+                           "effective modifier 0x1C is nonzero")
+        modifier_0x5f = effective_modifier_value(attacker, 0x5F)
+        reduced = defence_input - modifier_0x5f
+        defence_trace.step("modifier 0x5F resistance subtraction",
+                           defence_input, reduced,
+                           "resistance branch before resolver")
+        defence_input = reduced
+        defence_trace.result = defence_input
+        damage, traces = _resolve_attack_against_defence(
+            attack_int, atk_trace, attacker.name, defence_input, defence_trace, rng,
+            "selected defensive input")
+        channel_trace = Trace("ranged channel")
+        channel_trace.step("ranged received-damage channel", 2, 2,
+                           "0x1C resistance branch returns before non-resistance tail")
+        channel_trace.result = 2
+        traces.append(channel_trace)
+        return damage, traces, 2
+
+    defence_input, defence_trace = current_defence(defender, AttackKind.RANGED)
+    defence_trace.step("ordinary ranged-defence branch",
+                       defence_input, defence_input,
+                       "effective modifier 0x1C is zero")
+    modifier_0x11 = effective_modifier_value(attacker, 0x11)
+    if modifier_0x11 != 0:
+        halved = trunc0_half(defence_input)
+        defence_trace.step("modifier 0x11 ranged-defence halving",
+                           defence_input, halved,
+                           "signed truncation toward zero; before 0x4D")
+        defence_input = halved
+    modifier_0x4d = effective_modifier_value(attacker, 0x4D)
+    reduced = defence_input - modifier_0x4d
+    defence_trace.step("modifier 0x4D ranged-defence subtraction",
+                       defence_input, reduced,
+                       "non-resistance branch before resolver")
+    defence_input = reduced
+    defence_trace.result = defence_input
+    damage, traces = _resolve_attack_against_defence(
+        attack_int, atk_trace, attacker.name, defence_input, defence_trace, rng,
+        "selected defensive input")
+
+    modifier_0x3c = effective_modifier_value(attacker, 0x3C)
+    target_resistance, _ = current_resistance(defender)
+    excess = max(0, modifier_0x3c - target_resistance)
+    post_trace = Trace("ranged post-resolver")
+    post_trace.base = damage
+    post_trace.step("modifier 0x3C excess over resistance",
+                    damage, damage + excess,
+                    f"max(0, {modifier_0x3c} - {target_resistance})")
+    damage += excess
+    post_trace.step("ranged received-damage channel", 1, 1,
+                    "ordinary non-resistance branch")
+    post_trace.result = damage
+    traces.append(post_trace)
+    return damage, traces, 1
+
+
+def resolve_attack(attacker: Combatant, defender: Combatant,
+                   kind: AttackKind, rng: Rng,
+                   selected_ordinary_1_5x: bool = False) -> tuple[int, list]:
+    """Full ordinary-damage pipeline. Returns (damage_dealt, [traces])."""
+    if kind is AttackKind.RANGED:
+        damage, traces, _channel = resolve_ranged_attack(attacker, defender, rng)
+        return damage, traces
+
+    attack_int, atk_trace = attack_power_before_randomisation(
+        attacker, kind, selected_ordinary_1_5x)
+    if _offensive_disabled(attacker):
+        return 0, [atk_trace]
+    defence_input, defence_trace = current_defence(defender, kind)
+    return _resolve_attack_against_defence(
+        attack_int, atk_trace, attacker.name, defence_input, defence_trace, rng)
 
 
 def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
@@ -791,6 +885,26 @@ def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
 
     final = max(0, _trunc(value))
     t.step("final defence clamp", value, final, "minimum 0")
+    t.result = final
+    return final, t
+
+
+def current_resistance(u: Combatant) -> tuple[int, Trace]:
+    """Represented effective resistance providers, without defence stamina rules."""
+    t = Trace(f"{u.name}.resistance")
+    t.base = u.resist
+    value = float(u.resist)
+    from modifier import Hook
+    resolved = _run_hook(value, u, Hook.STAT_PASSIVE,
+                         {"stat": "resist", "unit": u}, "modifiers")
+    if resolved[1] is not None and resolved[0] != value:
+        t.steps.extend(resolved[1].steps)
+        value = resolved[0]
+    provider_total = _trunc(value)
+    t.step("resistance provider total", value, provider_total,
+           "represented providers complete; signed integer truncation")
+    final = max(0, provider_total)
+    t.step("final resistance clamp", provider_total, final, "minimum 0")
     t.result = final
     return final, t
 

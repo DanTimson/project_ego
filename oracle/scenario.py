@@ -76,6 +76,15 @@ _ORDERING_TRACE_SOURCES = {
     "zero-stamina defence halving",
     "final defence clamp",
     "defence subtraction",
+    "resistance provider total",
+    "final resistance clamp",
+    "ranged resistance branch",
+    "ordinary ranged-defence branch",
+    "modifier 0x5F resistance subtraction",
+    "modifier 0x11 ranged-defence halving",
+    "modifier 0x4D ranged-defence subtraction",
+    "modifier 0x3C excess over resistance",
+    "ranged received-damage channel",
     "command-entry charge consumption",
     "live-capacity stamina discriminator",
     "attack stamina mutation",
@@ -923,6 +932,7 @@ class Scenario:
                 "alive": u.alive, "life": max(0, u.life), "stamina": u.stamina,
                 "at": self._at(u), "steps_this_round": u.steps_this_round,
                 "action_spent": u.action_spent, "movement_remaining": u.movement_remaining,
+                "ammo": u.ammo, "damage_received": list(u.damage_received),
             }
             if u.statuses:
                 unit_state["statuses"] = [status.to_dict() for status in u.statuses]

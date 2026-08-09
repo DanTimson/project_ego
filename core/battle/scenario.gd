@@ -990,6 +990,7 @@ func final_state() -> Dictionary:
 			"at": _at(u), "steps_this_round": u.steps_this_round,
 			"action_spent": u.action_spent,
 			"movement_remaining": u.movement_remaining,
+			"ammo": u.ammo, "damage_received": u.damage_received.duplicate(),
 		}
 		if not u.statuses.is_empty():
 			unit_state["statuses"] = Statuses.serialize(u)

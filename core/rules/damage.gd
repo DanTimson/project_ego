@@ -62,6 +62,15 @@ static func has_effective_modifier(u: Combatant, ability: int) -> bool:
 	return false
 
 
+static func effective_modifier_value(u: Combatant, ability: int) -> int:
+	## Signed numeric total for one modifier ID across represented providers.
+	var total := 0
+	for modifier in effective_modifiers(u):
+		if int((modifier as Modifier).ability) == ability:
+			total += int((modifier as Modifier).power)
+	return total
+
+
 static func _offensive_disabled(u: Combatant) -> bool:
 	return has_effective_modifier(u, 0x26) or u.has_flag(&"Не сражается")
 
@@ -95,7 +104,10 @@ const _STAT_FOR_KIND: Dictionary = {
 
 ## Returns [value: float, trace: Trace].
 static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
-	var t := Trace.new("%s.attack[%d]" % [u.name, kind])
+	var trace_stat := "ranged_attack" if kind == Combatant.AttackKind.RANGED else "melee_attack"
+	if kind == Combatant.AttackKind.COUNTER:
+		trace_stat = "counter_attack"
+	var t := Trace.new("%s.%s" % [u.name, trace_stat])
 	var base: int = u.base_attack_for(kind)
 	t.base = float(base)
 	var value: float = float(base)
@@ -238,6 +250,24 @@ static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
 	return [final, t]
 
 
+static func current_resistance(u: Combatant) -> Array:
+	## Represented effective resistance providers, without defence stamina rules.
+	var t := Trace.new("%s.resistance" % u.name)
+	t.base = float(u.resist)
+	var value := float(u.resist)
+	var resolved := _run_hook(value, u, Modifier.Hook.STAT_PASSIVE,
+		{"stat": "resist", "unit": u}, "modifiers")
+	value = _append_hook_steps(t, resolved, value)
+	var provider_total := int(value)
+	t.step("resistance provider total", value, float(provider_total),
+		"represented providers complete; signed integer truncation")
+	var final := maxi(0, provider_total)
+	t.step("final resistance clamp", float(provider_total), float(final),
+		"minimum 0")
+	t.result = float(final)
+	return [final, t]
+
+
 ## «Расчёт урона при атаках», exact form.
 ##
 ##     attack >= 5:  attack + attack/5 - Random(2*(attack/5) + 1)
@@ -304,46 +334,139 @@ static func attack_power_before_randomisation(attacker: Combatant,
 	return [int(atk_value), atk_trace]
 
 
+## Existing randomized resolver with an already-selected defensive input.
+static func _resolve_attack_against_defence(attack_int: int, atk_trace: Trace,
+		attacker_name: String, defence_input: int, defence_trace: Trace, rng: Rng,
+		defence_note: String = "effective defence") -> Array:
+	var rolled_pair: Array = roll_attack(attack_int, rng)
+	var rolled: int = rolled_pair[0]
+	var roll_trace := Trace.new("%s.roll" % attacker_name)
+	roll_trace.base = float(attack_int)
+	roll_trace.step("attack randomisation", float(attack_int),
+		float(rolled), rolled_pair[1])
+	roll_trace.result = float(rolled)
+
+	var damage := rolled - defence_input
+	var dmg_trace := Trace.new("damage")
+	dmg_trace.base = float(rolled)
+	dmg_trace.step("defence subtraction", float(rolled), float(damage),
+		"%s %d" % [defence_note, defence_input])
+	if damage <= 0:
+		if negative_damage_hits(damage, rng):
+			dmg_trace.step("chip roll", float(damage), 1.0,
+				"negative-damage rule succeeded")
+			damage = 1
+		else:
+			dmg_trace.step("chip roll", float(damage), 0.0,
+				"negative-damage rule failed")
+			damage = 0
+	dmg_trace.result = float(damage)
+	return [damage, [atk_trace, roll_trace, defence_trace, dmg_trace]]
+
+
+static func trunc0_half(value: int) -> int:
+	## Exact signed division by two toward zero, shared by frozen damage branches.
+	var half := value >> 1
+	return half + 1 if value < 0 and (value & 1) != 0 else half
+
+
+static func resolve_ranged_attack(attacker: Combatant, defender: Combatant,
+		rng: Rng) -> Array:
+	## Frozen DAMAGE-RANGED-001 calculator: [damage, traces, sink channel].
+	var attack_power := attack_power_before_randomisation(
+		attacker, Combatant.AttackKind.RANGED)
+	var attack_int := int(attack_power[0])
+	var atk_trace := attack_power[1] as Trace
+	var modifier_0x1c := effective_modifier_value(attacker, 0x1C)
+	var channel := 2 if modifier_0x1c != 0 else 1
+	if attack_int == 0:
+		var channel_trace := Trace.new("ranged channel")
+		channel_trace.step("ranged received-damage channel", float(channel),
+			float(channel), "modifier 0x1C nonzero" if channel == 2
+			else "ordinary ranged branch")
+		channel_trace.result = float(channel)
+		return [0, [atk_trace, channel_trace], channel]
+
+	if modifier_0x1c != 0:
+		var resistance_pair := current_resistance(defender)
+		var defence_input := int(resistance_pair[0])
+		var defence_trace := resistance_pair[1] as Trace
+		defence_trace.step("ranged resistance branch", float(defence_input),
+			float(defence_input), "effective modifier 0x1C is nonzero")
+		var modifier_0x5f := effective_modifier_value(attacker, 0x5F)
+		var reduced := defence_input - modifier_0x5f
+		defence_trace.step("modifier 0x5F resistance subtraction",
+			float(defence_input), float(reduced),
+			"resistance branch before resolver")
+		defence_input = reduced
+		defence_trace.result = float(defence_input)
+		var resolved := _resolve_attack_against_defence(
+			attack_int, atk_trace, attacker.name, defence_input, defence_trace, rng,
+			"selected defensive input")
+		var channel_trace := Trace.new("ranged channel")
+		channel_trace.step("ranged received-damage channel", 2.0, 2.0,
+			"0x1C resistance branch returns before non-resistance tail")
+		channel_trace.result = 2.0
+		(resolved[1] as Array).append(channel_trace)
+		return [int(resolved[0]), resolved[1], 2]
+
+	var defence_pair := current_defence(defender, Combatant.AttackKind.RANGED)
+	var defence_input := int(defence_pair[0])
+	var defence_trace := defence_pair[1] as Trace
+	defence_trace.step("ordinary ranged-defence branch", float(defence_input),
+		float(defence_input), "effective modifier 0x1C is zero")
+	var modifier_0x11 := effective_modifier_value(attacker, 0x11)
+	if modifier_0x11 != 0:
+		var halved := trunc0_half(defence_input)
+		defence_trace.step("modifier 0x11 ranged-defence halving",
+			float(defence_input), float(halved),
+			"signed truncation toward zero; before 0x4D")
+		defence_input = halved
+	var modifier_0x4d := effective_modifier_value(attacker, 0x4D)
+	var reduced := defence_input - modifier_0x4d
+	defence_trace.step("modifier 0x4D ranged-defence subtraction",
+		float(defence_input), float(reduced),
+		"non-resistance branch before resolver")
+	defence_input = reduced
+	defence_trace.result = float(defence_input)
+	var resolved := _resolve_attack_against_defence(
+		attack_int, atk_trace, attacker.name, defence_input, defence_trace, rng,
+		"selected defensive input")
+	var damage := int(resolved[0])
+	var modifier_0x3c := effective_modifier_value(attacker, 0x3C)
+	var target_resistance := int(current_resistance(defender)[0])
+	var excess := maxi(0, modifier_0x3c - target_resistance)
+	var post_trace := Trace.new("ranged post-resolver")
+	post_trace.base = float(damage)
+	post_trace.step("modifier 0x3C excess over resistance", float(damage),
+		float(damage + excess), "max(0, %d - %d)" % [
+			modifier_0x3c, target_resistance])
+	damage += excess
+	post_trace.step("ranged received-damage channel", 1.0, 1.0,
+		"ordinary non-resistance branch")
+	post_trace.result = float(damage)
+	(resolved[1] as Array).append(post_trace)
+	return [damage, resolved[1], 1]
+
+
 ## Full pipeline. Returns [damage: int, traces: Array[Trace]].
 static func resolve_attack(attacker: Combatant, defender: Combatant,
 		kind: Combatant.AttackKind, rng: Rng,
 		selected_ordinary_1_5x: bool = false) -> Array:
+	if kind == Combatant.AttackKind.RANGED:
+		var ranged := resolve_ranged_attack(attacker, defender, rng)
+		return [ranged[0], ranged[1]]
+
 	var attack_power := attack_power_before_randomisation(
 		attacker, kind, selected_ordinary_1_5x)
-	var attack_int: int = int(attack_power[0])
-	var atk_trace: Trace = attack_power[1]
-
-	if ((kind == Combatant.AttackKind.MELEE
-			or kind == Combatant.AttackKind.COUNTER)
-			and _offensive_disabled(attacker)):
+	var attack_int := int(attack_power[0])
+	var atk_trace := attack_power[1] as Trace
+	if _offensive_disabled(attacker):
 		return [0, [atk_trace]]
-	if kind == Combatant.AttackKind.RANGED and attack_int == 0:
-		return [0, [atk_trace]]
-	var rolled_pair: Array = roll_attack(attack_int, rng)
-	var rolled: int = rolled_pair[0]
-	var roll_trace := Trace.new("%s.roll" % attacker.name)
-	roll_trace.base = float(attack_int)
-	roll_trace.step("attack randomisation", float(attack_int), float(rolled), rolled_pair[1])
-	roll_trace.result = float(rolled)
-
-	var def_pair: Array = current_defence(defender, kind)
-	var def_value: int = def_pair[0]
-	var damage: int = rolled - def_value
-
-	var dmg_trace := Trace.new("damage")
-	dmg_trace.base = float(rolled)
-	dmg_trace.step("defence subtraction", float(rolled), float(damage),
-		"effective defence %d" % def_value)
-
-	if damage <= 0:
-		if negative_damage_hits(damage, rng):
-			dmg_trace.step("chip roll", float(damage), 1.0, "negative-damage rule succeeded")
-			damage = 1
-		else:
-			dmg_trace.step("chip roll", float(damage), 0.0, "negative-damage rule failed")
-			damage = 0
-	dmg_trace.result = float(damage)
-	return [damage, [atk_trace, roll_trace, def_pair[1], dmg_trace]]
+	var defence_pair := current_defence(defender, kind)
+	return _resolve_attack_against_defence(
+		attack_int, atk_trace, attacker.name, int(defence_pair[0]),
+		defence_pair[1], rng)
 
 
 # ---------------------------------------------------------------------------

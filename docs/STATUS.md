@@ -16,8 +16,8 @@ This is a coverage map, not a release claim.
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
 | round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0`; owner-confirmed terminality | implemented | implemented | whole-side phases and pre-action capacity-preserving reselection remain; successful consuming commands close only their actor's activation; explicit order fixture still needed |
 | melee execution | binary | partial compatibility model | counterattack path plus tactical fatal lifecycle implemented | EXP-CI11 fatal-event sequencing distinguishes first-strike survival from fatal-primary retaliation suppression; R17 secondary ordering remains excluded |
-| ranged execution | binary | partial compatibility model | partial | exact ranged early-provider zero cutoff, live-capacity stamina discriminator and central fatal lifecycle routing are implemented; special modes remain incomplete |
-| damage channels and death | binary | implemented tactical lifecycle | implemented tactical lifecycle | channel accounting, remove-on-damage order, adjacent morale, full status clear, revival, rollback, exact tier replacement, final living occupancy, battle-owned cleanup and opposite-side transfer are parity-covered; hero-wide cohort, strategy writeback, corpses, rewards and R17 remain outside this tranche |
+| ranged execution | binary | partial compatibility model | partial | one-shot `cmd_shoot`, exact ranged early-provider zero cutoff, live-capacity R8 stamina selection, CX-009 terminality and central fatal lifecycle routing are implemented; Extra Shot/two-shot action execution and special modes remain incomplete |
+| damage channels and death | binary | implemented tactical lifecycle + ranged calculator | implemented tactical lifecycle + ranged calculator | CX-012 covers exact `0x1C` resistance/channel-2, `0x5F`, `0x11`, `0x4D` and non-`0x1C` `0x3C` routing through the CX-011 sink; lifecycle parity remains covered; large-hit morale delta/`0x19`, hero-wide cohort, strategy writeback, corpses, rewards and R17 remain outside this tranche |
 | battle actions and target legality | public/data descriptions + selective binary evidence | partial | content model only | R16 whole-dispatcher reconstruction retired; observable action-semantics coverage matrix required |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
 | scenario format and traces | Project EGO design | inline and canonical-definition units implemented | inline and canonical-definition units implemented | portable synthetic parity fixture covers provenance, merge and identity |
@@ -135,6 +135,22 @@ retired. R17 is reduced to a finite black-box matrix covering zero-damage
 triggers, follow-up attack order, component damage, trample and instant-death
 placement.
 
+
+CX-012 implements the narrowed `DAMAGE-RANGED-001` tranche. Python and
+GDScript now select resistance plus received-damage channel 2 only when effective
+modifier `0x1C` is nonzero, apply `0x5F` only to that resistance input, and return
+before the non-resistance tail. The ordinary branch uses effective ranged
+defence, exact integer-only signed-truncating `0x11` halving before `0x4D`,
+then applies only the positive post-resolver `0x3C - resistance` excess.
+Effective resistance now includes represented providers, truncates their total,
+and clamps it to zero without defence stamina halving before either `0x5F` or
+`0x3C` consumes it. Eight original branch vectors, four clamp/provider
+correction vectors and a live one-shot scenario cover one ammunition, one CX-011
+sink application, channel accounting, exact life, pre-terminal R8 cost selection
+and CX-009 terminality. The Extra Shot/two-shot action producer and
+`DAMAGE-MORALE-001` exact delta/`0x19` branch remain deferred; no claim is made
+for complete `RANGED-EXEC-001`, exact shared RNG ordering, or special ranged
+modes.
 
 CX-011 implements the frozen tactical death lifecycle. Received damage now
 accounts its channel, removes remove-on-damage statuses before life subtraction,

@@ -1,0 +1,86 @@
+{
+  "name": "CX-012 ranged damage one-shot parity",
+  "profile": "native",
+  "seed": 9,
+  "battlefield": {
+    "width": 8,
+    "height": 3,
+    "tiles": []
+  },
+  "sides": [
+    {
+      "id": 0,
+      "is_attacker": true,
+      "leader_initiative": 1,
+      "units": [
+        {
+          "name": "shooter",
+          "at": [
+            0,
+            0
+          ],
+          "ranged_attack": 20,
+          "shooting_range": 8,
+          "ammo": 2,
+          "counter_attack": 0,
+          "life": 30,
+          "stamina": 10,
+          "stamina_base": 10,
+          "morale": 10,
+          "speed": 4,
+          "modifiers": [
+            {
+              "ability": 28,
+              "handler": "cx012_numeric_branch",
+              "hook": "DAMAGE_VS_TARGET",
+              "power": 1,
+              "source": "modifier 0x1C"
+            },
+            {
+              "ability": 95,
+              "handler": "cx012_numeric_branch",
+              "hook": "DAMAGE_VS_TARGET",
+              "power": 3,
+              "source": "modifier 0x5F"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "leader_initiative": 0,
+      "units": [
+        {
+          "name": "target",
+          "at": [
+            4,
+            0
+          ],
+          "counter_attack": 0,
+          "ranged_defence": 2,
+          "resist": 7,
+          "life": 30,
+          "stamina": 10,
+          "morale": 10,
+          "speed": 1
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "op": "move",
+      "unit": "shooter",
+      "to": [
+        1,
+        0
+      ]
+    },
+    {
+      "op": "shoot",
+      "unit": "shooter",
+      "target": "target"
+    }
+  ]
+}

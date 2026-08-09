@@ -187,6 +187,13 @@
      "steps_this_round": 0,
      "action_spent": false,
      "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ],
      "statuses": [
       {
        "id": "turtle:Защита",
@@ -239,7 +246,14 @@
      "at": "3,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
     }
    }
   },
@@ -470,7 +484,14 @@
      "at": "2,0",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 1
+     "movement_remaining": 1,
+     "ammo": 0,
+     "damage_received": [
+      2,
+      0,
+      0,
+      0
+     ]
     },
     "Капитан": {
      "alive": true,
@@ -479,7 +500,14 @@
      "at": "1,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
     },
     "Налётчик": {
      "alive": true,
@@ -488,7 +516,14 @@
      "at": "3,0",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      11,
+      0,
+      0,
+      0
+     ]
     },
     "Одиночка": {
      "alive": true,
@@ -497,7 +532,14 @@
      "at": "2,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 1
+     "movement_remaining": 1,
+     "ammo": 0,
+     "damage_received": [
+      2,
+      0,
+      0,
+      0
+     ]
     },
     "Отравитель": {
      "alive": true,
@@ -506,7 +548,14 @@
      "at": "3,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      5,
+      0,
+      0,
+      0
+     ]
     }
    }
   },
@@ -644,7 +693,14 @@
      "at": "3,2",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 1
+     "movement_remaining": 1,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
     },
     "initiator": {
      "alive": true,
@@ -653,7 +709,14 @@
      "at": "1,2",
      "steps_this_round": 0,
      "action_spent": true,
-     "movement_remaining": 3
+     "movement_remaining": 3,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
     },
     "reviver": {
      "alive": true,
@@ -663,19 +726,19 @@
      "steps_this_round": 0,
      "action_spent": false,
      "movement_remaining": 2,
-     "side": 1,
-     "definition_id": 0,
-     "content_id": "",
-     "tier": 1,
-     "morale": 7,
      "ammo": 2,
-     "morale_break_accumulator": 0,
      "damage_received": [
       96,
       0,
       0,
       0
      ],
+     "side": 1,
+     "definition_id": 0,
+     "content_id": "",
+     "tier": 1,
+     "morale": 7,
+     "morale_break_accumulator": 0,
      "battle_owned": false,
      "discarded": false
     }
@@ -818,7 +881,14 @@
      "at": "2,0",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
     },
     "sword_b": {
      "alive": true,
@@ -827,7 +897,14 @@
      "at": "2,2",
      "steps_this_round": 0,
      "action_spent": true,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      2,
+      0,
+      0,
+      0
+     ]
     },
     "Ополченец": {
      "alive": true,
@@ -836,7 +913,14 @@
      "at": "2,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      5,
+      0,
+      0,
+      0
+     ]
     }
    }
   },
@@ -1001,7 +1085,14 @@
      "at": "3,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      6,
+      0,
+      0,
+      0
+     ]
     },
     "Ловкач": {
      "alive": true,
@@ -1010,7 +1101,14 @@
      "at": "2,0",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 3
+     "movement_remaining": 3,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
     },
     "Мечник": {
      "alive": true,
@@ -1019,7 +1117,14 @@
      "at": "2,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 3
+     "movement_remaining": 3,
+     "ammo": 0,
+     "damage_received": [
+      4,
+      0,
+      0,
+      0
+     ]
     },
     "Отдыхающий": {
      "alive": true,
@@ -1028,7 +1133,154 @@
      "at": "3,0",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      5,
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "ranged_damage.json": {
+   "spec": {
+    "name": "CX-012 ranged damage one-shot parity",
+    "profile": "native",
+    "seed": 9,
+    "battlefield": {
+     "width": 8,
+     "height": 3,
+     "tiles": []
+    },
+    "sides": [
+     {
+      "id": 0,
+      "is_attacker": true,
+      "leader_initiative": 1,
+      "units": [
+       {
+        "name": "shooter",
+        "at": [
+         0,
+         0
+        ],
+        "ranged_attack": 20,
+        "shooting_range": 8,
+        "ammo": 2,
+        "counter_attack": 0,
+        "life": 30,
+        "stamina": 10,
+        "stamina_base": 10,
+        "morale": 10,
+        "speed": 4,
+        "modifiers": [
+         {
+          "ability": 28,
+          "handler": "cx012_numeric_branch",
+          "hook": "DAMAGE_VS_TARGET",
+          "power": 1,
+          "source": "modifier 0x1C"
+         },
+         {
+          "ability": 95,
+          "handler": "cx012_numeric_branch",
+          "hook": "DAMAGE_VS_TARGET",
+          "power": 3,
+          "source": "modifier 0x5F"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": 1,
+      "leader_initiative": 0,
+      "units": [
+       {
+        "name": "target",
+        "at": [
+         4,
+         0
+        ],
+        "counter_attack": 0,
+        "ranged_defence": 2,
+        "resist": 7,
+        "life": 30,
+        "stamina": 10,
+        "morale": 10,
+        "speed": 1
+       }
+      ]
+     }
+    ],
+    "commands": [
+     {
+      "op": "move",
+      "unit": "shooter",
+      "to": [
+       1,
+       0
+      ]
+     },
+     {
+      "op": "shoot",
+      "unit": "shooter",
+      "target": "target"
+     }
+    ]
+   },
+   "log": [
+    "== CX-012 ranged damage one-shot parity (seed 9) ==",
+    "-- round 1, side 0 first --",
+    "shooter moves to 1,0 (1 steps, 1 total this round)",
+    "  [trace] shooter.ranged_attack | ranged early provider total: 20 -> 20 # definition plus unit modifiers; status/environment not consulted",
+    "  [trace] shooter.roll | attack randomisation: 20 -> 19 # uniform [16, 24]",
+    "  [trace] target.resistance | resistance provider total: 7 -> 7 # represented providers complete; signed integer truncation",
+    "  [trace] target.resistance | final resistance clamp: 7 -> 7 # minimum 0",
+    "  [trace] target.resistance | ranged resistance branch: 7 -> 7 # effective modifier 0x1C is nonzero",
+    "  [trace] target.resistance | modifier 0x5F resistance subtraction: 7 -> 4 # resistance branch before resolver",
+    "  [trace] damage | defence subtraction: 19 -> 15 # selected defensive input 4",
+    "  [trace] ranged channel | ranged received-damage channel: 2 -> 2 # 0x1C resistance branch returns before non-resistance tail",
+    "  [trace] shooter.ranged_attack_cost | live-capacity stamina discriminator: 3 -> 2 # effective speed 4; strict capacity < speed is true; selected base cost 2",
+    "  [trace] shooter.ranged_attack_cost | attack stamina mutation: 10 -> 8 # selected base cost 2",
+    "  [trace] shooter.ranged_attack_cost | ranged activation capacity clear: 3 -> 0 # ranged executor ends activation",
+    "shooter hits target for 15 (target at 15/30, stamina 8)",
+    "-- side 1 takes over (no units left to act) --"
+   ],
+   "final": {
+    "shooter": {
+     "alive": true,
+     "life": 30,
+     "stamina": 8,
+     "at": "1,0",
+     "steps_this_round": 1,
+     "action_spent": true,
+     "movement_remaining": 0,
+     "ammo": 1,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    "target": {
+     "alive": true,
+     "life": 15,
+     "stamina": 10,
+     "at": "4,0",
+     "steps_this_round": 0,
+     "action_spent": false,
+     "movement_remaining": 1,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      15,
+      0
+     ]
     }
    }
   },
@@ -1263,7 +1515,14 @@
      "at": "3,0",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
     },
     "Лучник": {
      "alive": true,
@@ -1272,7 +1531,14 @@
      "at": "0,2",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 6,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ]
     },
     "Мечник": {
      "alive": true,
@@ -1281,7 +1547,14 @@
      "at": "1,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 2
+     "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      1,
+      0,
+      0,
+      0
+     ]
     },
     "Ополченец": {
      "alive": false,
@@ -1291,19 +1564,19 @@
      "steps_this_round": 1,
      "action_spent": true,
      "movement_remaining": 1,
-     "side": 1,
-     "definition_id": 0,
-     "content_id": "",
-     "tier": 1,
-     "morale": 10,
      "ammo": 0,
-     "morale_break_accumulator": 0,
      "damage_received": [
       12,
       0,
       0,
       0
      ],
+     "side": 1,
+     "definition_id": 0,
+     "content_id": "",
+     "tier": 1,
+     "morale": 10,
+     "morale_break_accumulator": 0,
      "battle_owned": false,
      "discarded": false
     }
@@ -1440,6 +1713,13 @@
      "steps_this_round": 0,
      "action_spent": true,
      "movement_remaining": 2,
+     "ammo": 0,
+     "damage_received": [
+      0,
+      0,
+      0,
+      0
+     ],
      "statuses": [
       {
        "id": "synthetic_attack",
@@ -1477,7 +1757,14 @@
      "at": "2,1",
      "steps_this_round": 0,
      "action_spent": false,
-     "movement_remaining": 1
+     "movement_remaining": 1,
+     "ammo": 0,
+     "damage_received": [
+      12,
+      0,
+      0,
+      0
+     ]
     }
    }
   }

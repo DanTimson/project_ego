@@ -150,9 +150,14 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
         selected_ordinary_1_5x = (
             kind is AttackKind.MELEE and action is not None
             and abs(float(getattr(action, "damage_scale", 1.0)) - 1.5) < 1e-9)
-        ordinary_damage, traces = combat.resolve_attack(
-            attacker, defender, kind, rng,
-            selected_ordinary_1_5x=selected_ordinary_1_5x)
+        if kind is AttackKind.RANGED:
+            ordinary_damage, traces, ranged_channel = combat.resolve_ranged_attack(
+                attacker, defender, rng)
+        else:
+            ordinary_damage, traces = combat.resolve_attack(
+                attacker, defender, kind, rng,
+                selected_ordinary_1_5x=selected_ordinary_1_5x)
+            ranged_channel = 0
         ex.ordinary_attack_damage = ordinary_damage
         damage = ordinary_damage
         if kind is AttackKind.MELEE and primary_melee_charge is not None:
@@ -176,9 +181,7 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
         ex.order.append(("attack", damage))
         outcome = combat.apply_received_damage(
             defender, damage,
-            2 if kind is AttackKind.RANGED
-            and combat.has_effective_modifier(attacker, 0x1C)
-            else (1 if kind is AttackKind.RANGED else 0),
+            ranged_channel if kind is AttackKind.RANGED else 0,
             _death_resolver)
         ex.defender_fatal_event = outcome["fatal_event"]
         ex.defender_died = outcome["final_death"]

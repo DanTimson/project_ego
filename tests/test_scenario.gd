@@ -415,6 +415,54 @@ func _test_ranged_numeric_tranche_integration() -> void:
 		"trace shows the accepted early cutoff without resolving the aura")
 
 
+func _test_cx012_one_shot_channel_integration() -> void:
+	print("\n[CX-012] one-shot resistance/channel integration")
+	var spec := {
+		"name": "CX-012 one-shot channel integration", "profile": "native", "seed": 9,
+		"battlefield": {"width": 8, "height": 3, "tiles": []},
+		"sides": [
+			{"id": 0, "is_attacker": true, "leader_initiative": 1, "units": [{
+				"name": "shooter", "at": [0, 0], "ranged_attack": 20,
+				"shooting_range": 8, "ammo": 2, "counter_attack": 0,
+				"life": 30, "stamina": 10, "stamina_base": 10,
+				"morale": 10, "speed": 4,
+				"modifiers": [_numeric_modifier(0x1C, "", 1),
+					_numeric_modifier(0x5F, "", 3)],
+			}]},
+			{"id": 1, "leader_initiative": 0, "units": [{
+				"name": "target", "at": [4, 0], "counter_attack": 0,
+				"ranged_defence": 2, "resist": 7, "life": 30,
+				"stamina": 10, "morale": 10, "speed": 1,
+			}]},
+		],
+		"commands": [
+			{"op": "move", "unit": "shooter", "to": [1, 0]},
+			{"op": "shoot", "unit": "shooter", "target": "target"},
+		],
+	}
+	var battle := Scenario.new(spec, MaxRollRng.new())
+	var result := battle.run()
+	var shooter: Combatant = battle.units["shooter"]
+	var target: Combatant = battle.units["target"]
+	var lines: Array = result["log"]
+	var discriminator := _trace_index(lines, "live-capacity stamina discriminator")
+	var capacity_clear := _trace_index(lines, "ranged activation capacity clear")
+	_check(shooter.ammo == 1,
+		"one successful cmd_shoot consumes exactly one ammo")
+	_check(target.life == 18 and target.damage_received == [0, 0, 12, 0],
+		"0x1C + 0x5F resolves 16 - (7 - 3) once through channel 2")
+	_check(shooter.stamina == 8 and shooter.action_spent
+			and shooter.movement_remaining == 0,
+		"R8 cost 2 is applied and successful ranged resolution is terminal")
+	_check(discriminator >= 0 and discriminator < capacity_clear,
+		"R8 live-capacity selection precedes CX-009 terminal clearing")
+	_check(_trace_index(lines, "modifier 0x5F resistance subtraction")
+			< _trace_index(lines, "defence subtraction")
+			and _trace_index(lines, "defence subtraction")
+			< _trace_index(lines, "ranged received-damage channel"),
+		"resistance subtraction, resolver and channel decision are trace-visible")
+
+
 func _test_action_terminality() -> void:
 	print("\n[CX-009] terminal actions close only their actor's activation")
 	var melee_spec := {
@@ -684,6 +732,7 @@ func _init() -> void:
 	_test_genesis_r8_live_capacity()
 	_test_melee_numeric_tranche_integration()
 	_test_ranged_numeric_tranche_integration()
+	_test_cx012_one_shot_channel_integration()
 	_test_action_terminality()
 	_test_status_runtime_scenario()
 	_test_status_canonical_schema_boundary()

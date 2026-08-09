@@ -158,8 +158,14 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 	var selected_ordinary_1_5x := (kind == Combatant.AttackKind.MELEE
 		and action != null
 		and is_equal_approx(float(action.get("damage_scale")), 1.5))
-	var result: Array = Damage.resolve_attack(
-		attacker, defender, kind, rng, selected_ordinary_1_5x)
+	var result: Array
+	var ranged_channel := 0
+	if kind == Combatant.AttackKind.RANGED:
+		result = Damage.resolve_ranged_attack(attacker, defender, rng)
+		ranged_channel = int(result[2])
+	else:
+		result = Damage.resolve_attack(
+			attacker, defender, kind, rng, selected_ordinary_1_5x)
 	var ordinary_damage := int(result[0])
 	ex.ordinary_attack_damage = ordinary_damage
 	var damage := ordinary_damage
@@ -180,11 +186,10 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 	ex.attack_damage = damage
 	ex.traces.append_array(result[1])
 	ex.order.append(["attack", damage])
-	var channel := 0
-	if kind == Combatant.AttackKind.RANGED:
-		channel = 2 if Damage.has_effective_modifier(attacker, 0x1C) else 1
 	var outcome := Damage.apply_received_damage(
-		defender, damage, channel, _death_resolver)
+		defender, damage,
+		ranged_channel if kind == Combatant.AttackKind.RANGED else 0,
+		_death_resolver)
 	ex.defender_fatal_event = bool(outcome["fatal_event"])
 	ex.defender_died = bool(outcome["final_death"])
 

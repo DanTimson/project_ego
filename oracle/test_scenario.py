@@ -583,6 +583,53 @@ def test_ranged_numeric_tranche_integration() -> None:
           "trace shows the accepted early cutoff without resolving the aura")
 
 
+def test_cx012_one_shot_channel_integration() -> None:
+    print("\n[CX-012] one-shot resistance/channel integration")
+    spec = {
+        "name": "CX-012 one-shot channel integration", "profile": "native", "seed": 9,
+        "battlefield": {"width": 8, "height": 3, "tiles": []},
+        "sides": [
+            {"id": 0, "is_attacker": True, "leader_initiative": 1,
+             "units": [{
+                 "name": "shooter", "at": [0, 0], "ranged_attack": 20,
+                 "shooting_range": 8, "ammo": 2, "counter_attack": 0,
+                 "life": 30, "stamina": 10, "stamina_base": 10,
+                 "morale": 10, "speed": 4,
+                 "modifiers": [numeric_modifier(0x1C, power=1),
+                               numeric_modifier(0x5F, power=3)],
+             }]},
+            {"id": 1, "leader_initiative": 0, "units": [{
+                "name": "target", "at": [4, 0], "counter_attack": 0,
+                "ranged_defence": 2, "resist": 7, "life": 30,
+                "stamina": 10, "morale": 10, "speed": 1,
+            }]},
+        ],
+        "commands": [
+            {"op": "move", "unit": "shooter", "to": [1, 0]},
+            {"op": "shoot", "unit": "shooter", "target": "target"},
+        ],
+    }
+    battle = scenario.Scenario(spec, rng=MaxRollRng())
+    result = battle.run()
+    shooter = battle.units["shooter"]
+    target = battle.units["target"]
+    lines = result["log"]
+    discriminator = trace_index(lines, "live-capacity stamina discriminator")
+    capacity_clear = trace_index(lines, "ranged activation capacity clear")
+    check(shooter.ammo == 1, "one successful cmd_shoot consumes exactly one ammo")
+    check(target.life == 18 and target.damage_received == [0, 0, 12, 0],
+          "0x1C + 0x5F resolves 16 - (7 - 3) once through channel 2")
+    check(shooter.stamina == 8 and shooter.action_spent
+          and shooter.movement_remaining == 0,
+          "R8 cost 2 is applied and successful ranged resolution is terminal")
+    check(0 <= discriminator < capacity_clear,
+          "R8 live-capacity selection precedes CX-009 terminal clearing")
+    check(trace_index(lines, "modifier 0x5F resistance subtraction")
+          < trace_index(lines, "defence subtraction")
+          < trace_index(lines, "ranged received-damage channel"),
+          "resistance subtraction, resolver and channel decision are trace-visible")
+
+
 def test_terrain_matters() -> None:
     print("\n[4] terrain reaches the outcome")
     spec = json.loads(json.dumps(SPEC))
@@ -937,6 +984,7 @@ if __name__ == "__main__":
     test_genesis_r8_live_capacity_integration()
     test_melee_numeric_tranche_integration()
     test_ranged_numeric_tranche_integration()
+    test_cx012_one_shot_channel_integration()
     test_terrain_matters()
     test_phase_passing()
     test_illegal_commands()
