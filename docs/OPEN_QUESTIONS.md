@@ -107,3 +107,26 @@ implements. R17 is similarly narrowed to the observation cells in
 | C5 | Unit level cap and 30 selected-upgrade slots. | `00432660`, `00433130`, `eador_runtime.h`. |
 
 Architectural obligations for these items — whether a recovered fact must be reproduced, imported, or merely recorded — are tracked by binding scope. The engine side's standing position is in `POSITION_ENGINE.md`.
+
+## Post-0.2 compatibility observation — movement exhaustion with adjacent enemy
+
+Record for post-audit compatibility work; this entry is **not** promoted to
+binary evidence by its presence here.
+
+Reported original tactical behavior:
+
+- exhausting a unit's movement allowance does not by itself terminate that
+  unit's actionable state when an enemy unit is adjacent;
+- after movement reaches zero in that situation, the unit may still finish its
+  activation by attacking one of the adjacent enemies;
+- otherwise play advances by ending the overall side turn;
+- there is no separate per-unit "end turn" command/mechanic that should be
+  introduced to model this behavior.
+
+Current Project EGO behavior ends the unit's turn when movement is spent, so
+this is a known compatibility discrepancy.
+
+For later implementation/research, treat this primarily as an
+**action-terminal-state / activation-lifetime** question rather than a movement
+cost arithmetic question. Reconcile it with the accepted CX-009 action
+terminality model and any relevant binary evidence before implementation.

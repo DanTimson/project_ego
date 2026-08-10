@@ -218,3 +218,17 @@ When a new checkpoint is produced, update together:
 - `docs/FUNCTION_MAP.csv`;
 - this file;
 - affected formula and open-question entries.
+
+## Milestone 0.2 release state
+
+Milestone 0.2 is released from
+`aa0de561f53889d2465fd75c80a3a3f40c986f0d`.
+
+The authoritative public/private pair passed fresh-clone build, shared-runtime
+identity, public fallback, private mapped-closure, runtime-smoke, manifest,
+CRC and deterministic repeat-packaging gates. Windows display scaling remains
+a known accepted prototype limitation: the executable does not currently adapt
+its logical UI geometry to the OS scale setting.
+
+Implementation remains frozen for the planned full repository
+audit/reconciliation before CX-014+ work resumes.

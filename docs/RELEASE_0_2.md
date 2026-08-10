@@ -1,6 +1,6 @@
 # REL-0.2 — Milestone 0.2 release hardening
 
-Status: `TOOLING_ACCEPTED` — release artifacts pending
+Status: `RELEASED` — Milestone 0.2
 
 Frozen implementation baseline:
 `510ff0c585222aa152a50ec47420e992f8942daf`
@@ -585,3 +585,57 @@ Milestone 0.2 has been released. After integration and commit:
    manifest, identity, closure and both runtime-smoke gates pass;
 4. record the resulting artifact and manifest hashes before marking the milestone
    released.
+
+## 13. Milestone 0.2 artifact and manual acceptance
+
+Milestone 0.2 is released from commit
+`aa0de561f53889d2465fd75c80a3a3f40c986f0d`.
+
+The authoritative public/private deliverables were produced together from one
+fresh Windows-backed clone and one shared Godot export payload. Repeating the
+official pair packaging from that payload produced byte-identical public ZIP,
+private ZIP and pair manifest.
+
+Authoritative release hashes:
+
+- public ZIP:
+  `d77446e8d56727cf0df0051c26ed9773159d0778a04087775f0df398621d1a4e`;
+- private ZIP:
+  `5f7457170db7e85258c64317076104faad9911318cb979c55f8f9f8a62853223`;
+- pair manifest:
+  `123ae7e858376b4911fe59c3eb6f133284b1fb415bbcc7cc0f5962853e282854`;
+- shared executable payload:
+  `66b26ad96df7458ea917b632a73ac7c88bb058db24dbd11a457fd50435ab7b13`.
+
+The pair acceptance verified:
+
+- fresh-clone source at the exact release commit;
+- public/private EXE and PCK byte identity inside the authoritative pair;
+- public fallback/no-local-assets boundary;
+- private exact mapped-asset closure;
+- public and private runtime smoke passes;
+- pair-manifest integrity and ZIP CRCs;
+- byte-identical repeat packaging of the same exported payload;
+- clean tracked state after the release build.
+
+Independent Godot export byte identity is **not** claimed. A separate
+fresh-clone public-only acceptance probe produced the same executable but a
+different compiled PCK. Inspection found the same PCK path set and ordering,
+with differences concentrated in Godot-generated compiled GDScript and
+exported-scene payloads and no developer-path leakage. The release guarantee is
+therefore intentionally bounded to deterministic packaging of a fixed Godot
+payload plus exact public/private runtime identity within the official pair.
+
+### Manual Windows UI/DPI acceptance
+
+The remaining human UI gate is accepted under the same criterion used for the
+earlier 0.1/0.1.1 milestone deliverables.
+
+The executable continues to ignore Windows display scaling rather than adapting
+its logical UI geometry to 100%, 125%, 150% or 200% scaling. This is a known
+pre-existing limitation and was not introduced by Milestone 0.2. It is recorded
+as an accepted prototype limitation rather than a Milestone 0.2 release blocker.
+
+Milestone 0.2 remains a mixed research/prototype G0 release. This release state
+does not imply stable community API guarantees, broad presentation parity or a
+public-lineage migration.
