@@ -1,6 +1,6 @@
 # Milestone demo releases
 
-Project EGO Milestone 0.1.1 has one Windows x86-64 engine payload and two package
+Project EGO Milestone 0.2 has one Windows x86-64 engine payload and two package
 modes. Release packaging changes presentation and distribution only; it does not
 change combat rules.
 
@@ -24,37 +24,63 @@ x86-64` in `export_presets.cfg`; it exports `Project EGO.exe` plus the external
 
 ## Build commands
 
-From a clean committed revision:
+`tools/build_demo.py` remains the authoritative single-mode packager for
+ordinary developer builds. From a clean committed revision, for example:
 
 ```bash
-python3 tools/build_demo.py --mode public --milestone 0.1.1
-python3 tools/build_demo.py --mode private --milestone 0.1.1 \
-    --asset-root .local/eador_assets
+python3 tools/build_demo.py --mode public --milestone 0.2
 ```
 
-The builder refuses tracked index/worktree changes. It materializes `git archive
-HEAD` under ignored `.release_staging/`, exports only that tree, and removes
-staging on success or failure. Ignored `.local/` data is not part of the export
-project. The engine/PCK are cached by exact commit and Godot version under the
-ignored `dist/.engine-cache/`; both package modes copy that identical payload.
-If the other mode's ZIP already exists, hashes are compared again.
+The official public/private path is the small pair wrapper. In the accepted WSL
+setup, run it from the Windows-backed worktree and put its temporary export tree
+under a Windows-backed caller-owned parent:
+
+```bash
+python3 tools/build_release_pair.py --milestone 0.2 \
+    --asset-root .local/eador_assets --staging-parent /mnt/d
+```
+
+The pair wrapper runs the existing packager once per mode, requires both runtime
+smokes, and then reopens both ZIPs through the existing public/private scanners,
+exact private-closure validator and runtime identity checks. It writes the
+ignored sidecar `dist/Project-EGO-Milestone-0.2-release-pair.json` only after the
+complete pair passes. The sidecar records commit, Godot version, deterministic
+epoch, artifact and runtime hashes, inventories, content-boundary results and
+smoke results.
+
+An official pair uses the exact released commit timestamp. An explicitly set
+`SOURCE_DATE_EPOCH` takes precedence. Thus both modes receive the same
+`built_at`, and repeated packaging with the same tracked commit, Godot payload
+and private closure is byte-identical. This is not a promise across arbitrary
+Godot versions: the exact reported Godot 4.3 version is recorded. Single-mode
+ad-hoc builds retain wall-clock timestamps unless `--reproducible` or
+`SOURCE_DATE_EPOCH` is selected.
+
+The builder refuses tracked index/worktree changes. It materializes exact
+tracked `HEAD` with `git archive`, so ignored files, untracked worktree material
+and local/private data cannot enter the export project. Each invocation creates
+one uniquely owned temporary directory below the selected parent and removes
+only that child; it never recursively removes the caller's parent. The portable
+default remains ignored `.release_staging/`. The engine/PCK cache remains keyed
+by exact commit and Godot version under ignored `dist/.engine-cache/`.
 
 Output is written to:
 
 ```text
-dist/public/Project-EGO-Milestone-0.1.1-Windows-x86_64.zip
-dist/private/Project-EGO-Milestone-0.1.1-private-Windows-x86_64.zip
+dist/public/Project-EGO-Milestone-0.2-Windows-x86_64.zip
+dist/private/Project-EGO-Milestone-0.2-private-Windows-x86_64.zip
 ```
 
 Each ZIP opens directly at the application files. `BUILD.json`, `BUILD.txt` and
 `demo-info.txt` record Project EGO, milestone, exact commit, Godot version, mode
-and UTC build time. The About dialog reads adjacent `BUILD.json`; development
-runs use an explicit fallback and generate no tracked metadata file.
+and UTC build time. The visible menu subtitle and About dialog use adjacent
+`BUILD.json`; development runs use an explicit development fallback and generate
+no tracked metadata file.
 
 
 ## Window, resizing, and Windows DPI acceptance
 
-Milestone 0.1.1 requests a 1152×648 logical content area and enforces a 960×540
+Milestone 0.2 requests a 1152×648 logical content area and enforces a 960×540
 minimum. This default was selected to leave room for Windows decorations and the
 taskbar on a 1920×1080 desktop at 150% scaling; it is not an arbitrary increase
 to conceal clipping. Below the minimum the OS blocks further resize. Between the
@@ -73,7 +99,7 @@ back into `TacticalBattlefieldView` local coordinates before
 
 Portable tests validate logical layout at 960×540, 1152×648, and 1440×810. They
 do **not** change or simulate the user's Windows display scale. Before a
-Milestone 0.1.1 release, run the exported public and private builds using this
+Milestone 0.2 release, run the exported public and private builds using this
 manual matrix and record the scale shown by **Settings → System → Display →
 Scale**:
 
@@ -115,6 +141,38 @@ At runtime `TacticalAssetResolver` chooses presentation roots in this order:
 
 An absent optional root is normal and does not affect canonical content
 identity or combat state.
+
+## Fresh-clone release acceptance
+
+After this release-tooling change is reviewed, integrated and committed, the
+human/reviewer performs real artifact acceptance from a fresh clone at the
+release commit on the Windows-backed volume. First, build and accept the public
+artifact independently; this step does not require any local/private assets:
+
+```bash
+git clone <reviewed-project-ego-source> /mnt/d/project-ego-release-0.2
+cd /mnt/d/project-ego-release-0.2
+git checkout --detach <exact-release-commit>
+python3 tools/build_demo.py --mode public --milestone 0.2 \
+    --reproducible --staging-parent /mnt/d
+python3 -m pytest -q tools/test_build_demo.py tools/test_build_release_pair.py
+```
+
+Once a valid prepared private root exists outside tracked Git content, perform
+the subsequent official pair acceptance:
+
+```bash
+python3 tools/build_release_pair.py --milestone 0.2 \
+    --asset-root <prepared-private-root> --staging-parent /mnt/d
+```
+
+The fresh-clone public artifact can be accepted without the private root. Final
+public/private pair acceptance still requires that root, both artifacts passing
+all scanner, smoke, identity and closure gates, and the generated pair manifest.
+Record the exact commit, Godot version, pair-manifest hash, both artifact hashes,
+runtime smoke results and Windows DPI matrix. Because the implementation
+candidate is dirty and `build_demo.py` intentionally archives frozen `HEAD`, a
+pre-integration run is not candidate 0.2 artifact acceptance.
 
 ## Recipient workflow
 

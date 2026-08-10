@@ -17,7 +17,6 @@ var about_dialog: AcceptDialog
 
 
 func _ready() -> void:
-	build_metadata = load_build_metadata()
 	%PlayButton.pressed.connect(play_demo)
 	%ControlsButton.pressed.connect(show_controls)
 	%AboutButton.pressed.connect(show_about)
@@ -27,7 +26,7 @@ func _ready() -> void:
 	_prepare_dialog(controls_dialog)
 	_prepare_dialog(about_dialog)
 	controls_dialog.dialog_text = controls_text()
-	about_dialog.dialog_text = about_text(build_metadata)
+	apply_build_metadata(load_build_metadata())
 	if OS.get_cmdline_user_args().has("--demo-smoke"):
 		_run_export_smoke.call_deferred()
 
@@ -60,6 +59,20 @@ func controls_text() -> String:
 		+ "R or Ranged button: ranged mode; click a magenta target.\n"
 		+ "Space or Pass button: end the side's phase.\n"
 		+ "Escape or Cancel button: clear the selection.")
+
+
+func milestone_subtitle(metadata: Dictionary) -> String:
+	var milestone := String(metadata.get("milestone", "development"))
+	if milestone == "development":
+		return "Tactical Prototype — Development Build"
+	return "Tactical Prototype — Milestone %s" % milestone
+
+
+func apply_build_metadata(metadata: Dictionary) -> void:
+	build_metadata = metadata.duplicate(true)
+	%Subtitle.text = milestone_subtitle(build_metadata)
+	if about_dialog != null:
+		about_dialog.dialog_text = about_text(build_metadata)
 
 
 func about_text(metadata: Dictionary) -> String:

@@ -8,6 +8,7 @@ assets are added only after export and never enter the Godot project or PCK.
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import hashlib
 import io
@@ -299,6 +300,41 @@ def require_clean_tracked_head(repo: Path) -> str:
     return head
 
 
+def staging_parent_path(repo: Path, selected: Path | None) -> Path:
+    """Return a usable staging parent without taking ownership of the parent."""
+    parent = selected.expanduser() if selected is not None else repo / STAGING_ROOT_NAME
+    if selected is None:
+        try:
+            parent.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            raise BuildError(f"cannot create default staging parent {parent}: {exc}") from exc
+    if parent.is_symlink():
+        raise BuildError(f"staging parent must not be a symlink: {parent}")
+    try:
+        resolved = parent.resolve(strict=True)
+    except OSError as exc:
+        raise BuildError(f"staging parent does not exist or is unusable: {parent}: {exc}") from exc
+    if not resolved.is_dir():
+        raise BuildError(f"staging parent is not a directory: {resolved}")
+    return resolved
+
+
+@contextmanager
+def owned_staging_directory(repo: Path, selected: Path | None = None) -> Iterable[Path]:
+    """Create and clean one uniquely owned child of the caller-selected parent."""
+    parent = staging_parent_path(repo, selected)
+    try:
+        owned = Path(tempfile.mkdtemp(prefix="project-ego-release-", dir=parent))
+    except OSError as exc:
+        raise BuildError(f"cannot create release staging directory under {parent}: {exc}") from exc
+    try:
+        yield owned
+    finally:
+        # ``owned`` was returned by mkdtemp in ``parent``; never clean the parent.
+        if owned.exists():
+            shutil.rmtree(owned)
+
+
 def materialize_tracked_head(repo: Path, destination: Path, head: str) -> None:
     if destination.exists():
         raise BuildError(f"tracked staging destination already exists: {destination}")
@@ -419,13 +455,34 @@ def validate_or_create_engine_cache(repo: Path, head: str, version: str,
     return cache
 
 
-def build_timestamp() -> str:
-    epoch = os.environ.get("SOURCE_DATE_EPOCH")
+def release_epoch(repo: Path, head: str, reproducible: bool,
+                  environ: dict[str, str] | None = None) -> int | None:
+    """Choose an epoch, with explicit SOURCE_DATE_EPOCH always authoritative."""
+    environment = os.environ if environ is None else environ
+    supplied = environment.get("SOURCE_DATE_EPOCH")
+    if supplied is not None:
+        label = "SOURCE_DATE_EPOCH"
+        raw = supplied
+    elif reproducible:
+        label = "Git commit timestamp"
+        raw = git_output(repo, "show", "-s", "--format=%ct", head)
+    else:
+        return None
     try:
-        moment = datetime.fromtimestamp(int(epoch), timezone.utc) if epoch is not None \
-            else datetime.now(timezone.utc)
-    except (ValueError, OverflowError, OSError) as exc:
-        raise BuildError("SOURCE_DATE_EPOCH must be a valid Unix timestamp") from exc
+        epoch = int(raw)
+        # Validate conversion now; the ZIP writer retains its established 1980 clamp.
+        datetime.fromtimestamp(epoch, timezone.utc)
+    except (TypeError, ValueError, OverflowError, OSError) as exc:
+        raise BuildError(f"{label} must be a valid Unix timestamp") from exc
+    return epoch
+
+
+def build_timestamp(repo: Path = REPOSITORY_ROOT, head: str = "HEAD",
+                    reproducible: bool = False,
+                    environ: dict[str, str] | None = None) -> str:
+    epoch = release_epoch(repo, head, reproducible, environ)
+    moment = (datetime.fromtimestamp(epoch, timezone.utc) if epoch is not None
+              else datetime.now(timezone.utc))
     return moment.replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
@@ -625,13 +682,10 @@ def build(args: argparse.Namespace) -> tuple[Path, list[str], dict[str, str], st
     head = require_clean_tracked_head(repo)
     godot = locate_godot(args.godot)
     version = godot_version(godot)
-    timestamp = build_timestamp()
-    staging_root = repo / STAGING_ROOT_NAME
-    if staging_root.exists():
-        shutil.rmtree(staging_root)
-    source_stage = staging_root / "source"
-    package = staging_root / "package"
-    try:
+    timestamp = build_timestamp(repo, head, getattr(args, "reproducible", False))
+    with owned_staging_directory(repo, getattr(args, "staging_parent", None)) as staging_root:
+        source_stage = staging_root / "source"
+        package = staging_root / "package"
         materialize_tracked_head(repo, source_stage, head)
         cache = validate_or_create_engine_cache(repo, head, version, godot, source_stage)
         package.mkdir(parents=True)
@@ -673,9 +727,6 @@ def build(args: argparse.Namespace) -> tuple[Path, list[str], dict[str, str], st
             raise BuildError("ZIP inventory differs from validated package inventory")
         hashes = runtime_hashes(package)
         return artifact, inventory, hashes, smoke
-    finally:
-        if staging_root.exists():
-            shutil.rmtree(staging_root)
 
 
 def make_parser() -> argparse.ArgumentParser:
@@ -686,6 +737,10 @@ def make_parser() -> argparse.ArgumentParser:
     parser.add_argument("--asset-root", type=Path,
                         help="prepared local index/mapping root (private mode only)")
     parser.add_argument("--godot", help="Godot executable or wrapper override")
+    parser.add_argument("--staging-parent", type=Path,
+                        help="existing parent for one uniquely owned temporary release directory")
+    parser.add_argument("--reproducible", action="store_true",
+                        help="use the released commit timestamp (SOURCE_DATE_EPOCH takes precedence)")
     parser.add_argument("--skip-runtime-smoke", action="store_true",
                         help="explicitly skip executable smoke (package tests only)")
     return parser

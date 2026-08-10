@@ -209,13 +209,22 @@ explicit tool/test root wins; exported builds next probe executable-adjacent
 `res://.local/eador_assets/`. Failure at every probe leaves the authored fallback
 path intact. These paths never define `ContentId` or model identity.
 
-`tools/build_demo.py` is the single public/private release pipeline. It rejects
-tracked changes, exports a `git archive HEAD` staging tree, and uses one cached
-executable/PCK payload per commit and Godot version. Public packaging never
-consults a local asset root. Private packaging adds only the strict mapped-image
-closure after export and regenerates a self-contained runtime index. Both
-staging and final artifacts are ignored; detailed prerequisites, hygiene gates
-and recipient workflow are in `docs/DEMO_RELEASE.md`.
+`tools/build_demo.py` remains the authoritative single-mode public/private
+packager. It rejects tracked changes, exports a `git archive HEAD` staging tree,
+and uses one cached executable/PCK payload per commit and Godot version. Each run
+owns only one unique temporary child under either the portable ignored default
+or a caller-selected staging parent suitable for Windows-backed WSL export.
+Public packaging never consults a local asset root. Private packaging adds only
+the strict mapped-image closure after export and regenerates a self-contained
+runtime index.
+
+`tools/build_release_pair.py` is a thin official-release orchestrator, not a
+second packager. It selects the released commit epoch unless explicit
+`SOURCE_DATE_EPOCH` takes precedence, invokes the existing builder for both
+modes, and reuses the package scanners, private closure check and EXE/PCK
+identity logic before writing an ignored pair manifest. Both staging and final
+artifacts are ignored; detailed prerequisites, hygiene gates, fresh-clone
+acceptance and recipient workflow are in `docs/DEMO_RELEASE.md`.
 
 ## Evidence flow
 

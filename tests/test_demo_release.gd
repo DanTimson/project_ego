@@ -48,16 +48,21 @@ func _run() -> void:
 	var metadata_path := "user://demo_build_metadata.json"
 	var metadata_file := FileAccess.open(metadata_path, FileAccess.WRITE)
 	metadata_file.store_string(JSON.stringify({
-		"project": "Project EGO", "milestone": "0.1", "commit": "abc123",
+		"project": "Project EGO", "milestone": "0.2", "commit": "abc123",
 		"godot_version": "4.3.test", "mode": "public", "built_at": "test-time",
 	}))
 	metadata_file.close()
 	var parsed: Dictionary = menu.load_build_metadata(metadata_path)
-	_check(parsed["commit"] == "abc123" and parsed["mode"] == "public",
-		"valid external build metadata parses")
+	menu.apply_build_metadata(parsed)
+	var subtitle: Label = menu.get_node(button_root + "Subtitle") as Label
+	_check(parsed["commit"] == "abc123" and parsed["mode"] == "public"
+		and subtitle.text == "Tactical Prototype — Milestone 0.2",
+		"packaged metadata drives the visible milestone")
 	var missing: Dictionary = menu.load_build_metadata("user://missing-build-metadata.json")
-	_check(missing["mode"] == "development" and missing["commit"] == "unavailable",
-		"missing build metadata has a development fallback")
+	menu.apply_build_metadata(missing)
+	_check(missing["mode"] == "development" and missing["commit"] == "unavailable"
+		and subtitle.text == "Tactical Prototype — Development Build",
+		"missing build metadata has a sensible development fallback")
 
 	var resolver := TacticalAssetResolver.new()
 	_check(resolver.runtime_asset_root("C:/Demo/Project EGO.exe", true)

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import sys
@@ -17,9 +18,12 @@ from tools.build_demo import (
     compare_runtime_with_zip,
     inspect_zip,
     load_json,
+    build_timestamp,
     mapping_references,
     normalize_relative_path,
+    owned_staging_directory,
     prepare_minimal_asset_bundle,
+    release_epoch,
     runtime_hashes,
     scan_release_tree,
     verify_runtime_asset_bundle,
@@ -71,7 +75,7 @@ def make_asset_root(root: Path) -> Path:
 
 def metadata(mode: str) -> dict[str, str]:
     return {
-        "project": "Project EGO", "milestone": "0.1", "commit": "a" * 40,
+        "project": "Project EGO", "milestone": "0.2", "commit": "a" * 40,
         "godot_version": "4.3.test", "mode": mode,
         "built_at": "2026-01-02T03:04:05Z",
     }
@@ -264,6 +268,87 @@ def test_identity_comparison_fails_closed_on_different_engine(tmp_path: Path):
     (private / EXE_NAME).write_bytes(b"different")
     with pytest.raises(BuildError, match="identity mismatch"):
         compare_runtime_with_zip(private, public_zip)
+
+
+def test_default_and_external_staging_are_uniquely_owned_and_cleaned(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    with owned_staging_directory(repo) as default_stage:
+        default_parent = repo / ".release_staging"
+        assert default_stage.parent == default_parent.resolve()
+        (default_stage / "owned.txt").write_text("owned", encoding="utf-8")
+    assert default_parent.is_dir()
+    assert not default_stage.exists()
+
+    external_parent = tmp_path / "windows-backed"
+    external_parent.mkdir()
+    sentinel = external_parent / "caller-owned.txt"
+    sentinel.write_text("keep", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="synthetic failure"):
+        with owned_staging_directory(repo, external_parent) as external_stage:
+            assert external_stage.parent == external_parent.resolve()
+            assert external_stage != external_parent
+            (external_stage / "owned.txt").write_text("owned", encoding="utf-8")
+            raise RuntimeError("synthetic failure")
+    assert sentinel.read_text(encoding="utf-8") == "keep"
+    assert external_parent.is_dir()
+    assert not external_stage.exists()
+
+
+def test_staging_rejects_a_non_directory_or_symlink_parent(tmp_path: Path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    not_a_directory = tmp_path / "file"
+    not_a_directory.write_text("x", encoding="utf-8")
+    with pytest.raises(BuildError, match="not a directory"):
+        with owned_staging_directory(repo, not_a_directory):
+            pass
+    target = tmp_path / "target"
+    target.mkdir()
+    link = tmp_path / "link"
+    link.symlink_to(target, target_is_directory=True)
+    with pytest.raises(BuildError, match="symlink"):
+        with owned_staging_directory(repo, link):
+            pass
+
+
+def test_reproducible_epoch_and_source_date_epoch_precedence(monkeypatch: pytest.MonkeyPatch,
+                                                              tmp_path: Path):
+    git_calls: list[tuple[str, ...]] = []
+
+    def fake_git_output(repo: Path, *args: str) -> str:
+        git_calls.append(args)
+        return "1700000000"
+
+    monkeypatch.setattr("tools.build_demo.git_output", fake_git_output)
+    assert release_epoch(tmp_path, "a" * 40, True, {}) == 1700000000
+    assert build_timestamp(tmp_path, "a" * 40, True, {}) == "2023-11-14T22:13:20Z"
+    assert len(git_calls) == 2
+    assert release_epoch(
+        tmp_path, "a" * 40, True, {"SOURCE_DATE_EPOCH": "1700000123"}
+    ) == 1700000123
+    assert build_timestamp(
+        tmp_path, "a" * 40, True, {"SOURCE_DATE_EPOCH": "1700000123"}
+    ) == "2023-11-14T22:15:23Z"
+    assert len(git_calls) == 2
+    assert release_epoch(tmp_path, "a" * 40, False, {}) is None
+    before = datetime.now(timezone.utc).replace(microsecond=0)
+    ordinary = datetime.fromisoformat(
+        build_timestamp(tmp_path, "a" * 40, False, {}).replace("Z", "+00:00")
+    )
+    after = datetime.now(timezone.utc).replace(microsecond=0)
+    assert before <= ordinary <= after
+
+
+def test_fixed_epoch_zip_packaging_is_byte_identical(tmp_path: Path):
+    first = make_package(tmp_path / "first", "public")
+    second = make_package(tmp_path / "second", "public")
+    timestamp = metadata("public")["built_at"]
+    first_zip = tmp_path / "first.zip"
+    second_zip = tmp_path / "second.zip"
+    write_zip(first, first_zip, timestamp)
+    write_zip(second, second_zip, timestamp)
+    assert first_zip.read_bytes() == second_zip.read_bytes()
 
 
 if __name__ == "__main__":

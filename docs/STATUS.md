@@ -28,18 +28,23 @@ This is a coverage map, not a release claim.
 | tactical AI scoring | decompilation corpus | not consolidated | scaffold only | deferred |
 | presentation | Project EGO Slice-3 contract + direct local visual inspection | n/a | playable hot-seat scene with layered field, inward facing, shadows, categorized ignored assets, and narrow tactical panel | real textured field/right panel and full authored fallback GUI-smoked; structural resemblance only, not original parity |
 
-## Playable tactical slice and Milestone 0.1.1 release shell
+## Playable tactical slice and Milestone 0.2 release shell
 
-Ordinary project play now opens the Milestone 0.1.1 demo menu; **Play Demo** enters
-the accepted Tactical Visual Slice 3. Developers can still launch
-`game/tactical/tactical_main.tscn` directly. The menu adds no battle semantics.
+Ordinary project play opens the Milestone demo menu; packaged `BUILD.json`
+metadata supplies the visible 0.2 identity while editor/development runs show an
+explicit development fallback. **Play Demo** enters the accepted Tactical Visual
+Slice 3. Developers can still launch `game/tactical/tactical_main.tscn` directly.
+The menu adds no battle semantics.
 
-The tracked Windows x86-64 export preset and `tools/build_demo.py` establish a
-tracked-HEAD-only public/private packaging pipeline. Public output is fallback
-only. Private output adds an exact, validated mapping-reference closure under
-executable-adjacent `local_assets/` while reusing byte-identical executable/PCK
-payloads. Metadata and hygiene are external package gates. See
-`docs/DEMO_RELEASE.md`.
+The tracked Windows x86-64 export preset and authoritative `tools/build_demo.py`
+establish a tracked-HEAD-only public/private packaging pipeline. The 0.2 pair
+wrapper selects the released commit epoch unless `SOURCE_DATE_EPOCH` is explicit,
+uses caller-selected uniquely owned staging suitable for Windows-backed WSL
+export, and writes an ignored verified pair manifest only after both modes pass.
+Public output is fallback only. Private output adds an exact, validated
+mapping-reference closure under executable-adjacent `local_assets/` while
+reusing byte-identical executable/PCK payloads. Metadata and existing fail-closed
+hygiene scanners remain external package gates. See `docs/DEMO_RELEASE.md`.
 
 Tactical Slice 3 preserves the synthetic 8×5 hot-seat battle, authoritative structured command
 boundary, and placeholder-only fresh-clone behavior. Presentation now uses a
@@ -58,14 +63,14 @@ three variations, four deterministic decorations, the legacy segmented battle
 panel, and four recognizable UI icons. Runtime exact-magenta keying restores
 binary transparency where demonstrated by the exports.
 
-Milestone 0.1.1 hardens the provisional tactical UI at a 1152×648 default and
-960×540 minimum logical content size. The right panel is an anchored 320-pixel
+The release shell retains the Milestone 0.1.1 tactical UI hardening at a
+1152×648 default and 960×540 minimum logical content size. The right panel is an anchored 320-pixel
 region; its portrait, values, actions, status, feedback, events, and restart
 content uses wrapping and bounded scrolling. The battlefield scales uniformly in
 the non-overlapping remainder, while adapter-based hit testing remains unchanged.
 Portable scene tests cover minimum, default, and larger sizes plus representative
 long text. Windows 100%, 125%, 150%, and 200% display scaling remain a documented
-manual exported-build matrix; 150% is a required 0.1.1 release run, not an
+manual exported-build matrix; 150% is a required 0.2 release run, not an
 automated claim. No unsupported ability or legacy terrain semantics were added.
 Instance mappings remain explicit local presentation choices; no canonical
 `genesis:unit/N` relationship is established.

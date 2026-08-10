@@ -18,7 +18,9 @@ the evidence and data policy.
 
 Project EGO is no longer only a headless rules prototype. The repository now
 contains a **playable tactical vertical slice** backed by the same deterministic
-core used by the oracle and headless tests.
+core used by the oracle and headless tests. Milestone 0.2 remains the mixed
+research/prototype lineage at G0; it is not a stable community API or a complete
+Eador battle implementation.
 
 Implemented or substantially integrated:
 
@@ -33,7 +35,7 @@ Implemented or substantially integrated:
   battle-instance/content identity;
 - a playable tactical Godot scene with mouse routing, responsive layout, local
   asset resolution, and committed fallback presentation;
-- repeatable demo/export infrastructure;
+- reproducible public/private demo packaging with a verified pair manifest;
 - reverse-engineering evidence, function maps, compatibility matrices, and
   deterministic fixtures.
 
@@ -42,8 +44,8 @@ Important remaining work includes:
 - exact legacy PRNG call ordering and reseed lifecycle;
 - exact timed-status automatic tick/expiry boundaries;
 - incomplete battle-action/effect and modifier dictionaries;
-- missing tactical lifecycle families such as death, revival, transformation,
-  and side transfer;
+- remaining lifecycle boundaries including automatic status timing, strategy
+  writeback, corpses, rewards, and wider battle effects;
 - large-unit footprint and several observation-backed edge cases;
 - tactical AI and the strategic layer;
 - broader presentation fidelity and original-style UI work.
@@ -67,7 +69,10 @@ godot --path . game/tactical/tactical_main.tscn
 The public repository is designed to remain runnable without redistributing
 original Eador assets. Committed project-owned fallback visuals support the
 portable tactical/demo path; locally extracted content and assets can be used by
-the separate local-content tier where supported.
+the separate local-content tier where supported. Milestone 0.2 release commands,
+Windows-backed WSL staging, reproducible timestamps, the public/private pair
+manifest and fresh-clone acceptance are documented in
+[docs/DEMO_RELEASE.md](docs/DEMO_RELEASE.md).
 
 Run the main validation suites:
 
