@@ -422,6 +422,15 @@ def _trunc(x: float) -> int:
     return int(x)
 
 
+def trunc0_ratio(value: int, numerator: int, denominator: int) -> int:
+    """Scale signed integers without float mediation, truncating toward zero."""
+    if denominator <= 0:
+        raise ValueError("ratio denominator must be positive")
+    product = int(value) * int(numerator)
+    magnitude = abs(product) // denominator
+    return -magnitude if product < 0 else magnitude
+
+
 def morale_band(morale: int) -> int:
     """Band index n for morale >= 16; multiplier is 1.0 + 0.05 * n."""
     n = 1
@@ -519,6 +528,26 @@ def effective_modifier_value(u, ability: int) -> int:
     """Signed numeric total for one modifier ID across represented providers."""
     return sum(int(m.power) for m in effective_modifiers(u)
                if m.ability == ability)
+
+
+def apply_tactical_stamina_drain(
+        u: Combatant, amount: int,
+        modifier_0x12_effective: bool = False) -> Trace:
+    """Apply the bounded CX-013 drain; positive restoration is unsupported."""
+    if amount > 0:
+        raise ValueError("CX-013 tactical stamina operation supports drains only")
+    t = Trace(f"{u.name}.stamina_delta")
+    t.base = u.stamina
+    suppressed = modifier_0x12_effective or u.has_flag("Неутомимый")
+    if amount and suppressed:
+        t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+               "requested tactical stamina drain %+d" % amount)
+    elif amount < 0:
+        u.stamina = max(0, u.stamina + int(amount))
+        t.step("tactical stamina mutation", t.base, u.stamina,
+               "signed resource delta %+d" % amount)
+    t.result = u.stamina
+    return t
 
 
 def _offensive_disabled(u) -> bool:
@@ -684,7 +713,9 @@ def negative_damage_hits(damage: int, rng: Rng, stream: str = "chip") -> bool:
 
 def attack_power_before_randomisation(
         attacker: Combatant, kind: AttackKind,
-        selected_ordinary_1_5x: bool = False) -> tuple[int, Trace]:
+        selected_ordinary_1_5x: bool = False,
+        initiating_scale_numerator: int = 1,
+        initiating_scale_denominator: int = 1) -> tuple[int, Trace]:
     """Final attack power immediately before randomisation (R10).
 
     ``conditional_bonus`` is an already-resolved applicability/provider
@@ -695,11 +726,20 @@ def attack_power_before_randomisation(
     atk_value, atk_trace = current_attack(attacker, kind)
 
     if kind is AttackKind.MELEE and selected_ordinary_1_5x:
-        branch_add = _trunc(atk_value / 2)
-        branch_value = atk_value + branch_add
-        atk_trace.step("selected ordinary 1.5x branch", atk_value, branch_value,
-                       "after finalized effective attack")
-        atk_value = branch_value
+        initiating_scale_numerator, initiating_scale_denominator = 3, 2
+    if initiating_scale_denominator <= 0:
+        raise ValueError("initiating attack scale denominator must be positive")
+    if (kind is AttackKind.MELEE
+            and (initiating_scale_numerator, initiating_scale_denominator) != (1, 1)):
+        before = _trunc(atk_value)
+        scaled = trunc0_ratio(before, initiating_scale_numerator,
+                              initiating_scale_denominator)
+        source = ("selected ordinary 1.5x branch" if selected_ordinary_1_5x
+                  else "initiating attack scale %d/%d" %
+                       (initiating_scale_numerator, initiating_scale_denominator))
+        atk_trace.step(source, atk_value, scaled,
+                       "after finalized effective attack; exact rational trunc0")
+        atk_value = float(scaled)
 
     if (kind in (AttackKind.MELEE, AttackKind.COUNTER)
             and attacker.conditional_bonus):
@@ -823,14 +863,17 @@ def resolve_ranged_attack(attacker: Combatant, defender: Combatant,
 
 def resolve_attack(attacker: Combatant, defender: Combatant,
                    kind: AttackKind, rng: Rng,
-                   selected_ordinary_1_5x: bool = False) -> tuple[int, list]:
+                   selected_ordinary_1_5x: bool = False,
+                   initiating_scale_numerator: int = 1,
+                   initiating_scale_denominator: int = 1) -> tuple[int, list]:
     """Full ordinary-damage pipeline. Returns (damage_dealt, [traces])."""
     if kind is AttackKind.RANGED:
         damage, traces, _channel = resolve_ranged_attack(attacker, defender, rng)
         return damage, traces
 
     attack_int, atk_trace = attack_power_before_randomisation(
-        attacker, kind, selected_ordinary_1_5x)
+        attacker, kind, selected_ordinary_1_5x,
+        initiating_scale_numerator, initiating_scale_denominator)
     if _offensive_disabled(attacker):
         return 0, [atk_trace]
     defence_input, defence_trace = current_defence(defender, kind)

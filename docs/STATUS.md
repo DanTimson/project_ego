@@ -9,7 +9,7 @@ This is a coverage map, not a release claim.
 | effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | implemented | implemented | R9 fixture-covered: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets remain distinct |
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 early-provider cutoff and distinct melee/counter minimum handling are fixture-covered |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 numeric placement is fixture-covered after effective-stat/selected 1.5× processing and before randomisation/defence; target applicability and wider provider coverage remain incomplete |
-| activated actions | public/data families + selective binary edges | implemented | `Action` catalogue + generic grants executor implemented | resolved action-consumption policy now controls activation terminality; fourteen explicit NH unit actions and public effect-family matrix catalogued; wider battlefield effects and consumer-triggered opcode mappings remain incomplete |
+| activated actions | public/data families + selective binary edges | typed plan execution for Crushing Blow and Shield Bash | typed plan execution for Crushing Blow and Shield Bash | source ID → canonical `Action` → recipe → immutable ordered plan → shared primitive is implemented; the other twelve catalogue actions and generic battle effects remain unsupported |
 | runtime statuses | public/project stable policy + unresolved binary lifecycle | stable container, stacking/resistance and explicit manipulation implemented | first-class `Status` model integrated through `Combatant`, later modifier providers and scenarios | stable container/parity fixture implemented; automatic duration tick/expiry and `UNTIL_NEXT_TURN` clock remain open pending R13 |
 | level-up selection | data + binary | implemented in part | `core/model/option.gd` and `tests/test_options.gd` empty | ordinary selection is specified; R15 zero-total/underfull edge deferred until an executable consumer and fixture exist |
 | battlefield coordinates and adjacency | binary + controlled observation | implemented | implemented | adjacency recovered; R14 large-unit logical-footprint protocol ready |
@@ -18,7 +18,7 @@ This is a coverage map, not a release claim.
 | melee execution | binary | partial compatibility model | counterattack path plus tactical fatal lifecycle implemented | EXP-CI11 fatal-event sequencing distinguishes first-strike survival from fatal-primary retaliation suppression; R17 secondary ordering remains excluded |
 | ranged execution | binary | partial compatibility model | partial | one-shot `cmd_shoot`, exact ranged early-provider zero cutoff, live-capacity R8 stamina selection, CX-009 terminality and central fatal lifecycle routing are implemented; Extra Shot/two-shot action execution and special modes remain incomplete |
 | damage channels and death | binary | implemented tactical lifecycle + ranged calculator | implemented tactical lifecycle + ranged calculator | CX-012 covers exact `0x1C` resistance/channel-2, `0x5F`, `0x11`, `0x4D` and non-`0x1C` `0x3C` routing through the CX-011 sink; lifecycle parity remains covered; large-hit morale delta/`0x19`, hero-wide cohort, strategy writeback, corpses, rewards and R17 remain outside this tranche |
-| battle actions and target legality | public/data descriptions + selective binary evidence | partial | content model only | R16 whole-dispatcher reconstruction retired; observable action-semantics coverage matrix required |
+| battle actions and target legality | public/data descriptions + selective binary evidence | adjacent enemy legality, exclusions and mutation-free refusal implemented for two unit actions | matching implementation | canonical typed unit-action command is covered; R16 stays retired and generic battle-action effects remain separate/unimplemented |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
 | scenario format and traces | Project EGO design | inline and canonical-definition units implemented | inline and canonical-definition units implemented | portable synthetic parity fixture covers provenance, merge and identity |
 | content packs and bindings | data analysis | implemented; `ContentDb` is a scenario provider | implemented; `ContentDb` is a scenario provider | canonical content ID, battle-instance ID and display name remain separate; actual content requires a verified local pack snapshot |
@@ -135,6 +135,20 @@ retired. R17 is reduced to a finite black-box matrix covering zero-damage
 triggers, follow-up attack order, component damage, trample and instant-death
 placement.
 
+
+
+CX-013 establishes the engine-native explicit-unit-action boundary without
+recreating the recovered dispatcher: source ability IDs remain content metadata;
+the pure canonical recipe resolver creates a fresh immutable ordered plan; the
+typed executor iterates operations; and Scenario owns validation, payment,
+orchestration and neutral tracing while delegating to shared primitives.
+`crushing_blow` is one melee `AttackOp` with integer-only signed truncation of the
+initiating `3/2` scale at the R10 pre-randomisation stage. `shield_bash` is one
+drain-only stamina `ResourceDeltaOp` with floor-zero and the battle-contextual
+effective R11 `0x12` write gate. Both pay the resolved Action cost once and obey
+CX-009 terminality. The other twelve catalogue actions, generic battle effects,
+R12/R13/R14/R17, special ranged producers and exact legacy RNG ordering remain
+outside this implementation.
 
 CX-012 implements the narrowed `DAMAGE-RANGED-001` tranche. Python and
 GDScript now select resistance plus received-damage channel 2 only when effective

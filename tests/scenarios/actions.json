@@ -1,5 +1,5 @@
 {
-  "name": "a defensive stance",
+  "name": "typed action execution",
   "profile": "native",
   "seed": 909,
   "battlefield": {
@@ -8,77 +8,46 @@
   },
   "actions": [
     {
-      "id": "frenzy",
-      "name": "Бешенство",
+      "id": "crushing_blow",
+      "source_id": 59,
+      "name": "Localized crushing action",
       "target": 1,
-      "cost_stamina": 2,
+      "cost_stamina": 0,
       "cost_ammo": 0,
       "consumes_action": true,
       "attack_surcharge": true,
       "free_action_for": [],
       "magnitude": 0,
       "is_attack": true,
-      "damage_scale": 1.0,
+      "damage_scale": 1.5,
       "suppresses": [],
       "scales": [],
       "excluded_targets": [],
       "suppresses_counterattack": false,
       "grants": [],
-      "notes": "Heals the actor up to `magnitude`, capped at damage actually dealt — so the heal must be sequenced after damage resolution."
+      "notes": ""
     },
     {
-      "id": "turtle",
-      "name": "Глухая оборона",
-      "target": 0,
-      "cost_stamina": 0,
+      "id": "shield_bash",
+      "source_id": 388,
+      "name": "Localized shield action",
+      "target": 1,
+      "cost_stamina": 1,
       "cost_ammo": 0,
       "consumes_action": true,
-      "attack_surcharge": false,
+      "attack_surcharge": true,
       "free_action_for": [],
-      "magnitude": 0,
-      "is_attack": false,
-      "damage_scale": 1.0,
+      "magnitude": 4,
+      "is_attack": true,
+      "damage_scale": 0.0,
       "suppresses": [],
       "scales": [],
-      "excluded_targets": [],
-      "suppresses_counterattack": false,
-      "grants": [
-        [
-          "Защита",
-          null,
-          1
-        ],
-        [
-          "Защита от выстрела",
-          null,
-          1
-        ],
-        [
-          "Бдительность",
-          1,
-          1
-        ]
+      "excluded_targets": [
+        "Бестелесный"
       ],
-      "notes": "+magnitude to both defences and Бдительность until next turn; attack and counterattack drop by a second documented amount. OPEN: the penalty is a separate %d from the bonus."
-    },
-    {
-      "id": "gather_ammo",
-      "name": "Сбор снарядов",
-      "target": 6,
-      "cost_stamina": 0,
-      "cost_ammo": 0,
-      "consumes_action": true,
-      "attack_surcharge": false,
-      "free_action_for": [],
-      "magnitude": 0,
-      "is_attack": false,
-      "damage_scale": 1.0,
-      "suppresses": [],
-      "scales": [],
-      "excluded_targets": [],
-      "suppresses_counterattack": false,
+      "suppresses_counterattack": true,
       "grants": [],
-      "notes": "Up to `magnitude` ammo. An adjacent Оруженосец guarantees at least one; multiple Оруженосец take the MAXIMUM, they do not sum."
+      "notes": ""
     }
   ],
   "sides": [
@@ -89,17 +58,35 @@
       "is_attacker": true,
       "units": [
         {
-          "name": "Мечник",
+          "name": "Crusher",
           "at": [
             1,
-            1
+            0
           ],
-          "life": 17,
-          "attack": 7,
-          "counter_attack": 7,
-          "defence": 3,
+          "life": 30,
+          "life_base": 30,
+          "attack": 9,
+          "counter_attack": 3,
+          "defence": 2,
           "speed": 2,
           "stamina": 10,
+          "stamina_base": 10,
+          "morale": 10
+        },
+        {
+          "name": "Basher",
+          "at": [
+            1,
+            2
+          ],
+          "life": 20,
+          "life_base": 20,
+          "attack": 6,
+          "counter_attack": 2,
+          "defence": 2,
+          "speed": 2,
+          "stamina": 10,
+          "stamina_base": 10,
           "morale": 10
         }
       ]
@@ -110,17 +97,35 @@
       "leader_initiative": 2,
       "units": [
         {
-          "name": "Ополченец",
+          "name": "CrusherTarget",
           "at": [
-            3,
-            1
+            2,
+            0
           ],
-          "life": 12,
-          "attack": 5,
-          "counter_attack": 4,
-          "defence": 2,
+          "life": 30,
+          "life_base": 30,
+          "attack": 4,
+          "counter_attack": 5,
+          "defence": 4,
           "speed": 2,
           "stamina": 10,
+          "stamina_base": 10,
+          "morale": 10
+        },
+        {
+          "name": "BashTarget",
+          "at": [
+            2,
+            2
+          ],
+          "life": 25,
+          "life_base": 25,
+          "attack": 8,
+          "counter_attack": 7,
+          "defence": 3,
+          "speed": 2,
+          "stamina": 9,
+          "stamina_base": 9,
           "morale": 10
         }
       ]
@@ -129,36 +134,15 @@
   "commands": [
     {
       "op": "action",
-      "unit": "Мечник",
-      "action": "turtle"
+      "unit": "Crusher",
+      "action": "crushing_blow",
+      "target": "CrusherTarget"
     },
     {
       "op": "action",
-      "unit": "Мечник",
-      "action": "turtle"
-    },
-    {
-      "op": "action",
-      "unit": "Мечник",
-      "action": "frenzy"
-    },
-    {
-      "op": "action",
-      "unit": "Мечник",
-      "action": "gather_ammo"
-    },
-    {
-      "op": "action",
-      "unit": "Мечник",
-      "action": "nonesuch"
-    },
-    {
-      "op": "end_phase"
-    },
-    {
-      "op": "attack",
-      "unit": "Ополченец",
-      "target": "Мечник"
+      "unit": "Basher",
+      "action": "shield_bash",
+      "target": "BashTarget"
     }
   ]
 }

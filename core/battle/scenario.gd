@@ -491,7 +491,7 @@ func query_command(command: Dictionary) -> Dictionary:
 	var command_name := _command_name(op)
 	if op == "end_phase":
 		return _command_query(true, command_name)
-	if op not in ["move", "attack", "shoot", "rest"]:
+	if op not in ["move", "attack", "shoot", "rest", "action"]:
 		return _command_query(false, command_name,
 			"unknown command '%s'" % op)
 	var unit: Combatant = units.get(String(command.get("unit", "")))
@@ -511,6 +511,8 @@ func query_command(command: Dictionary) -> Dictionary:
 	if not ActionPoints.has_resources(unit):
 		return _command_query(false, command_name,
 			"%s has no resources left this activation" % unit.label())
+	if op == "action":
+		return _query_action_command(unit, command, command_name)
 	if op == "move":
 		var destination_v: Variant = command.get("to")
 		if typeof(destination_v) != TYPE_ARRAY or destination_v.size() != 2:
@@ -572,6 +574,9 @@ func execute_command(command: Dictionary) -> Dictionary:
 				cmd_attack(unit, units[String(command["target"])])
 			"shoot":
 				cmd_shoot(unit, units[String(command["target"])])
+			"action":
+				cmd_action(unit, String(command.get("action", "")),
+					units.get(String(command.get("target", ""))))
 			"rest":
 				cmd_rest(unit)
 	if RoundLoop.battle_over(state):
@@ -597,6 +602,45 @@ func movement_plan(unit: Combatant, col: int, row: int) -> Dictionary:
 	return {"ok": true, "reason": "", "start": start, "goal": goal,
 		"path": path, "cost": cost, "stamina_cost": _path_stamina(path)}
 
+
+func _resolve_action_command(unit: Combatant, action_id: String,
+		target: Combatant) -> Dictionary:
+	if not catalogue.has(StringName(action_id)):
+		return {"reason": "unknown action '%s'" % action_id,
+			"refusal": "unknown"}
+	var action: Action = catalogue[StringName(action_id)]
+	var resolution := ActionRecipeResolver.resolve(action)
+	if not resolution.supported:
+		return {"reason": "action %s is known but unsupported" % action.id,
+			"refusal": "unsupported"}
+	var refusal := action.availability(unit,
+		Damage.has_effective_modifier(unit, 0x12))
+	if refusal != Action.Refusal.OK:
+		return {"reason": Action.REFUSAL_TEXT[refusal]}
+	if target == null:
+		return {"reason": "requires an existing target"}
+	if not target.alive or target.life <= 0:
+		return {"reason": "%s is down and cannot be targeted" % target.label()}
+	if side_of(target) == side_of(unit):
+		return {"reason": "%s is on the same side as %s" % [
+			target.label(), unit.label()]}
+	if Battlefield.distance(field.find_unit(unit), field.find_unit(target)) != 1:
+		return {"reason": "%s is not adjacent to %s" % [
+			target.label(), unit.label()]}
+	for excluded in action.excluded_targets:
+		if target.has_flag(excluded) or target.has_subtype(excluded):
+			return {"reason": "%s is excluded by %s" % [
+				target.label(), action.id]}
+	return {"reason": "", "action": action, "plan": resolution.plan}
+
+
+func _query_action_command(unit: Combatant, command: Dictionary,
+		command_name: String) -> Dictionary:
+	var prepared := _resolve_action_command(unit,
+		String(command.get("action", "")),
+		units.get(String(command.get("target", ""))))
+	var reason := String(prepared["reason"])
+	return _command_query(reason == "", command_name, reason)
 
 func _command_name(op: String) -> String:
 	return {"attack": "melee", "shoot": "ranged", "end_phase": "pass"}.get(op, op)
@@ -741,10 +785,12 @@ func _fell(unit: Combatant) -> void:
 ## the blow that caused it, so a defender can kill an attacker before the attack
 ## lands.
 func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
-		action: Variant = null, primary_melee_charge: Variant = null) -> void:
+		attack_context: Variant = null, primary_melee_charge: Variant = null,
+		spend_attack_cost: bool = true) -> Counterattack.Exchange:
 	Counterattack.bind_death_resolver(Callable(self, "_resolve_fatal_event"))
 	var ex := ScenarioNumericOrdering.resolve_exchange(
-		log, unit, target, rng, kind, action, primary_melee_charge)
+		log, unit, target, rng, kind, attack_context, primary_melee_charge,
+		spend_attack_cost)
 	Counterattack.bind_death_resolver(Callable())
 
 	for entry in ex.order:
@@ -765,6 +811,17 @@ func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
 			and ex.reason != Counterattack.NoCounter.DEAD:
 		emit("  (%s does not counter: %s)"
 			% [target.label(), Counterattack.REASON_TEXT[ex.reason]])
+	return ex
+
+
+func _primary_melee_charge_at_command_entry(unit: Combatant,
+		target: Combatant, movement_requested: bool) -> Variant:
+	var attacker_entry := Battlefield.axial_to_offset(field.find_unit(unit))
+	var target_entry := Battlefield.axial_to_offset(field.find_unit(target))
+	var charge_decision: Variant = _attack_command_charge.call(
+		unit, attacker_entry, target_entry, movement_requested)
+	return ScenarioNumericOrdering.charge_value(
+		log, charge_decision, attacker_entry, target_entry, movement_requested)
 
 
 func cmd_attack(unit: Combatant, target: Combatant) -> void:
@@ -778,14 +835,10 @@ func cmd_attack(unit: Combatant, target: Combatant) -> void:
 	# mutates battlefield occupancy or the environment-derived modifier set.
 	var attacker_entry_h := field.find_unit(unit)
 	var target_entry_h := field.find_unit(target)
-	var attacker_entry := Battlefield.axial_to_offset(attacker_entry_h)
-	var target_entry := Battlefield.axial_to_offset(target_entry_h)
 	var movement_requested := Battlefield.distance(
 		attacker_entry_h, target_entry_h) != 1
-	var charge_decision: Variant = _attack_command_charge.call(
-		unit, attacker_entry, target_entry, movement_requested)
-	var primary_melee_charge: Variant = ScenarioNumericOrdering.charge_value(
-		log, charge_decision, attacker_entry, target_entry, movement_requested)
+	var primary_melee_charge: Variant = _primary_melee_charge_at_command_entry(
+		unit, target, movement_requested)
 	if not _approach(unit, target):
 		emit("%s cannot reach %s" % [unit.label(), target.label()])
 		return
@@ -830,54 +883,78 @@ func cmd_extra_turn(unit: Combatant, c: Dictionary) -> void:
 			unit.movement_remaining, unit.steps_this_round])
 
 
-## Invoke a catalogued action.
-##
-## Executes the Action model's `grants` through normal timed statuses. Other
-## shapes are refused explicitly rather than pretending that an inert action
-## succeeded: `is_attack` still lacks target/effect execution, and target effects
-## still lack magnitudes from `unit_upg.Quantity` in Action instances.
-##
-## Log strings mirror oracle/scenario.py exactly; the scenario fixture compares
-## them line for line.
-func cmd_action(unit: Combatant, action_id: String) -> void:
-	if not catalogue.has(StringName(action_id)):
-		emit("unknown action '%s'" % action_id)
-		return
-	var action: Action = catalogue[StringName(action_id)]
+## Execute validated typed operations through existing battle primitives.
+## Recipe selection remains pure; command ownership stays in Scenario.
+func _execute_action_attack(operation: ActionExecutionPlan.AttackOp,
+		unit: Combatant, target: Combatant) -> Counterattack.Exchange:
+	var charge_value: Variant = _primary_melee_charge_at_command_entry(
+		unit, target, false)
+	return _strike(unit, target, Combatant.AttackKind.MELEE, operation,
+		charge_value, false)
 
-	var modifier_0x12 := Damage.has_effective_modifier(unit, 0x12)
-	var refusal: int = action.availability(unit, modifier_0x12)
-	if refusal != Action.Refusal.OK:
-		emit("%s cannot use %s: %s"
-			% [unit.label(), action.name, Action.REFUSAL_TEXT[refusal]])
+
+func _execute_action_resource_delta(
+		operation: ActionExecutionPlan.ResourceDeltaOp,
+		target: Combatant) -> Trace:
+	assert(operation.target == ActionExecutionPlan.OperationTarget.SELECTED_ENEMY
+		and operation.resource == ActionExecutionPlan.ResourceKind.STAMINA
+		and operation.amount <= 0,
+		"unsupported internal ResourceDeltaOp parameters")
+	var trace := Stamina.apply_tactical_drain(target, operation.amount,
+		Damage.has_effective_modifier(target, 0x12))
+	ScenarioNumericOrdering.append_traces(log, [trace])
+	return trace
+
+
+func cmd_action(unit: Combatant, action_id: String,
+		target: Combatant = null) -> void:
+	var prepared := _resolve_action_command(unit, action_id, target)
+	var reason := String(prepared["reason"])
+	if reason != "":
+		match String(prepared.get("refusal", "validation")):
+			"unknown":
+				emit(reason)
+			"unsupported":
+				emit("%s: %s" % [unit.label(), reason])
+			_:
+				emit("%s cannot use %s: %s" % [
+					unit.label(), action_id, reason])
 		return
 
-	if action.is_attack:
-		emit("%s: %s is an attack-replacing action and is not executable yet"
-			% [unit.label(), action.name])
-		return
-	if action.grants.is_empty():
-		emit("%s: %s has no executable effect yet (magnitudes are not loaded from unit_upg)"
-			% [unit.label(), action.name])
-		return
-
-	var action_cost_trace := action.pay(unit, modifier_0x12)
+	var action: Action = prepared["action"]
+	var plan: ActionExecutionPlan = prepared["plan"]
+	var operation_names: Array[String] = []
+	for operation in plan.operations():
+		operation_names.append(String(operation.kind))
+	var before_stamina := unit.stamina
+	emit("%s requests action %s" % [unit.label(), action.id])
+	emit("  [action] %s resolved plan [%s]" % [
+		action.id, ", ".join(operation_names)])
+	var action_cost_trace := action.pay(unit,
+		Damage.has_effective_modifier(unit, 0x12))
 	ScenarioNumericOrdering.append_traces(log, [action_cost_trace])
-	var applied: Array = []
-	for g in action.grants:
-		var ability := String(g[0])
-		var magnitude: int = int(g[1]) if g[1] != null else 0
-		var duration: int = int(g[2]) if g.size() > 2 and g[2] != null else Statuses.PERMANENT
-		var effect := Status.new()
-		effect.id = StringName("%s:%s" % [action.id, ability])
-		effect.name = ability
-		effect.source = action.name
-		effect.duration = duration
-		effect.power = magnitude
-		Statuses.apply(unit, effect)
-		applied.append(ability)
-	emit("%s uses %s (%s; stamina %d)"
-		% [unit.label(), action.name, ", ".join(applied), unit.stamina])
+	emit("  [action] %s payment stamina %d -> %d; spent %s" % [
+		action.id, before_stamina, unit.stamina, str(unit.action_spent)])
+
+	var attack := func(operation: ActionExecutionPlan.AttackOp) -> Variant:
+		emit("  [action] operation AttackOp melee scale %d/%d" % [
+			operation.initiating_attack_scale_numerator,
+			operation.initiating_attack_scale_denominator])
+		return _execute_action_attack(operation, unit, target)
+	var resource_delta := func(
+			operation: ActionExecutionPlan.ResourceDeltaOp) -> Variant:
+		var before := target.stamina
+		emit("  [action] operation ResourceDeltaOp selected_enemy stamina %+d"
+			% operation.amount)
+		var trace := _execute_action_resource_delta(operation, target)
+		emit("  [action] resource result %s stamina %d -> %d" % [
+			target.label(), before, target.stamina])
+		return trace
+	ActionExecutionPlan.Executor.execute(plan, attack, resource_delta)
+	emit("  [action] %s result target life %d stamina %d" % [
+		action.id, maxi(0, target.life), target.stamina])
+	emit("  [action] %s terminal actor spent %s" % [
+		action.id, str(unit.action_spent)])
 
 
 func cmd_end_phase() -> void:
@@ -965,7 +1042,8 @@ func _run() -> Dictionary:
 			"rest":
 				cmd_rest(unit)
 			"action":
-				cmd_action(unit, String(c.get("action", "")))
+				cmd_action(unit, String(c.get("action", "")),
+					units.get(String(c.get("target", ""))))
 			"extra_turn":
 				cmd_extra_turn(unit, c)
 			_:

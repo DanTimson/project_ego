@@ -125,9 +125,11 @@ Unit-command eligibility is model-owned by `ActionPoints.action_spent` and
 `ActionPoints.has_resources()`. Partial movement leaves the activation open and
 may survive deselection/reselection; after a successful turn-consuming action,
 `action_spent` closes only that actor's activation even if capacity remains.
-Round start and accepted extra-turn refreshes reopen it. Generic active actions
-use `Action.resolved_consumes_action(actor)`, so an explicitly non-consuming
-resolved action remains eligible rather than bypassing this boundary in UI code.
+Round start and accepted extra-turn refreshes reopen it. Action definitions
+retain `Action.resolved_consumes_action(actor)` as their actor-side policy; every
+currently executable CX-013 recipe consumes its actor, while future explicitly
+non-consuming recipes must preserve this boundary rather than bypass it in UI
+code.
 
 `TacticalCoordinateAdapter` is the sole model/screen coordinate boundary. It
 maps offset battlefield cells to pointy-top screen polygons and performs the
@@ -320,6 +322,27 @@ Modifiers are not actions.
   text, owns mutable duration/stack state and its `Modifier` instances, and has
   explicit copy/serialization operations.
 - An **event** records a resolved transition for trace/replay.
+
+Explicit unit-action execution has a separate engine-native composition
+boundary:
+
+```text
+source ability ID -> canonical Action definition -> recipe resolver
+                  -> immutable ordered ActionExecutionPlan -> shared primitive
+```
+
+`Action` remains content/player identity plus execution-neutral metadata; it is
+not battle-instance state. The recipe resolver performs only canonical identity
+to fresh-plan construction. A typed plan executor owns ordered operation
+iteration. Scenario owns command/turn and target validation, one-time payment,
+battle orchestration and neutral trace output, delegating operation details to
+existing melee and tactical-stamina primitives rather than per-action combat
+algorithms. CX-013 plans contain only `AttackOp` and drain-only `ResourceDeltaOp`
+values. The attack context carries an integer rational scale only for the
+initiating primary; the stamina operation accepts no positive restoration path.
+Nothing dispatches on display text, source IDs, binary offsets or raw legacy
+opcodes. The explicit-unit-action resolver remains separate from generic
+spell/battle-effect content and from any future R17 event vocabulary.
 
 Modifier providers remain layered. Unit-owned/intrinsic modifiers are the R6
 ranged early-provider set. Status/runtime modifiers and environment/aura

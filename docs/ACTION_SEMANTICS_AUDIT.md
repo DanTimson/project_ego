@@ -26,7 +26,12 @@ The current Python/GDScript model already represents:
 - public suppression/scaling relationships;
 - actor-only availability and payment.
 
-It does not yet execute those actions against battlefield state.
+CX-013 now executes exactly two canonical actions against battlefield state:
+`crushing_blow` and `shield_bash`. A pure canonical recipe resolver creates fresh
+typed immutable plans, a typed executor owns ordered operation iteration, and the
+battle command owns validation, one-time payment, orchestration and neutral
+tracing. The current stamina operation is drain-only. The other twelve catalogue
+actions remain explicitly unsupported before payment.
 
 ### 1.2 Generic battle-action effects
 
@@ -202,8 +207,12 @@ No broad binary packet is justified before these observations are attempted.
 
 ## 7. Implementation consequence
 
-The next implementation artifact should be an event vocabulary and fixture
-matrix, not a translation of `004D9800`.
+CX-013 implements the first neutral artifact as a typed ordered plan boundary,
+not a translation of `004D9800`: canonical action identity resolves to
+`AttackOp` or `ResourceDeltaOp`, which delegates to shared tactical primitives.
+Only Crushing Blow and Shield Bash are executable. The broader event vocabulary
+below remains a guide for later R17 observation/order work, not an implemented
+event bus.
 
 A suitable neutral event vocabulary is:
 

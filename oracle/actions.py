@@ -92,6 +92,10 @@ class Action:
     cost: Cost
     target: Target
 
+    ## Original/source ability identity retained only at the content boundary.
+    ## Runtime recipes resolve from canonical ``id`` and never dispatch on this.
+    source_id: int = -1
+
     ## From unit_upg.Quantity. Meaning is per-action: heal amount, stamina
     ## drain inflicted, ammo collected, defence bonus.
     magnitude: int = 0
@@ -196,6 +200,7 @@ def action_from_dict(d: dict) -> Action:
                   free_action_for=tuple(d.get("free_action_for", ()))),
         target=(list(Target)[int(d["target"])] if isinstance(d.get("target"), int)
                 else Target(d.get("target", Target.SELF.value))),
+        source_id=int(d.get("source_id", -1)),
         magnitude=int(d.get("magnitude", 0)),
         is_attack=bool(d.get("is_attack", False)),
         damage_scale=float(d.get("damage_scale", 1.0)),
@@ -219,7 +224,7 @@ def _add(a: Action) -> Action:
 # --- attack replacements ---------------------------------------------------
 
 _add(Action(
-    id="extra_shot", name="Дополнительный выстрел",
+    id="extra_shot", source_id=20, name="Дополнительный выстрел",
     cost=Cost(stamina=0, attack_surcharge=True),   # stamina from Расход выносливости
     target=Target.ENEMY_RANGED, is_attack=True,
     suppresses=("Бронебойный выстрел",),
@@ -228,25 +233,25 @@ _add(Action(
 ))
 
 _add(Action(
-    id="power_shot", name="Мощный выстрел",
+    id="power_shot", source_id=361, name="Мощный выстрел",
     cost=Cost(stamina=0, attack_surcharge=True),
     target=Target.ENEMY_RANGED, is_attack=True, damage_scale=1.5,
 ))
 
 _add(Action(
-    id="crushing_blow", name="Сокрушающий удар",
+    id="crushing_blow", source_id=59, name="Сокрушающий удар",
     cost=Cost(stamina=0, attack_surcharge=True),
     target=Target.ENEMY_MELEE, is_attack=True, damage_scale=1.5,
 ))
 
 _add(Action(
-    id="whirlwind", name="Круговая атака",
+    id="whirlwind", source_id=66, name="Круговая атака",
     cost=Cost(stamina=0, attack_surcharge=True),
     target=Target.ALL_ADJACENT_ENEMIES, is_attack=True,
 ))
 
 _add(Action(
-    id="shield_bash", name="Удар щитом",
+    id="shield_bash", source_id=388, name="Удар щитом",
     cost=Cost(stamina=1, attack_surcharge=True),
     target=Target.ENEMY_MELEE, is_attack=True, damage_scale=0.0,
     suppresses_counterattack=True,
@@ -256,7 +261,7 @@ _add(Action(
 ))
 
 _add(Action(
-    id="frenzy", name="Бешенство",
+    id="frenzy", source_id=454, name="Бешенство",
     cost=Cost(stamina=2, attack_surcharge=True),
     target=Target.ENEMY_MELEE, is_attack=True,
     notes="Heals the actor up to `magnitude`, capped at damage actually dealt — "
@@ -266,7 +271,7 @@ _add(Action(
 # --- self buffs ------------------------------------------------------------
 
 _add(Action(
-    id="turtle", name="Глухая оборона",
+    id="turtle", source_id=458, name="Глухая оборона",
     cost=Cost(stamina=0), target=Target.SELF,
     grants=(("Защита", None, 1), ("Защита от выстрела", None, 1), ("Бдительность", 1, 1)),
     notes="+magnitude to both defences and Бдительность until next turn; "
@@ -275,14 +280,14 @@ _add(Action(
 ))
 
 _add(Action(
-    id="forced_march", name="Марш-бросок",
+    id="forced_march", source_id=29, name="Марш-бросок",
     cost=Cost(stamina=3), target=Target.SELF,
     grants=(("Скорость", 1, 0),),
     notes="+1 speed until end of turn.",
 ))
 
 _add(Action(
-    id="sniper_shot", name="Снайперский выстрел",
+    id="sniper_shot", source_id=360, name="Снайперский выстрел",
     cost=Cost(stamina=0, attack_surcharge=True),
     target=Target.ENEMY_RANGED, is_attack=True,
     scales=(("Точный выстрел", 2.0),),
@@ -292,14 +297,14 @@ _add(Action(
 # --- support ---------------------------------------------------------------
 
 _add(Action(
-    id="healing", name="Целительство",
+    id="healing", source_id=24, name="Целительство",
     cost=Cost(ammo=1), target=Target.ALLY_IN_SHOOTING_RANGE,
     excluded_targets=("Нежить", "Механизм", "Голем", "Стихийный дух"),
     notes="Restores `magnitude` life on average — randomised, distribution unknown.",
 ))
 
 _add(Action(
-    id="repair", name="Ремонт",
+    id="repair", source_id=374, name="Ремонт",
     cost=Cost(ammo=1), target=Target.ALLY_IN_SHOOTING_RANGE,
     notes="Mechanisms only. Restores `magnitude` on average and shortens armour "
           "and weapon damage effects.",
@@ -308,14 +313,14 @@ _add(Action(
 # --- resource --------------------------------------------------------------
 
 _add(Action(
-    id="gather_ammo", name="Сбор снарядов",
+    id="gather_ammo", source_id=23, name="Сбор снарядов",
     cost=Cost(), target=Target.NONE,
     notes="Up to `magnitude` ammo. An adjacent Оруженосец guarantees at least one; "
           "multiple Оруженосец take the MAXIMUM, they do not sum.",
 ))
 
 _add(Action(
-    id="carrion_eater", name="Трупоед",
+    id="carrion_eater", source_id=49, name="Трупоед",
     cost=Cost(free_action_for=("Крысолюд",)), target=Target.CORPSE,
     notes="Restores up to `magnitude` life. Free action for Крысолюд.",
 ))
@@ -323,10 +328,20 @@ _add(Action(
 # --- movement rider --------------------------------------------------------
 
 _add(Action(
-    id="strike_and_return", name="Удар и возврат",
+    id="strike_and_return", source_id=518, name="Удар и возврат",
     cost=Cost(stamina=1), target=Target.SELF,
     notes="Returns to the tile where the ATTACK COMMAND was issued, not the "
           "round-start tile. FAILS if a defender carrying Корни or "
           "Калечащий удар counterattacks — so resolution is conditional on the "
           "counterattack outcome.",
 ))
+
+
+def canonical_id_for_source(source_id: int,
+                            catalogue: dict[str, Action] | None = None) -> str | None:
+    """Content/import boundary lookup; runtime recipes never consume source IDs."""
+    definitions = CATALOGUE if catalogue is None else catalogue
+    for canonical_id, action in definitions.items():
+        if action.source_id == int(source_id):
+            return canonical_id
+    return None

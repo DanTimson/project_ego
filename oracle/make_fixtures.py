@@ -258,7 +258,8 @@ def action_fixture() -> dict:
     }
     for a in actions.CATALOGUE.values():
         fx["catalogue"].append({
-            "id": a.id, "name": a.name, "target": list(actions.Target).index(a.target),
+            "id": a.id, "source_id": a.source_id, "name": a.name,
+            "target": list(actions.Target).index(a.target),
             "cost_stamina": a.cost.stamina, "cost_ammo": a.cost.ammo,
             "consumes_action": a.cost.consumes_action,
             "attack_surcharge": a.cost.attack_surcharge,

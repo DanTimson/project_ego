@@ -52,6 +52,9 @@ const REFUSAL_TEXT: Dictionary = {
 
 var id: StringName
 var name: String
+## Original/source ability identity retained only at the content boundary.
+## Runtime recipes resolve from canonical `id` and never dispatch on this.
+var source_id: int = -1
 var target: Target = Target.SELF
 
 # --- cost ------------------------------------------------------------------
@@ -161,10 +164,21 @@ static func load_catalogue(entries: Array) -> void:
 		CATALOGUE[a.id] = a
 
 
+static func canonical_id_for_source(source_id: int,
+		definitions: Dictionary = CATALOGUE) -> StringName:
+	## Content/import boundary only; runtime recipes never consume source IDs.
+	for canonical_id in definitions:
+		var action := definitions[canonical_id] as Action
+		if action != null and action.source_id == source_id:
+			return StringName(canonical_id)
+	return &""
+
+
 static func from_dict(d: Dictionary) -> Action:
 	var a := Action.new()
 	a.id = StringName(d.get("id", ""))
 	a.name = String(d.get("name", ""))
+	a.source_id = int(d.get("source_id", -1))
 	a.target = int(d.get("target", Target.SELF))
 	a.cost_stamina = int(d.get("cost_stamina", 0))
 	a.cost_ammo = int(d.get("cost_ammo", 0))

@@ -739,28 +739,29 @@ def test_action_terminality() -> None:
         "name": "active action terminality", "profile": "native", "seed": 3,
         "battlefield": {"width": 5, "height": 3, "tiles": []},
         "actions": [
-            {"id": "terminal", "name": "Terminal fixture", "target": 0,
-             "consumes_action": True, "grants": [["terminal-effect", 1, 1]]},
-            {"id": "free", "name": "Free fixture", "target": 0,
-             "consumes_action": False, "grants": [["free-effect", 1, 1]]},
-            {"id": "unavailable", "name": "Unavailable fixture", "target": 0,
-             "cost_stamina": 99, "consumes_action": True,
-             "grants": [["unavailable-effect", 1, 1]]},
+            {"id": "shield_bash", "source_id": 388, "name": "Localized",
+             "target": 1, "cost_stamina": 1, "attack_surcharge": True,
+             "consumes_action": True, "magnitude": 1,
+             "excluded_targets": ["Бестелесный"]},
         ],
         "sides": [
             {"id": 0, "is_attacker": True, "leader_initiative": 2,
-             "units": [fighter("consumer", [0, 0]), fighter("exception", [0, 2])]},
+             "units": [fighter("consumer", [0, 0]),
+                       fighter("exception", [0, 2], stamina=1)]},
             {"id": 1, "leader_initiative": 1,
-             "units": [fighter("target", [4, 0])]},
+             "units": [fighter("target", [2, 0]),
+                       fighter("target2", [1, 2])]},
         ],
         "commands": [
             {"op": "move", "unit": "consumer", "to": [1, 0]},
-            {"op": "action", "unit": "consumer", "action": "terminal"},
+            {"op": "action", "unit": "consumer", "action": "shield_bash",
+             "target": "target"},
             {"op": "move", "unit": "consumer", "to": [0, 0]},
-            {"op": "action", "unit": "consumer", "action": "terminal"},
-            {"op": "action", "unit": "exception", "action": "unavailable"},
-            {"op": "action", "unit": "exception", "action": "free"},
-            {"op": "move", "unit": "exception", "to": [1, 2]},
+            {"op": "action", "unit": "consumer", "action": "shield_bash",
+             "target": "target"},
+            {"op": "action", "unit": "exception", "action": "shield_bash",
+             "target": "target2"},
+            {"op": "move", "unit": "exception", "to": [0, 1]},
         ],
     }
     active = scenario.Scenario(action_spec)
@@ -770,16 +771,16 @@ def test_action_terminality() -> None:
     active_log = "\n".join(active_result["log"])
     check(consumer.action_spent and consumer.movement_remaining > 0
           and not turn.has_resources(consumer),
-          "resolved consuming Action policy terminates the actor")
+          "resolved consuming typed Action policy terminates the actor")
     check("consumer cannot reach 0,0" in active_log
-          and "cannot use Terminal fixture: already acted" in active_log,
+          and "cannot use shield_bash: already acted" in active_log,
           "ordinary and consuming-action follow-ups are refused")
-    check("cannot use Unavailable fixture: not enough stamina" in active_log
-          and exception.stamina == 10,
-          "an unavailable action refusal is non-terminal and spends nothing")
+    check("cannot use shield_bash: not enough stamina" in active_log
+          and exception.stamina == 1,
+          "an unavailable typed action refusal is non-terminal and spends nothing")
     check(not exception.action_spent and exception.steps_this_round == 1
           and turn.has_resources(exception),
-          "resolved non-consuming Action policy remains a real exception")
+          "a refused typed Action leaves the actor eligible")
 
 
 def test_phase_passing() -> None:

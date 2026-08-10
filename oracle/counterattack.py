@@ -147,16 +147,18 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
         # Resolve the ordinary strike completely before consuming R3 charge.
         # The combined capped value then feeds the exchange accumulator/order
         # before life subtraction. Retaliation has its own charge-free path.
-        selected_ordinary_1_5x = (
-            kind is AttackKind.MELEE and action is not None
-            and abs(float(getattr(action, "damage_scale", 1.0)) - 1.5) < 1e-9)
+        scale_numerator = int(getattr(
+            action, "initiating_attack_scale_numerator", 1))
+        scale_denominator = int(getattr(
+            action, "initiating_attack_scale_denominator", 1))
         if kind is AttackKind.RANGED:
             ordinary_damage, traces, ranged_channel = combat.resolve_ranged_attack(
                 attacker, defender, rng)
         else:
             ordinary_damage, traces = combat.resolve_attack(
                 attacker, defender, kind, rng,
-                selected_ordinary_1_5x=selected_ordinary_1_5x)
+                initiating_scale_numerator=scale_numerator,
+                initiating_scale_denominator=scale_denominator)
             ranged_channel = 0
         ex.ordinary_attack_damage = ordinary_damage
         damage = ordinary_damage

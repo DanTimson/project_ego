@@ -38,3 +38,24 @@ static func speed_penalty(u: Combatant) -> int:
 ## recovered defence tail (R9); modifier 0x12 is not consulted.
 static func is_exhausted(u: Combatant) -> bool:
 	return u.stamina == 0
+
+
+## CX-013 tactical stamina drain. This is intentionally not a generic signed
+## resource mutation: no authoritative maximum-stamina clamp is established here.
+## The caller supplies the battle-contextual effective-0x12 result; the Russian
+## flag remains the existing compatibility alias.
+static func apply_tactical_drain(u: Combatant, amount: int,
+		modifier_0x12_effective: bool = false) -> Trace:
+	assert(amount <= 0, "CX-013 tactical stamina operation supports drains only")
+	var t := Trace.new("%s.stamina_delta" % u.name)
+	t.base = float(u.stamina)
+	var suppressed := modifier_0x12_effective or u.has_flag(&"Неутомимый")
+	if amount != 0 and suppressed:
+		t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+			"requested tactical stamina drain %+d" % amount)
+	elif amount < 0:
+		u.stamina = maxi(0, u.stamina + amount)
+		t.step("tactical stamina mutation", t.base, float(u.stamina),
+			"signed resource delta %+d" % amount)
+	t.result = float(u.stamina)
+	return t

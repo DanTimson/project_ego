@@ -280,7 +280,7 @@ static func current_resistance(u: Combatant) -> Array:
 ## error at attack 5 and negligible at 50.
 ##
 ## Returns [value: int, note: String].
-static func roll_attack(attack: int, rng: Rng, stream: StringName = &"attack") -> Array:
+static func roll_attack(attack: int, rng: Variant, stream: StringName = &"attack") -> Array:
 	var rolled: int
 	var note: String
 	if attack >= 5:
@@ -297,7 +297,7 @@ static func roll_attack(attack: int, rng: Rng, stream: StringName = &"attack") -
 
 ## «"Отрицательный" урон»: at damage <= 0 but > -10, one point still lands if
 ## Random(20 + damage) >= 10. Probability 1 - 10/(20+damage).
-static func negative_damage_hits(damage: int, rng: Rng, stream: StringName = &"chip") -> bool:
+static func negative_damage_hits(damage: int, rng: Variant, stream: StringName = &"chip") -> bool:
 	if damage <= -10:
 		return false
 	return rng.roll(20 + damage, stream) >= 10
@@ -309,18 +309,40 @@ static func negative_damage_hits(damage: int, rng: Rng, stream: StringName = &"c
 ## callers decide whether modifier 0x3D contributes. This function freezes only
 ## its numeric placement and does not infer a target class from presentation.
 ## Returns [power: int, trace: Trace].
+static func trunc0_ratio(value: int, numerator: int, denominator: int) -> int:
+	## Integer-only signed rational scaling; division truncates toward zero.
+	assert(denominator > 0, "ratio denominator must be positive")
+	var product := value * numerator
+	@warning_ignore("integer_division")
+	var magnitude := absi(product) / denominator
+	return -magnitude if product < 0 else magnitude
+
+
 static func attack_power_before_randomisation(attacker: Combatant,
-		kind: Combatant.AttackKind, selected_ordinary_1_5x: bool = false) -> Array:
+		kind: Combatant.AttackKind, selected_ordinary_1_5x: bool = false,
+		initiating_scale_numerator: int = 1,
+		initiating_scale_denominator: int = 1) -> Array:
 	var atk: Array = current_attack(attacker, kind)
 	var atk_value: float = atk[0]
 	var atk_trace: Trace = atk[1]
 
 	if kind == Combatant.AttackKind.MELEE and selected_ordinary_1_5x:
-		var branch_add := int(atk_value / 2.0)
-		var branch_value := atk_value + float(branch_add)
-		atk_trace.step("selected ordinary 1.5x branch", atk_value, branch_value,
-			"after finalized effective attack")
-		atk_value = branch_value
+		initiating_scale_numerator = 3
+		initiating_scale_denominator = 2
+	assert(initiating_scale_denominator > 0,
+		"initiating attack scale denominator must be positive")
+	if (kind == Combatant.AttackKind.MELEE
+			and (initiating_scale_numerator != 1
+				or initiating_scale_denominator != 1)):
+		var before := int(atk_value)
+		var scaled := trunc0_ratio(before, initiating_scale_numerator,
+			initiating_scale_denominator)
+		var source := "selected ordinary 1.5x branch" if selected_ordinary_1_5x else \
+			"initiating attack scale %d/%d" % [
+				initiating_scale_numerator, initiating_scale_denominator]
+		atk_trace.step(source, atk_value, float(scaled),
+			"after finalized effective attack; exact rational trunc0")
+		atk_value = float(scaled)
 
 	if ((kind == Combatant.AttackKind.MELEE
 			or kind == Combatant.AttackKind.COUNTER)
@@ -336,7 +358,7 @@ static func attack_power_before_randomisation(attacker: Combatant,
 
 ## Existing randomized resolver with an already-selected defensive input.
 static func _resolve_attack_against_defence(attack_int: int, atk_trace: Trace,
-		attacker_name: String, defence_input: int, defence_trace: Trace, rng: Rng,
+		attacker_name: String, defence_input: int, defence_trace: Trace, rng: Variant,
 		defence_note: String = "effective defence") -> Array:
 	var rolled_pair: Array = roll_attack(attack_int, rng)
 	var rolled: int = rolled_pair[0]
@@ -371,7 +393,7 @@ static func trunc0_half(value: int) -> int:
 
 
 static func resolve_ranged_attack(attacker: Combatant, defender: Combatant,
-		rng: Rng) -> Array:
+		rng: Variant) -> Array:
 	## Frozen DAMAGE-RANGED-001 calculator: [damage, traces, sink channel].
 	var attack_power := attack_power_before_randomisation(
 		attacker, Combatant.AttackKind.RANGED)
@@ -451,14 +473,17 @@ static func resolve_ranged_attack(attacker: Combatant, defender: Combatant,
 
 ## Full pipeline. Returns [damage: int, traces: Array[Trace]].
 static func resolve_attack(attacker: Combatant, defender: Combatant,
-		kind: Combatant.AttackKind, rng: Rng,
-		selected_ordinary_1_5x: bool = false) -> Array:
+		kind: Combatant.AttackKind, rng: Variant,
+		selected_ordinary_1_5x: bool = false,
+		initiating_scale_numerator: int = 1,
+		initiating_scale_denominator: int = 1) -> Array:
 	if kind == Combatant.AttackKind.RANGED:
 		var ranged := resolve_ranged_attack(attacker, defender, rng)
 		return [ranged[0], ranged[1]]
 
 	var attack_power := attack_power_before_randomisation(
-		attacker, kind, selected_ordinary_1_5x)
+		attacker, kind, selected_ordinary_1_5x,
+		initiating_scale_numerator, initiating_scale_denominator)
 	var attack_int := int(attack_power[0])
 	var atk_trace := attack_power[1] as Trace
 	if _offensive_disabled(attacker):

@@ -6,6 +6,7 @@ extends RefCounted
 
 const TRACE_SOURCES := {
 	"conditional attack contribution": true,
+	"initiating attack scale 3/2": true,
 	"attack randomisation": true,
 	"ranged early provider total": true,
 	"defence provider total": true,
@@ -24,6 +25,7 @@ const TRACE_SOURCES := {
 	"command-entry charge consumption": true,
 	"live-capacity stamina discriminator": true,
 	"attack stamina mutation": true,
+	"tactical stamina mutation": true,
 	"modifier 0x12 stamina mutation suppression": true,
 	"ranged activation capacity clear": true,
 }
@@ -44,6 +46,11 @@ static func append_traces(log: Array, traces: Array) -> void:
 				Trace.fmt(float(step["after"])),
 				(" # " + note) if note != "" else "",
 			])
+
+
+static func append_bound_traces(traces: Array, log: Array) -> void:
+	## Callable.bind appends bound arguments; expose the executor-friendly order.
+	append_traces(log, traces)
 
 
 static func genesis_charge(unit: Combatant, attacker_xy: Vector2i,
@@ -75,13 +82,14 @@ static func spend_attack(unit: Combatant,
 
 
 static func resolve_exchange(log: Array, unit: Combatant, target: Combatant,
-		rng: Rng, kind: Combatant.AttackKind, action: Variant,
-		primary_melee_charge: Variant) -> Counterattack.Exchange:
+		rng: Variant, kind: Combatant.AttackKind, action: Variant,
+		primary_melee_charge: Variant,
+		spend_attack_cost: bool = true) -> Counterattack.Exchange:
 	var exchange := Counterattack.resolve(
 		unit, target, rng, kind, action, primary_melee_charge)
-	var cost_trace := spend_attack(unit, kind)
 	append_traces(log, exchange.traces)
-	append_traces(log, [cost_trace])
+	if spend_attack_cost:
+		append_traces(log, [spend_attack(unit, kind)])
 	return exchange
 
 

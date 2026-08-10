@@ -3,6 +3,7 @@
  "catalogue": [
   {
    "id": "extra_shot",
+   "source_id": 20,
    "name": "Дополнительный выстрел",
    "target": 2,
    "cost_stamina": 0,
@@ -29,6 +30,7 @@
   },
   {
    "id": "power_shot",
+   "source_id": 361,
    "name": "Мощный выстрел",
    "target": 2,
    "cost_stamina": 0,
@@ -48,6 +50,7 @@
   },
   {
    "id": "crushing_blow",
+   "source_id": 59,
    "name": "Сокрушающий удар",
    "target": 1,
    "cost_stamina": 0,
@@ -67,6 +70,7 @@
   },
   {
    "id": "whirlwind",
+   "source_id": 66,
    "name": "Круговая атака",
    "target": 3,
    "cost_stamina": 0,
@@ -86,6 +90,7 @@
   },
   {
    "id": "shield_bash",
+   "source_id": 388,
    "name": "Удар щитом",
    "target": 1,
    "cost_stamina": 1,
@@ -107,6 +112,7 @@
   },
   {
    "id": "frenzy",
+   "source_id": 454,
    "name": "Бешенство",
    "target": 1,
    "cost_stamina": 2,
@@ -126,6 +132,7 @@
   },
   {
    "id": "turtle",
+   "source_id": 458,
    "name": "Глухая оборона",
    "target": 0,
    "cost_stamina": 0,
@@ -161,6 +168,7 @@
   },
   {
    "id": "forced_march",
+   "source_id": 29,
    "name": "Марш-бросок",
    "target": 0,
    "cost_stamina": 3,
@@ -186,6 +194,7 @@
   },
   {
    "id": "sniper_shot",
+   "source_id": 360,
    "name": "Снайперский выстрел",
    "target": 2,
    "cost_stamina": 0,
@@ -210,6 +219,7 @@
   },
   {
    "id": "healing",
+   "source_id": 24,
    "name": "Целительство",
    "target": 4,
    "cost_stamina": 0,
@@ -234,6 +244,7 @@
   },
   {
    "id": "repair",
+   "source_id": 374,
    "name": "Ремонт",
    "target": 4,
    "cost_stamina": 0,
@@ -253,6 +264,7 @@
   },
   {
    "id": "gather_ammo",
+   "source_id": 23,
    "name": "Сбор снарядов",
    "target": 6,
    "cost_stamina": 0,
@@ -272,6 +284,7 @@
   },
   {
    "id": "carrion_eater",
+   "source_id": 49,
    "name": "Трупоед",
    "target": 5,
    "cost_stamina": 0,
@@ -293,6 +306,7 @@
   },
   {
    "id": "strike_and_return",
+   "source_id": 518,
    "name": "Удар и возврат",
    "target": 0,
    "cost_stamina": 1,

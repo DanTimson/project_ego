@@ -546,30 +546,29 @@ func _test_action_terminality() -> void:
 		"name": "active action terminality", "profile": "native", "seed": 3,
 		"battlefield": {"width": 5, "height": 3, "tiles": []},
 		"actions": [
-			{"id": "terminal", "name": "Terminal fixture", "target": 0,
-				"consumes_action": true,
-				"grants": [["terminal-effect", 1, 1]]},
-			{"id": "free", "name": "Free fixture", "target": 0,
-				"consumes_action": false, "grants": [["free-effect", 1, 1]]},
-			{"id": "unavailable", "name": "Unavailable fixture", "target": 0,
-				"cost_stamina": 99, "consumes_action": true,
-				"grants": [["unavailable-effect", 1, 1]]},
+			{"id": "shield_bash", "source_id": 388, "name": "Localized",
+				"target": 1, "cost_stamina": 1, "attack_surcharge": true,
+				"consumes_action": true, "magnitude": 1,
+				"excluded_targets": ["Бестелесный"]},
 		],
 		"sides": [
 			{"id": 0, "is_attacker": true, "leader_initiative": 2,
 				"units": [_fighter("consumer", [0, 0]),
-					_fighter("exception", [0, 2])]},
+					_fighter("exception", [0, 2], {"stamina": 1})]},
 			{"id": 1, "leader_initiative": 1,
-				"units": [_fighter("target", [4, 0])]},
+				"units": [_fighter("target", [2, 0]),
+					_fighter("target2", [1, 2])]},
 		],
 		"commands": [
 			{"op": "move", "unit": "consumer", "to": [1, 0]},
-			{"op": "action", "unit": "consumer", "action": "terminal"},
+			{"op": "action", "unit": "consumer", "action": "shield_bash",
+				"target": "target"},
 			{"op": "move", "unit": "consumer", "to": [0, 0]},
-			{"op": "action", "unit": "consumer", "action": "terminal"},
-			{"op": "action", "unit": "exception", "action": "unavailable"},
-			{"op": "action", "unit": "exception", "action": "free"},
-			{"op": "move", "unit": "exception", "to": [1, 2]},
+			{"op": "action", "unit": "consumer", "action": "shield_bash",
+				"target": "target"},
+			{"op": "action", "unit": "exception", "action": "shield_bash",
+				"target": "target2"},
+			{"op": "move", "unit": "exception", "to": [0, 1]},
 		],
 	}
 	var active := Scenario.new(action_spec)
@@ -579,16 +578,16 @@ func _test_action_terminality() -> void:
 	var active_log := "\n".join(active_result["log"])
 	_check(consumer.action_spent and consumer.movement_remaining > 0
 			and not ActionPoints.has_resources(consumer),
-		"resolved consuming Action policy terminates the actor")
+		"resolved consuming typed Action policy terminates the actor")
 	_check("consumer cannot reach 0,0" in active_log
-			and "cannot use Terminal fixture: already acted" in active_log,
+			and "cannot use shield_bash: already acted" in active_log,
 		"ordinary and consuming-action follow-ups are refused")
-	_check("cannot use Unavailable fixture: not enough stamina" in active_log
-			and exception.stamina == 10,
-		"an unavailable action refusal is non-terminal and spends nothing")
+	_check("cannot use shield_bash: not enough stamina" in active_log
+			and exception.stamina == 1,
+		"an unavailable typed action refusal is non-terminal and spends nothing")
 	_check(not exception.action_spent and exception.steps_this_round == 1
 			and ActionPoints.has_resources(exception),
-		"resolved non-consuming Action policy remains a real exception")
+		"a refused typed Action leaves the actor eligible")
 
 
 func _test_status_runtime_scenario() -> void:

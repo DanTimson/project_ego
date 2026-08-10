@@ -661,6 +661,41 @@ documented set: 16 mention a stamina cost, 26 an ammo cost, 25 carry per-turn or
 decaying state, 26 are area/adjacency scoped, 33 have explicit exclusion
 clauses, and 8 state stacking rules outright.
 
+### CX-013 typed action formulas
+
+`[DOC-EADOROPEDIA-NH-26.0620-F01; R10; R11]` · **STATED/RECOVERED**
+
+Only two canonical unit actions currently have executable recipes:
+
+```text
+crushing_blow:
+    product = effective_initiating_melee_attack * 3       # integer
+    effective_initiating_melee_attack = trunc0(product / 2)  # integer division
+    then ordinary attack randomisation, defence, damage sink,
+         first-strike/counterattack and fatal-lifecycle gates
+
+shield_bash:
+    requested_target_stamina_drain = -action.magnitude   # non-positive only
+    if battle-contextual effective target modifier 0x12 is absent:
+        target.stamina = max(0, target.stamina - action.magnitude)
+    otherwise target stamina is unchanged
+```
+
+Crushing Blow scaling is ephemeral and applies only to the initiating primary,
+after the effective melee stat is finalized and before the R10 conditional
+contribution, randomisation and defence. Multiplication and signed
+truncation-toward-zero use integers throughout; realistic odd values include
+`1 -> 1`, `3 -> 4`, `9 -> 13` and `19 -> 28`. It does not scale final damage or
+the defender reaction. Its resolved Action cost already includes the
+ordinary-attack surcharge, so the delegated melee exchange performs no second
+attack payment. Shield Bash never enters ordinary damage/on-hit/first-strike or
+retaliation logic. Its current resource operation is deliberately drain-only;
+positive stamina restoration remains unsupported because this boundary does not
+own an authoritative maximum-stamina clamp. Target `0x12` suppression uses the
+battle-contextual effective result and is a successful zero-mutation result, not
+a refusal; actor-side Action payment retains its independent R11 gate and
+successful CX-009 terminality.
+
 ---
 
 ## 10. Legacy CRT random and weighted selection

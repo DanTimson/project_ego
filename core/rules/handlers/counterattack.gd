@@ -86,6 +86,17 @@ class Exchange extends RefCounted:
 	var order: Array = []      ## [["attack"|"counter", damage], ...]
 
 
+static func _suppresses_counterattack(action: Variant) -> bool:
+	if typeof(action) == TYPE_DICTIONARY:
+		return bool(action.get("suppresses_counterattack", false))
+	if typeof(action) != TYPE_OBJECT:
+		return false
+	for property in action.get_property_list():
+		if String(property["name"]) == "suppresses_counterattack":
+			return bool(action.get("suppresses_counterattack"))
+	return false
+
+
 ## Decidable before any dice are rolled.
 static func why_no_counter(defender: Combatant, attacker: Combatant,
 		kind: Combatant.AttackKind, action: Variant = null) -> int:
@@ -104,7 +115,7 @@ static func why_no_counter(defender: Combatant, attacker: Combatant,
 	for f in EVASIVE:
 		if attacker.has_flag(f):
 			return NoCounter.EVADED
-	if action != null and action.get("suppresses_counterattack") == true:
+	if _suppresses_counterattack(action):
 		return NoCounter.SUPPRESSED
 	return NoCounter.NONE
 
@@ -125,7 +136,7 @@ static func strikes_first(defender: Combatant, attacker: Combatant) -> bool:
 ## EXP-CI11 distinguishes fatal_event from final post-lifecycle alive state:
 ## a first-strike survivor still attacks, while a fatal initiating primary
 ## suppresses ordinary retaliation even if its target survives the lifecycle.
-static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
+static func resolve(attacker: Combatant, defender: Combatant, rng: Variant,
 		kind: Combatant.AttackKind = Combatant.AttackKind.MELEE,
 		action: Variant = null, primary_melee_charge: Variant = null) -> Exchange:
 	var ex := Exchange.new()
@@ -150,14 +161,16 @@ static func resolve(attacker: Combatant, defender: Combatant, rng: Rng,
 
 
 static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
-		rng: Rng, kind: Combatant.AttackKind, action: Variant = null,
+		rng: Variant, kind: Combatant.AttackKind, action: Variant = null,
 		primary_melee_charge: Variant = null) -> void:
 	# Resolve the ordinary strike completely before consuming R3 charge. The
 	# combined capped value feeds the exchange accumulator/order before life
 	# subtraction. Retaliation has its own charge-free path below.
-	var selected_ordinary_1_5x := (kind == Combatant.AttackKind.MELEE
-		and action != null
-		and is_equal_approx(float(action.get("damage_scale")), 1.5))
+	var scale_numerator := 1
+	var scale_denominator := 1
+	if action != null and action.get("initiating_attack_scale_numerator") != null:
+		scale_numerator = int(action.get("initiating_attack_scale_numerator"))
+		scale_denominator = int(action.get("initiating_attack_scale_denominator"))
 	var result: Array
 	var ranged_channel := 0
 	if kind == Combatant.AttackKind.RANGED:
@@ -165,7 +178,8 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 		ranged_channel = int(result[2])
 	else:
 		result = Damage.resolve_attack(
-			attacker, defender, kind, rng, selected_ordinary_1_5x)
+			attacker, defender, kind, rng, false,
+			scale_numerator, scale_denominator)
 	var ordinary_damage := int(result[0])
 	ex.ordinary_attack_damage = ordinary_damage
 	var damage := ordinary_damage
@@ -195,7 +209,7 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 
 
 static func _do_counter(ex: Exchange, attacker: Combatant, defender: Combatant,
-		rng: Rng) -> void:
+		rng: Variant) -> void:
 	var result: Array = Damage.resolve_attack(
 		defender, attacker, Combatant.AttackKind.COUNTER, rng)
 	ex.counter_damage = int(result[0])

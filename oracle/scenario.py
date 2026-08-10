@@ -46,6 +46,7 @@ import counterattack as ca
 import death_lifecycle
 import statuses as st
 import actions as actionsmod
+import action_execution
 import turn
 from battlefield import Battlefield
 from modifier import Hook, Modifier, Pipeline
@@ -70,6 +71,7 @@ _NEW_HORIZONS_INCOMPLETE = (
 )
 _ORDERING_TRACE_SOURCES = {
     "conditional attack contribution",
+    "initiating attack scale 3/2",
     "attack randomisation",
     "ranged early provider total",
     "defence provider total",
@@ -88,6 +90,7 @@ _ORDERING_TRACE_SOURCES = {
     "command-entry charge consumption",
     "live-capacity stamina discriminator",
     "attack stamina mutation",
+    "tactical stamina mutation",
     "modifier 0x12 stamina mutation suppression",
     "ranged activation capacity clear",
 }
@@ -629,7 +632,8 @@ class Scenario:
         self.emit("%s falls" % unit.label())
 
     def _strike(self, unit: Combatant, target: Combatant, kind: AttackKind,
-                action=None, primary_melee_charge: int | None = None) -> None:
+                attack_context=None, primary_melee_charge: int | None = None,
+                spend_attack_cost: bool = True):
         """One exchange: the attack and any retaliation, in the right order.
 
         Melee is answered; a shot is not. `Первый удар` moves the retaliation
@@ -638,19 +642,21 @@ class Scenario:
         """
         ca.bind_death_resolver(self._resolve_fatal_event)
         try:
-            ex = ca.resolve(unit, target, self.rng, kind, action,
+            ex = ca.resolve(unit, target, self.rng, kind, attack_context,
                             primary_melee_charge=primary_melee_charge)
         finally:
             ca.bind_death_resolver(None)
-        modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
-        if kind is AttackKind.RANGED:
-            cost_trace = turn.spend_ranged_attack(
-                unit, modifier_0x12_effective=modifier_0x12)
-        else:
-            # R8 is not generalized here: non-ranged callers retain their
-            # established cost boundary; only ranged clears live capacity.
-            cost_trace = turn.spend_attack(
-                unit, modifier_0x12_effective=modifier_0x12)
+        cost_trace = None
+        if spend_attack_cost:
+            modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
+            if kind is AttackKind.RANGED:
+                cost_trace = turn.spend_ranged_attack(
+                    unit, modifier_0x12_effective=modifier_0x12)
+            else:
+                # R8 is not generalized here: non-ranged callers retain their
+                # established cost boundary; only ranged clears live capacity.
+                cost_trace = turn.spend_attack(
+                    unit, modifier_0x12_effective=modifier_0x12)
         self._emit_ordering_traces(ex.traces)
         self._emit_ordering_traces([cost_trace])
 
@@ -673,6 +679,26 @@ class Scenario:
                                                   ca.NoCounter.DEAD):
             self.emit("  (%s does not counter: %s)"
                       % (target.label(), ex.reason.value))
+        return ex
+
+    def _primary_melee_charge_at_command_entry(
+            self, unit: Combatant, target: Combatant,
+            movement_requested: bool) -> int | None:
+        attacker_entry = bfmod.axial_to_offset(self.field.find(unit))
+        target_entry = bfmod.axial_to_offset(self.field.find(target))
+        charge_decision = self._attack_command_charge(
+            unit, attacker_entry, target_entry, movement_requested)
+        if charge_decision is None:
+            return None
+        applicable = bool(charge_decision["applicable"])
+        charge_value = int(charge_decision["value"])
+        self.emit(
+            "  [trace] command-entry charge | modifier 0x25 applicable %s; "
+            "movement requested %s; attacker %d,%d; target %d,%d; value %d"
+            % (str(applicable).lower(), str(movement_requested).lower(),
+               attacker_entry[0], attacker_entry[1],
+               target_entry[0], target_entry[1], charge_value))
+        return charge_value if applicable else None
 
     def cmd_attack(self, unit: Combatant, target: Combatant) -> None:
         if not target.alive:
@@ -685,23 +711,9 @@ class Scenario:
         # mutates battlefield occupancy or the environment-derived modifier set.
         attacker_entry_h = self.field.find(unit)
         target_entry_h = self.field.find(target)
-        attacker_entry = bfmod.axial_to_offset(attacker_entry_h)
-        target_entry = bfmod.axial_to_offset(target_entry_h)
         movement_requested = attacker_entry_h.distance(target_entry_h) != 1
-        charge_decision = self._attack_command_charge(
-            unit, attacker_entry, target_entry, movement_requested)
-        primary_melee_charge = None
-        if charge_decision is not None:
-            applicable = bool(charge_decision["applicable"])
-            charge_value = int(charge_decision["value"])
-            self.emit(
-                "  [trace] command-entry charge | modifier 0x25 applicable %s; "
-                "movement requested %s; attacker %d,%d; target %d,%d; value %d"
-                % (str(applicable).lower(), str(movement_requested).lower(),
-                   attacker_entry[0], attacker_entry[1],
-                   target_entry[0], target_entry[1], charge_value))
-            if applicable:
-                primary_melee_charge = charge_value
+        primary_melee_charge = self._primary_melee_charge_at_command_entry(
+            unit, target, movement_requested)
         if not self._approach(unit, target):
             self.emit("%s cannot reach %s" % (unit.label(), target.label()))
             return
@@ -785,62 +797,95 @@ class Scenario:
                 if not turn.phase_done(self.state, self.state.active_side):
                     break
 
+    def _action_target_refusal(self, unit: Combatant, action,
+                               target: Combatant | None) -> str:
+        if target is None:
+            return "requires an existing target"
+        if not target.alive or target.life <= 0:
+            return "%s is down and cannot be targeted" % target.label()
+        if self._side_of(target) is self._side_of(unit):
+            return "%s is on the same side as %s" % (target.label(), unit.label())
+        if self.field.find(unit).distance(self.field.find(target)) != 1:
+            return "%s is not adjacent to %s" % (target.label(), unit.label())
+        for excluded in action.excluded_targets:
+            if target.has_flag(excluded) or target.has_subtype(excluded):
+                return "%s is excluded by %s" % (target.label(), action.id)
+        return ""
+
+    def _execute_action_attack(self, operation, unit: Combatant,
+                               target: Combatant):
+        self.emit("  [action] operation AttackOp melee scale %d/%d" % (
+            operation.initiating_attack_scale_numerator,
+            operation.initiating_attack_scale_denominator))
+        charge_value = self._primary_melee_charge_at_command_entry(
+            unit, target, False)
+        return self._strike(
+            unit, target, AttackKind.MELEE, attack_context=operation,
+            primary_melee_charge=charge_value, spend_attack_cost=False)
+
+    def _execute_action_resource_delta(self, operation, target: Combatant):
+        if (operation.target is not action_execution.OperationTarget.SELECTED_ENEMY
+                or operation.resource is not action_execution.Resource.STAMINA):
+            raise TypeError("unsupported internal ResourceDeltaOp parameters")
+        before = target.stamina
+        self.emit("  [action] operation ResourceDeltaOp selected_enemy stamina %+d"
+                  % operation.amount)
+        trace = combat.apply_tactical_stamina_drain(
+            target, operation.amount,
+            combat.has_effective_modifier(target, 0x12))
+        self._emit_ordering_traces([trace])
+        self.emit("  [action] resource result %s stamina %d -> %d" % (
+            target.label(), before, target.stamina))
+        return trace
+
     def cmd_action(self, unit: Combatant, action_id: str,
                    target: Combatant | None = None) -> None:
-        """Invoke a catalogued action.
-
-        Before this, `oracle/actions.py` defined fourteen actions with costs,
-        availability and refusal reasons — and the battle layer had no command
-        that could invoke any of them. The whole catalogue was reachable only
-        from its own unit tests: tested, and inert.
-
-        What executes here is the part the Action model actually declares:
-        `grants`, applied as timed statuses through the normal status machinery.
-        Everything else is REFUSED EXPLICITLY rather than silently doing
-        nothing, because an action that appears to succeed and changes nothing is
-        worse than one that reports it cannot run yet:
-
-          - `is_attack` actions need the attack pipeline plus `damage_scale`,
-            whose insertion point is an open question (§1.1);
-          - target-consuming effects (healing, ammo transfer) need magnitudes
-            from `unit_upg.Quantity`, which are not yet carried into Action
-            instances — every catalogue magnitude is currently 0.
-        """
+        """Resolve a canonical unit action to a fresh typed plan and execute it."""
         action = self.catalogue.get(action_id)
         if action is None:
             self.emit("unknown action %r" % action_id)
+            return
+
+        resolution = action_execution.ActionRecipeResolver.resolve(action)
+        if not resolution.supported:
+            self.emit("%s: action %s is known but unsupported"
+                      % (unit.label(), action.id))
             return
 
         modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
         refusal = action.availability(unit, modifier_0x12)
         if refusal is not actionsmod.Refusal.OK:
             self.emit("%s cannot use %s: %s"
-                      % (unit.label(), action.name, refusal.value))
+                      % (unit.label(), action.id, refusal.value))
+            return
+        target_refusal = self._action_target_refusal(unit, action, target)
+        if target_refusal:
+            self.emit("%s cannot use %s: %s"
+                      % (unit.label(), action.id, target_refusal))
             return
 
-        if action.is_attack:
-            self.emit("%s: %s is an attack-replacing action and is not "
-                      "executable yet" % (unit.label(), action.name))
-            return
-        if not action.grants:
-            self.emit("%s: %s has no executable effect yet (magnitudes are not "
-                      "loaded from unit_upg)" % (unit.label(), action.name))
-            return
-
+        plan = resolution.plan
+        assert plan is not None
+        before_stamina = unit.stamina
+        self.emit("%s requests action %s" % (unit.label(), action.id))
+        self.emit("  [action] %s resolved plan [%s]" % (
+            action.id, ", ".join(operation.kind for operation in plan.operations)))
         action_cost_trace = action.pay(unit, modifier_0x12)
         self._emit_ordering_traces([action_cost_trace])
-        applied = []
-        for ability, magnitude, duration in action.grants:
-            effect = st.StatusEffect(
-                id="%s:%s" % (action.id, ability),
-                name=ability, source=action.name,
-                duration=int(duration) if duration is not None else st.PERMANENT,
-                power=int(magnitude or 0),
-            )
-            st.apply(unit, effect)
-            applied.append(ability)
-        self.emit("%s uses %s (%s; stamina %d)"
-                  % (unit.label(), action.name, ", ".join(applied), unit.stamina))
+        self.emit("  [action] %s payment stamina %d -> %d; spent %s" % (
+            action.id, before_stamina, unit.stamina,
+            str(unit.action_spent).lower()))
+
+        action_execution.ActionPlanExecutor.execute(
+            plan,
+            attack_primitive=lambda operation: self._execute_action_attack(
+                operation, unit, target),
+            resource_delta_primitive=lambda operation:
+                self._execute_action_resource_delta(operation, target))
+        self.emit("  [action] %s result target life %d stamina %d" % (
+            action.id, max(0, target.life), target.stamina))
+        self.emit("  [action] %s terminal actor spent %s" % (
+            action.id, str(unit.action_spent).lower()))
 
     def cmd_end_phase(self) -> None:
         new_round = turn.end_phase(self.state)

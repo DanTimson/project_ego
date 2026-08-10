@@ -62,8 +62,8 @@ def spec(**overrides) -> dict:
 
 # --- part 1: one new action -------------------------------------------------
 
-def test_a_new_action_needs_no_engine_edit() -> None:
-    """Add an action the engine has never heard of and invoke it in a battle."""
+def test_a_new_action_requires_an_explicit_recipe() -> None:
+    """Catalogue registration alone must not invent executable semantics."""
     print("\n[1] one new action")
 
     braced = actionsmod.Action(
@@ -78,9 +78,9 @@ def test_a_new_action_needs_no_engine_edit() -> None:
     before = len(actionsmod.CATALOGUE)
     actionsmod.CATALOGUE[braced.id] = braced
     check(len(actionsmod.CATALOGUE) == before + 1,
-          "a new action can be registered", braced.id)
-    finding("registration goes through the CATALOGUE dict directly; `_add` is "
-            "private, so there is no public registration function")
+          "a new action definition can be registered", braced.id)
+    finding("CX-013 intentionally requires a canonical recipe before a new "
+            "action can execute; catalogue metadata is not a universal DSL")
 
     try:
         s = spec(commands=[
@@ -88,19 +88,15 @@ def test_a_new_action_needs_no_engine_edit() -> None:
             {"op": "action", "unit": "Мечник", "action": "mod_brace"},
         ])
         sc = scenario.Scenario(s)
+        unit = sc.units["Мечник"]
+        before_state = (unit.stamina, unit.action_spent, tuple(unit.statuses))
         result = sc.run()
 
-        used = [l for l in result["log"] if "Упор копья" in l]
-        check(used, "and invoked from a scenario with no engine edit",
-              str(used[:1]))
-
-        unit = sc.units["Мечник"]
-        granted = [e for e in unit.statuses if e.source == "Упор копья"]
-        check(granted, "its grant reaches the unit as a timed status",
-              str([(e.name, e.duration, e.power) for e in granted]))
-        check(any(e.power == 2 and e.duration == 2 for e in granted),
-              "carrying the declared magnitude and duration")
-        check(unit.stamina == 9, "and its cost was paid", "stamina %d" % unit.stamina)
+        check(any("action mod_brace is known but unsupported" in line
+                  for line in result["log"]),
+              "an un-reciped definition is explicitly unsupported")
+        check((unit.stamina, unit.action_spent, tuple(unit.statuses)) == before_state,
+              "unsupported metadata cannot pay or execute generic grants")
     finally:
         actionsmod.CATALOGUE.pop(braced.id, None)
 
