@@ -9,7 +9,7 @@ This is a coverage map, not a release claim.
 | effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | implemented | implemented | R9 fixture-covered: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets remain distinct |
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 early-provider cutoff and distinct melee/counter minimum handling are fixture-covered |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 numeric placement is fixture-covered after effective-stat/selected 1.5× processing and before randomisation/defence; target applicability and wider provider coverage remain incomplete |
-| activated actions | public/data families + selective binary edges | typed plan execution for Crushing Blow and Shield Bash | typed plan execution for Crushing Blow and Shield Bash | source ID → canonical `Action` → recipe → immutable ordered plan → shared primitive is implemented; the other twelve reference-catalogue actions and generic battle effects remain unsupported; production composition remains held under AD-3 |
+| activated actions | public/data families + selective binary edges | typed built-in plus bounded declarative pack plans | typed built-in plus bounded declarative pack plans | source ID → canonical `Action` → validated recipe → fresh immutable ordered plan → shared primitive is implemented; pack-namespaced v1 recipes may compose only melee `AttackOp` and drain-only stamina `ResourceDeltaOp`; the other twelve reference actions and generic battle effects remain unsupported |
 | runtime statuses | public/project stable policy + unresolved binary lifecycle | stable container, stacking/resistance and explicit manipulation implemented | first-class `Status` model integrated through `Combatant`, later modifier providers and scenarios | stable container/parity fixture implemented; automatic duration tick/expiry and `UNTIL_NEXT_TURN` clock remain open pending R13 |
 | level-up selection | data + binary | reference implementation in part | no completed playable GDScript consumer; `core/model/option.gd` and `tests/test_options.gd` are empty | ordinary selection/reference work is not playable integration; R15 zero-total/underfull edge is deferred until an executable consumer and fixture exist |
 | battlefield coordinates and adjacency | binary + controlled observation | implemented | implemented | adjacency recovered; R14 large-unit logical-footprint protocol ready |
@@ -154,9 +154,22 @@ effective R11 `0x12` write gate. Both pay the resolved Action cost once and obey
 CX-009 terminality. The other twelve reference-catalogue actions, generic battle effects,
 R12/R13/R14/R17, special ranged producers and exact legacy RNG ordering remain
 outside this implementation. The hand-authored Python catalogue is reference
-coverage, not a production ContentPack catalogue; AD-3 holds production
-composition, source binding, per-unit availability/magnitude and Scenario
-injection.
+coverage, not a production ContentPack catalogue. DELIB-0004 production
+composition supplies pack/profile-qualified definitions, source binding,
+per-unit availability/magnitude and Scenario injection.
+
+CX-014 adds the first declarative production recipe layer without adding a new
+operation kind. Content composition validates and normalizes pack-namespaced v1
+recipes before battle construction. Recipes may contain non-positive fixed or
+negative-resolved-magnitude selected-enemy stamina drains followed by at most
+one final melee attack with a literal positive exact rational scale. Strict
+composition fails closed; permissive composition retains durable diagnostics
+and makes the invalid action refuse before payment while unrelated definitions
+remain usable. Grants cannot rewrite recipes, pack namespaces remain isolated,
+and `crushing_blow` / `shield_bash` reject declarative overrides while retaining
+their accepted engine recipes. Matching Python/GDScript coverage preserves
+fresh typed plans, operation order, the effective `0x12` drain gate, existing
+command payment/terminality and all CX-013 boundaries.
 
 CX-012 implements the narrowed `DAMAGE-RANGED-001` tranche. Python and
 GDScript now select resistance plus received-damage channel 2 only when effective
@@ -241,4 +254,4 @@ its logical UI geometry to the OS scale setting.
 `AUDIT_LEDGER.csv` is the canonical post-0.2 audit-disposition record. Its
 accepted implementation findings remain separate future engine work; its held
 architecture, profile and provenance items remain unresolved. This governance
-reconciliation does not authorize CX-014+, gameplay changes, or G1+.
+post-0.2 remediation and the CX-014+ resume gate are closed; engine work still requires an explicit frozen task contract and this does not authorize G1+.

@@ -124,6 +124,12 @@ class Action:
 
     notes: str = ""
 
+    # Composition-owned normalized metadata for pack-defined declarative plans.
+    # The value is an immutable DeclarativeRecipe; malformed permissive content
+    # retains only its durable error and can never partially compile.
+    declarative_recipe: object | None = None
+    declarative_recipe_error: str = ""
+
     def availability(self, actor,
                      modifier_0x12_effective: bool = False) -> Refusal:
         """Decidable from the actor alone. Target legality is checked by the
@@ -207,6 +213,8 @@ def action_from_dict(d: dict) -> Action:
         excluded_targets=tuple(d.get("excluded_targets", ())),
         grants=tuple(tuple(g) for g in d.get("grants", ())),
         notes=str(d.get("notes", "")),
+        declarative_recipe=d.get("__validated_declarative_recipe"),
+        declarative_recipe_error=str(d.get("__declarative_recipe_error", "")),
     )
 
 

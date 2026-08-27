@@ -11,6 +11,7 @@ import copy
 from dataclasses import dataclass, field, replace
 
 import actions
+import declarative_action_recipe as dar
 
 STRICT = "strict"
 PERMISSIVE = "permissive"
@@ -23,6 +24,7 @@ _DEFINITION_FIELDS = frozenset({
     "cost_stamina", "cost_ammo", "consumes_action", "attack_surcharge",
     "free_action_for", "magnitude", "is_attack", "damage_scale",
     "suppresses", "scales", "excluded_targets", "grants", "notes", "replace",
+    "recipe",
 })
 _ARRAY_FIELDS = ("free_action_for", "suppresses", "scales", "excluded_targets", "grants")
 
@@ -93,7 +95,7 @@ class CompositionResult:
 
 
 def action_to_dict(action: actions.Action) -> dict:
-    return {
+    data = {
         "id": action.id, "name": action.name, "source_id": action.source_id,
         "target": action.target.value,
         "cost_stamina": action.cost.stamina, "cost_ammo": action.cost.ammo,
@@ -108,6 +110,9 @@ def action_to_dict(action: actions.Action) -> dict:
         "grants": [list(value) for value in action.grants],
         "notes": action.notes,
     }
+    if isinstance(action.declarative_recipe, dar.DeclarativeRecipe):
+        data["recipe"] = dar.authored_dict(action.declarative_recipe)
+    return data
 
 
 def namespace_id(pack: str, source_id: int) -> str:
@@ -193,9 +198,23 @@ def compose(pack: str, profile: str, overlay: dict | None = None,
             ambiguous_sources.add(source_id)
             continue
 
+        # Declarative data can never replace an engine-owned shared recipe.  In
+        # permissive Genesis composition, retain the default definition already
+        # installed rather than letting collision/replacement remove it.
+        raw_for_action = raw
+        if canonical_id in SHARED_IDS and "recipe" in raw:
+            _diagnostic(out, "shared_recipe_override",
+                        "action %r cannot attach or replace its engine-owned recipe"
+                        % canonical_id,
+                        source_id=source_id, canonical_id=canonical_id)
+            if canonical_id in owner_by_canonical:
+                continue
+            raw_for_action = copy.deepcopy(raw)
+            raw_for_action.pop("recipe", None)
+
         if source_id in out.source_map:
             old_canonical = out.source_map[source_id]
-            if raw.get("replace") is True:
+            if raw_for_action.get("replace") is True:
                 out.definitions.pop(old_canonical, None)
                 owner_by_canonical.pop(old_canonical, None)
                 out.source_map.pop(source_id, None)
@@ -218,9 +237,10 @@ def compose(pack: str, profile: str, overlay: dict | None = None,
             out.source_map.pop(other, None)
             ambiguous_sources.update((other, source_id))
             continue
+        recipe_input = raw_for_action.get("recipe") if "recipe" in raw_for_action else None
         try:
-            data = copy.deepcopy(raw)
-            for metadata in ("shared_id", "canonical_id", "replace"):
+            data = copy.deepcopy(raw_for_action)
+            for metadata in ("shared_id", "canonical_id", "replace", "recipe"):
                 data.pop(metadata, None)
             data["id"] = canonical_id
             action = actions.action_from_dict(data)
@@ -230,6 +250,17 @@ def compose(pack: str, profile: str, overlay: dict | None = None,
                         source_id=source_id)
             ambiguous_sources.add(source_id)
             continue
+        if "recipe" in raw_for_action:
+            validated = dar.validate_recipe(recipe_input,
+                                            action_magnitude=action.magnitude)
+            if validated.ok:
+                action = replace(action, declarative_recipe=validated.recipe)
+            else:
+                message = "action %r has invalid declarative recipe: %s" % (
+                    canonical_id, validated.error)
+                _diagnostic(out, "invalid_declarative_recipe", message,
+                            source_id=source_id, canonical_id=canonical_id)
+                action = replace(action, declarative_recipe_error=validated.error)
         out.definitions[canonical_id] = action
         out.source_map[source_id] = canonical_id
         owner_by_canonical[canonical_id] = source_id
@@ -303,6 +334,17 @@ def compose(pack: str, profile: str, overlay: dict | None = None,
                             unit=unit_id, source_id=source_id,
                             canonical_id=candidate)
                 out.refusals.setdefault(unit_id, {})[candidate] = message
+                continue
+            definition = out.definitions[canonical_id]
+            resolved_magnitude = overrides.get("magnitude", definition.magnitude)
+            if (dar.uses_action_magnitude(definition.declarative_recipe)
+                    and resolved_magnitude < 0):
+                message = ("action grant for %r source %d makes declarative "
+                           "stamina delta positive" % (unit_id, source_id))
+                _diagnostic(out, "invalid_declarative_recipe", message,
+                            unit=unit_id, source_id=source_id,
+                            canonical_id=canonical_id)
+                out.refusals.setdefault(unit_id, {})[canonical_id] = message
                 continue
             out.grants.setdefault(unit_id, []).append({
                 "canonical_id": canonical_id,

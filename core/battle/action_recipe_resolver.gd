@@ -30,5 +30,18 @@ static func resolve(action: Action) -> Resolution:
 					ActionExecutionPlan.ResourceKind.STAMINA,
 					-action.magnitude),
 			]))
+	if action.declarative_recipe_error != "":
+		return Resolution.new(false, null, "invalid declarative recipe: %s" 			% action.declarative_recipe_error)
+	if action.has_declarative_recipe():
+		var canonical_id := String(action.id)
+		if ":action/" not in canonical_id or canonical_id.begins_with(":"):
+			return Resolution.new(false, null, (
+				"invalid declarative recipe: action identity is not pack-namespaced"))
+		var compiled := DeclarativeActionRecipe.compile(
+			action.declarative_recipe(), action.magnitude)
+		if not compiled["ok"]:
+			return Resolution.new(false, null,
+				"invalid declarative recipe: %s" % compiled["error"])
+		return Resolution.new(true, compiled["plan"])
 	return Resolution.new(false, null, "known action has no frozen recipe")
 

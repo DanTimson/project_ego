@@ -83,6 +83,29 @@ var excluded_targets: Array[StringName] = []
 ## [ability_name, magnitude_or_null, duration]
 var grants: Array = []
 var notes: String = ""
+## Composition-owned normalized recipe metadata. Runtime callers receive only a
+## deep copy, so a per-unit grant or plan resolution cannot mutate the shared
+## canonical definition.
+var _declarative_recipe: Dictionary = {}
+var declarative_recipe_error: String = ""
+
+
+func set_declarative_recipe(recipe: Dictionary) -> void:
+	_declarative_recipe = recipe.duplicate(true)
+	declarative_recipe_error = ""
+
+
+func set_declarative_recipe_error(message: String) -> void:
+	_declarative_recipe = {}
+	declarative_recipe_error = message
+
+
+func has_declarative_recipe() -> bool:
+	return not _declarative_recipe.is_empty()
+
+
+func declarative_recipe() -> Dictionary:
+	return _declarative_recipe.duplicate(true)
 
 
 func resolved_stamina() -> int:
@@ -160,7 +183,7 @@ func to_dict() -> Dictionary:
 	var scale_pairs: Array = []
 	for key in scales:
 		scale_pairs.append([String(key), scales[key]])
-	return {
+	var data := {
 		"id": String(id), "name": name, "source_id": source_id,
 		"target": target, "cost_stamina": cost_stamina,
 		"cost_ammo": cost_ammo, "consumes_action": consumes_action,
@@ -171,6 +194,11 @@ func to_dict() -> Dictionary:
 		"scales": scale_pairs, "excluded_targets": excluded_targets.duplicate(),
 		"grants": grants.duplicate(true), "notes": notes,
 	}
+	if has_declarative_recipe():
+		data["__validated_declarative_recipe"] = declarative_recipe()
+	if declarative_recipe_error != "":
+		data["__declarative_recipe_error"] = declarative_recipe_error
+	return data
 
 
 static func from_dict(d: Dictionary) -> Action:
@@ -201,4 +229,9 @@ static func from_dict(d: Dictionary) -> Action:
 	for pair in d.get("scales", []):
 		a.scales[StringName(pair[0])] = float(pair[1])
 	a.grants = d.get("grants", [])
+	var validated_recipe: Variant = d.get("__validated_declarative_recipe")
+	if typeof(validated_recipe) == TYPE_DICTIONARY:
+		a.set_declarative_recipe(validated_recipe)
+	if d.has("__declarative_recipe_error"):
+		a.set_declarative_recipe_error(String(d["__declarative_recipe_error"]))
 	return a

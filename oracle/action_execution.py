@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Callable
 
+import declarative_action_recipe as dar
+
 
 class AttackMode(Enum):
     MELEE = "melee"
@@ -82,6 +84,45 @@ class ActionRecipeResolver:
                 resource=Resource.STAMINA,
                 amount=-int(action.magnitude),
             ),)))
+        if action.declarative_recipe_error:
+            return RecipeResolution(
+                False, reason="invalid declarative recipe: %s"
+                % action.declarative_recipe_error)
+        recipe = action.declarative_recipe
+        if recipe is not None:
+            if ":action/" not in action.id or action.id.startswith(":"):
+                return RecipeResolution(
+                    False, reason="invalid declarative recipe: action identity is not pack-namespaced")
+            if not isinstance(recipe, dar.DeclarativeRecipe):
+                return RecipeResolution(
+                    False, reason="invalid declarative recipe: normalized metadata is malformed")
+            operations: list[ActionOp] = []
+            for recipe_operation in recipe.operations:
+                if isinstance(recipe_operation, dar.AttackRecipeOp):
+                    operations.append(AttackOp(
+                        mode=AttackMode.MELEE,
+                        initiating_attack_scale_numerator=recipe_operation.scale_numerator,
+                        initiating_attack_scale_denominator=recipe_operation.scale_denominator,
+                    ))
+                elif isinstance(recipe_operation, dar.ResourceDeltaRecipeOp):
+                    amount = (-int(action.magnitude)
+                              if recipe_operation.negative_action_magnitude
+                              else int(recipe_operation.fixed_amount))
+                    if amount > 0:
+                        return RecipeResolution(
+                            False, reason="invalid declarative recipe: resolved stamina delta is positive")
+                    operations.append(ResourceDeltaOp(
+                        target=OperationTarget.SELECTED_ENEMY,
+                        resource=Resource.STAMINA,
+                        amount=amount,
+                    ))
+                else:
+                    return RecipeResolution(
+                        False, reason="invalid declarative recipe: unknown normalized operation")
+            if not operations:
+                return RecipeResolution(
+                    False, reason="invalid declarative recipe: empty normalized operation list")
+            return RecipeResolution(True, ActionExecutionPlan(tuple(operations)))
         return RecipeResolution(False, reason="known action has no frozen recipe")
 
 

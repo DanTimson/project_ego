@@ -34,6 +34,7 @@ priority.
 | CX-011 | `SPEC_IMPLEMENTATION` | tactical death lifecycle and control transfer | engine | `DONE` | CX-010; mandatory tactical tranche implemented; strategy/corpse/reward/kill-credit/R17 boundaries excluded |
 | CX-012 | `SPEC_IMPLEMENTATION` | ranged damage branch parity closure | engine | `DONE` | CX-011; DAMAGE-RANGED-001 plus one-shot channel integration accepted; two-shot producer and DAMAGE-MORALE deferred |
 | CX-013 | `SPEC_IMPLEMENTATION` | typed unit-action execution-plan foundation | engine | `DONE` | CX-012; engine-native plan layer + Crushing Blow/Shield Bash accepted; final substantial pre-0.2 tranche |
+| CX-014 | `SPEC_IMPLEMENTATION` | declarative data-defined action plans v1 | engine | `DONE` | CX-013; DELIB-0004 decided; A-F pass in Python/GDScript; awaiting engine/human acceptance |
 
 Task contracts live in `docs/codex/tasks/`.
 
@@ -58,9 +59,10 @@ No engine task is implicitly authorized by this queue.
 ## Post-0.2 audit disposition
 
 `docs/AUDIT_LEDGER.csv` is the canonical governance record for IR/AD/GV/PV/CL/RS
-findings. IR-1 through IR-4 are accepted implementation-ready findings but have
-not been assigned CX numbers by this reconciliation. AD-1 through AD-4 remain
-held for architecture/profile ownership; PV-1 remains provenance-held; RS-1 is
-deferred. CX-008 through CX-013 remain `DONE`, but their completion does not
-claim full R8 closure (modifier-7 provider aggregation is missing), full
-strategic/reward death lifecycle, or production action-definition composition.
+findings. The post-0.2 remediation/resume gate is closed: AD-3 and CL-1 are
+implemented and review-accepted, while DELIB-0004 through DELIB-0007 record the
+accepted architecture decisions. AD-1, AD-2 and AD-4 implementation remains
+separately fenced; PV-1 remains provenance-held; RS-1 remains deferred.
+CX-008 through CX-013 remain `DONE`. CX-014 is explicitly assigned under the
+DELIB-0004 declarative-safe-plan decision and does not claim full R8 closure,
+strategic/reward death lifecycle, status lifecycle, or NH rules compatibility.

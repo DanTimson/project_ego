@@ -745,6 +745,9 @@ func _resolve_action_command(unit: Combatant, action_id: String,
 	var action: Action = available[StringName(action_id)]
 	var resolution := ActionRecipeResolver.resolve(action)
 	if not resolution.supported:
+		if resolution.reason.begins_with("invalid declarative recipe"):
+			return {"reason": "action %s refuses: %s" % [
+				action.id, resolution.reason], "refusal": "unsupported"}
 		return {"reason": "action %s is known but unsupported" % action.id,
 			"refusal": "unsupported"}
 	var refusal := action.availability(unit,

@@ -341,16 +341,27 @@ source ability ID -> canonical Action definition -> recipe resolver
 ```
 
 `Action` remains content/player identity plus execution-neutral metadata; it is
-not battle-instance state. The recipe resolver performs only canonical identity
-to fresh-plan construction. A typed plan executor owns ordered operation
-iteration. Scenario owns command/turn and target validation, one-time payment,
-battle orchestration and neutral trace output, delegating operation details to
-existing melee and tactical-stamina primitives rather than per-action combat
-algorithms. CX-013 plans contain only `AttackOp` and drain-only `ResourceDeltaOp`
-values. The attack context carries an integer rational scale only for the
-initiating primary; the stamina operation accepts no positive restoration path.
-Nothing dispatches on display text, source IDs, binary offsets or raw legacy
-opcodes. The explicit-unit-action resolver remains separate from generic
+not battle-instance state. A pack-namespaced definition may carry a version-1
+declarative recipe that is normalized and validated by content composition.
+The safe schema can express only ordered selected-enemy stamina drains and at
+most one final melee attack with a literal positive exact rational scale. A
+magnitude-sourced drain reads the resolved per-unit `Action.magnitude`; grants
+may still override only that existing allowlisted field and receive an isolated
+copy of the normalized recipe. Malformed recipes fail strict composition; in
+permissive composition they retain durable diagnostics and refuse before
+payment. The shared `crushing_blow` and `shield_bash` identities always retain
+their engine recipes and reject pack declarative overrides.
+
+The recipe resolver performs only canonical identity to fresh-plan construction.
+A typed plan executor owns ordered operation iteration. Scenario owns
+command/turn and target validation, one-time payment, battle orchestration and
+neutral trace output, delegating operation details to existing melee and
+tactical-stamina primitives rather than per-action combat algorithms. Plans
+still contain only `AttackOp` and drain-only `ResourceDeltaOp` values. The
+attack context carries an integer rational scale only for the initiating
+primary; the stamina operation accepts no positive restoration path. Nothing
+dispatches on display text, source IDs, binary offsets or raw legacy opcodes.
+The explicit-unit-action resolver remains separate from generic
 spell/battle-effect content and from any future R17 event vocabulary.
 
 Modifier providers remain layered. Unit-owned/intrinsic modifiers are the R6

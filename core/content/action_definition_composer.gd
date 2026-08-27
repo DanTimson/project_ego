@@ -14,7 +14,7 @@ const DEFINITION_FIELDS := {
 	"consumes_action": true, "attack_surcharge": true, "free_action_for": true,
 	"magnitude": true, "is_attack": true, "damage_scale": true,
 	"suppresses": true, "scales": true, "excluded_targets": true,
-	"grants": true, "notes": true, "replace": true,
+	"grants": true, "notes": true, "replace": true, "recipe": true,
 }
 const GENESIS_DEFAULTS := [
 	{"source_id": 59, "shared_id": "crushing_blow", "name": "Crushing Blow",
@@ -142,9 +142,20 @@ static func compose(pack: String, profile: String, overlay_v: Variant = {},
 				"action source %d requires a non-empty name" % source_id,
 				{"source_id": source_id})
 			continue
+		# Declarative pack data cannot replace either engine-owned shared recipe.
+		# In permissive Genesis composition, preserve the installed default.
+		var raw_for_action: Dictionary = raw
+		if SHARED_IDS.has(canonical_id) and raw.has("recipe"):
+			_diagnostic(out, "shared_recipe_override",
+				"action '%s' cannot attach or replace its engine-owned recipe" % canonical_id,
+				{"source_id": source_id, "canonical_id": canonical_id})
+			if owner_by_canonical.has(canonical_id):
+				continue
+			raw_for_action = raw.duplicate(true)
+			raw_for_action.erase("recipe")
 		if out["source_map"].has(source_id):
 			var old_canonical := String(out["source_map"][source_id])
-			if raw.get("replace") == true:
+			if raw_for_action.get("replace") == true:
 				out["definitions"].erase(StringName(old_canonical))
 				owner_by_canonical.erase(old_canonical)
 				out["source_map"].erase(source_id)
@@ -166,7 +177,7 @@ static func compose(pack: String, profile: String, overlay_v: Variant = {},
 			out["source_map"].erase(other)
 			owner_by_canonical.erase(canonical_id)
 			continue
-		var target_v: Variant = raw.get("target", "self")
+		var target_v: Variant = raw_for_action.get("target", "self")
 		if typeof(target_v) == TYPE_STRING:
 			var target_key := String(target_v).to_upper()
 			if not Action.Target.has(target_key):
@@ -180,12 +191,24 @@ static func compose(pack: String, profile: String, overlay_v: Variant = {},
 				"action source %d has an invalid target" % source_id,
 				{"source_id": source_id})
 			continue
-		var data := raw.duplicate(true)
+		var data := raw_for_action.duplicate(true)
 		data.erase("shared_id")
 		data.erase("canonical_id")
 		data.erase("replace")
+		data.erase("recipe")
 		data["id"] = canonical_id
 		var action := Action.from_dict(data)
+		if raw_for_action.has("recipe"):
+			var validated := DeclarativeActionRecipe.validate(
+				raw_for_action["recipe"], action.magnitude)
+			if validated["ok"]:
+				action.set_declarative_recipe(validated["recipe"])
+			else:
+				var recipe_message := "action '%s' has invalid declarative recipe: %s" % [
+					canonical_id, validated["error"]]
+				_diagnostic(out, "invalid_declarative_recipe", recipe_message,
+					{"source_id": source_id, "canonical_id": canonical_id})
+				action.set_declarative_recipe_error(String(validated["error"]))
 		out["definitions"][action.id] = action
 		out["source_map"][source_id] = canonical_id
 		owner_by_canonical[canonical_id] = source_id
@@ -268,10 +291,26 @@ static func compose(pack: String, profile: String, overlay_v: Variant = {},
 					out["refusals"][unit_id] = {}
 				out["refusals"][unit_id][candidate] = message
 				continue
+			var resolved_canonical := String(out["source_map"][source_id])
+			var definition: Action = out["definitions"][StringName(resolved_canonical)]
+			var resolved_magnitude := int(overrides.get("magnitude", definition.magnitude))
+			if definition.has_declarative_recipe() \
+					and DeclarativeActionRecipe.uses_action_magnitude(
+						definition.declarative_recipe()) \
+					and resolved_magnitude < 0:
+				var recipe_message := ("action grant for '%s' source %d makes "
+					+ "declarative stamina delta positive") % [unit_id, source_id]
+				_diagnostic(out, "invalid_declarative_recipe", recipe_message,
+					{"unit": unit_id, "source_id": source_id,
+					 "canonical_id": resolved_canonical})
+				if not out["refusals"].has(unit_id):
+					out["refusals"][unit_id] = {}
+				out["refusals"][unit_id][resolved_canonical] = recipe_message
+				continue
 			if not out["grants"].has(unit_id):
 				out["grants"][unit_id] = []
 			out["grants"][unit_id].append({
-				"canonical_id": String(out["source_map"][source_id]),
+				"canonical_id": resolved_canonical,
 				"overrides": overrides.duplicate(true),
 			})
 	out["ok"] = out["diagnostics"].is_empty() or mode == PERMISSIVE

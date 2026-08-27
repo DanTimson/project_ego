@@ -927,8 +927,12 @@ class Scenario:
 
         resolution = action_execution.ActionRecipeResolver.resolve(action)
         if not resolution.supported:
-            self.emit("%s: action %s is known but unsupported"
-                      % (unit.label(), action.id))
+            if resolution.reason.startswith("invalid declarative recipe"):
+                self.emit("%s: action %s refuses: %s"
+                          % (unit.label(), action.id, resolution.reason))
+            else:
+                self.emit("%s: action %s is known but unsupported"
+                          % (unit.label(), action.id))
             return
 
         modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
