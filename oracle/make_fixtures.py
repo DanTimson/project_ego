@@ -256,7 +256,7 @@ def action_fixture() -> dict:
         "catalogue": [],
         "cases": [],
     }
-    for a in actions.CATALOGUE.values():
+    for a in actions.REFERENCE_CATALOGUE.values():
         fx["catalogue"].append({
             "id": a.id, "source_id": a.source_id, "name": a.name,
             "target": list(actions.Target).index(a.target),
@@ -269,7 +269,6 @@ def action_fixture() -> dict:
             "suppresses": list(a.suppresses),
             "scales": [list(p) for p in a.scales],
             "excluded_targets": list(a.excluded_targets),
-            "suppresses_counterattack": a.suppresses_counterattack,
             # grants were omitted here, so the port's catalogue silently had
             # none: Action.from_dict reads them, the generator never emitted
             # them, and the two grant-bearing actions (turtle, forced_march)
@@ -286,7 +285,7 @@ def action_fixture() -> dict:
                 setattr(u, k, set(v))
             else:
                 setattr(u, k, v)
-        a = actions.CATALOGUE[action_id]
+        a = actions.REFERENCE_CATALOGUE[action_id]
         before = (u.stamina, u.ammo, u.action_spent)
         avail = a.availability(u)
         if avail is actions.Refusal.OK:
@@ -777,19 +776,13 @@ def counter_fixture() -> dict:
         c.morale_base = 10
         return c
 
-    def refusal(label, defender_kw, attacker_kw, kind, suppress=False):
+    def refusal(label, defender_kw, attacker_kw, kind):
         d, a = mk(**defender_kw), mk(**attacker_kw)
-        action = None
-        if suppress:
-            class _A:
-                suppresses_counterattack = True
-            action = _A()
-        r = camod.why_no_counter(d, a, kind, action)
+        r = camod.why_no_counter(d, a, kind)
         fx["refusals"].append({
             "label": label, "defender": defender_kw, "attacker": attacker_kw,
             "kind": int(kind.value == "ranged") * 2 if False else
                     {"melee": 0, "counter": 1, "ranged": 2}[kind.value],
-            "suppress": suppress,
             "expected": list(camod.NoCounter).index(r),
             "expected_name": r.name,
         })
@@ -807,7 +800,6 @@ def counter_fixture() -> dict:
     refusal("attacker has Ловкость", {}, {"flags": ["Ловкость"]}, K.MELEE)
     refusal("attacker has Касание вампира", {}, {"flags": ["Касание вампира"]},
             K.MELEE)
-    refusal("suppressed by the action", {}, {}, K.MELEE, suppress=True)
 
     def exchange(label, attacker_kw, defender_kw, seed, kind=K.MELEE):
         a, d = mk(**attacker_kw), mk(**defender_kw)

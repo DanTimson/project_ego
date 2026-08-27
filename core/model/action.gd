@@ -82,7 +82,6 @@ var scales: Dictionary = {}
 var excluded_targets: Array[StringName] = []
 ## [ability_name, magnitude_or_null, duration]
 var grants: Array = []
-var suppresses_counterattack: bool = false
 var notes: String = ""
 
 
@@ -145,28 +144,11 @@ func pay(actor: Combatant,
 	return t
 
 
-## Build from a pack definition dictionary. Actions are CONTENT: which exist and
-## what they cost differs between the genesis and new_horizons packs, so this
-## must be data-driven rather than a hardcoded catalogue.
-## Actions available to the running game.
-##
-## Loaded from data rather than hardcoded, mirroring the oracle's module-level
-## CATALOGUE. A scenario may declare its own entries so a committed scenario file
-## is self-contained and both implementations build the same catalogue from the
-## same bytes.
-static var CATALOGUE: Dictionary = {}
-
-
-## Merge `entries` (an Array of Dictionaries) into the catalogue.
-static func load_catalogue(entries: Array) -> void:
-	for d in entries:
-		var a := Action.from_dict(d)
-		CATALOGUE[a.id] = a
-
-
+## Build from one already composed definition dictionary. Production enumeration
+## belongs to the injected content provider, never to this model class.
 static func canonical_id_for_source(source_id: int,
-		definitions: Dictionary = CATALOGUE) -> StringName:
-	## Content/import boundary only; runtime recipes never consume source IDs.
+		definitions: Dictionary) -> StringName:
+	## Explicit content/import-boundary lookup; there is no model-global default.
 	for canonical_id in definitions:
 		var action := definitions[canonical_id] as Action
 		if action != null and action.source_id == source_id:
@@ -174,12 +156,34 @@ static func canonical_id_for_source(source_id: int,
 	return &""
 
 
+func to_dict() -> Dictionary:
+	var scale_pairs: Array = []
+	for key in scales:
+		scale_pairs.append([String(key), scales[key]])
+	return {
+		"id": String(id), "name": name, "source_id": source_id,
+		"target": target, "cost_stamina": cost_stamina,
+		"cost_ammo": cost_ammo, "consumes_action": consumes_action,
+		"attack_surcharge": attack_surcharge,
+		"free_action_for": free_action_for.duplicate(),
+		"magnitude": magnitude, "is_attack": is_attack,
+		"damage_scale": damage_scale, "suppresses": suppresses.duplicate(),
+		"scales": scale_pairs, "excluded_targets": excluded_targets.duplicate(),
+		"grants": grants.duplicate(true), "notes": notes,
+	}
+
+
 static func from_dict(d: Dictionary) -> Action:
 	var a := Action.new()
 	a.id = StringName(d.get("id", ""))
 	a.name = String(d.get("name", ""))
 	a.source_id = int(d.get("source_id", -1))
-	a.target = int(d.get("target", Target.SELF))
+	var target_v: Variant = d.get("target", Target.SELF)
+	if typeof(target_v) == TYPE_STRING:
+		var target_key := String(target_v).to_upper()
+		a.target = Target[target_key] if Target.has(target_key) else Target.SELF
+	else:
+		a.target = int(target_v)
 	a.cost_stamina = int(d.get("cost_stamina", 0))
 	a.cost_ammo = int(d.get("cost_ammo", 0))
 	a.consumes_action = bool(d.get("consumes_action", true))
@@ -187,7 +191,6 @@ static func from_dict(d: Dictionary) -> Action:
 	a.magnitude = int(d.get("magnitude", 0))
 	a.is_attack = bool(d.get("is_attack", false))
 	a.damage_scale = float(d.get("damage_scale", 1.0))
-	a.suppresses_counterattack = bool(d.get("suppresses_counterattack", false))
 	a.notes = String(d.get("notes", ""))
 	for s in d.get("free_action_for", []):
 		a.free_action_for.append(StringName(s))

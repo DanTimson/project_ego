@@ -75,6 +75,7 @@ var loaded_from: String = ""
 var version: String = ""
 var build: String = ""
 var declared_fingerprint: String = ""
+var action_overlay: Dictionary = {}
 
 
 func _init(p_id: String = "") -> void:
@@ -104,6 +105,13 @@ func load_bindings(path: String) -> Array[String]:
 	version = String(payload.get("version", ""))
 	build = String(payload.get("build", ""))
 	declared_fingerprint = String(payload.get("fingerprint", ""))
+	var raw_actions: Variant = payload.get("actions", {})
+	if typeof(raw_actions) != TYPE_DICTIONARY:
+		errors.append("actions overlay must be an object")
+		# Preserve action-specific invalidity for composer diagnostics.
+		action_overlay = {"definitions": null}
+	else:
+		action_overlay = (raw_actions as Dictionary).duplicate(true)
 
 	var abilities: Dictionary = payload.get("abilities", {})
 	for key in abilities:
@@ -178,13 +186,16 @@ func snapshot_payload() -> Dictionary:
 			"params": entry.params,
 			"uses": entry.uses,
 		}
-	return {
+	var payload := {
 		"pack": id,
 		"version": version,
 		"build": build,
 		"bindings": serialized_bindings,
 		"tables": tables,
 	}
+	if not action_overlay.is_empty():
+		payload["actions"] = action_overlay
+	return payload
 
 
 func provenance() -> Dictionary:

@@ -8,8 +8,7 @@
   "EXHAUSTED": 4,
   "RESTING": 5,
   "CANNOT_FIGHT": 6,
-  "EVADED": 7,
-  "SUPPRESSED": 8
+  "EVADED": 7
  },
  "refusals": [
   {
@@ -17,7 +16,6 @@
    "defender": {},
    "attacker": {},
    "kind": 0,
-   "suppress": false,
    "expected": 0,
    "expected_name": "NONE"
   },
@@ -26,7 +24,6 @@
    "defender": {},
    "attacker": {},
    "kind": 2,
-   "suppress": false,
    "expected": 2,
    "expected_name": "RANGED"
   },
@@ -37,7 +34,6 @@
    },
    "attacker": {},
    "kind": 0,
-   "suppress": false,
    "expected": 3,
    "expected_name": "NO_STAT"
   },
@@ -48,7 +44,6 @@
    },
    "attacker": {},
    "kind": 0,
-   "suppress": false,
    "expected": 4,
    "expected_name": "EXHAUSTED"
   },
@@ -62,7 +57,6 @@
    },
    "attacker": {},
    "kind": 0,
-   "suppress": false,
    "expected": 4,
    "expected_name": "EXHAUSTED"
   },
@@ -73,7 +67,6 @@
    },
    "attacker": {},
    "kind": 0,
-   "suppress": false,
    "expected": 5,
    "expected_name": "RESTING"
   },
@@ -86,7 +79,6 @@
    },
    "attacker": {},
    "kind": 0,
-   "suppress": false,
    "expected": 6,
    "expected_name": "CANNOT_FIGHT"
   },
@@ -97,7 +89,6 @@
    },
    "attacker": {},
    "kind": 0,
-   "suppress": false,
    "expected": 1,
    "expected_name": "DEAD"
   },
@@ -110,7 +101,6 @@
     ]
    },
    "kind": 0,
-   "suppress": false,
    "expected": 7,
    "expected_name": "EVADED"
   },
@@ -123,18 +113,8 @@
     ]
    },
    "kind": 0,
-   "suppress": false,
    "expected": 7,
    "expected_name": "EVADED"
-  },
-  {
-   "label": "suppressed by the action",
-   "defender": {},
-   "attacker": {},
-   "kind": 0,
-   "suppress": true,
-   "expected": 8,
-   "expected_name": "SUPPRESSED"
   }
  ],
  "exchanges": [

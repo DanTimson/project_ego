@@ -150,12 +150,9 @@ def test_attacker_side_suppression() -> None:
                             AttackKind.MELEE) is NoCounter.EVADED,
           "Касание вампира — «не получать контратаки»")
 
-    class ShieldBash:
-        suppresses_counterattack = True
-
-    check(ca.why_no_counter(d, unit("a"), AttackKind.MELEE, ShieldBash())
-          is NoCounter.SUPPRESSED,
-          "Удар щитом suppresses it from the action side")
+    import inspect
+    check("action" not in inspect.signature(ca.why_no_counter).parameters,
+          "dead action metadata is no longer a counterattack input")
 
 
 def test_first_strike_order() -> None:

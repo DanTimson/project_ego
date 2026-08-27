@@ -122,9 +122,6 @@ class Action:
     ## Modifiers granted to the actor, as (ability_name, magnitude, duration).
     grants: tuple = ()
 
-    ## Defender does not retaliate against this action.
-    suppresses_counterattack: bool = False
-
     notes: str = ""
 
     def availability(self, actor,
@@ -175,8 +172,9 @@ class Action:
 
 
 # ---------------------------------------------------------------------------
-# The fourteen. Magnitudes come from unit_upg.Quantity at load time; the values
-# here are the DEFINITIONS, not instances.
+# Fourteen evidence/reference entries. They are not a production composition source.
+# Production stock defaults deliberately include only currently executable, tracked
+# bindings and live in content_actions.py.
 # ---------------------------------------------------------------------------
 
 def action_from_dict(d: dict) -> Action:
@@ -208,16 +206,15 @@ def action_from_dict(d: dict) -> Action:
         scales=tuple(tuple(x) for x in d.get("scales", ())),
         excluded_targets=tuple(d.get("excluded_targets", ())),
         grants=tuple(tuple(g) for g in d.get("grants", ())),
-        suppresses_counterattack=bool(d.get("suppresses_counterattack", False)),
         notes=str(d.get("notes", "")),
     )
 
 
-CATALOGUE: dict[str, Action] = {}
+REFERENCE_CATALOGUE: dict[str, Action] = {}
 
 
 def _add(a: Action) -> Action:
-    CATALOGUE[a.id] = a
+    REFERENCE_CATALOGUE[a.id] = a
     return a
 
 
@@ -254,7 +251,6 @@ _add(Action(
     id="shield_bash", source_id=388, name="Удар щитом",
     cost=Cost(stamina=1, attack_surcharge=True),
     target=Target.ENEMY_MELEE, is_attack=True, damage_scale=0.0,
-    suppresses_counterattack=True,
     excluded_targets=("Бестелесный",),
     notes="No damage and no normal on-hit effects; drains `magnitude` stamina "
           "from the target. Defender does not retaliate.",
@@ -338,9 +334,9 @@ _add(Action(
 
 
 def canonical_id_for_source(source_id: int,
-                            catalogue: dict[str, Action] | None = None) -> str | None:
-    """Content/import boundary lookup; runtime recipes never consume source IDs."""
-    definitions = CATALOGUE if catalogue is None else catalogue
+                            catalogue: dict[str, Action]) -> str | None:
+    """Explicit content/import-boundary lookup over composed definitions."""
+    definitions = catalogue
     for canonical_id, action in definitions.items():
         if action.source_id == int(source_id):
             return canonical_id

@@ -29,6 +29,7 @@ import json
 import os
 
 import identity
+import content_actions
 from dataclasses import dataclass, field
 
 
@@ -70,20 +71,25 @@ class ScenarioContentProvider:
     """
 
     def __init__(self, pack: str, definitions: dict, *, version: str = "",
-                 build: str = "", fingerprint: str = ""):
+                 build: str = "", fingerprint: str = "",
+                 action_overlay: dict | None = None):
         self.pack_id = str(pack)
         self.version = str(version)
         self.build = str(build)
         self._definitions = copy.deepcopy(definitions)
         self.asserted_fingerprint = str(fingerprint)
+        self._action_overlay = copy.deepcopy(action_overlay or {})
 
     def snapshot_payload(self) -> dict:
-        return {
+        payload = {
             "pack": self.pack_id,
             "version": self.version,
             "build": self.build,
             "definitions": self._definitions,
         }
+        if self._action_overlay:
+            payload["actions"] = self._action_overlay
+        return payload
 
     @property
     def fingerprint(self) -> str:
@@ -106,6 +112,10 @@ class ScenarioContentProvider:
     def resolve_definition(self, content_id: str):
         definition = self._definitions.get(content_id)
         return copy.deepcopy(definition) if definition is not None else None
+
+    def compose_actions(self, profile: str, mode: str = content_actions.STRICT):
+        return content_actions.compose(self.pack_id, profile,
+                                       self._action_overlay, mode)
 
 
 class AbilityRegistry:
@@ -206,6 +216,7 @@ class ContentPack:
         self.version: str = ""
         self.build: str = ""
         self.declared_fingerprint: str = ""
+        self.action_overlay: dict = {}
 
     # -- loading ------------------------------------------------------------
 
@@ -226,6 +237,14 @@ class ContentPack:
         self.version = str(payload.get("version", "") or "")
         self.build = str(payload.get("build", "") or "")
         self.declared_fingerprint = str(payload.get("fingerprint", "") or "")
+        raw_actions = payload.get("actions", {})
+        if not isinstance(raw_actions, dict):
+            errors.append("actions overlay must be an object")
+            # Preserve action-specific invalidity for strict/permissive composer
+            # diagnostics instead of silently replacing it with an empty overlay.
+            self.action_overlay = {"definitions": None}
+        else:
+            self.action_overlay = copy.deepcopy(raw_actions)
 
         for key, entry in (payload.get("abilities") or {}).items():
             try:
@@ -284,13 +303,16 @@ class ContentPack:
                 "params": binding.params,
                 "uses": binding.uses,
             }
-        return {
+        payload = {
             "pack": self.id,
             "version": self.version,
             "build": self.build,
             "bindings": bindings,
             "tables": self.tables,
         }
+        if self.action_overlay:
+            payload["actions"] = self.action_overlay
+        return payload
 
     def provenance(self) -> dict:
         observed = canonical_fingerprint(self.snapshot_payload())
@@ -329,6 +351,7 @@ class ContentDb:
         self.index = identity.Index(pack=pack.id)
         for table_name, records in pack.tables.items():
             self.index.add_table(table_name, records)
+        self._active_action_composition = None
 
     @classmethod
     def load(cls, pack_id: str, pack_dir: str, registry: AbilityRegistry,
@@ -351,6 +374,29 @@ class ContentDb:
     # model for scenarios.
     def content_provenance(self) -> dict:
         return self.pack.provenance()
+
+    def compose_actions(self, profile: str,
+                        mode: str = content_actions.STRICT):
+        result = content_actions.compose(self.pack.id, profile,
+                                         self.pack.action_overlay, mode)
+        self._active_action_composition = result
+        return result
+
+    def resolve_action_grant(self, source_id: int, magnitude):
+        composed = self._active_action_composition
+        if composed is None or source_id not in composed.source_map:
+            return None
+        canonical_id = composed.source_map[source_id]
+        if canonical_id == "shield_bash" and (
+                not isinstance(magnitude, int) or isinstance(magnitude, bool)):
+            return {
+                "source_id": source_id,
+                "error": "action grant source %d (%s) requires integer Quantity"
+                         % (source_id, canonical_id),
+            }
+        overrides = ({"magnitude": magnitude}
+                     if canonical_id == "shield_bash" else {})
+        return {"source_id": source_id, "overrides": overrides}
 
     def resolve_definition(self, content_id: str):
         """Return one fresh, normalized scenario construction record.
@@ -392,6 +438,7 @@ class ContentDb:
             "conditional_bonus": unit.conditional_bonus,
             "flags": sorted(unit.flags),
             "subtypes": sorted(unit.subtypes),
+            "__scenario_action_grants": copy.deepcopy(built.action_grants),
             "modifiers": [{
                 "ability": modifier.ability,
                 "handler": modifier.handler,

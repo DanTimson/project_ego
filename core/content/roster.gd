@@ -63,6 +63,7 @@ class Built extends RefCounted:
 	var unit: Combatant
 	var resolved: Array = []      ## [[opcode, name], ...]
 	var unresolved: Array = []    ## [Unresolved, ...]
+	var action_grants: Array = [] ## raw source grants for Scenario composition
 
 	func complete() -> bool:
 		return unresolved.is_empty()
@@ -261,12 +262,20 @@ func _resolve_one(ref: int, upgrade_name: String, opcode_v: Variant,
 		built.unresolved.append(u)
 		return
 	var opcode := int(opcode_v)
-	var power := int(power_v) if typeof(power_v) != TYPE_ARRAY else 0
 
 	var ability: Variant = by_number.get(opcode)
 	var ability_name := String((ability as Dictionary).get("Name", "")) \
 		if ability != null else ""
 
+	# Classify action grants before coercing Quantity for passive modifiers.
+	# Malformed action data must not become magnitude 0 or passive behavior.
+	var action_grant: Variant = db.resolve_action_grant(opcode, power_v)
+	if action_grant != null:
+		built.action_grants.append(action_grant)
+		built.resolved.append([opcode, upgrade_name if upgrade_name != "" else ability_name])
+		return
+
+	var power := int(power_v) if typeof(power_v) != TYPE_ARRAY else 0
 	var resolved: Array = db.resolve(opcode)
 	var handler: StringName = resolved[0]
 	if handler == &"":

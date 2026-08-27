@@ -9,6 +9,7 @@ extends RefCounted
 var pack: ContentPack
 var registry: AbilityRegistry
 var report: ContentPack.LoadReport
+var _active_action_composition: Dictionary = {}
 
 
 func _init(p_pack: ContentPack, p_registry: AbilityRegistry,
@@ -42,6 +43,28 @@ func resolve(opcode: int) -> Array:
 ## rules never load or branch on pack identity.
 func content_provenance() -> Dictionary:
 	return pack.provenance()
+
+
+func compose_actions(profile: String,
+		mode: String = ActionDefinitionComposer.STRICT) -> Dictionary:
+	_active_action_composition = ActionDefinitionComposer.compose(
+		pack.id, profile, pack.action_overlay, mode)
+	return _active_action_composition
+
+
+func resolve_action_grant(source_id: int, magnitude: Variant) -> Variant:
+	var source_map: Dictionary = _active_action_composition.get("source_map", {})
+	if not source_map.has(source_id):
+		return null
+	var canonical_id := String(source_map[source_id])
+	if canonical_id == "shield_bash" and typeof(magnitude) != TYPE_INT:
+		return {
+			"source_id": source_id,
+			"error": "action grant source %d (%s) requires integer Quantity" % [
+				source_id, canonical_id],
+		}
+	var overrides := {"magnitude": magnitude} if canonical_id == "shield_bash" else {}
+	return {"source_id": source_id, "overrides": overrides}
 
 
 func resolve_definition(content_id: String) -> Variant:
@@ -88,5 +111,6 @@ func resolve_definition(content_id: String) -> Variant:
 		"conditional_bonus": unit.conditional_bonus,
 		"flags": unit.flags.keys(),
 		"subtypes": unit.subtypes.keys(),
+		"__scenario_action_grants": built.action_grants.duplicate(true),
 		"modifiers": modifiers,
 	}.duplicate(true)

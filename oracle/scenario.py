@@ -46,6 +46,7 @@ import counterattack as ca
 import death_lifecycle
 import statuses as st
 import actions as actionsmod
+import content_actions
 import action_execution
 import turn
 from battlefield import Battlefield
@@ -123,8 +124,18 @@ class Scenario:
         self.name = spec.get("name", "unnamed")
         self.seed = int(spec.get("seed", 0))
         self.profile = self.normalize_profile(spec)
+        self.action_load_mode = str(spec.get("action_load_mode", content_actions.STRICT))
+        if self.action_load_mode not in content_actions.MODES:
+            raise ValueError("unknown action load mode %r" % self.action_load_mode)
+        compose_fn = getattr(content_provider, "compose_actions", None)
+        self.action_composition = (compose_fn(self.profile, self.action_load_mode)
+                                   if callable(compose_fn) else
+                                   content_actions.CompositionResult(
+                                       pack="", profile=self.profile,
+                                       mode=self.action_load_mode))
+        self.action_diagnostics = copy.deepcopy(self.action_composition.diagnostics)
         # Resolve and verify all canonical dependencies before constructing a
-        # battlefield or a Combatant. Inline scenarios never touch the provider.
+        # battlefield or a Combatant.
         self._side_specs = self.prepare_content(spec, content_provider)
         self._content_provider = content_provider
         self.log: list[str] = []
@@ -147,18 +158,24 @@ class Scenario:
             self._genesis_attack_command_charge
             if self.profile == PROFILE_GENESIS else self._no_attack_command_charge
         )
-        # Actions available in this battle. A scenario may declare its own so
-        # the file is self-contained and the GDScript port can build the same
-        # catalogue from the same source — the port loads its catalogue from
-        # data rather than hardcoding it, and a committed scenario must not
-        # depend on a fixture only one side reads.
-        self.catalogue = dict(actionsmod.CATALOGUE)
+        # Provider-composed definitions are the production enumeration source.
+        # Inline entries remain a self-contained fixture override layer.
+        self.catalogue = dict(self.action_composition.definitions)
+        self._inline_action_ids = set()
         for entry in spec.get("actions", []) or []:
             action = actionsmod.action_from_dict(entry)
             self.catalogue[action.id] = action
+            self._inline_action_ids.add(action.id)
         self.field = self._build_field(spec.get("battlefield", {}))
         self.units: dict[str, Combatant] = {}
         self.sides = self._build_sides(self._side_specs)
+        self.unit_catalogues, self.action_refusals = self._resolve_unit_actions(
+            self._side_specs)
+        if self.action_load_mode == content_actions.STRICT:
+            malformed = [item for item in self.action_diagnostics
+                         if item.get("code") == "malformed_grant"]
+            if malformed:
+                raise content_actions.ActionCompositionError(malformed)
         self.state = turn.BattleState(sides=self.sides)
         ## unit -> its projected auras. Passive, so it is built once; which units
         ## an aura REACHES is recomputed on every query.
@@ -209,8 +226,10 @@ class Scenario:
             raise ValueError("scenario canonical definitions require an injected content provider")
         provenance_fn = getattr(provider, "content_provenance", None)
         resolve_fn = getattr(provider, "resolve_definition", None)
-        if not callable(provenance_fn) or not callable(resolve_fn):
-            raise ValueError("content provider must report provenance and resolve canonical definitions")
+        compose_fn = getattr(provider, "compose_actions", None)
+        if (not callable(provenance_fn) or not callable(resolve_fn)
+                or not callable(compose_fn)):
+            raise ValueError("content provider must report provenance, resolve canonical definitions, and compose actions")
         observed = provenance_fn()
         if not isinstance(observed, dict):
             raise ValueError("content provider returned malformed provenance")
@@ -276,7 +295,8 @@ class Scenario:
                 if reserved:
                     raise ValueError("canonical definition %r contains scenario-owned fields: %s"
                                      % (content_id, ", ".join(reserved)))
-                unknown_definition = sorted(set(definition) - _SETTABLE_UNIT_FIELDS)
+                unknown_definition = sorted(
+                    set(definition) - _SETTABLE_UNIT_FIELDS - {"__scenario_action_grants"})
                 if unknown_definition:
                     raise ValueError("canonical definition %r contains unknown construction fields: %s"
                                      % (content_id, ", ".join(unknown_definition)))
@@ -332,6 +352,55 @@ class Scenario:
             return Rng(seed)
         raise AssertionError("profile was not validated: %s" % profile)
 
+    def _resolve_unit_actions(self, specs: list) -> tuple[dict, dict]:
+        catalogues: dict[str, dict[str, actionsmod.Action]] = {}
+        refusals: dict[str, dict[str, str]] = {}
+        for side in specs:
+            for unit_spec in side.get("units", []):
+                instance_id = str(unit_spec.get("id") or unit_spec.get("name", ""))
+                content_id = str(unit_spec.get(_RESOLVED_CONTENT_ID, ""))
+                available = {action_id: self.catalogue[action_id]
+                             for action_id in self._inline_action_ids}
+                raw_grants = list(self.action_composition.grants.get(content_id, ()))
+                for raw in unit_spec.get("__scenario_action_grants", ()) or ():
+                    source_id = raw.get("source_id") if isinstance(raw, dict) else None
+                    if isinstance(raw, dict) and raw.get("error"):
+                        candidate = self.action_composition.source_map.get(
+                            source_id, content_actions.namespace_id(
+                                self.action_composition.pack, int(source_id or -1)))
+                        message = str(raw["error"])
+                        refusals.setdefault(instance_id, {})[candidate] = message
+                        self.action_diagnostics.append({
+                            "code": "malformed_grant",
+                            "message": message,
+                            "unit": content_id or instance_id,
+                            "source_id": source_id,
+                            "canonical_id": candidate,
+                        })
+                        continue
+                    canonical_id = self.action_composition.source_map.get(source_id)
+                    if canonical_id is None:
+                        candidate = content_actions.namespace_id(
+                            self.action_composition.pack, int(source_id or -1))
+                        message = "unit %r has unresolved required action grant source %s" % (
+                            content_id or instance_id, source_id)
+                        refusals.setdefault(instance_id, {})[candidate] = message
+                        continue
+                    raw_grants.append({"canonical_id": canonical_id,
+                                       "overrides": copy.deepcopy(raw.get("overrides", {}))})
+                for grant in raw_grants:
+                    canonical_id = grant["canonical_id"]
+                    definition = self.catalogue.get(canonical_id)
+                    if definition is None:
+                        continue
+                    available[canonical_id] = content_actions.resolve_grant(
+                        definition, grant.get("overrides", {}))
+                catalogues[instance_id] = available
+                inherited_refusals = self.action_composition.refusals.get(content_id, {})
+                if inherited_refusals:
+                    refusals.setdefault(instance_id, {}).update(copy.deepcopy(inherited_refusals))
+        return catalogues, refusals
+
     def _build_field(self, spec: dict) -> Battlefield:
         field = Battlefield(int(spec.get("width", 7)), int(spec.get("height", 7)))
         for t in spec.get("tiles", []):
@@ -365,7 +434,8 @@ class Scenario:
                 for key, value in u.items():
                     if key in ("name", "id", "at", "flags", "subtypes",
                                "modifiers", "auras", "statuses", "content_id",
-                               "instance_id", _RESOLVED_CONTENT_ID):
+                               "instance_id", _RESOLVED_CONTENT_ID,
+                               "__scenario_action_grants"):
                         continue
                     setattr(unit, key, value)
                 unit.content_id = str(u.get(_RESOLVED_CONTENT_ID, ""))
@@ -841,9 +911,18 @@ class Scenario:
     def cmd_action(self, unit: Combatant, action_id: str,
                    target: Combatant | None = None) -> None:
         """Resolve a canonical unit action to a fresh typed plan and execute it."""
-        action = self.catalogue.get(action_id)
+        refusal = self.action_refusals.get(unit.instance_id, {}).get(action_id)
+        if refusal:
+            self.emit("%s cannot use %s: unresolved action grant: %s"
+                      % (unit.label(), action_id, refusal))
+            return
+        action = self.unit_catalogues.get(unit.instance_id, {}).get(action_id)
         if action is None:
-            self.emit("unknown action %r" % action_id)
+            if action_id in self.catalogue:
+                self.emit("%s cannot use %s: action is not granted"
+                          % (unit.label(), action_id))
+            else:
+                self.emit("unknown action %r" % action_id)
             return
 
         resolution = action_execution.ActionRecipeResolver.resolve(action)

@@ -14,7 +14,7 @@ from modifier import Hook, Modifier
 
 
 def _action_dict(action_id: str, *, magnitude: int = 0, name: str = "Localized") -> dict:
-    action = actions.CATALOGUE[action_id]
+    action = actions.REFERENCE_CATALOGUE[action_id]
     return {
         "id": action.id, "source_id": action.source_id, "name": name,
         "target": 1, "cost_stamina": action.cost.stamina,
@@ -65,17 +65,17 @@ def _run_action(action_id: str = "shield_bash", *, magnitude: int = 4,
 
 
 def test_plan_resolution_is_typed_immutable_and_identity_based() -> None:
-    assert {key: value.source_id for key, value in actions.CATALOGUE.items()} == {
+    assert {key: value.source_id for key, value in actions.REFERENCE_CATALOGUE.items()} == {
         "extra_shot": 20, "power_shot": 361, "crushing_blow": 59,
         "whirlwind": 66, "shield_bash": 388, "frenzy": 454,
         "turtle": 458, "forced_march": 29, "sniper_shot": 360,
         "healing": 24, "repair": 374, "gather_ammo": 23,
         "carrion_eater": 49, "strike_and_return": 518,
     }
-    assert actions.canonical_id_for_source(59) == "crushing_blow"
-    assert actions.canonical_id_for_source(388) == "shield_bash"
-    assert actions.canonical_id_for_source(999999) is None
-    crushing = actions.CATALOGUE["crushing_blow"]
+    assert actions.canonical_id_for_source(59, actions.REFERENCE_CATALOGUE) == "crushing_blow"
+    assert actions.canonical_id_for_source(388, actions.REFERENCE_CATALOGUE) == "shield_bash"
+    assert actions.canonical_id_for_source(999999, actions.REFERENCE_CATALOGUE) is None
+    crushing = actions.REFERENCE_CATALOGUE["crushing_blow"]
     renamed = replace(crushing, name="Any locale at all")
     before = copy.deepcopy(crushing)
     r1 = ae.ActionRecipeResolver.resolve(crushing)
@@ -91,7 +91,7 @@ def test_plan_resolution_is_typed_immutable_and_identity_based() -> None:
             attack.initiating_attack_scale_denominator) == (3, 2)
     assert crushing == before and crushing.source_id == 59
 
-    shield = replace(actions.CATALOGUE["shield_bash"], magnitude=7,
+    shield = replace(actions.REFERENCE_CATALOGUE["shield_bash"], magnitude=7,
                      name="Not Russian")
     shield_resolution = ae.ActionRecipeResolver.resolve(shield)
     resource = shield_resolution.plan.operations[0]
@@ -110,7 +110,7 @@ def test_plan_resolution_is_typed_immutable_and_identity_based() -> None:
     with pytest.raises(FrozenInstanceError):
         attack.initiating_attack_scale_numerator = 9
 
-    unsupported = ae.ActionRecipeResolver.resolve(actions.CATALOGUE["extra_shot"])
+    unsupported = ae.ActionRecipeResolver.resolve(actions.REFERENCE_CATALOGUE["extra_shot"])
     assert not unsupported.supported and unsupported.plan is None
 
 
@@ -136,7 +136,7 @@ def test_plan_executor_owns_ordered_operation_iteration() -> None:
 
 def test_plan_creation_and_refusal_are_mutation_free() -> None:
     unit = Combatant(stamina=10, life=20)
-    action = replace(actions.CATALOGUE["shield_bash"], magnitude=4)
+    action = replace(actions.REFERENCE_CATALOGUE["shield_bash"], magnitude=4)
     before = copy.deepcopy(unit.__dict__)
     ae.ActionRecipeResolver.resolve(action)
     assert unit.__dict__ == before
@@ -171,7 +171,7 @@ def test_crushing_blow_uses_one_scaled_primary_and_shared_exchange() -> None:
     defender = Combatant(name="d", defence=8, counter_attack=5, life=30,
                          life_base=30, stamina=10, stamina_base=10, morale=10)
     op = ae.ActionRecipeResolver.resolve(
-        actions.CATALOGUE["crushing_blow"]).plan.operations[0]
+        actions.REFERENCE_CATALOGUE["crushing_blow"]).plan.operations[0]
     damage, traces = combat.resolve_attack(
         attacker, defender, AttackKind.MELEE, ZeroRng(),
         initiating_scale_numerator=op.initiating_attack_scale_numerator,

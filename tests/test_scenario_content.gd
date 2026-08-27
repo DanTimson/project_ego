@@ -28,6 +28,9 @@ class MalformedProvider:
 	func resolve_definition(_content_id: String) -> Variant:
 		return null
 
+	func compose_actions(_profile: String, _mode: String) -> Dictionary:
+		return ActionDefinitionComposer.empty_result(_profile, _mode)
+
 
 func _check(ok: bool, what: String, detail: String = "") -> void:
 	print("  %s  %s%s" % ["PASS" if ok else "FAIL", what,

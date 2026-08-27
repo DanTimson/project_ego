@@ -60,6 +60,12 @@ var construction_error: String = ""
 var log: Array[String] = []
 ## Either Rng (named streams) or LegacyRng (Genesis compatibility).
 var catalogue: Dictionary = {}
+var unit_catalogues: Dictionary = {}
+var action_refusals: Dictionary = {}
+var action_diagnostics: Array = []
+var action_load_mode: String = ActionDefinitionComposer.STRICT
+var _action_composition: Dictionary = {}
+var _inline_action_ids: Dictionary = {}
 
 var rng: Variant
 ## Profile-composed primary-melee charge. Ordinary damage rules never receive
@@ -149,10 +155,11 @@ static func prepare_content(p_spec: Dictionary, provider: Variant = null) -> Dic
 	if typeof(provider) != TYPE_OBJECT:
 		return {"sides": [], "error": "content provider must be an object"}
 	var provider_capable: bool = provider.has_method("content_provenance") \
-		and provider.has_method("resolve_definition")
+		and provider.has_method("resolve_definition") \
+		and provider.has_method("compose_actions")
 	if not provider_capable:
-		return {"sides": [],
-			"error": "content provider must report provenance and resolve canonical definitions"}
+		return {"sides": [], "error": (
+			"content provider must report provenance, resolve canonical definitions, and compose actions")}
 	var observed_v: Variant = provider.call("content_provenance")
 	if typeof(observed_v) != TYPE_DICTIONARY:
 		return {"sides": [], "error": "content provider returned malformed provenance"}
@@ -229,6 +236,8 @@ static func prepare_content(p_spec: Dictionary, provider: Variant = null) -> Dic
 			var definition: Dictionary = definition_v.duplicate(true)
 			for key in definition:
 				var field := String(key)
+				if field == "__scenario_action_grants":
+					continue
 				if FORBIDDEN_OVERRIDE_FIELDS.has(field):
 					return {"sides": [], "error":
 						"canonical definition '%s' contains scenario-owned field: %s"
@@ -268,6 +277,27 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null,
 		construction_error = profile_error
 		push_error(profile_error)
 		return
+	action_load_mode = String(spec.get("action_load_mode", ActionDefinitionComposer.STRICT))
+	if action_load_mode != ActionDefinitionComposer.STRICT \
+			and action_load_mode != ActionDefinitionComposer.PERMISSIVE:
+		construction_error = "unknown action load mode '%s'" % action_load_mode
+		push_error(construction_error)
+		return
+	if injected_content_provider != null \
+			and typeof(injected_content_provider) == TYPE_OBJECT \
+			and injected_content_provider.has_method("compose_actions"):
+		_action_composition = injected_content_provider.call(
+			"compose_actions", profile, action_load_mode)
+	else:
+		_action_composition = ActionDefinitionComposer.empty_result(profile, action_load_mode)
+	action_diagnostics = _action_composition.get("diagnostics", []).duplicate(true)
+	if not bool(_action_composition.get("ok", false)):
+		var messages: PackedStringArray = []
+		for diagnostic in action_diagnostics:
+			messages.append(String(diagnostic.get("message", "action composition error")))
+		construction_error = "action composition failed: %s" % "; ".join(messages)
+		push_error(construction_error)
+		return
 	var prepared := prepare_content(spec, injected_content_provider)
 	construction_error = String(prepared["error"])
 	if construction_error != "":
@@ -275,12 +305,13 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null,
 		return
 	_side_specs = prepared["sides"]
 	_content_provider = injected_content_provider
-	# Actions available in this battle. A scenario may declare its own so the
-	# file is self-contained; see Action.CATALOGUE.
-	catalogue = Action.CATALOGUE.duplicate()
+	# Provider-composed definitions are the production enumeration source.
+	# Inline entries remain a self-contained fixture override layer.
+	catalogue = (_action_composition.get("definitions", {}) as Dictionary).duplicate()
 	for entry in spec.get("actions", []):
 		var a := Action.from_dict(entry)
 		catalogue[a.id] = a
+		_inline_action_ids[a.id] = true
 	# THE randomness boundary. Rules never choose a generator and never branch on
 	# profile — they receive whatever is injected here and call roll(x, stream).
 	# Genesis compatibility needs ONE shared LegacyRng because the original
@@ -312,9 +343,88 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null,
 		push_error(construction_error)
 		return
 	units = built["units"]
+	var resolved_actions := _resolve_unit_actions(_side_specs)
+	unit_catalogues = resolved_actions["catalogues"]
+	action_refusals = resolved_actions["refusals"]
+	if action_load_mode == ActionDefinitionComposer.STRICT:
+		var malformed: Array = action_diagnostics.filter(
+				func(d): return String(d.get("code", "")) == "malformed_grant")
+		if not malformed.is_empty():
+			var messages: PackedStringArray = []
+			for diagnostic in malformed:
+				messages.append(String(diagnostic.get("message", "malformed action grant")))
+			construction_error = "action composition failed: %s" % "; ".join(messages)
+			field = null
+			units = {}
+			unit_catalogues = {}
+			action_refusals = {}
+			push_error(construction_error)
+			return
 	state = RoundLoop.BattleState.new()
 	state.sides = built["sides"]
 	auras_by_source = _build_auras(_side_specs)
+
+
+func _resolve_unit_actions(specs: Array) -> Dictionary:
+	var catalogues: Dictionary = {}
+	var refusals: Dictionary = {}
+	var composed_grants: Dictionary = _action_composition.get("grants", {})
+	var source_map: Dictionary = _action_composition.get("source_map", {})
+	var composed_refusals: Dictionary = _action_composition.get("refusals", {})
+	for side in specs:
+		for unit_spec in side.get("units", []):
+			var instance_id := String(unit_spec.get("id", unit_spec.get("name", "")))
+			var content_id := String(unit_spec.get(RESOLVED_CONTENT_ID, ""))
+			var available: Dictionary = {}
+			for action_id in _inline_action_ids:
+				available[action_id] = catalogue[action_id]
+			var raw_grants: Array = composed_grants.get(content_id, []).duplicate(true)
+			for raw_v in unit_spec.get("__scenario_action_grants", []):
+				var raw: Dictionary = raw_v
+				var source_id := int(raw.get("source_id", -1))
+				if raw.has("error"):
+					var candidate := String(source_map.get(source_id,
+							ActionDefinitionComposer.namespace_id(
+								String(_action_composition.get("pack", "")), source_id)))
+					var message := String(raw["error"])
+					if not refusals.has(instance_id):
+						refusals[instance_id] = {}
+					refusals[instance_id][candidate] = message
+					action_diagnostics.append({
+						"code": "malformed_grant",
+						"message": message,
+						"unit": content_id if content_id != "" else instance_id,
+						"source_id": source_id,
+						"canonical_id": candidate,
+					})
+					continue
+				if not source_map.has(source_id):
+					var candidate := ActionDefinitionComposer.namespace_id(
+						String(_action_composition.get("pack", "")), source_id)
+					var message := "unit '%s' has unresolved required action grant source %d" % [
+						content_id if content_id != "" else instance_id, source_id]
+					if not refusals.has(instance_id):
+						refusals[instance_id] = {}
+					refusals[instance_id][candidate] = message
+					continue
+				raw_grants.append({
+					"canonical_id": String(source_map[source_id]),
+					"overrides": raw.get("overrides", {}).duplicate(true),
+				})
+			for grant_v in raw_grants:
+				var grant: Dictionary = grant_v
+				var canonical_id := StringName(String(grant["canonical_id"]))
+				if not catalogue.has(canonical_id):
+					continue
+				available[canonical_id] = ActionDefinitionComposer.resolve_grant(
+					catalogue[canonical_id], grant.get("overrides", {}))
+			catalogues[instance_id] = available
+			if composed_refusals.has(content_id):
+				if not refusals.has(instance_id):
+					refusals[instance_id] = {}
+				refusals[instance_id].merge(
+					(composed_refusals[content_id] as Dictionary).duplicate(true), true)
+	return {"catalogues": catalogues, "refusals": refusals}
 
 
 func _build_field(s: Dictionary) -> Battlefield:
@@ -353,7 +463,8 @@ func _build_sides(specs: Array) -> Dictionary:
 				if k == "id":
 					continue
 				if k in ["name", "at", "flags", "subtypes", "modifiers", "auras",
-						"statuses", "content_id", "instance_id", RESOLVED_CONTENT_ID]:
+						"statuses", "content_id", "instance_id", RESOLVED_CONTENT_ID,
+						"__scenario_action_grants"]:
 					continue
 				if k == "damage_received":
 					unit.damage_received.assign(u[key])
@@ -621,10 +732,17 @@ func movement_plan(unit: Combatant, col: int, row: int) -> Dictionary:
 
 func _resolve_action_command(unit: Combatant, action_id: String,
 		target: Combatant) -> Dictionary:
-	if not catalogue.has(StringName(action_id)):
+	var unit_refusals: Dictionary = action_refusals.get(unit.instance_id, {})
+	if unit_refusals.has(action_id):
+		return {"reason": "unresolved action grant: %s" % unit_refusals[action_id],
+			"refusal": "validation"}
+	var available: Dictionary = unit_catalogues.get(unit.instance_id, {})
+	if not available.has(StringName(action_id)):
+		if catalogue.has(StringName(action_id)):
+			return {"reason": "action is not granted", "refusal": "validation"}
 		return {"reason": "unknown action '%s'" % action_id,
 			"refusal": "unknown"}
-	var action: Action = catalogue[StringName(action_id)]
+	var action: Action = available[StringName(action_id)]
 	var resolution := ActionRecipeResolver.resolve(action)
 	if not resolution.supported:
 		return {"reason": "action %s is known but unsupported" % action.id,

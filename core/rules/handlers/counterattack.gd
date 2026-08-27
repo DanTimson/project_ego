@@ -14,7 +14,6 @@ extends RefCounted
 ##   Ловкость              «атаковать врукопашную, ИЗБЕГАЯ ответных ударов»
 ##   Не сражается          «не может атаковать и контратаковать»
 ##   Касание вампира       «не получать контратаки»
-##   Удар щитом            suppresses it from the action side
 ##   Смертельное касание   «не действует при контратаках»
 ##   Парализующее касание  «атаки, контратаки и выстрелы» — so rider suppression
 ##                         is per-ability, not a blanket rule
@@ -38,7 +37,6 @@ enum NoCounter {
 	RESTING,
 	CANNOT_FIGHT,
 	EVADED,
-	SUPPRESSED,
 }
 
 const REASON_TEXT: Dictionary = {
@@ -50,7 +48,6 @@ const REASON_TEXT: Dictionary = {
 	NoCounter.RESTING: "resting forgoes counterattacks",
 	NoCounter.CANNOT_FIGHT: "Не сражается",
 	NoCounter.EVADED: "the attacker avoided it",
-	NoCounter.SUPPRESSED: "suppressed by the attacker's action",
 }
 
 ## Attacker-side abilities that avoid retaliation entirely.
@@ -86,20 +83,9 @@ class Exchange extends RefCounted:
 	var order: Array = []      ## [["attack"|"counter", damage], ...]
 
 
-static func _suppresses_counterattack(action: Variant) -> bool:
-	if typeof(action) == TYPE_DICTIONARY:
-		return bool(action.get("suppresses_counterattack", false))
-	if typeof(action) != TYPE_OBJECT:
-		return false
-	for property in action.get_property_list():
-		if String(property["name"]) == "suppresses_counterattack":
-			return bool(action.get("suppresses_counterattack"))
-	return false
-
-
 ## Decidable before any dice are rolled.
 static func why_no_counter(defender: Combatant, attacker: Combatant,
-		kind: Combatant.AttackKind, action: Variant = null) -> int:
+		kind: Combatant.AttackKind) -> int:
 	if kind != Combatant.AttackKind.MELEE:
 		return NoCounter.RANGED
 	if not defender.alive or defender.life <= 0:
@@ -116,14 +102,12 @@ static func why_no_counter(defender: Combatant, attacker: Combatant,
 	for f in EVASIVE:
 		if attacker.has_flag(f):
 			return NoCounter.EVADED
-	if _suppresses_counterattack(action):
-		return NoCounter.SUPPRESSED
 	return NoCounter.NONE
 
 
 static func will_counter(defender: Combatant, attacker: Combatant,
-		kind: Combatant.AttackKind, action: Variant = null) -> bool:
-	return why_no_counter(defender, attacker, kind, action) == NoCounter.NONE
+		kind: Combatant.AttackKind) -> bool:
+	return why_no_counter(defender, attacker, kind) == NoCounter.NONE
 
 
 ## «Это правило не действует, если противник тоже обладает первым ударом.»
@@ -141,7 +125,7 @@ static func resolve(attacker: Combatant, defender: Combatant, rng: Variant,
 		kind: Combatant.AttackKind = Combatant.AttackKind.MELEE,
 		action: Variant = null, primary_melee_charge: Variant = null) -> Exchange:
 	var ex := Exchange.new()
-	ex.reason = why_no_counter(defender, attacker, kind, action)
+	ex.reason = why_no_counter(defender, attacker, kind)
 	ex.countered = ex.reason == NoCounter.NONE
 	ex.counter_first = ex.countered and strikes_first(defender, attacker)
 

@@ -47,10 +47,6 @@ func _unit(spec: Dictionary) -> Combatant:
 	c.life_base = c.life
 	return c
 
-class _SuppressingAction extends RefCounted:
-	var suppresses_counterattack: bool = true
-
-
 func _test_effective_offensive_disable_and_live_exhaustion() -> void:
 	print("\n[IR-2/IR-3] effective 0x26 and live zero-stamina eligibility")
 	var attacker := _unit({"name": "attacker", "life": 50})
@@ -246,8 +242,7 @@ func _init() -> void:
 	for case in fx["refusals"]:
 		var d := _unit(case["defender"])
 		var a := _unit(case["attacker"])
-		var action: Variant = _SuppressingAction.new() if bool(case["suppress"]) else null
-		var got := Counterattack.why_no_counter(d, a, int(case["kind"]), action)
+		var got := Counterattack.why_no_counter(d, a, int(case["kind"]))
 		var want := int(case["expected"])
 		_check(got == want, "%s -> %s" % [case["label"], case["expected_name"]],
 			"got %d, expected %d" % [got, want])

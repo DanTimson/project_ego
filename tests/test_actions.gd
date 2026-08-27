@@ -17,6 +17,13 @@ func _check(ok: bool, what: String, detail: String = "") -> void:
 	if not ok:
 		failures += 1
 
+func _has_property(value: Object, property_name: StringName) -> bool:
+	for property in value.get_property_list():
+		if StringName(property["name"]) == property_name:
+			return true
+	return false
+
+
 func _actor(spec: Dictionary) -> Combatant:
 	var c := Combatant.new()
 	c.stamina = 10
@@ -93,8 +100,8 @@ func _init() -> void:
 		"Дополнительный выстрел halves Точный выстрел")
 	_check(catalogue[&"sniper_shot"].scales.get(&"Точный выстрел", 0.0) == 2.0,
 		"Снайперский выстрел doubles Точный выстрел")
-	_check(catalogue[&"shield_bash"].suppresses_counterattack,
-		"Удар щитом suppresses the counterattack")
+	_check(not _has_property(catalogue[&"shield_bash"], &"suppresses_counterattack"),
+		"dead counterattack-suppression field is absent")
 	_check(catalogue[&"shield_bash"].excluded_targets.has(&"Бестелесный"),
 		"Удар щитом excludes incorporeal targets")
 	_check(catalogue[&"healing"].excluded_targets.has(&"Нежить"),

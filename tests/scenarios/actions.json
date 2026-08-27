@@ -23,7 +23,6 @@
       "suppresses": [],
       "scales": [],
       "excluded_targets": [],
-      "suppresses_counterattack": false,
       "grants": [],
       "notes": ""
     },
@@ -45,7 +44,6 @@
       "excluded_targets": [
         "Бестелесный"
       ],
-      "suppresses_counterattack": true,
       "grants": [],
       "notes": ""
     }

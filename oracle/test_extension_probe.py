@@ -25,6 +25,7 @@ import os
 import sys
 
 import actions as actionsmod
+import content_actions
 import combat
 import scenario
 import turn
@@ -75,30 +76,25 @@ def test_a_new_action_requires_an_explicit_recipe() -> None:
         notes="probe-only action, not Genesis content",
     )
 
-    before = len(actionsmod.CATALOGUE)
-    actionsmod.CATALOGUE[braced.id] = braced
-    check(len(actionsmod.CATALOGUE) == before + 1,
-          "a new action definition can be registered", braced.id)
     finding("CX-013 intentionally requires a canonical recipe before a new "
             "action can execute; catalogue metadata is not a universal DSL")
+    s = spec(commands=[
+        {"op": "end_phase"},
+        {"op": "action", "unit": "Мечник", "action": "mod_brace"},
+    ])
+    # This historical probe is deliberately self-contained. Production uses the
+    # injected composer; changing the reference catalogue must have no effect.
+    s["actions"] = [content_actions.action_to_dict(braced)]
+    sc = scenario.Scenario(s)
+    unit = sc.units["Мечник"]
+    before_state = (unit.stamina, unit.action_spent, tuple(unit.statuses))
+    result = sc.run()
 
-    try:
-        s = spec(commands=[
-            {"op": "end_phase"},
-            {"op": "action", "unit": "Мечник", "action": "mod_brace"},
-        ])
-        sc = scenario.Scenario(s)
-        unit = sc.units["Мечник"]
-        before_state = (unit.stamina, unit.action_spent, tuple(unit.statuses))
-        result = sc.run()
-
-        check(any("action mod_brace is known but unsupported" in line
-                  for line in result["log"]),
-              "an un-reciped definition is explicitly unsupported")
-        check((unit.stamina, unit.action_spent, tuple(unit.statuses)) == before_state,
-              "unsupported metadata cannot pay or execute generic grants")
-    finally:
-        actionsmod.CATALOGUE.pop(braced.id, None)
+    check(any("action mod_brace is known but unsupported" in line
+              for line in result["log"]),
+          "an un-reciped definition is explicitly unsupported")
+    check((unit.stamina, unit.action_spent, tuple(unit.statuses)) == before_state,
+          "unsupported metadata cannot pay or execute generic grants")
 
 
 # --- part 2: one altered rule ----------------------------------------------
@@ -151,15 +147,15 @@ def test_an_altered_rule_needs_no_engine_edit() -> None:
 def test_the_boundaries_that_are_actually_missing() -> None:
     print("\n[3] boundaries the probe could not cross")
 
-    attack_actions = [a for a in actionsmod.CATALOGUE.values() if a.is_attack]
+    attack_actions = [a for a in actionsmod.REFERENCE_CATALOGUE.values() if a.is_attack]
     check(attack_actions, "attack-replacing actions exist in the catalogue",
-          "%d of %d" % (len(attack_actions), len(actionsmod.CATALOGUE)))
+          "%d of %d" % (len(attack_actions), len(actionsmod.REFERENCE_CATALOGUE)))
     finding("attack-replacing actions cannot execute: they need the attack "
             "pipeline plus damage_scale, whose insertion point is open (FORMULAS "
             "§1.1). cmd_action refuses them explicitly rather than silently "
             "doing nothing")
 
-    zero_magnitude = [a for a in actionsmod.CATALOGUE.values()
+    zero_magnitude = [a for a in actionsmod.REFERENCE_CATALOGUE.values()
                       if not a.grants and not a.is_attack]
     check(zero_magnitude, "and effect actions carry no magnitudes yet",
           "%d actions" % len(zero_magnitude))
@@ -168,10 +164,9 @@ def test_the_boundaries_that_are_actually_missing() -> None:
 
     finding("no persistence layer exists, so the save/load third of the probe "
             "cannot run at all; it is tracked as its own pending item")
-    finding("action parity is now closed: the port has the Action model, Refusal "
-            "reasons, a data-loaded catalogue and cmd_action. A scenario may "
-            "declare its own `actions`, so a committed scenario is self-contained "
-            "and both implementations build the catalogue from the same bytes")
+    finding("action parity is now closed: production uses injected, profile-aware "
+            "composition and per-unit grants; inline `actions` remains only the "
+            "self-contained fixture override layer")
 
 
 def main() -> None:

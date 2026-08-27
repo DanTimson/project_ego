@@ -78,6 +78,7 @@ class BuiltUnit:
     unit: Combatant
     resolved: list = field(default_factory=list)      # (opcode, name)
     unresolved: list = field(default_factory=list)    # UnresolvedAbility
+    action_grants: list = field(default_factory=list) # raw source grants
     content_id: str = ""                              # canonical, pack-qualified
     provenance: dict = field(default_factory=dict)
 
@@ -231,6 +232,16 @@ class Roster:
 
         ability = self.by_number.get(opcode)
         ability_name = ability.get("Name", "") if ability else ""
+
+        action_grant_fn = getattr(self.db, "resolve_action_grant", None)
+        # Classify action grants before passive-modifier coercion/fallback.
+        action_grant = (action_grant_fn(opcode, power)
+                        if callable(action_grant_fn)
+                        else None)
+        if action_grant is not None:
+            built.action_grants.append(action_grant)
+            built.resolved.append((opcode, upgrade_name or ability_name))
+            return
 
         handler, params = self.db.resolve(opcode)
         if not handler:

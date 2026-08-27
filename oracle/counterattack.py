@@ -14,7 +14,6 @@ pin the rules down further than any single one does:
                           ударов» — attacker-side suppression
     Не сражается          «не может атаковать и контратаковать»
     Касание вампира       «не получать контратаки»
-    Удар щитом            suppresses it from the action side
     Смертельное касание   «не действует при контратаках» — some on-hit riders
                           are suppressed during a counter
     Парализующее касание  «атаки, контратаки и выстрелы» — and some are not
@@ -51,7 +50,6 @@ class NoCounter(Enum):
     RESTING = "resting forgoes counterattacks"
     CANNOT_FIGHT = "Не сражается"
     EVADED = "the attacker avoided it"
-    SUPPRESSED = "suppressed by the attacker's action"
 
 
 ## Attacker-side abilities that avoid retaliation entirely.
@@ -68,7 +66,7 @@ def bind_death_resolver(resolver) -> None:
 
 
 def why_no_counter(defender: Combatant, attacker: Combatant,
-                   kind: AttackKind, action=None) -> NoCounter:
+                   kind: AttackKind) -> NoCounter:
     """Decidable before any dice are rolled."""
     if kind is not AttackKind.MELEE:
         return NoCounter.RANGED
@@ -87,14 +85,12 @@ def why_no_counter(defender: Combatant, attacker: Combatant,
         return NoCounter.RESTING
     if any(attacker.has_flag(f) for f in EVASIVE):
         return NoCounter.EVADED
-    if action is not None and getattr(action, "suppresses_counterattack", False):
-        return NoCounter.SUPPRESSED
     return NoCounter.NONE
 
 
 def will_counter(defender: Combatant, attacker: Combatant,
-                 kind: AttackKind, action=None) -> bool:
-    return why_no_counter(defender, attacker, kind, action) is NoCounter.NONE
+                 kind: AttackKind) -> bool:
+    return why_no_counter(defender, attacker, kind) is NoCounter.NONE
 
 
 def strikes_first(defender: Combatant, attacker: Combatant) -> bool:
@@ -141,7 +137,7 @@ def resolve(attacker: Combatant, defender: Combatant, rng,
     suppresses ordinary retaliation even if its target survives the lifecycle.
     """
     ex = Exchange()
-    ex.reason = why_no_counter(defender, attacker, kind, action)
+    ex.reason = why_no_counter(defender, attacker, kind)
     ex.countered = ex.reason is NoCounter.NONE
     ex.counter_first = ex.countered and strikes_first(defender, attacker)
 
