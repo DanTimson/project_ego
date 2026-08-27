@@ -51,6 +51,62 @@ class _SuppressingAction extends RefCounted:
 	var suppresses_counterattack: bool = true
 
 
+func _test_effective_offensive_disable_and_live_exhaustion() -> void:
+	print("\n[IR-2/IR-3] effective 0x26 and live zero-stamina eligibility")
+	var attacker := _unit({"name": "attacker", "life": 50})
+
+	var status_disabled := _unit({"name": "status-disabled", "life": 50})
+	var disabled_status := Status.new()
+	disabled_status.id = &"numeric-0x26"
+	disabled_status.modifiers.append(Modifier.make(
+		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET))
+	status_disabled.statuses.append(disabled_status)
+	_check(not status_disabled.has_flag(&"Не сражается")
+			and Counterattack.why_no_counter(status_disabled, attacker,
+				Combatant.AttackKind.MELEE) == Counterattack.NoCounter.CANNOT_FIGHT,
+		"status-owned effective numeric 0x26 suppresses retaliation")
+
+	var aura_disabled := _unit({"name": "aura-disabled", "life": 50})
+	var aura_modifier := Modifier.make(
+		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET)
+	Damage.bind_environment(func(candidate: Combatant) -> Array:
+		return [aura_modifier] if candidate == aura_disabled else [])
+	_check(Counterattack.why_no_counter(aura_disabled, attacker,
+			Combatant.AttackKind.MELEE) == Counterattack.NoCounter.CANNOT_FIGHT,
+		"eligible environment/aura-provided 0x26 suppresses retaliation")
+	Damage.bind_environment(Callable())
+
+	_check(Counterattack.why_no_counter(_unit({"name": "positive", "life": 50}),
+			attacker, Combatant.AttackKind.MELEE) == Counterattack.NoCounter.NONE,
+		"a defender without effective 0x26 remains eligible")
+
+	var exchange := Counterattack.resolve(attacker, status_disabled, Rng.new(17))
+	var counter_operations := 0
+	for operation in exchange.order:
+		if String(operation[0]) == "counter":
+			counter_operations += 1
+	_check(exchange.reason == Counterattack.NoCounter.CANNOT_FIGHT
+			and not exchange.countered and counter_operations == 0,
+		"a full effective-0x26 exchange emits no counter operation",
+		str(exchange.order))
+
+	var exhaustion_cases := [
+		{"label": "effective numeric 0x12", "numeric": true, "flag": false},
+		{"label": "symbolic Неутомимый", "numeric": false, "flag": true},
+		{"label": "numeric 0x12 plus symbolic alias", "numeric": true, "flag": true},
+	]
+	for case in exhaustion_cases:
+		var defender := _unit({"name": case["label"], "stamina": 0})
+		if bool(case["numeric"]):
+			defender.modifiers.append(Modifier.make(
+				0x12, &"modifier_0x12", Modifier.Hook.STAMINA))
+		if bool(case["flag"]):
+			defender.set_flag(&"Неутомимый")
+		_check(Counterattack.why_no_counter(defender, attacker,
+				Combatant.AttackKind.MELEE) == Counterattack.NoCounter.EXHAUSTED,
+			"%s does not bypass live exhaustion" % case["label"])
+
+
 func _test_primary_melee_charge_consumption() -> void:
 	print("\n[5] command-entry charge is flat post-defence melee damage")
 
@@ -235,6 +291,7 @@ func _init() -> void:
 				bool(case["expected"])],
 			"got %s" % got)
 
+	_test_effective_offensive_disable_and_live_exhaustion()
 	_test_primary_melee_charge_consumption()
 	_test_fatal_event_melee_lifecycle_sequencing()
 

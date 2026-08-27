@@ -590,6 +590,48 @@ func _test_action_terminality() -> void:
 		"a refused typed Action leaves the actor eligible")
 
 
+func _test_zero_movement_unspent_action_melee() -> void:
+	print("\n[IR-4] zero movement retains an unspent adjacent melee")
+	var specification := {
+		"name": "IR-4 movement/action distinction", "profile": "native", "seed": 4,
+		"battlefield": {"width": 3, "height": 2, "tiles": []},
+		"sides": [
+			{"id": 0, "is_attacker": true, "leader_initiative": 2,
+				"units": [_fighter("actor", [0, 0], {"speed": 1})]},
+			{"id": 1, "leader_initiative": 1,
+				"units": [_fighter("defender", [2, 0], {"counter_attack": 0})]},
+		],
+		"commands": [],
+	}
+	var manual := Scenario.new(specification)
+	RoundLoop.begin_battle(manual.state)
+	var actor: Combatant = manual.units["actor"]
+	var defender: Combatant = manual.units["defender"]
+	var move := manual.execute_command(
+		{"op": "move", "unit": "actor", "to": [1, 0]})
+	_check(bool(move["accepted"]) and actor.movement_remaining == 0
+			and actor.steps_this_round == 1,
+		"movement is exhausted to zero through the manual Scenario command")
+	var melee_query := manual.query_command(
+		{"op": "attack", "unit": "actor", "target": "defender"})
+	_check(not actor.action_spent and ActionPoints.has_resources(actor)
+			and actor in RoundLoop.activatable(manual.state, 0)
+			and bool(melee_query["accepted"]),
+		"the zero-movement actor remains selectable and melee-actionable")
+	var defender_life_before := defender.life
+	var melee := manual.execute_command(
+		{"op": "attack", "unit": "actor", "target": "defender"})
+	var combat_event := false
+	for event in melee["events"]:
+		if "actor hits defender" in String(event):
+			combat_event = true
+	_check(bool(melee["accepted"]) and combat_event
+			and defender.life < defender_life_before,
+		"adjacent melee succeeds and emits the expected combat event")
+	_check(actor.action_spent and not ActionPoints.has_resources(actor),
+		"only the successful melee makes the action terminal")
+
+
 func _test_status_runtime_scenario() -> void:
 	print("\n[CX-010] first-class status scenario and no implicit lifecycle")
 	var file := FileAccess.open("res://tests/scenarios/status_runtime.json", FileAccess.READ)
@@ -733,6 +775,7 @@ func _init() -> void:
 	_test_ranged_numeric_tranche_integration()
 	_test_cx012_one_shot_channel_integration()
 	_test_action_terminality()
+	_test_zero_movement_unspent_action_melee()
 	_test_status_runtime_scenario()
 	_test_status_canonical_schema_boundary()
 

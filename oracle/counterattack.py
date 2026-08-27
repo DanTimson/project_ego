@@ -74,12 +74,14 @@ def why_no_counter(defender: Combatant, attacker: Combatant,
         return NoCounter.RANGED
     if not defender.alive or defender.life <= 0:
         return NoCounter.DEAD
-    if defender.has_flag("Не сражается"):
+    if (combat.has_effective_modifier(defender, 0x26)
+            or defender.has_flag("Не сражается")):
         return NoCounter.CANNOT_FIGHT
     if defender.counter_attack <= 0:
         return NoCounter.NO_STAT
-    # «его Защита и Защита от выстрела уменьшаются в 2 раза ... не контратакует»
-    if defender.stamina <= 0 and not defender.has_flag("Неутомимый"):
+    # Live exhaustion remains authoritative even when stamina mutation is
+    # suppressed by effective modifier 0x12 or its symbolic compatibility alias.
+    if defender.stamina <= 0:
         return NoCounter.EXHAUSTED
     if defender.resting:
         return NoCounter.RESTING

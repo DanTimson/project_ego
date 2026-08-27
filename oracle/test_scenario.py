@@ -783,6 +783,53 @@ def test_action_terminality() -> None:
           "a refused typed Action leaves the actor eligible")
 
 
+def test_zero_movement_unspent_action_adjacent_melee() -> None:
+    print("\n[IR-4] zero movement retains an unspent adjacent melee")
+    spec = {
+        "name": "IR-4 movement/action distinction", "profile": "native", "seed": 4,
+        "battlefield": {"width": 3, "height": 2, "tiles": []},
+        "sides": [
+            {"id": 0, "is_attacker": True, "leader_initiative": 2,
+             "units": [{
+                 "name": "actor", "at": [0, 0], "attack": 8,
+                 "counter_attack": 3, "defence": 0, "life": 40,
+                 "stamina": 10, "stamina_base": 10, "morale": 10,
+                 "speed": 1,
+             }]},
+            {"id": 1, "leader_initiative": 1,
+             "units": [{
+                 "name": "defender", "at": [2, 0], "attack": 1,
+                 "counter_attack": 0, "defence": 0, "life": 40,
+                 "stamina": 10, "stamina_base": 10, "morale": 10,
+                 "speed": 1,
+             }]},
+        ],
+        "commands": [],
+    }
+    manual = scenario.Scenario(spec)
+    turn.begin_battle(manual.state)
+    actor = manual.units["actor"]
+    defender = manual.units["defender"]
+
+    manual.cmd_move(actor, 1, 0)
+    check(actor.movement_remaining == 0 and actor.steps_this_round == 1,
+          "movement is exhausted to zero through the manual Scenario command")
+    check(not actor.action_spent and turn.has_resources(actor)
+          and actor in turn.activatable(manual.state, 0)
+          and manual.field.find(actor).distance(manual.field.find(defender)) == 1,
+          "the zero-movement actor remains selectable for adjacent melee")
+
+    defender_life_before = defender.life
+    combat_log_start = len(manual.log)
+    manual.cmd_attack(actor, defender)
+    combat_events = manual.log[combat_log_start:]
+    check(defender.life < defender_life_before
+          and any("actor hits defender" in event for event in combat_events),
+          "adjacent melee succeeds and emits the expected combat event")
+    check(actor.action_spent and not turn.has_resources(actor),
+          "only the successful melee makes the action terminal")
+
+
 def test_phase_passing() -> None:
     """A voluntary pass remains necessary while eligible units are unspent."""
     print("\n[5] two voluntary side passes advance a fully unspent round")
@@ -987,6 +1034,7 @@ if __name__ == "__main__":
     test_ranged_numeric_tranche_integration()
     test_cx012_one_shot_channel_integration()
     test_terrain_matters()
+    test_zero_movement_unspent_action_adjacent_melee()
     test_phase_passing()
     test_illegal_commands()
     test_ammunition()

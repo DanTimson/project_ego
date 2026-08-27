@@ -16,6 +16,7 @@ import os
 import sys
 
 import battlefield as bfmod
+import combat
 import counterattack as ca
 import death_lifecycle as death
 import statuses
@@ -70,8 +71,8 @@ def test_refusals() -> None:
     check(ca.why_no_counter(unit("d", stamina=0), a, AttackKind.MELEE)
           is NoCounter.EXHAUSTED, "a unit at 0 stamina does not answer")
     check(ca.why_no_counter(unit("d", stamina=0, flags=["Неутомимый"]), a,
-                            AttackKind.MELEE) is NoCounter.NONE,
-          "unless it is Неутомимый and never loses stamina")
+                            AttackKind.MELEE) is NoCounter.EXHAUSTED,
+          "the Неутомимый compatibility flag does not bypass live exhaustion")
 
     resting = unit("d")
     resting.resting = True
@@ -84,6 +85,59 @@ def test_refusals() -> None:
     dead.alive = False
     check(ca.why_no_counter(dead, a, AttackKind.MELEE) is NoCounter.DEAD,
           "the dead do not answer")
+
+
+def test_effective_offensive_disable_and_live_exhaustion() -> None:
+    print("\n[IR-2/IR-3] effective 0x26 and live zero-stamina eligibility")
+    attacker = unit("a", life=50)
+
+    status_disabled = unit("status-disabled", life=50)
+    status_disabled.statuses = [statuses.StatusEffect(
+        id="numeric-0x26",
+        modifiers=[Modifier(ability=0x26, handler="modifier_0x26",
+                            hook=Hook.DAMAGE_VS_TARGET)])]
+    check(not status_disabled.has_flag("Не сражается")
+          and ca.why_no_counter(status_disabled, attacker, AttackKind.MELEE)
+          is NoCounter.CANNOT_FIGHT,
+          "status-owned effective numeric 0x26 suppresses retaliation")
+
+    aura_disabled = unit("aura-disabled", life=50)
+    aura_modifier = Modifier(ability=0x26, handler="modifier_0x26",
+                             hook=Hook.DAMAGE_VS_TARGET)
+    combat.bind_environment(
+        lambda candidate: [aura_modifier] if candidate is aura_disabled else [])
+    try:
+        check(ca.why_no_counter(aura_disabled, attacker, AttackKind.MELEE)
+              is NoCounter.CANNOT_FIGHT,
+              "eligible environment/aura-provided 0x26 suppresses retaliation")
+    finally:
+        combat.bind_environment(None)
+
+    check(ca.why_no_counter(unit("positive", life=50), attacker,
+                            AttackKind.MELEE) is NoCounter.NONE,
+          "a defender without effective 0x26 remains eligible")
+
+    exchange = ca.resolve(attacker, status_disabled, Rng(17))
+    check(exchange.reason is NoCounter.CANNOT_FIGHT
+          and not exchange.countered
+          and [operation for operation, _damage in exchange.order
+               if operation == "counter"] == [],
+          "a full effective-0x26 exchange emits no counter operation",
+          str(exchange.order))
+
+    numeric_0x12 = Modifier(ability=0x12, handler="modifier_0x12",
+                            hook=Hook.STAMINA)
+    exhaustion_cases = [
+        ("effective numeric 0x12", [numeric_0x12], set()),
+        ("symbolic Неутомимый", [], {"Неутомимый"}),
+        ("numeric 0x12 plus symbolic alias", [numeric_0x12], {"Неутомимый"}),
+    ]
+    for label, modifiers, flags in exhaustion_cases:
+        defender = unit(label, stamina=0, flags=flags)
+        defender.modifiers = list(modifiers)
+        check(ca.why_no_counter(defender, attacker, AttackKind.MELEE)
+              is NoCounter.EXHAUSTED,
+              "%s does not bypass live exhaustion" % label)
 
 
 def test_attacker_side_suppression() -> None:
@@ -308,6 +362,7 @@ def test_determinism() -> None:
 
 if __name__ == "__main__":
     test_refusals()
+    test_effective_offensive_disable_and_live_exhaustion()
     test_attacker_side_suppression()
     test_first_strike_order()
     test_lethal_first_strike()

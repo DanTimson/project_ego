@@ -63,8 +63,8 @@
    "attacker": {},
    "kind": 0,
    "suppress": false,
-   "expected": 0,
-   "expected_name": "NONE"
+   "expected": 4,
+   "expected_name": "EXHAUSTED"
   },
   {
    "label": "resting",

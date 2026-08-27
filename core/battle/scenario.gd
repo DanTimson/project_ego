@@ -97,6 +97,7 @@ static func profile_configuration(p_spec: Dictionary) -> Dictionary:
 static func prepare_content(p_spec: Dictionary, provider: Variant = null) -> Dictionary:
 	var sides: Array = p_spec.get("sides", [])
 	var has_references := false
+	var inline_instance_ids: Dictionary = {}
 	for side in sides:
 		for unit in side.get("units", []):
 			if unit.has("def"):
@@ -107,6 +108,11 @@ static func prepare_content(p_spec: Dictionary, provider: Variant = null) -> Dic
 					return {"sides": [], "error":
 						"inline unit '%s' cannot contain serialized identity field: %s"
 						% [unit.get("id", unit.get("name", "?")), field]}
+			var inline_id := String(unit.get("id", unit.get("name", "")))
+			if inline_instance_ids.has(inline_id):
+				return {"sides": [],
+					"error": "duplicate unit instance id '%s'" % inline_id}
+			inline_instance_ids[inline_id] = true
 	if not has_references:
 		return {"sides": sides, "error": ""}
 
@@ -167,16 +173,12 @@ static func prepare_content(p_spec: Dictionary, provider: Variant = null) -> Dic
 				% [key, expected, actual]}
 
 	var prepared: Array = sides.duplicate(true)
-	var seen_instance_ids: Dictionary = {}
+	var seen_instance_ids: Dictionary = inline_instance_ids.duplicate()
 	for side in prepared:
 		var side_units: Array = side.get("units", [])
 		for index in side_units.size():
 			var unit: Dictionary = side_units[index]
 			if not unit.has("def"):
-				var inline_id := String(unit.get("id", unit.get("name", "")))
-				if seen_instance_ids.has(inline_id):
-					return {"sides": [], "error": "duplicate unit instance id '%s'" % inline_id}
-				seen_instance_ids[inline_id] = true
 				continue
 			for key in unit:
 				if not CANONICAL_UNIT_KEYS.has(String(key)):
@@ -268,7 +270,6 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null,
 		return
 	var prepared := prepare_content(spec, injected_content_provider)
 	construction_error = String(prepared["error"])
-	assert(construction_error == "", construction_error)
 	if construction_error != "":
 		push_error(construction_error)
 		return
@@ -302,8 +303,17 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null,
 	else:
 		_attack_command_charge = Callable(self, "_no_attack_command_charge")
 	field = _build_field(spec.get("battlefield", {}))
+	var built := _build_sides(_side_specs)
+	construction_error = String(built["error"])
+	if construction_error != "":
+		# _build_sides is transactional for indexes. Drop the staging field too,
+		# so no occupied partial battlefield can be mistaken for a Scenario.
+		field = null
+		push_error(construction_error)
+		return
+	units = built["units"]
 	state = RoundLoop.BattleState.new()
-	state.sides = _build_sides(_side_specs)
+	state.sides = built["sides"]
 	auras_by_source = _build_auras(_side_specs)
 
 
@@ -323,8 +333,9 @@ func _build_field(s: Dictionary) -> Battlefield:
 	return bf
 
 
-func _build_sides(specs: Array) -> Array:
+func _build_sides(specs: Array) -> Dictionary:
 	var out: Array = []
+	var built_units: Dictionary = {}
 	for s in specs:
 		var side := RoundLoop.Side.new()
 		side.id = int(s["id"])
@@ -372,14 +383,19 @@ func _build_sides(specs: Array) -> Array:
 			if not unit.original_definition.is_empty():
 				unit.original_definition = DeathLifecycle.normalize_definition(
 					unit.original_definition)
+			if built_units.has(unit.instance_id):
+				return {"sides": [], "units": {}, "error":
+					"duplicate unit instance id '%s' — give each unit an explicit \"id\" when several share a display name"
+					% unit.instance_id}
 			var at: Array = u["at"]
-			field.place(unit, Battlefield.offset_to_axial(int(at[0]), int(at[1])))
-			if units.has(unit.instance_id):
-				push_error("duplicate unit instance id '%s' — give each unit an explicit \"id\" when several share a display name" % unit.instance_id)
-			units[unit.instance_id] = unit
+			if not field.place(unit,
+					Battlefield.offset_to_axial(int(at[0]), int(at[1]))):
+				return {"sides": [], "units": {}, "error":
+					"cannot place unit '%s' at %s" % [unit.instance_id, str(at)]}
+			built_units[unit.instance_id] = unit
 			side.units.append(unit)
 		out.append(side)
-	return out
+	return {"sides": out, "units": built_units, "error": ""}
 
 
 func _build_auras(specs: Array) -> Dictionary:

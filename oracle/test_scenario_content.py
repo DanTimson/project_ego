@@ -31,6 +31,42 @@ def canonical(fx=None):
     return copy.deepcopy(fx["canonical_spec"])
 
 
+def inline_construction_spec():
+    return {
+        "name": "IR-1 inline construction", "profile": "native", "seed": 1,
+        "battlefield": {"width": 2, "height": 2, "tiles": []},
+        "sides": [
+            {"id": 0, "units": [
+                {"id": "one", "name": "One", "at": [0, 0]}]},
+            {"id": 1, "units": [
+                {"id": "two", "name": "Two", "at": [1, 1]}]},
+        ],
+        "commands": [],
+    }
+
+
+def test_inline_construction_fails_closed_for_identity_and_placement_errors():
+    duplicate = inline_construction_spec()
+    duplicate["sides"][1]["units"][0]["id"] = "one"
+    with pytest.raises(ValueError, match="duplicate unit instance id"):
+        scenario.Scenario(duplicate)
+
+    occupied = inline_construction_spec()
+    occupied["sides"][1]["units"][0]["at"] = [0, 0]
+    with pytest.raises(ValueError, match="cannot place"):
+        scenario.Scenario(occupied)
+
+    out_of_bounds = inline_construction_spec()
+    out_of_bounds["sides"][1]["units"][0]["at"] = [4, 4]
+    with pytest.raises(ValueError, match="cannot place"):
+        scenario.Scenario(out_of_bounds)
+
+    valid = scenario.Scenario(inline_construction_spec())
+    assert set(valid.units) == {"one", "two"}
+    assert len(valid.sides) == 2
+    assert all(valid.field.find(unit) is not None for unit in valid.units.values())
+
+
 def test_canonical_and_inline_construction_are_equivalent_and_portable():
     fx = fixture()
     resolved = scenario.Scenario(canonical(fx), content_provider=provider(fx))

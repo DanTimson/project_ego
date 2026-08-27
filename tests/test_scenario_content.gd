@@ -65,6 +65,55 @@ func _error(spec: Dictionary, provider: Variant) -> String:
 	return String(Scenario.prepare_content(spec, provider)["error"])
 
 
+func _inline_construction_spec() -> Dictionary:
+	return {
+		"name": "IR-1 inline construction", "profile": "native", "seed": 1,
+		"battlefield": {"width": 2, "height": 2, "tiles": []},
+		"sides": [
+			{"id": 0, "units": [{"id": "one", "name": "One", "at": [0, 0]}]},
+			{"id": 1, "units": [{"id": "two", "name": "Two", "at": [1, 1]}]},
+		],
+		"commands": [],
+	}
+
+
+func _check_failed_construction(built: Scenario, fragment: String,
+		what: String) -> void:
+	_check(fragment in built.construction_error
+			and built.units.is_empty()
+			and built.field == null
+			and built.state == null
+			and built.auras_by_source.is_empty(),
+		what + " fails closed without a usable partial Scenario",
+		built.construction_error)
+
+
+func _test_inline_construction_fail_closed() -> void:
+	print("\n[IR-1] inline Scenario construction fails closed")
+	var duplicate := _inline_construction_spec()
+	duplicate["sides"][1]["units"][0]["id"] = "one"
+	_check_failed_construction(Scenario.new(duplicate),
+		"duplicate unit instance id", "duplicate inline instance ID")
+
+	var occupied := _inline_construction_spec()
+	occupied["sides"][1]["units"][0]["at"] = [0, 0]
+	_check_failed_construction(Scenario.new(occupied),
+		"cannot place unit", "occupied-tile placement")
+
+	var out_of_bounds := _inline_construction_spec()
+	out_of_bounds["sides"][1]["units"][0]["at"] = [4, 4]
+	_check_failed_construction(Scenario.new(out_of_bounds),
+		"cannot place unit", "out-of-bounds placement")
+
+	var valid := Scenario.new(_inline_construction_spec())
+	_check(valid.construction_error == "" and valid.field != null
+			and valid.state != null and valid.state.sides.size() == 2
+			and valid.units.size() == 2
+			and valid.field.has_unit(valid.units["one"])
+			and valid.field.has_unit(valid.units["two"]),
+		"valid inline construction remains usable")
+
+
 func _init() -> void:
 	var file := FileAccess.open(FIXTURE, FileAccess.READ)
 	if file == null:
@@ -76,6 +125,7 @@ func _init() -> void:
 	var fx: Dictionary = ScenarioContentProvider._canonical_json_value(
 		JSON.parse_string(file.get_as_text())) as Dictionary
 	file.close()
+	_test_inline_construction_fail_closed()
 	var provider := _provider(fx)
 	_check(provider.fingerprint == fx["provider"]["fingerprint"],
 		"canonical fingerprint matches the Python oracle", provider.fingerprint)
