@@ -35,6 +35,12 @@ Required now:
 
 No migration or history rewrite is required at G0.
 
+The AUD-REM-GOV-01 post-registry backfill records material profile, tactical,
+CX-008..CX-013, presentation and Milestone-0.2 release surfaces. The
+`tools/reference/abil_doc.json` row remains explicitly `unclassified` because
+PV-1 could not establish its provenance from tracked evidence. That hold does
+not trigger G1 and must not be treated as an assigned transfer class.
+
 ## 3. G1 — preparation before the trigger
 
 - [ ] Confirm that the trigger is expected rather than speculative.

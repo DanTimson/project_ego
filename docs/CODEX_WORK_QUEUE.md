@@ -54,3 +54,13 @@ named. In particular, DELIB-0003 implementation work must wait until the engine
 side defines or accepts the profile API.
 
 No engine task is implicitly authorized by this queue.
+
+## Post-0.2 audit disposition
+
+`docs/AUDIT_LEDGER.csv` is the canonical governance record for IR/AD/GV/PV/CL/RS
+findings. IR-1 through IR-4 are accepted implementation-ready findings but have
+not been assigned CX numbers by this reconciliation. AD-1 through AD-4 remain
+held for architecture/profile ownership; PV-1 remains provenance-held; RS-1 is
+deferred. CX-008 through CX-013 remain `DONE`, but their completion does not
+claim full R8 closure (modifier-7 provider aggregation is missing), full
+strategic/reward death lifecycle, or production action-definition composition.

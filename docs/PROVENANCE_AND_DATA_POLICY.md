@@ -83,6 +83,33 @@ Numeric modifier, upgrade and effect IDs remain numeric until data or
 localization ties them to a name. Mechanically descriptive names such as
 `life_steal_candidate` are working names, not proof of original terminology.
 
+## Tracked provenance hold: `tools/reference/abil_doc.json`
+
+PV-1 reviewed the tracked blob and its tracked history without modifying it. The
+file first appears in commit
+`39652abdae0c1c162ae9296be3d61b0f4a781ba2` (2026-07-26), whose subject is
+“populated with placeholders”; no earlier tracked version or tracked generator
+is present. The current blob is 239,237 bytes with SHA-256
+`aaa7a9b97369331d42470ab41b0328e9c9d6a9e5bcdff0653801744060c88be4` and has
+not changed since introduction. A later historical tree caption called it
+“extracted ability documentation”, but supplies no source linkage or method and
+is not sufficient provenance.
+
+Tracked evidence does **not** establish the source publication/build/file,
+whether the content was extracted, copied, transcribed, generated, transformed
+or authored, a source version/date/hash/path, or its redistribution/licensing
+basis. Commit authorship, Russian text, the filename and downstream tool use are
+not substitutes for those facts. The artifact therefore remains HELD and its
+lineage registry row remains explicitly `unclassified`; no transfer class has
+been inferred.
+
+**Bounded owner question:** can the artifact owner provide a tracked source
+record that identifies the exact source/publication/build/file and
+version/date/hash/path, documents the acquisition and transformation method, and
+states the redistribution/licensing basis for the blob introduced by
+`39652ab`? If not, governance must decide whether it remains private or is
+removed/replaced; this audit does not make that decision.
+
 ## Review requirements
 
 A pull request based on reverse engineering should state:

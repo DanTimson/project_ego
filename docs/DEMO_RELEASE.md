@@ -142,12 +142,13 @@ At runtime `TacticalAssetResolver` chooses presentation roots in this order:
 An absent optional root is normal and does not affect canonical content
 identity or combat state.
 
-## Fresh-clone release acceptance
+## Fresh-clone rebuild and reproducibility procedure
 
-After this release-tooling change is reviewed, integrated and committed, the
-human/reviewer performs real artifact acceptance from a fresh clone at the
-release commit on the Windows-backed volume. First, build and accept the public
-artifact independently; this step does not require any local/private assets:
+Milestone 0.2 and its official public/private pair are already accepted. The
+following commands document how to rebuild or repeat the accepted checks from a
+fresh clone at the exact release commit on a Windows-backed volume; they are not
+pending original-release acceptance instructions. A public-only rebuild does not
+require local/private assets:
 
 ```bash
 git clone <reviewed-project-ego-source> /mnt/d/project-ego-release-0.2
@@ -158,21 +159,20 @@ python3 tools/build_demo.py --mode public --milestone 0.2 \
 python3 -m pytest -q tools/test_build_demo.py tools/test_build_release_pair.py
 ```
 
-Once a valid prepared private root exists outside tracked Git content, perform
-the subsequent official pair acceptance:
+With a valid prepared private root outside tracked Git content, repeat the
+official pair build/check:
 
 ```bash
 python3 tools/build_release_pair.py --milestone 0.2 \
     --asset-root <prepared-private-root> --staging-parent /mnt/d
 ```
 
-The fresh-clone public artifact can be accepted without the private root. Final
-public/private pair acceptance still requires that root, both artifacts passing
-all scanner, smoke, identity and closure gates, and the generated pair manifest.
-Record the exact commit, Godot version, pair-manifest hash, both artifact hashes,
-runtime smoke results and Windows DPI matrix. Because the implementation
-candidate is dirty and `build_demo.py` intentionally archives frozen `HEAD`, a
-pre-integration run is not candidate 0.2 artifact acceptance.
+A public-only rebuild can be checked without the private root. Repeating the
+pair checks requires that root, both artifacts passing all scanner, smoke,
+identity and closure gates, and the generated pair manifest. Record the exact
+commit, Godot version, pair-manifest hash, both artifact hashes, runtime smoke
+results and Windows DPI matrix. Determinism is guaranteed for packaging a fixed
+Godot export payload; independent PCK export byte identity is not claimed.
 
 ## Recipient workflow
 

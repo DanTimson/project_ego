@@ -1,9 +1,10 @@
 # Project EGO
 
 Project EGO is an independent, data-driven reimplementation and extension
-platform for **Eador: Genesis** combat and content systems, with compatibility
-profiles for the original game, New Horizons, and intentionally modernized
-native behavior.
+platform for **Eador: Genesis** combat and content systems. Genesis and native
+rules are executable profiles. New Horizons profile/content identity and routing
+exist, but New Horizons rules compatibility is incomplete and Scenario
+construction deliberately rejects that profile.
 
 The project is built around a deterministic rules core rather than around copied
 original code or bundled game data. Mechanics are recovered from published
@@ -27,17 +28,27 @@ Implemented or substantially integrated:
 - deterministic Python and GDScript rule paths with scenario/trace parity;
 - ordinary melee, counterattack, ranged attack, defence, stamina, wound, morale,
   charge, and action-terminal mechanics;
-- modifiers, activated actions, auras, level-up options, and first-class runtime
-  statuses with stable stacking, resistance, and explicit manipulation semantics;
+- modifiers, auras, and first-class runtime statuses with stable stacking,
+  resistance, and explicit manipulation semantics;
+- typed execution plans for Crushing Blow and Shield Bash; the other twelve
+  represented actions are unsupported;
 - battlefield coordinates, occupancy, pathfinding, movement, and side/round
   scheduling;
 - content packs, profile routing, opaque opcode bindings, and strict
   battle-instance/content identity;
 - a playable tactical Godot scene with mouse routing, responsive layout, local
   asset resolution, and committed fallback presentation;
-- reproducible public/private demo packaging with a verified pair manifest;
+- released Milestone 0.2 public/private demo packaging with a verified pair
+  manifest and deterministic repackaging of a fixed Godot payload; independent
+  PCK export byte reproducibility is not claimed;
 - reverse-engineering evidence, function maps, compatibility matrices, and
   deterministic fixtures.
+
+The represented fourteen-action list is a hand-authored Python/reference
+catalogue, not a production ContentPack catalogue loader or production truth.
+Production action-definition composition, source binding, per-unit availability
+and magnitude, and Scenario injection remain unresolved. Likewise, recovered
+level-up/reference rules do not yet have a completed playable GDScript consumer.
 
 Important remaining work includes:
 

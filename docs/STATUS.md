@@ -9,19 +9,19 @@ This is a coverage map, not a release claim.
 | effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | implemented | implemented | R9 fixture-covered: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets remain distinct |
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 early-provider cutoff and distinct melee/counter minimum handling are fixture-covered |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 numeric placement is fixture-covered after effective-stat/selected 1.5× processing and before randomisation/defence; target applicability and wider provider coverage remain incomplete |
-| activated actions | public/data families + selective binary edges | typed plan execution for Crushing Blow and Shield Bash | typed plan execution for Crushing Blow and Shield Bash | source ID → canonical `Action` → recipe → immutable ordered plan → shared primitive is implemented; the other twelve catalogue actions and generic battle effects remain unsupported |
+| activated actions | public/data families + selective binary edges | typed plan execution for Crushing Blow and Shield Bash | typed plan execution for Crushing Blow and Shield Bash | source ID → canonical `Action` → recipe → immutable ordered plan → shared primitive is implemented; the other twelve reference-catalogue actions and generic battle effects remain unsupported; production composition remains held under AD-3 |
 | runtime statuses | public/project stable policy + unresolved binary lifecycle | stable container, stacking/resistance and explicit manipulation implemented | first-class `Status` model integrated through `Combatant`, later modifier providers and scenarios | stable container/parity fixture implemented; automatic duration tick/expiry and `UNTIL_NEXT_TURN` clock remain open pending R13 |
-| level-up selection | data + binary | implemented in part | `core/model/option.gd` and `tests/test_options.gd` empty | ordinary selection is specified; R15 zero-total/underfull edge deferred until an executable consumer and fixture exist |
+| level-up selection | data + binary | reference implementation in part | no completed playable GDScript consumer; `core/model/option.gd` and `tests/test_options.gd` are empty | ordinary selection/reference work is not playable integration; R15 zero-total/underfull edge is deferred until an executable consumer and fixture exist |
 | battlefield coordinates and adjacency | binary + controlled observation | implemented | implemented | adjacency recovered; R14 large-unit logical-footprint protocol ready |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
 | round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0`; owner-confirmed terminality | implemented | implemented | whole-side phases and pre-action capacity-preserving reselection remain; successful consuming commands close only their actor's activation; explicit order fixture still needed |
 | melee execution | binary | partial compatibility model | counterattack path plus tactical fatal lifecycle implemented | EXP-CI11 fatal-event sequencing distinguishes first-strike survival from fatal-primary retaliation suppression; R17 secondary ordering remains excluded |
-| ranged execution | binary | partial compatibility model | partial | one-shot `cmd_shoot`, exact ranged early-provider zero cutoff, live-capacity R8 stamina selection, CX-009 terminality and central fatal lifecycle routing are implemented; Extra Shot/two-shot action execution and special modes remain incomplete |
-| damage channels and death | binary | implemented tactical lifecycle + ranged calculator | implemented tactical lifecycle + ranged calculator | CX-012 covers exact `0x1C` resistance/channel-2, `0x5F`, `0x11`, `0x4D` and non-`0x1C` `0x3C` routing through the CX-011 sink; lifecycle parity remains covered; large-hit morale delta/`0x19`, hero-wide cohort, strategy writeback, corpses, rewards and R17 remain outside this tranche |
+| ranged execution | binary | partial compatibility model | partial | one-shot `cmd_shoot`, exact ranged early-provider zero cutoff, the R8 live-capacity comparator/restoration ordering, CX-009 terminality and central fatal lifecycle routing are implemented; modifier-7 provider aggregation into effective speed (AD-1), Extra Shot/two-shot action execution and special modes remain incomplete |
+| damage channels and death | binary | implemented tactical lifecycle + ranged calculator | implemented tactical lifecycle + ranged calculator | CX-012 covers exact `0x1C` resistance/channel-2, `0x5F`, `0x11`, `0x4D` and non-`0x1C` `0x3C` routing through the CX-011 sink; Genesis tier 1..4 replacement uses source records 21/37/56/65, not pack-independent identities; large-hit morale delta/`0x19`, hero-wide cohort, strategy writeback, corpses, rewards and R17 remain outside this tranche |
 | battle actions and target legality | public/data descriptions + selective binary evidence | adjacent enemy legality, exclusions and mutation-free refusal implemented for two unit actions | matching implementation | canonical typed unit-action command is covered; R16 stays retired and generic battle-action effects remain separate/unimplemented |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
 | scenario format and traces | Project EGO design | inline and canonical-definition units implemented | inline and canonical-definition units implemented | portable synthetic parity fixture covers provenance, merge and identity |
-| content packs and bindings | data analysis | implemented; `ContentDb` is a scenario provider | implemented; `ContentDb` is a scenario provider | canonical content ID, battle-instance ID and display name remain separate; actual content requires a verified local pack snapshot |
+| content packs and bindings | data analysis | implemented; `ContentDb` is a scenario provider | implemented; `ContentDb` is a scenario provider | canonical content ID, battle-instance ID and display name remain separate; actual content requires a verified local pack snapshot; New Horizons identity/plumbing exists but its rules profile is deliberately rejected as incomplete |
 | `.var` lexical parser | binary | tools exist | n/a | record schemas incomplete |
 | unit upkeep/recruitment | binary | not normalized | not implemented | evidence available |
 | province income/economy | binary | not normalized | not implemented | evidence available |
@@ -151,9 +151,12 @@ orchestration and neutral tracing while delegating to shared primitives.
 initiating `3/2` scale at the R10 pre-randomisation stage. `shield_bash` is one
 drain-only stamina `ResourceDeltaOp` with floor-zero and the battle-contextual
 effective R11 `0x12` write gate. Both pay the resolved Action cost once and obey
-CX-009 terminality. The other twelve catalogue actions, generic battle effects,
+CX-009 terminality. The other twelve reference-catalogue actions, generic battle effects,
 R12/R13/R14/R17, special ranged producers and exact legacy RNG ordering remain
-outside this implementation.
+outside this implementation. The hand-authored Python catalogue is reference
+coverage, not a production ContentPack catalogue; AD-3 holds production
+composition, source binding, per-unit availability/magnitude and Scenario
+injection.
 
 CX-012 implements the narrowed `DAMAGE-RANGED-001` tranche. Python and
 GDScript now select resistance plus received-damage channel 2 only when effective
@@ -176,7 +179,9 @@ accounts its channel, removes remove-on-damage statuses before life subtraction,
 and routes a fatal event exactly once through a battle-contextual resolver.
 Adjacent death morale precedes all survival branches; runtime-status-only
 `0x49/0x4A/0x5A/0x5B` markers drive complete status clear, rollback, revival,
-exact tier replacement, final cleanup and transfer in the accepted order.
+exact Genesis tier replacement, final cleanup and transfer in the accepted order.
+The tier 1..4 source records 21/37/56/65 are Genesis-qualified and are not
+pack-independent canonical identities.
 Persistent and battle-owned final deaths are distinct, and surviving branches do
 not refresh activation or advance status time. Aura upkeep routes only a newly
 caused living-to-dead transition, so a retained finalized dead record is not
@@ -206,7 +211,10 @@ model/command boundary: successful ordinary melee/ranged and resolved consuming
 active actions close only their actor, while reactions, refusals and resolved
 non-consuming action policy remain non-terminal. Partial movement/reselection
 before the action and existing round/extra-turn refresh semantics are preserved.
-This records implementation status, not new binary verification.
+Zero movement alone does not spend an unspent action: an adjacent living enemy
+may still be attacked, so movement exhaustion needs a regression test (IR-4),
+not a gameplay fix. This records implementation status, not new binary
+verification.
 
 
 CX-001 passed governance review and is classified `N0_PUBLIC / T0_RETAIN`. R14 now has a five-case giant-footprint observation packet. R15 is formally deferred until a level-up option consumer and synthetic underfull/all-zero fixtures exist. The stale broad dispatcher and melee matrix rows are reconciled with the public-family and finite-observation reductions.
@@ -230,5 +238,7 @@ CRC and deterministic repeat-packaging gates. Windows display scaling remains
 a known accepted prototype limitation: the executable does not currently adapt
 its logical UI geometry to the OS scale setting.
 
-Implementation remains frozen for the planned full repository
-audit/reconciliation before CX-014+ work resumes.
+`AUDIT_LEDGER.csv` is the canonical post-0.2 audit-disposition record. Its
+accepted implementation findings remain separate future engine work; its held
+architecture, profile and provenance items remain unresolved. This governance
+reconciliation does not authorize CX-014+, gameplay changes, or G1+.

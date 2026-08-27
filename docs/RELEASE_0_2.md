@@ -535,6 +535,11 @@ private root exists outside tracked Git content.
 
 ## 12. Independent review result
 
+> **Historical pre-release record.** This section preserves the tooling-review
+> state at that pass. It is superseded as current release authority by the
+> accepted artifact record in section 13; its remaining steps are now a
+> rebuild/reproducibility procedure, not pending original acceptance.
+
 **Decision:** release tooling accepted; Milestone 0.2 artifacts are not yet
 released.
 

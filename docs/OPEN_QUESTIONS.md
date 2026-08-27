@@ -60,12 +60,29 @@ special field meanings needed by content records that the engine actually
 implements. R17 is similarly narrowed to the observation cells in
 `MELEE_SECONDARY_COVERAGE.csv`.
 
+## Held architecture and profile boundaries
+
+`AUDIT_LEDGER.csv` is canonical for audit disposition. The current held semantic
+boundaries are:
+
+| ID | Held question | Closure owner/condition |
+|---|---|---|
+| AD-1 | Who supplies battle context and the persistent/intrinsic/runtime/aura providers for effective-speed modifier 7? | Engine architecture; preserve the implemented R8 live-capacity comparator while adding no guessed provider. |
+| AD-2 | Is `Status.prevents_action` authoritative, and exactly which query/command surfaces consume it? | Engine architecture; the field name alone is not authority. |
+| AD-3 | How are production action definitions composed and source-bound, including per-unit availability/magnitude and Scenario injection? | Engine + content architecture; the Python fourteen-action reference catalogue is not production truth. |
+| AD-4 | Which pack owns Genesis death-replacement records 21/37/56/65? | Profile/content decision; do not use them as pack-independent canonical identities. |
+
+New Horizons modifier-`0x5B` replacement research (RS-1) is deferred until NH
+compatibility is scheduled. NH profile/content plumbing is not executable rules
+compatibility; Scenario construction deliberately rejects the incomplete profile.
+
 ## Incomplete systems
 
-- **Timed status container in GDScript.** `core/model/status.gd` is currently
-  empty, while the binary runtime node is a recovered `0x20` doubly linked
-  object with source, duration/stack value, UI visibility and
-  remove-on-damage behaviour.
+- **Automatic status lifecycle integration.** `core/model/status.gd` contains the
+  stable first-class status model and query/manipulation machinery. The open
+  R13-family boundary is automatic duration ticking, expiry, periodic effects,
+  `UNTIL_NEXT_TURN` and their exact lifecycle ordering. The recovered binary
+  runtime node remains a separate layout/evidence concern.
 - **Aura resolution.** Personal hero and commander-aura channels are distinct,
   but radius, adjacency and stacking coverage is incomplete.
 - **Battlefield generation.** Tile storage/pathfinding exists; generation from
@@ -108,25 +125,13 @@ implements. R17 is similarly narrowed to the observation cells in
 
 Architectural obligations for these items — whether a recovered fact must be reproduced, imported, or merely recorded — are tracked by binding scope. The engine side's standing position is in `POSITION_ENGINE.md`.
 
-## Post-0.2 compatibility observation — movement exhaustion with adjacent enemy
+## Post-0.2 movement-exhaustion regression boundary
 
-Record for post-audit compatibility work; this entry is **not** promoted to
-binary evidence by its presence here.
+Current Project EGO behavior is correct: movement reaching zero does not itself
+set `action_spent`. A living unit with zero movement, an unspent action and an
+adjacent living enemy can still make its melee attack. No gameplay fix or new
+per-unit end-turn mechanic is required.
 
-Reported original tactical behavior:
-
-- exhausting a unit's movement allowance does not by itself terminate that
-  unit's actionable state when an enemy unit is adjacent;
-- after movement reaches zero in that situation, the unit may still finish its
-  activation by attacking one of the adjacent enemies;
-- otherwise play advances by ending the overall side turn;
-- there is no separate per-unit "end turn" command/mechanic that should be
-  introduced to model this behavior.
-
-Current Project EGO behavior ends the unit's turn when movement is spent, so
-this is a known compatibility discrepancy.
-
-For later implementation/research, treat this primarily as an
-**action-terminal-state / activation-lifetime** question rather than a movement
-cost arithmetic question. Reconcile it with the accepted CX-009 action
-terminality model and any relevant binary evidence before implementation.
+IR-4 requires a deterministic regression for that exact state combination. The
+absence of that dedicated regression is a test-coverage gap, not a current
+compatibility discrepancy or evidence that movement exhaustion is terminal.

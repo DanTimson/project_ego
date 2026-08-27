@@ -15,7 +15,9 @@ The supplied NH 26.0620.f01 Eadoropedia snapshot contains exactly fourteen
 ability descriptions using the explicit special-action formulation that the
 current `Action` model uses as its catalogue boundary.
 
-They are recorded in `UNIT_ACTION_COVERAGE.csv`.
+They are recorded in `UNIT_ACTION_COVERAGE.csv`. This is a reference/audit
+boundary, not evidence that a production ContentPack action-catalogue loader
+exists or that Python's hand-authored entries are production truth.
 
 The current Python/GDScript model already represents:
 
@@ -30,8 +32,11 @@ CX-013 now executes exactly two canonical actions against battlefield state:
 `crushing_blow` and `shield_bash`. A pure canonical recipe resolver creates fresh
 typed immutable plans, a typed executor owns ordered operation iteration, and the
 battle command owns validation, one-time payment, orchestration and neutral
-tracing. The current stamina operation is drain-only. The other twelve catalogue
-actions remain explicitly unsupported before payment.
+tracing. The current stamina operation is drain-only. The other twelve
+reference-catalogue actions remain explicitly unsupported before payment.
+Production action-definition composition, source binding, per-unit availability
+and magnitude, and Scenario injection remain held under AD-3. Level-up/reference
+work likewise does not supply a completed playable GDScript consumer.
 
 ### 1.2 Generic battle-action effects
 
@@ -70,9 +75,10 @@ These are recorded in `MELEE_SECONDARY_COVERAGE.csv`.
 
 ## 2. Unit-action result
 
-All fourteen public action names currently appear in the repository action
-catalogue. This supports catalogue completeness for the supplied NH snapshot,
-not complete battle execution.
+All fourteen public action names currently appear in the hand-authored Python
+reference catalogue. This supports audit coverage for the supplied NH snapshot,
+not production catalogue composition, per-unit binding, or complete battle
+execution.
 
 The basic semantics divide as follows.
 
