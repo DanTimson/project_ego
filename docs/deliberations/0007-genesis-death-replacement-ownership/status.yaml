@@ -1,0 +1,11 @@
+id: DELIB-0007
+title: Genesis death-replacement content ownership
+state: decided
+opened: 2026-08-27
+participants:
+  - human
+  - binary
+  - engine
+decision: decision.md
+verification:
+supersedes:

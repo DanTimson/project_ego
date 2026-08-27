@@ -1,0 +1,11 @@
+id: DELIB-0005
+title: Effective-speed provider and context ownership
+state: decided
+opened: 2026-08-27
+participants:
+  - human
+  - binary
+  - engine
+decision: decision.md
+verification:
+supersedes:

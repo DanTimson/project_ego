@@ -1,0 +1,11 @@
+id: DELIB-0006
+title: Status.prevents_action authority
+state: decided
+opened: 2026-08-27
+participants:
+  - human
+  - binary
+  - engine
+decision: decision.md
+verification:
+supersedes:
