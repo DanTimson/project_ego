@@ -35,6 +35,7 @@ priority.
 | CX-012 | `SPEC_IMPLEMENTATION` | ranged damage branch parity closure | engine | `DONE` | CX-011; DAMAGE-RANGED-001 plus one-shot channel integration accepted; two-shot producer and DAMAGE-MORALE deferred |
 | CX-013 | `SPEC_IMPLEMENTATION` | typed unit-action execution-plan foundation | engine | `DONE` | CX-012; engine-native plan layer + Crushing Blow/Shield Bash accepted; final substantial pre-0.2 tranche |
 | CX-014 | `SPEC_IMPLEMENTATION` | declarative data-defined action plans v1 | engine | `DONE` | CX-013; DELIB-0004 decided; A-F pass in Python/GDScript; awaiting engine/human acceptance |
+| CX-015 | `SPEC_IMPLEMENTATION` | typed tactical capability restrictions | engine | `DONE` | CX-014; DELIB-0006 accepted; AD-2 architecture resolved; legacy restriction-id binding excluded |
 
 Task contracts live in `docs/codex/tasks/`.
 
@@ -61,8 +62,10 @@ No engine task is implicitly authorized by this queue.
 `docs/AUDIT_LEDGER.csv` is the canonical governance record for IR/AD/GV/PV/CL/RS
 findings. The post-0.2 remediation/resume gate is closed: AD-3 and CL-1 are
 implemented and review-accepted, while DELIB-0004 through DELIB-0007 record the
-accepted architecture decisions. AD-1, AD-2 and AD-4 implementation remains
-separately fenced; PV-1 remains provenance-held; RS-1 remains deferred.
-CX-008 through CX-013 remain `DONE`. CX-014 is explicitly assigned under the
-DELIB-0004 declarative-safe-plan decision and does not claim full R8 closure,
-strategic/reward death lifecycle, status lifecycle, or NH rules compatibility.
+accepted architecture decisions. AD-1 and AD-4 implementation remain
+separately fenced; AD-2's DELIB-0006 architecture is implemented by CX-015 and
+awaits review; PV-1 remains provenance-held; RS-1 remains deferred.
+CX-008 through CX-014 remain `DONE`. CX-015 is at `REVIEW` under DELIB-0006 and
+does not claim raw legacy restriction-ID binding, casting-command implementation,
+status lifecycle changes, AD-1 provider aggregation, AD-4 profile policy, or NH
+rules compatibility.

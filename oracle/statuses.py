@@ -22,7 +22,35 @@ class Stacking(Enum):
     UNIQUE = "unique"
 
 
+class Capability(Enum):
+    """Independently restricted voluntary tactical command capabilities."""
+
+    MOVEMENT = "movement"
+    MELEE = "melee"
+    RANGED = "ranged"
+    CASTING = "casting"
+    ACTIVATED_ACTION = "activated_action"
+
+
 PERMANENT = -1
+
+
+def normalize_restrictions(values=()) -> frozenset[Capability]:
+    """Strict model/content boundary; unknown values fail closed."""
+    if values is None or isinstance(values, (str, bytes)):
+        raise ValueError("status restrictions must be a collection")
+    normalized = set()
+    for value in values:
+        if isinstance(value, Capability):
+            normalized.add(value)
+            continue
+        if not isinstance(value, str):
+            raise ValueError("status restriction values must be capability names")
+        try:
+            normalized.add(Capability(value.strip().lower()))
+        except ValueError as exc:
+            raise ValueError("unknown status capability %r" % value) from exc
+    return frozenset(normalized)
 
 
 @dataclass
@@ -40,10 +68,13 @@ class StatusEffect:
     tick: dict = field(default_factory=dict)
     decay_per: tuple | None = None
     stacking: Stacking = Stacking.REFRESH
-    prevents_action: bool = False
+    restrictions: frozenset[Capability] = field(default_factory=frozenset)
     hostile: bool = False
     remove_on_damage: bool = False
     tags: tuple = ()
+
+    def __post_init__(self) -> None:
+        self.restrictions = normalize_restrictions(self.restrictions)
 
     def describe(self) -> str:
         if self.duration == PERMANENT:
@@ -63,7 +94,8 @@ class StatusEffect:
             "tick": copy.deepcopy(self.tick),
             "decay_per": list(self.decay_per) if self.decay_per else [],
             "stacking": self.stacking.name,
-            "prevents_action": self.prevents_action,
+            "restrictions": [capability.value for capability in Capability
+                             if capability in self.restrictions],
             "hostile": self.hostile,
             "tags": list(self.tags),
             "modifiers": [
@@ -233,9 +265,23 @@ def active_modifiers(unit) -> list:
     return [modifier for effect in unit.statuses for modifier in effect.modifiers]
 
 
-def can_act(unit) -> tuple[bool, str]:
-    """Existing stable status-state query; not an action executor."""
+def can_perform(unit, capability: Capability) -> tuple[bool, str]:
+    """Authoritative query-on-demand capability gate.
+
+    Returns ``(allowed, blocking_status)``. Unknown values fail closed rather
+    than silently granting an unrecognized capability.
+    """
+    if not isinstance(capability, Capability):
+        return False, "unknown capability"
     for effect in unit.statuses:
-        if effect.prevents_action:
+        if capability in effect.restrictions:
             return False, effect.name or effect.id
     return True, ""
+
+
+def restriction_reason(unit, capability: Capability) -> str:
+    allowed, blocker = can_perform(unit, capability)
+    if allowed:
+        return ""
+    name = capability.value if isinstance(capability, Capability) else "unknown"
+    return "%s restricted by %s" % (name, blocker)

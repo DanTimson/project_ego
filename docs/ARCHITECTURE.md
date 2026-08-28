@@ -369,7 +369,17 @@ ranged early-provider set. Status/runtime modifiers and environment/aura
 modifiers enter only through the later-provider path; a status cannot resurrect
 an early ranged sum of zero. `Statuses` owns the stable apply/stack/reject,
 explicit removal and explicit shortening policy, while `Status` owns instance
-state. No round, side, selection, activation or extra-turn hook owns automatic
+state. `Status.restrictions` stores a normalized, independently copyable set of
+typed tactical capabilities (`movement`, `melee`, `ranged`, `casting`, and
+`activated_action`). `Statuses.can_perform()` is the query-on-demand authority:
+restrictions union naturally across active status instances, and each owning
+command checks only its own capability. Ordinary movement, melee and ranged
+commands consume their matching restriction; activated actions consume only
+`activated_action` before payment and plan execution, regardless of any
+`AttackOp` in the resolved plan. There is no production casting command yet, so
+casting currently has the typed query boundary only. The removed generic
+`prevents_action`/`can_act` surface has no replacement universal boolean.
+No round, side, selection, activation or extra-turn hook owns automatic
 status ageing until the R13 lifecycle boundary is observed and accepted. The
 pre-existing explicit `tick_round` reference helper remains isolated for
 regression disclosure; it is not called by battle flow and does not define that

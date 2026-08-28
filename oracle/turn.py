@@ -28,6 +28,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from combat import Combatant, Trace
+import statuses
 
 
 # ---------------------------------------------------------------------------
@@ -40,6 +41,7 @@ class Refusal(Enum):
     ACTION_SPENT = "already acted this round"
     EXHAUSTED = "forced to rest at 0 stamina"
     NOT_YOUR_PHASE = "not this side's phase"
+    RESTRICTED = "movement capability restricted"
 
 
 def effective_speed(u: Combatant) -> tuple[int, Trace]:
@@ -208,6 +210,8 @@ def grant_extra_turn_to(units, *, exclude=(), predicate=None, **kw) -> list:
 def can_move(u: Combatant, tiles: int = 1) -> Refusal:
     if u.action_spent:
         return Refusal.ACTION_SPENT
+    if not statuses.can_perform(u, statuses.Capability.MOVEMENT)[0]:
+        return Refusal.RESTRICTED
     if u.movement_remaining < tiles:
         return Refusal.NO_MOVEMENT
     return Refusal.OK

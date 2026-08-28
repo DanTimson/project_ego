@@ -1718,7 +1718,7 @@
        "tick": {},
        "decay_per": [],
        "stacking": "REFRESH",
-       "prevents_action": false,
+       "restrictions": [],
        "hostile": false,
        "tags": [
         "buff"

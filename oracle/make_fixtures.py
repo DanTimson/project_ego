@@ -868,13 +868,11 @@ def status_fixture() -> dict:
                 duration=effect_spec.get("duration", stmod.PERMANENT),
                 power=effect_spec.get("power", 0),
                 stacking=stmod.Stacking[effect_spec.get("stacking", "REFRESH")],
-                prevents_action=effect_spec.get("prevents_action", False),
                 hostile=effect_spec.get("hostile", False),
                 tags=tuple(effect_spec.get("tags", []))))
         if reduce_by:
             stmod.reduce_duration(unit, reduce_by, tags=tuple(reduce_tags))
         removed = stmod.remove(unit, remove_id) if remove_id else 0
-        can_act, blocked_by = stmod.can_act(unit)
         fx["sequences"].append({
             "label": label, "effects": effects,
             "reduce_by": reduce_by, "reduce_tags": list(reduce_tags),
@@ -883,8 +881,7 @@ def status_fixture() -> dict:
                 "ids": [effect.id for effect in unit.statuses],
                 "durations": [effect.duration for effect in unit.statuses],
                 "powers": [effect.power for effect in unit.statuses],
-                "removed": removed, "can_act": can_act,
-                "blocked_by": blocked_by,
+                "removed": removed,
             },
         })
 
@@ -917,9 +914,6 @@ def status_fixture() -> dict:
         {"id": "surge", "duration": 3, "stacking": "CUMULATIVE"},
         {"id": "surge", "duration": 4, "stacking": "CUMULATIVE"},
         {"id": "other", "duration": 4}], remove_id="surge")
-    seq("action prevention remains queryable", [
-        {"id": "web", "name": "Паутина", "duration": 6,
-         "prevents_action": True, "hostile": True}])
     seq("permanent status cannot be shortened", [
         {"id": "innate", "duration": stmod.PERMANENT}], reduce_by=5)
 
@@ -936,21 +930,18 @@ def status_fixture() -> dict:
                 duration=effect_spec.get("duration", stmod.PERMANENT),
                 tick=effect_spec.get("tick", {}),
                 stacking=stmod.Stacking[effect_spec.get("stacking", "REFRESH")],
-                prevents_action=effect_spec.get("prevents_action", False),
                 hostile=effect_spec.get("hostile", False),
                 tags=tuple(effect_spec.get("tags", [])),
                 decay_per=(tuple(effect_spec["decay_per"])
                            if effect_spec.get("decay_per") else None)))
         for _ in range(steps):
             stmod.tick_round(unit)
-        can_act, blocked_by = stmod.can_act(unit)
         fx["provisional_lifecycle"].append({
             "label": label, "unit": unit_kw, "effects": effects, "steps": steps,
             "after": {"life": unit.life, "stamina": unit.stamina,
                       "morale": unit.morale, "alive": unit.alive,
                       "ids": [effect.id for effect in unit.statuses],
-                      "durations": [effect.duration for effect in unit.statuses],
-                      "can_act": can_act, "blocked_by": blocked_by},
+                      "durations": [effect.duration for effect in unit.statuses]},
         })
 
     surge = {"id": "dark_surge", "name": "Всплеск Тьмы", "duration": 3,
@@ -964,12 +955,12 @@ def status_fixture() -> dict:
     provisional("weak stat-decay reference",
                 {"life": 30, "attack": 5, "counter_attack": 3},
                 [{"id": "web", "name": "Паутина", "duration": 6,
-                  "prevents_action": True, "hostile": True,
+                  "hostile": True,
                   "decay_per": ["attack_group", 10]}], 1)
     provisional("strong stat-decay reference",
                 {"life": 30, "attack": 25, "counter_attack": 8},
                 [{"id": "web", "name": "Паутина", "duration": 6,
-                  "prevents_action": True, "hostile": True,
+                  "hostile": True,
                   "decay_per": ["attack_group", 10]}], 1)
     provisional("lethal payload reference", {"life": 3}, [surge], 1)
     provisional("permanent reference", {"life": 30},

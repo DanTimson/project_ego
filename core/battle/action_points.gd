@@ -12,7 +12,7 @@ extends RefCounted
 ## Round and accepted extra-turn refreshes are the only activation resets below.
 ## Ordinary yield/reselection must not reset path history or per-round limiters.
 
-enum Refusal { OK, NO_MOVEMENT, ACTION_SPENT, EXHAUSTED, NOT_YOUR_PHASE }
+enum Refusal { OK, NO_MOVEMENT, ACTION_SPENT, EXHAUSTED, NOT_YOUR_PHASE, RESTRICTED }
 
 
 ## Speed after the documented stamina penalty: -1 at stamina 3-4, -2 at 2 or
@@ -174,6 +174,8 @@ static func grant_extra_turn_to(units: Array, exclude: Array = [],
 static func can_move(u: Combatant, tiles: int = 1) -> Refusal:
 	if u.action_spent:
 		return Refusal.ACTION_SPENT
+	if not bool(Statuses.can_perform(u, Status.Capability.MOVEMENT)[0]):
+		return Refusal.RESTRICTED
 	return Refusal.OK if u.movement_remaining >= tiles else Refusal.NO_MOVEMENT
 
 

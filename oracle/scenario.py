@@ -477,6 +477,9 @@ class Scenario:
 
     @staticmethod
     def _build_status(specification: dict) -> st.StatusEffect:
+        if "prevents_action" in specification:
+            raise ValueError("status %r uses removed field 'prevents_action'"
+                             % specification.get("id", "?"))
         status = st.StatusEffect(
             id=str(specification["id"]),
             name=str(specification.get("name", "")),
@@ -487,7 +490,8 @@ class Scenario:
             decay_per=(tuple(specification["decay_per"])
                        if specification.get("decay_per") else None),
             stacking=st.Stacking[specification.get("stacking", "REFRESH")],
-            prevents_action=bool(specification.get("prevents_action", False)),
+            restrictions=st.normalize_restrictions(
+                specification.get("restrictions", ())),
             hostile=bool(specification.get("hostile", False)),
             remove_on_damage=bool(specification.get("remove_on_damage", False)),
             tags=tuple(specification.get("tags", [])),
@@ -597,6 +601,10 @@ class Scenario:
     # -- commands -----------------------------------------------------------
 
     def cmd_move(self, unit: Combatant, col: int, row: int) -> None:
+        if turn.can_move(unit) is turn.Refusal.RESTRICTED:
+            self.emit("%s cannot move: %s" % (
+                unit.label(), st.restriction_reason(unit, st.Capability.MOVEMENT)))
+            return
         start = self.field.find(unit)
         goal = bfmod.offset_to_axial(col, row)
         path = (None if unit.action_spent else
@@ -777,6 +785,10 @@ class Scenario:
         if unit.action_spent:
             self.emit("%s has already acted" % unit.label())
             return
+        restriction = st.restriction_reason(unit, st.Capability.MELEE)
+        if restriction:
+            self.emit("%s cannot perform melee: %s" % (unit.label(), restriction))
+            return
         # Resolve both R3 applicability and distance before automatic approach
         # mutates battlefield occupancy or the environment-derived modifier set.
         attacker_entry_h = self.field.find(unit)
@@ -796,6 +808,10 @@ class Scenario:
             return
         if unit.action_spent:
             self.emit("%s has already acted" % unit.label())
+            return
+        restriction = st.restriction_reason(unit, st.Capability.RANGED)
+        if restriction:
+            self.emit("%s cannot perform ranged: %s" % (unit.label(), restriction))
             return
         if unit.ammo <= 0:
             self.emit("%s is out of ammunition" % unit.label())
@@ -933,6 +949,13 @@ class Scenario:
             else:
                 self.emit("%s: action %s is known but unsupported"
                           % (unit.label(), action.id))
+            return
+
+        restriction = st.restriction_reason(
+            unit, st.Capability.ACTIVATED_ACTION)
+        if restriction:
+            self.emit("%s cannot use %s: %s"
+                      % (unit.label(), action.id, restriction))
             return
 
         modifier_0x12 = combat.has_effective_modifier(unit, 0x12)

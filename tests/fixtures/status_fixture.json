@@ -101,9 +101,7 @@
      0,
      0
     ],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   },
   {
@@ -138,9 +136,7 @@
     "powers": [
      5
     ],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   },
   {
@@ -172,9 +168,7 @@
     "powers": [
      4
     ],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   },
   {
@@ -204,9 +198,7 @@
     "powers": [
      0
     ],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   },
   {
@@ -225,9 +217,7 @@
     "ids": [],
     "durations": [],
     "powers": [],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   },
   {
@@ -259,9 +249,7 @@
      0,
      0
     ],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   },
   {
@@ -303,9 +291,7 @@
      0,
      0
     ],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   },
   {
@@ -324,9 +310,7 @@
     "ids": [],
     "durations": [],
     "powers": [],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   },
   {
@@ -360,38 +344,7 @@
     "powers": [
      0
     ],
-    "removed": 2,
-    "can_act": true,
-    "blocked_by": ""
-   }
-  },
-  {
-   "label": "action prevention remains queryable",
-   "effects": [
-    {
-     "id": "web",
-     "name": "Паутина",
-     "duration": 6,
-     "prevents_action": true,
-     "hostile": true
-    }
-   ],
-   "reduce_by": 0,
-   "reduce_tags": [],
-   "remove_id": "",
-   "after": {
-    "ids": [
-     "web"
-    ],
-    "durations": [
-     6
-    ],
-    "powers": [
-     0
-    ],
-    "removed": 0,
-    "can_act": false,
-    "blocked_by": "Паутина"
+    "removed": 2
    }
   },
   {
@@ -415,9 +368,7 @@
     "powers": [
      0
     ],
-    "removed": 0,
-    "can_act": true,
-    "blocked_by": ""
+    "removed": 0
    }
   }
  ],
@@ -451,9 +402,7 @@
     "morale": 8,
     "alive": true,
     "ids": [],
-    "durations": [],
-    "can_act": true,
-    "blocked_by": ""
+    "durations": []
    }
   },
   {
@@ -485,9 +434,7 @@
     "morale": 4,
     "alive": true,
     "ids": [],
-    "durations": [],
-    "can_act": true,
-    "blocked_by": ""
+    "durations": []
    }
   },
   {
@@ -557,9 +504,7 @@
      2,
      2,
      2
-    ],
-    "can_act": true,
-    "blocked_by": ""
+    ]
    }
   },
   {
@@ -574,7 +519,6 @@
      "id": "web",
      "name": "Паутина",
      "duration": 6,
-     "prevents_action": true,
      "hostile": true,
      "decay_per": [
       "attack_group",
@@ -593,9 +537,7 @@
     ],
     "durations": [
      5
-    ],
-    "can_act": false,
-    "blocked_by": "Паутина"
+    ]
    }
   },
   {
@@ -610,7 +552,6 @@
      "id": "web",
      "name": "Паутина",
      "duration": 6,
-     "prevents_action": true,
      "hostile": true,
      "decay_per": [
       "attack_group",
@@ -629,9 +570,7 @@
     ],
     "durations": [
      3
-    ],
-    "can_act": false,
-    "blocked_by": "Паутина"
+    ]
    }
   },
   {
@@ -667,9 +606,7 @@
     ],
     "durations": [
      2
-    ],
-    "can_act": true,
-    "blocked_by": ""
+    ]
    }
   },
   {
@@ -694,9 +631,7 @@
     ],
     "durations": [
      -1
-    ],
-    "can_act": true,
-    "blocked_by": ""
+    ]
    }
   }
  ]

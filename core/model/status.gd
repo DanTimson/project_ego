@@ -14,7 +14,29 @@ enum Stacking {
 	UNIQUE,
 }
 
+enum Capability {
+	MOVEMENT,
+	MELEE,
+	RANGED,
+	CASTING,
+	ACTIVATED_ACTION,
+}
+
 const PERMANENT := -1
+const CAPABILITY_NAMES := {
+	Capability.MOVEMENT: "movement",
+	Capability.MELEE: "melee",
+	Capability.RANGED: "ranged",
+	Capability.CASTING: "casting",
+	Capability.ACTIVATED_ACTION: "activated_action",
+}
+const CAPABILITIES_BY_NAME := {
+	"movement": Capability.MOVEMENT,
+	"melee": Capability.MELEE,
+	"ranged": Capability.RANGED,
+	"casting": Capability.CASTING,
+	"activated_action": Capability.ACTIVATED_ACTION,
+}
 
 ## Project-local effect identity and stacking group. This is not a pack content ID
 ## or display text; two cumulative instances may intentionally share it.
@@ -29,13 +51,17 @@ var modifiers: Array[Modifier] = []
 var tick: Dictionary = {}
 var decay_per: Array = []
 var stacking: Stacking = Stacking.REFRESH
-var prevents_action: bool = false
+## Independently composable voluntary-command capabilities restricted while this
+## status is effective. Values are normalized and deduplicated at construction.
+var restrictions: Array[int] = []
 var hostile: bool = false
 var remove_on_damage: bool = false
 var tags: Array[StringName] = []
 
 
 static func from_dict(specification: Dictionary) -> Status:
+	if specification.has("prevents_action"):
+		return null
 	var status := Status.new()
 	status.id = StringName(String(specification["id"]))
 	status.name = String(specification.get("name", ""))
@@ -46,7 +72,10 @@ static func from_dict(specification: Dictionary) -> Status:
 	if specification.has("decay_per"):
 		status.decay_per = specification["decay_per"].duplicate(true)
 	status.stacking = Stacking[String(specification.get("stacking", "REFRESH"))]
-	status.prevents_action = bool(specification.get("prevents_action", false))
+	var parsed := parse_restrictions(specification.get("restrictions", []))
+	if not bool(parsed["ok"]):
+		return null
+	status.restrictions.assign(parsed["restrictions"])
 	status.hostile = bool(specification.get("hostile", false))
 	status.remove_on_damage = bool(specification.get("remove_on_damage", false))
 	for tag in specification.get("tags", []):
@@ -60,6 +89,35 @@ static func from_dict(specification: Dictionary) -> Status:
 			modifier_spec.get("params", {}).duplicate(true),
 			String(modifier_spec.get("source", status.name))))
 	return status
+
+
+## Strict address-free model/content boundary. Unknown names do not become an
+## ignored (and therefore permission-granting) declaration.
+static func parse_restrictions(value: Variant) -> Dictionary:
+	if typeof(value) != TYPE_ARRAY:
+		return {"ok": false, "restrictions": [],
+			"reason": "status restrictions must be an array"}
+	var parsed: Array[int] = []
+	for raw in value:
+		if typeof(raw) != TYPE_STRING:
+			return {"ok": false, "restrictions": [],
+				"reason": "status restriction values must be capability names"}
+		var normalized := String(raw).strip_edges().to_lower()
+		if not CAPABILITIES_BY_NAME.has(normalized):
+			return {"ok": false, "restrictions": [],
+				"reason": "unknown status capability '%s'" % normalized}
+		var capability := int(CAPABILITIES_BY_NAME[normalized])
+		if not parsed.has(capability):
+			parsed.append(capability)
+	return {"ok": true, "restrictions": parsed, "reason": ""}
+
+
+static func is_capability(value: int) -> bool:
+	return CAPABILITY_NAMES.has(value)
+
+
+static func capability_name(value: int) -> String:
+	return String(CAPABILITY_NAMES.get(value, "unknown"))
 
 
 func describe() -> String:
@@ -77,13 +135,20 @@ func copy() -> Status:
 	out.tick = tick.duplicate(true)
 	out.decay_per = decay_per.duplicate(true)
 	out.stacking = stacking
-	out.prevents_action = prevents_action
+	out.restrictions.assign(restrictions)
 	out.hostile = hostile
 	out.remove_on_damage = remove_on_damage
 	out.tags.assign(tags)
 	for modifier in modifiers:
 		out.modifiers.append(_copy_modifier(modifier))
 	return out
+
+
+func _serialized_restrictions() -> Array:
+	# Restrictions are semantic set data; emit canonical Capability enum order.
+	var ordered := restrictions.duplicate()
+	ordered.sort()
+	return ordered.map(func(value): return capability_name(int(value)))
 
 
 func to_dict() -> Dictionary:
@@ -109,7 +174,7 @@ func to_dict() -> Dictionary:
 		"tick": tick.duplicate(true),
 		"decay_per": decay_per.duplicate(true),
 		"stacking": _enum_name(Stacking, stacking),
-		"prevents_action": prevents_action,
+		"restrictions": _serialized_restrictions(),
 		"hostile": hostile,
 		"tags": serialized_tags,
 		"modifiers": serialized_modifiers,

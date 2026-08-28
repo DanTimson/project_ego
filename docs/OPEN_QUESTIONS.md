@@ -68,9 +68,14 @@ boundaries are:
 | ID | Held question | Closure owner/condition |
 |---|---|---|
 | AD-1 | Who supplies battle context and the persistent/intrinsic/runtime/aura providers for effective-speed modifier 7? | Engine architecture; preserve the implemented R8 live-capacity comparator while adding no guessed provider. |
-| AD-2 | Is `Status.prevents_action` authoritative, and exactly which query/command surfaces consume it? | Engine architecture; the field name alone is not authority. |
 | AD-3 | How are production action definitions composed and source-bound, including per-unit availability/magnitude and Scenario injection? | Engine + content architecture; the Python fourteen-action reference catalogue is not production truth. |
 | AD-4 | Which pack owns Genesis death-replacement records 21/37/56/65? | Profile/content decision; do not use them as pack-independent canonical identities. |
+
+AD-2 is no longer held. DELIB-0006 selected independent movement, ordinary
+melee, ordinary ranged, casting and activated-action restrictions, and CX-015
+implements that project architecture at the current tactical query/command
+surfaces. Exact legacy restriction-ID/content binding remains evidence-bounded;
+this closure does not infer mappings from names.
 
 New Horizons modifier-`0x5B` replacement research (RS-1) is deferred until NH
 compatibility is scheduled. NH profile/content plumbing is not executable rules

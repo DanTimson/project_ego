@@ -196,17 +196,19 @@ def test_flag_modifier_live_consumer() -> None:
           "removal restores the existing wound penalty")
 
 
-def test_prevents_action_policy() -> None:
-    print("\n[7] stable prevents-action policy remains covered")
+def test_typed_capability_policy() -> None:
+    print("\n[7] typed capability policy")
     target = unit()
-    allowed, reason = st.can_act(target)
-    check(allowed and reason == "", "an unaffected unit can act")
+    allowed, reason = st.can_perform(target, st.Capability.MELEE)
+    check(allowed and reason == "", "an unrestricted capability is allowed")
     st.apply(target, StatusEffect(
-        id="petrified", name="Окаменение", duration=3,
-        prevents_action=True, hostile=True))
-    allowed, reason = st.can_act(target)
-    check(not allowed and reason == "Окаменение",
-          "a preventing status blocks action through the stable policy")
+        id="synthetic-melee", name="Synthetic melee block", duration=3,
+        restrictions=(st.Capability.MELEE,), hostile=True))
+    allowed, reason = st.can_perform(target, st.Capability.MELEE)
+    check(not allowed and reason == "Synthetic melee block",
+          "a typed restriction identifies its blocking status")
+    check(st.can_perform(target, st.Capability.MOVEMENT)[0],
+          "a melee restriction does not become a universal gate")
 
 
 def dark_surge(duration: int = 3) -> StatusEffect:
@@ -241,8 +243,7 @@ def test_provisional_explicit_lifecycle_reference() -> None:
           "pre-existing cumulative payload reference remains unchanged")
 
     web = lambda: StatusEffect(id="web", name="Паутина", duration=6,
-                               prevents_action=True, hostile=True,
-                               decay_per=("attack_group", 10))
+                               hostile=True, decay_per=("attack_group", 10))
     weak = unit(attack=5, counter_attack=3, ranged_attack=0)
     strong = unit(attack=25, counter_attack=8, ranged_attack=0)
     st.apply(weak, web())
@@ -283,7 +284,7 @@ if __name__ == "__main__":
     test_explicit_manipulation()
     test_numeric_modifier_live_path_and_r6_separation()
     test_flag_modifier_live_consumer()
-    test_prevents_action_policy()
+    test_typed_capability_policy()
     test_provisional_explicit_lifecycle_reference()
     print("\n%s" % ("ALL PASS" if not FAILS else "%d FAILURES: %s"
                     % (len(FAILS), ", ".join(FAILS))))

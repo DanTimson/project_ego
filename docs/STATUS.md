@@ -10,7 +10,8 @@ This is a coverage map, not a release claim.
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 early-provider cutoff and distinct melee/counter minimum handling are fixture-covered |
 | modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 numeric placement is fixture-covered after effective-stat/selected 1.5× processing and before randomisation/defence; target applicability and wider provider coverage remain incomplete |
 | activated actions | public/data families + selective binary edges | typed built-in plus bounded declarative pack plans | typed built-in plus bounded declarative pack plans | source ID → canonical `Action` → validated recipe → fresh immutable ordered plan → shared primitive is implemented; pack-namespaced v1 recipes may compose only melee `AttackOp` and drain-only stamina `ResourceDeltaOp`; the other twelve reference actions and generic battle effects remain unsupported |
-| runtime statuses | public/project stable policy + unresolved binary lifecycle | stable container, stacking/resistance and explicit manipulation implemented | first-class `Status` model integrated through `Combatant`, later modifier providers and scenarios | stable container/parity fixture implemented; automatic duration tick/expiry and `UNTIL_NEXT_TURN` clock remain open pending R13 |
+| runtime statuses | public/project stable policy + unresolved binary lifecycle | stable container, stacking/resistance, explicit manipulation and typed capability restrictions implemented | first-class `Status` model integrated through `Combatant`, later modifier providers, scenarios and capability-owning commands | stable container plus CX-015 typed capability parity coverage implemented; generic action prevention removed; automatic duration tick/expiry and `UNTIL_NEXT_TURN` clock remain open pending R13 |
+| tactical capability restrictions | DELIB-0006 project architecture | query-on-demand movement/melee/ranged/casting/activated-action authority; existing command surfaces integrated | matching typed authority; manual query/execution and direct command surfaces integrated | CX-015 implementation awaiting review; casting is query-only because no production casting command exists; no raw legacy restriction IDs are bound |
 | level-up selection | data + binary | reference implementation in part | no completed playable GDScript consumer; `core/model/option.gd` and `tests/test_options.gd` are empty | ordinary selection/reference work is not playable integration; R15 zero-total/underfull edge is deferred until an executable consumer and fixture exist |
 | battlefield coordinates and adjacency | binary + controlled observation | implemented | implemented | adjacency recovered; R14 large-unit logical-footprint protocol ready |
 | pathfinding and occupancy | Project EGO design + observations | implemented | implemented | tie-break tests present |
@@ -218,6 +219,20 @@ retained in a clearly provisional test section, but no battle hook calls it and
 it is not compatibility truth. Automatic expiry, periodic effects,
 `UNTIL_NEXT_TURN`, wake-on-damage and their ordering remain unimplemented rather
 than inferred from the R13 protocol.
+
+CX-015 implements DELIB-0006's typed tactical capability authority without
+changing that lifecycle boundary. Each status owns a normalized set drawn from
+movement, ordinary melee, ordinary ranged, casting and activated action;
+`Statuses.can_perform` scans active instances on demand, so overlapping
+contributors compose and explicit removal/shortening cannot leave cached state.
+Movement, ordinary melee, ordinary ranged and activated-action command surfaces
+refuse their own restriction before payment, RNG, damage or terminality mutation.
+A melee restriction does not inspect an `AttackOp` inside an activated plan, and
+an activated-action restriction does not block ordinary melee. Casting remains a
+typed query only because the production model has no casting command. The old
+project-authored `prevents_action` field and generic `can_act` query are removed.
+No raw legacy restriction ID or name-inferred stock status behavior is bound.
+Implementation is awaiting independent review and is not legacy verification.
 
 CX-009 implements the project-owner-confirmed activation rule at the shared
 model/command boundary: successful ordinary melee/ranged and resolved consuming

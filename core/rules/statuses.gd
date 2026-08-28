@@ -208,9 +208,20 @@ static func active_modifiers(unit: Combatant) -> Array[Modifier]:
 	return out
 
 
-## «не может действовать» — existing stable query, not an action executor.
-static func can_act(unit: Combatant) -> Array:
+## Authoritative query-on-demand capability gate. Returns
+## [allowed: bool, blocking_status: String]. Unknown capability values fail closed.
+static func can_perform(unit: Combatant, capability: int) -> Array:
+	if not Status.is_capability(capability):
+		return [false, "unknown capability"]
 	for effect in unit.statuses:
-		if effect.prevents_action:
+		if effect.restrictions.has(capability):
 			return [false, effect.name if effect.name != "" else String(effect.id)]
 	return [true, ""]
+
+
+static func restriction_reason(unit: Combatant, capability: int) -> String:
+	var result := can_perform(unit, capability)
+	if bool(result[0]):
+		return ""
+	return "%s restricted by %s" % [
+		Status.capability_name(capability), String(result[1])]

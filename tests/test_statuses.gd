@@ -25,7 +25,8 @@ func _status(specification: Dictionary) -> Status:
 	if specification.has("decay_per"):
 		status.decay_per = specification["decay_per"].duplicate(true)
 	status.stacking = Status.Stacking[String(specification.get("stacking", "REFRESH"))]
-	status.prevents_action = bool(specification.get("prevents_action", false))
+	var parsed := Status.parse_restrictions(specification.get("restrictions", []))
+	status.restrictions.assign(parsed["restrictions"])
 	status.hostile = bool(specification.get("hostile", false))
 	for tag in specification.get("tags", []):
 		status.tags.append(StringName(String(tag)))
@@ -105,14 +106,11 @@ func _init() -> void:
 			ids.append(String(status.id))
 			durations.append(status.duration)
 			powers.append(status.power)
-		var can_act := Statuses.can_act(unit)
 		var expected: Dictionary = case["after"]
 		var ok := (_same_string_array(ids, expected["ids"])
 			and _same_int_array(durations, expected["durations"])
 			and _same_int_array(powers, expected["powers"])
-			and removed == int(expected["removed"])
-			and bool(can_act[0]) == bool(expected["can_act"])
-			and String(can_act[1]) == String(expected["blocked_by"]))
+			and removed == int(expected["removed"]))
 		_check(ok, String(case["label"]),
 			"ids %s durations %s powers %s" % [str(ids), str(durations), str(powers)])
 
@@ -131,16 +129,13 @@ func _init() -> void:
 		for status in unit.statuses:
 			ids.append(String(status.id))
 			durations.append(status.duration)
-		var can_act := Statuses.can_act(unit)
 		var expected: Dictionary = case["after"]
 		var ok := (unit.life == int(expected["life"])
 			and unit.stamina == int(expected["stamina"])
 			and unit.morale == int(expected["morale"])
 			and unit.alive == bool(expected["alive"])
 			and _same_string_array(ids, expected["ids"])
-			and _same_int_array(durations, expected["durations"])
-			and bool(can_act[0]) == bool(expected["can_act"])
-			and String(can_act[1]) == String(expected["blocked_by"]))
+			and _same_int_array(durations, expected["durations"]))
 		_check(ok, String(case["label"]),
 			"life %d durations %s" % [unit.life, str(durations)])
 

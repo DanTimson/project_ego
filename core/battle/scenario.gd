@@ -480,7 +480,22 @@ func _build_sides(specs: Array) -> Dictionary:
 					int(m.get("power", 0)), m.get("params", {}),
 					String(m.get("source", m["handler"]))))
 			for status_spec in u.get("statuses", []):
-				Statuses.apply(unit, Status.from_dict(status_spec))
+				if status_spec.has("prevents_action"):
+					return {"sides": [], "units": {}, "error":
+						"status '%s' on unit '%s' uses removed field 'prevents_action'" % [
+							status_spec.get("id", "?"), unit.instance_id]}
+				var restriction_validation := Status.parse_restrictions(
+					status_spec.get("restrictions", []))
+				if not bool(restriction_validation["ok"]):
+					return {"sides": [], "units": {}, "error":
+						"status '%s' on unit '%s': %s" % [status_spec.get("id", "?"),
+							unit.instance_id, restriction_validation["reason"]]}
+				var status := Status.from_dict(status_spec)
+				if status == null:
+					return {"sides": [], "units": {}, "error":
+						"invalid status '%s' on unit '%s'" % [
+							status_spec.get("id", "?"), unit.instance_id]}
+				Statuses.apply(unit, status)
 			for st in u.get("subtypes", []):
 				unit.add_subtype(StringName(String(st)))
 			if not u.has("life_base"):
@@ -638,6 +653,12 @@ func query_command(command: Dictionary) -> Dictionary:
 	if not ActionPoints.has_resources(unit):
 		return _command_query(false, command_name,
 			"%s has no resources left this activation" % unit.label())
+	var capability := _command_capability(op)
+	if capability >= 0:
+		var restriction := Statuses.restriction_reason(unit, capability)
+		if restriction != "":
+			return _command_query(false, command_name,
+				"%s cannot perform %s: %s" % [unit.label(), command_name, restriction])
 	if op == "action":
 		return _query_action_command(unit, command, command_name)
 	if op == "move":
@@ -716,6 +737,10 @@ func execute_command(command: Dictionary) -> Dictionary:
 
 
 func movement_plan(unit: Combatant, col: int, row: int) -> Dictionary:
+	var move_refusal := ActionPoints.can_move(unit)
+	if move_refusal == ActionPoints.Refusal.RESTRICTED:
+		return {"ok": false, "reason": "%s cannot move: %s" % [
+			unit.label(), Statuses.restriction_reason(unit, Status.Capability.MOVEMENT)]}
 	var start := field.find_unit(unit)
 	var goal := Battlefield.offset_to_axial(col, row)
 	var path := [] if unit.action_spent else field.path(start, goal, false, unit.movement_remaining)
@@ -750,6 +775,10 @@ func _resolve_action_command(unit: Combatant, action_id: String,
 				action.id, resolution.reason], "refusal": "unsupported"}
 		return {"reason": "action %s is known but unsupported" % action.id,
 			"refusal": "unsupported"}
+	var restriction := Statuses.restriction_reason(
+		unit, Status.Capability.ACTIVATED_ACTION)
+	if restriction != "":
+		return {"reason": restriction, "refusal": "restriction"}
 	var refusal := action.availability(unit,
 		Damage.has_effective_modifier(unit, 0x12))
 	if refusal != Action.Refusal.OK:
@@ -778,6 +807,14 @@ func _query_action_command(unit: Combatant, command: Dictionary,
 		units.get(String(command.get("target", ""))))
 	var reason := String(prepared["reason"])
 	return _command_query(reason == "", command_name, reason)
+
+func _command_capability(op: String) -> int:
+	return {
+		"move": Status.Capability.MOVEMENT,
+		"attack": Status.Capability.MELEE,
+		"shoot": Status.Capability.RANGED,
+	}.get(op, -1)
+
 
 func _command_name(op: String) -> String:
 	return {"attack": "melee", "shoot": "ranged", "end_phase": "pass"}.get(op, op)
@@ -968,6 +1005,10 @@ func cmd_attack(unit: Combatant, target: Combatant) -> void:
 	if unit.action_spent:
 		emit("%s has already acted" % unit.label())
 		return
+	var restriction := Statuses.restriction_reason(unit, Status.Capability.MELEE)
+	if restriction != "":
+		emit("%s cannot perform melee: %s" % [unit.label(), restriction])
+		return
 	# Resolve both R3 applicability and distance before automatic approach
 	# mutates battlefield occupancy or the environment-derived modifier set.
 	var attacker_entry_h := field.find_unit(unit)
@@ -989,6 +1030,10 @@ func cmd_shoot(unit: Combatant, target: Combatant) -> void:
 		return
 	if unit.action_spent:
 		emit("%s has already acted" % unit.label())
+		return
+	var restriction := Statuses.restriction_reason(unit, Status.Capability.RANGED)
+	if restriction != "":
+		emit("%s cannot perform ranged: %s" % [unit.label(), restriction])
 		return
 	if unit.ammo <= 0:
 		emit("%s is out of ammunition" % unit.label())
