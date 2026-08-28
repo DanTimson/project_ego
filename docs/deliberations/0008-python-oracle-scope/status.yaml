@@ -1,0 +1,10 @@
+id: DELIB-0008
+title: Python oracle long-term scope
+state: decided
+opened: 2026-08-28
+participants:
+  - human
+  - binary
+  - engine
+decision: decision.md
+supersedes:
