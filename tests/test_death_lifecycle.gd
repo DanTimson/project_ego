@@ -218,6 +218,10 @@ func _synthetic_replacement_decision(_unit: Combatant) -> Dictionary:
 		"definition_id": 901, "tier": 3}
 
 
+func _invalid_replacement_decision(_unit: Combatant) -> Dictionary:
+	return {"status": "bogus"}
+
+
 func _test_replacement_and_precedence() -> void:
 	print("\n[5] synthetic replacement and revival precedence")
 	var c := _setup()
@@ -251,6 +255,16 @@ func _test_replacement_and_precedence() -> void:
 				Callable(self, "_synthetic_replacement_decision")))
 	_check(precedence.final_alive and c.victim.definition_id == 8,
 		"revival takes precedence over an injected replacement decision")
+
+	c = _setup()
+	_set_statuses(c.victim, [_marker(DeathLifecycle.REVIVE)])
+	var invalid_masked := _damage(c,
+		func(unit: Combatant):
+			return DeathLifecycle.resolve(unit, c.field, c.sides,
+				Callable(self, "_invalid_replacement_decision")))
+	_check(invalid_masked.final_alive and c.victim.alive
+			and c.victim.life == c.victim.life_base,
+		"revival masks an invalid replacement decision as before")
 
 
 func _test_transfer_and_battle_owned() -> void:
@@ -353,6 +367,59 @@ func _death_started_count(lines: Array[String], unit_id: String) -> int:
 	return count
 
 
+func _unresolved_replacement(_unit: Combatant) -> Dictionary:
+	return {"status": "unresolved", "error": "synthetic unresolved replacement"}
+
+
+func _test_unresolved_replacement_fails_closed_before_mutation() -> void:
+	print("\n[CX-018 B] unresolved replacement preflight and damage propagation")
+	var c := _setup()
+	c.victim.name = "temporary"
+	c.victim.definition_id = 999
+	c.victim.original_definition = _original_snapshot()
+	var rollback := _marker(DeathLifecycle.ROLLBACK)
+	var replacement := _marker(GenesisDeathReplacementResolver.GENESIS_REPLACEMENT_MARKER)
+	var retained := _marker(2)
+	_set_statuses(c.victim, [rollback, replacement, retained])
+	var before_statuses: Array = c.victim.statuses.duplicate()
+	var before_original: Dictionary = c.victim.original_definition.duplicate(true)
+	var outcome := _damage(c, func(unit: Combatant):
+		return DeathLifecycle.resolve(unit, c.field, c.sides,
+			Callable(self, "_unresolved_replacement")))
+	_check(String(outcome.get("error", "")) == "synthetic unresolved replacement",
+		"death resolver failure reaches the received-damage caller")
+	_check(c.ally.morale == 5 and c.enemy.morale == 5,
+		"unresolved preflight occurs before adjacent morale mutation")
+	_check(c.victim.definition_id == 999
+			and c.victim.original_definition == before_original,
+		"unresolved preflight occurs before rollback restoration")
+	_check(c.victim.statuses == before_statuses,
+		"unresolved preflight occurs before status clearing")
+	_check(not c.victim.alive and c.victim.life == 0,
+		"unresolved replacement fails closed without phantom living state")
+	_check(not c.field.has_unit(c.victim)
+			and not c.sides[0].living().has(c.victim),
+		"occupancy and side living agree with fail-closed death")
+	var state := RoundLoop.BattleState.new()
+	state.sides = c.sides
+	state.active_side = 0
+	_check(not RoundLoop.activatable(state, 0).has(c.victim)
+			and RoundLoop.battle_over(state) == false,
+		"failed victim is not activatable or counted as its side's only living state")
+
+	var exchange_context := _setup()
+	exchange_context.enemy.attack = 100
+	exchange_context.enemy.stamina = 10
+	Counterattack.bind_death_resolver(func(unit: Combatant):
+		return DeathLifecycle.resolve(unit, exchange_context.field,
+			exchange_context.sides, Callable(self, "_unresolved_replacement")))
+	var exchange := Counterattack.resolve(exchange_context.enemy,
+		exchange_context.victim, Rng.new(7), Combatant.AttackKind.MELEE)
+	Counterattack.bind_death_resolver(Callable())
+	_check(exchange.runtime_error == "synthetic unresolved replacement",
+		"exchange retains the received-damage lifecycle failure")
+
+
 func _test_upkeep_fatal_transition_is_single() -> void:
 	print("\n[8] upkeep resolves only a new living-to-dead transition")
 	var spec := {
@@ -403,6 +470,7 @@ func _init() -> void:
 	_test_replacement_and_precedence()
 	_test_transfer_and_battle_owned()
 	_test_runtime_only_markers()
+	_test_unresolved_replacement_fails_closed_before_mutation()
 	_test_upkeep_fatal_transition_is_single()
 	print("\n%s" % ("ALL PASS" if failures == 0 else "%d FAILURES" % failures))
 	quit(1 if failures > 0 else 0)

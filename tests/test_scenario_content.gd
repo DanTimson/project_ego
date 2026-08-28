@@ -117,6 +117,36 @@ func _test_inline_construction_fail_closed() -> void:
 		"valid inline construction remains usable")
 
 
+func _test_aura_construction_fail_closed() -> void:
+	print("\n[CX-018 A] invalid aura construction fails closed")
+	var invalid := _inline_construction_spec()
+	invalid["sides"][0]["units"][0]["auras"] = [{
+		"id": "invalid-semantic", "scope": "SELF", "affects": "ALLY",
+		"modifiers": [{"handler": "stat_delta", "semantics": ["unknown.semantic"]}],
+	}]
+	var built := Scenario.new(invalid)
+	_check_failed_construction(built, "invalid modifier in aura",
+		"invalid aura semantic")
+	var session := ManualBattleSession.new(built)
+	var begun := session.begin()
+	_check(not bool(begun["ok"]) and not session.started
+			and "construction failed" in String(begun["message"]),
+		"manual session refuses an aura-invalid Scenario",
+		String(begun["message"]))
+
+	var valid := _inline_construction_spec()
+	valid["sides"][0]["units"][0]["auras"] = [{
+		"id": "valid-aura", "scope": "SELF", "affects": "ALLY",
+		"modifiers": [{"handler": "stat_delta", "power": 2,
+			"params": {"stat": "attack"}}],
+	}]
+	var valid_built := Scenario.new(valid)
+	_check(valid_built.construction_error == ""
+			and valid_built.auras_by_source.has(valid_built.units["one"])
+			and valid_built.auras_by_source[valid_built.units["one"]].size() == 1,
+		"valid aura construction remains unchanged")
+
+
 func _init() -> void:
 	var file := FileAccess.open(FIXTURE, FileAccess.READ)
 	if file == null:
@@ -129,6 +159,7 @@ func _init() -> void:
 		JSON.parse_string(file.get_as_text())) as Dictionary
 	file.close()
 	_test_inline_construction_fail_closed()
+	_test_aura_construction_fail_closed()
 	var provider := _provider(fx)
 	_check(provider.fingerprint == fx["provider"]["fingerprint"],
 		"canonical fingerprint matches the Python oracle", provider.fingerprint)

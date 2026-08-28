@@ -22,7 +22,7 @@ class Side extends RefCounted:
 	func living() -> Array[Combatant]:
 		var out: Array[Combatant] = []
 		for u in units:
-			if u.alive:
+			if u.alive and u.life > 0:
 				out.append(u)
 		return out
 

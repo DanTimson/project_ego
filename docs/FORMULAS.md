@@ -1006,8 +1006,14 @@ if life is zero: resolve one fatal event immediately
 resolver. It is separate from final post-lifecycle alive state and does not mean
 permanent death, kill credit, reward or an R17 trigger.
 
-For each fatal event, living adjacent allies receive morale `-1` and living
-adjacent opponents receive morale `+1` before any survival branch. The recovered Genesis source modifier `0x13`, translated by a profile-qualified binding to
+The already-computed replacement decision is preflighted before lifecycle-only
+morale, rollback or status-clear mutations. An exercised unresolved/error
+replacement fails visibly and coherently dead/nonoccupying without those
+mutations. This containment rule is `[PROJECT: CX-018]`; successful-path ordering
+remains unchanged.
+
+For each completable fatal event, living adjacent allies receive morale `-1` and
+living adjacent opponents receive morale `+1` before any survival branch. The recovered Genesis source modifier `0x13`, translated by a profile-qualified binding to
 `morale.underflow_suppressed`, suppresses the adjustment. Generic rules query only
 the semantic identity. Morale underflow floors current morale at zero
 and adds ten break-accumulator points per missing morale point. The wider

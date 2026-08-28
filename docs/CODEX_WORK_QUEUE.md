@@ -38,6 +38,7 @@ priority.
 | CX-015 | `SPEC_IMPLEMENTATION` | typed tactical capability restrictions | engine | `DONE` | CX-014; DELIB-0006 accepted; AD-2 architecture resolved; legacy restriction-id binding excluded |
 | CX-016 | `SPEC_IMPLEMENTATION` | profile-qualified Genesis death replacement | engine | `DONE` | CX-015; DELIB-0007 accepted; AD-4 architecture resolved; RS-1/NH replacement and custom tier maps excluded |
 | CX-017 | `ARCHITECTURE_IMPLEMENTATION` | semantic modifier binding boundary v1 | engine/content | `DONE` | accepted legacy-boundary inventory/review; migrates only 0x12/0x26/0x13 query authority |
+| CX-018 | `CORRECTNESS_HARDENING` | Scenario/fatal-event failure containment | engine/rules | `DONE` | APA-005A/B confirmed by architecture audit and independent review |
 
 Task contracts live in `docs/codex/tasks/`.
 

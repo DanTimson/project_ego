@@ -73,7 +73,36 @@ def resolve(unit, battlefield, sides, replacement_resolver=None, event_sink=None
     if position is not None:
         unit.last_position = position
 
-    # Morale reacts to the fatal event, not to the eventual survival result.
+    # Preflight the already-computed replacement decision before lifecycle-only
+    # mutation. Revival retains its established precedence over replacement.
+    transfer_status = _runtime_marker(unit, TRANSFER)
+    revive_status = _runtime_marker(unit, REVIVE)
+    rollback_status = _runtime_marker(unit, ROLLBACK)
+    replacement_decision = (replacement_resolver(unit)
+                            if replacement_resolver is not None
+                            else {"status": "not_applicable"})
+    replacement_error = ""
+    if revive_status is None:
+        if (not isinstance(replacement_decision, dict)
+                or replacement_decision.get("status") not in (
+                    "not_applicable", "resolved", "unresolved")):
+            replacement_error = "death replacement resolver returned an invalid decision"
+        elif replacement_decision["status"] == "unresolved":
+            replacement_error = str(replacement_decision.get(
+                "error", "applicable death replacement was unresolved"))
+        elif (replacement_decision["status"] == "resolved"
+              and not isinstance(replacement_decision.get("definition"), dict)):
+            replacement_error = "resolved death replacement has no definition"
+    if replacement_error:
+        unit.life = 0
+        unit.alive = False
+        if position is not None:
+            battlefield.remove(position)
+        _emit(events, event_sink, "death_resolution_failed", unit,
+              error=replacement_error)
+        raise ValueError(replacement_error)
+
+    # Morale reacts only after the fatal lifecycle decision can complete.
     if position is not None and original_side is not None:
         for adjacent in battlefield.adjacent_occupants(position):
             if adjacent is unit or not adjacent.alive or adjacent.life <= 0:
@@ -83,16 +112,6 @@ def resolve(unit, battlefield, sides, replacement_resolver=None, event_sink=None
             _emit(events, event_sink, "death_morale", unit,
                   target=adjacent.instance_id or adjacent.name, delta=delta,
                   applied=applied, morale=adjacent.morale)
-
-    transfer_status = _runtime_marker(unit, TRANSFER)
-    revive_status = _runtime_marker(unit, REVIVE)
-    replacement_decision = (replacement_resolver(unit)
-                            if replacement_resolver is not None
-                            else {"status": "not_applicable"})
-    if not isinstance(replacement_decision, dict) or replacement_decision.get("status") not in (
-            "not_applicable", "resolved", "unresolved"):
-        raise ValueError("death replacement resolver returned an invalid decision")
-    rollback_status = _runtime_marker(unit, ROLLBACK)
 
     if rollback_status is not None and unit.original_definition:
         unit.restore_definition(unit.original_definition)
@@ -115,14 +134,9 @@ def resolve(unit, battlefield, sides, replacement_resolver=None, event_sink=None
         unit.alive = True
         unit.discarded = False
         _emit(events, event_sink, "revived", unit, life=unit.life)
-    elif replacement_decision["status"] == "unresolved":
-        raise ValueError(str(replacement_decision.get(
-            "error", "applicable death replacement was unresolved")))
     elif replacement_decision["status"] == "resolved":
         branch = "replaced"
         definition = replacement_decision.get("definition")
-        if not isinstance(definition, dict):
-            raise ValueError("resolved death replacement has no definition")
         replacement_id = replacement_decision.get("definition_id")
         original_tier = replacement_decision.get("tier")
         unit.restore_definition(_normalize_definition(definition, replacement_id))

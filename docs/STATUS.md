@@ -289,3 +289,18 @@ binding validation, normalization, copy/serialization, all provider layers and
 negative controls. This does not complete the accepted standalone migration:
 death markers, charge, ranged modifiers, localized strings and modifier 7 remain
 outside this tranche.
+
+## CX-018 failure containment
+
+CX-018 is implemented and awaiting independent complete-diff review. APA-005A/B
+are confirmed immediate correctness defects, not a general architecture rewrite
+mandate. Aura construction now participates in Scenario's existing fail-closed
+publication boundary; invalid aura modifiers leave no field, units, state or aura
+map that ordinary execution/manual/tactical restart can begin. Fatal replacement
+decisions are preflighted before morale, rollback and status clearing. An
+exercised unresolved/error decision is surfaced through damage, exchange,
+Scenario and manual-command diagnostics, halts later commands, and leaves the
+unit dead/nonoccupying and absent from living/activation queries. Strict Genesis
+four-target validation and permissive deferred failure remain distinct. Python
+retains loud exception signaling after the same preflight and coherent cleanup.
+Broader APA-001/APA-006 command/event result-contract work remains deferred.

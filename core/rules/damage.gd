@@ -530,14 +530,25 @@ static func apply_received_damage(unit: Combatant, amount: int,
 	Statuses.remove_on_damage(unit)
 	unit.life = maxi(0, unit.life - amount)
 	var fatal_event := unit.alive and unit.life == 0
+	var lifecycle: Dictionary = {}
 	if fatal_event:
 		if death_resolver.is_valid():
-			death_resolver.call(unit)
+			var resolved: Variant = death_resolver.call(unit)
+			if typeof(resolved) == TYPE_DICTIONARY:
+				lifecycle = resolved
+			else:
+				lifecycle = {"error": "death resolver returned no result"}
+				unit.alive = false
 		else:
 			unit.alive = false
 	var final_alive := unit.alive and unit.life > 0
-	return {
+	var outcome := {
 		"fatal_event": fatal_event,
 		"final_alive": final_alive,
 		"final_death": fatal_event and not final_alive,
 	}
+	var lifecycle_error := String(lifecycle.get("error", ""))
+	if lifecycle_error != "":
+		outcome["error"] = lifecycle_error
+		outcome["lifecycle"] = lifecycle
+	return outcome

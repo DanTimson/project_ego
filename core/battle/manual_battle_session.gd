@@ -20,6 +20,12 @@ func _init(p_scenario: Scenario) -> void:
 func begin() -> Dictionary:
 	if started:
 		return {"ok": false, "message": "manual battle already started"}
+	if scenario == null or scenario.construction_error != "" \
+			or scenario.field == null or scenario.state == null:
+		var detail := "invalid Scenario" if scenario == null else scenario.construction_error
+		return {"ok": false,
+			"message": "scenario construction failed: %s" % detail,
+			"error": detail}
 	RoundLoop.begin_battle(scenario.state)
 	scenario.emit("== %s (seed %d) ==" % [scenario.scenario_name, scenario.seed_value])
 	scenario.emit("-- round %d, side %d first --" % [
@@ -177,6 +183,8 @@ func _unbind_rules() -> void:
 func _session_refusal() -> String:
 	if not started:
 		return "manual battle has not started"
+	if scenario.runtime_error != "":
+		return "battle halted after fatal resolution failure: %s" % scenario.runtime_error
 	return "battle is already over" if battle_complete() else ""
 
 
@@ -193,6 +201,8 @@ func _result(accepted: bool, command: String, reason: String,
 		"reason": reason,
 		"events": events,
 		"state_changed": state_changed,
+		"errored": scenario.runtime_error != "" if scenario != null else false,
+		"runtime_error": scenario.runtime_error if scenario != null else "",
 		"ok": accepted,
 		"message": reason if not accepted else " | ".join(events),
 		"log": events,

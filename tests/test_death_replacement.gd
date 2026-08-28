@@ -144,6 +144,50 @@ func _test_strict_and_permissive() -> void:
 		"applicable invalid tier fails explicitly")
 
 
+func _fatal_scenario_spec() -> Dictionary:
+	return {"name": "deferred replacement failure", "profile": "genesis", "seed": 3,
+		"death_replacement_load_mode": "permissive",
+		"battlefield": {"width": 2, "height": 1},
+		"sides": [
+			{"id": 0, "is_attacker": true, "leader_initiative": 1,
+				"units": [{"id": "actor", "name": "actor", "at": [0, 0],
+					"attack": 100, "counter_attack": 0, "life": 10,
+					"stamina": 10, "morale": 10, "speed": 2}]},
+			{"id": 1, "leader_initiative": 0,
+				"units": [{"id": "victim", "name": "victim", "at": [1, 0],
+					"tier": 5, "life": 1, "counter_attack": 0,
+					"stamina": 10, "morale": 10, "speed": 1,
+					"statuses": [{"id": "replacement-bearing", "modifiers": [{
+						"ability": GenesisDeathReplacementResolver.GENESIS_REPLACEMENT_MARKER,
+						"handler": "noop"}]}]}]},
+		], "commands": []}
+
+
+func _test_permissive_scenario_failure_is_visible_and_coherent() -> void:
+	print("\n[CX-018 B integration] deferred unresolved replacement")
+	var scenario := Scenario.new(_fatal_scenario_spec(), null, _provider())
+	var session := ManualBattleSession.new(scenario)
+	var begun := session.begin()
+	var result := session.issue_command({
+		"op": "attack", "unit": "actor", "target": "victim"})
+	var victim: Combatant = scenario.units["victim"]
+	_check(bool(begun["ok"]) and bool(result["errored"])
+			and String(result["runtime_error"]).contains("tier 1..4"),
+		"Scenario command exposes deferred replacement failure",
+		str(result))
+	_check(not victim.alive and victim.life == 0
+			and not scenario.field.has_unit(victim)
+			and not scenario.state.sides[1].living().has(victim),
+		"fail-closed victim has coherent life, living, and occupancy state")
+	_check(not session.selectable_units().has(victim)
+			and session.battle_complete() and session.winning_side_id() == 0,
+		"activation/selectability and battle-over ignore the failed victim")
+	var follow_up := session.issue_command({"op": "end_phase"})
+	_check(not bool(follow_up["accepted"])
+			and String(follow_up["reason"]).contains("fatal resolution failure"),
+		"manual session halts after the visible lifecycle error")
+
+
 func _scenario_spec() -> Dictionary:
 	return {"name": "replacement composition", "profile": "genesis", "seed": 1,
 		"battlefield": {"width": 2, "height": 1},
@@ -189,5 +233,6 @@ func _init() -> void:
 	_test_collision_independence_and_override()
 	_test_strict_and_permissive()
 	_test_scenario_composition_root()
+	_test_permissive_scenario_failure_is_visible_and_coherent()
 	print("\n%s" % ("ALL PASS" if failures == 0 else "%d FAILURES" % failures))
 	quit(0 if failures == 0 else 1)

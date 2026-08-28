@@ -143,3 +143,14 @@ per-unit end-turn mechanic is required.
 IR-4 requires a deterministic regression for that exact state combination. The
 absence of that dedicated regression is a test-coverage gap, not a current
 compatibility discrepancy or evidence that movement exhaustion is terminal.
+
+## CX-018 residual command-result contract
+
+CX-018 deliberately uses a narrow `runtime_error` / `errored` command diagnostic
+after an accepted command reaches a fatal-lifecycle failure. The battle is left
+coherent and halted, but `accepted`/`ok` still describe entry through the existing
+command gate rather than successful completion of every downstream lifecycle.
+Whether APA-001/APA-006 should replace that distinction with a structured
+prepare/commit result, event/error sum type, or another battle-owned result
+contract remains OPEN and requires its own deliberation. CX-018 supplies no
+general transaction or rollback policy and no expected value for that later work.

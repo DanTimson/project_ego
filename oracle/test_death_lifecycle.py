@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 import modifier_semantic as semantic
 
 import battlefield as bfmod
@@ -193,6 +195,15 @@ def test_revival_precedes_synthetic_replacement():
     assert result["final_alive"] and victim.definition_id == 8
     assert victim.life == victim.life_base
 
+    field, sides, victim, _, _ = setup()
+    victim.statuses = [marker(death.REVIVE)]
+    result = combat.apply_received_damage(
+        victim, 1, 0,
+        lambda unit: death.resolve(
+            unit, field, sides, lambda _victim: {"status": "bogus"}))
+    assert result["final_alive"] and victim.alive
+    assert victim.life == victim.life_base
+
 
 def test_direct_and_post_revival_transfer_preserve_one_identity_and_state():
     field, sides, victim, _, _ = setup()
@@ -257,6 +268,32 @@ def test_special_ids_are_runtime_status_only_and_all_statuses_clear():
     result = resolve_damage(field, sides, victim)
     assert result["final_death"] and not victim.alive
 
+
+
+def test_unresolved_replacement_preflights_and_fails_closed():
+    field, sides, victim, ally, enemy = setup()
+    victim.name = "temporary"
+    victim.definition_id = 999
+    victim.original_definition = original_snapshot()
+    victim.statuses = [marker(death.ROLLBACK), statuses.StatusEffect(id="retained")]
+    before_statuses = list(victim.statuses)
+    before_original = victim.original_definition.copy()
+
+    with pytest.raises(ValueError, match="synthetic unresolved replacement"):
+        combat.apply_received_damage(
+            victim, 1, 0,
+            lambda unit: death.resolve(
+                unit, field, sides,
+                lambda _victim: {"status": "unresolved",
+                                 "error": "synthetic unresolved replacement"}))
+
+    assert (ally.morale, enemy.morale) == (5, 5)
+    assert victim.definition_id == 999
+    assert victim.original_definition == before_original
+    assert victim.statuses == before_statuses
+    assert not victim.alive and victim.life == 0
+    assert field.find(victim) is None
+    assert victim not in sides[0].living()
 
 
 def test_upkeep_resolves_only_new_death_transition_and_roster_mutation_is_safe():

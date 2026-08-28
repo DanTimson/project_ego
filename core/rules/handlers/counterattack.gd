@@ -79,6 +79,8 @@ class Exchange extends RefCounted:
 	## Final post-lifecycle death, deliberately distinct from fatal_event.
 	var attacker_died: bool = false
 	var defender_died: bool = false
+	## Narrow propagation for a fatal lifecycle that could not resolve.
+	var runtime_error: String = ""
 	var traces: Array = []
 	var order: Array = []      ## [["attack"|"counter", damage], ...]
 
@@ -192,6 +194,7 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 		_death_resolver)
 	ex.defender_fatal_event = bool(outcome["fatal_event"])
 	ex.defender_died = bool(outcome["final_death"])
+	ex.runtime_error = String(outcome.get("error", ""))
 
 
 static func _do_counter(ex: Exchange, attacker: Combatant, defender: Combatant,
@@ -205,6 +208,7 @@ static func _do_counter(ex: Exchange, attacker: Combatant, defender: Combatant,
 		attacker, ex.counter_damage, 0, _death_resolver)
 	ex.attacker_fatal_event = bool(outcome["fatal_event"])
 	ex.attacker_died = bool(outcome["final_death"])
+	ex.runtime_error = String(outcome.get("error", ""))
 
 
 ## «При убийстве противника контратакой или выстрелом воин дополнительно

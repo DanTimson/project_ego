@@ -154,7 +154,41 @@ static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
 	if battlefield.contains(position):
 		unit.last_position = position
 
-	## Morale reacts to the fatal event before any survival branch.
+	# Preflight the already-computed replacement decision before morale,
+	# rollback, or status consumption. Revival keeps its established precedence,
+	# so a replacement decision it masks is not an exercised replacement path.
+	var transfer_status := _runtime_marker(unit, TRANSFER)
+	var revive_status := _runtime_marker(unit, REVIVE)
+	var rollback_status := _runtime_marker(unit, ROLLBACK)
+	var replacement_decision: Dictionary = (
+		replacement_resolver.call(unit)
+		if replacement_resolver.is_valid()
+		else {"status": "not_applicable"}
+	)
+	var decision_status := String(replacement_decision.get("status", ""))
+	var replacement_error := ""
+	if revive_status == null:
+		if decision_status not in ["not_applicable", "resolved", "unresolved"]:
+			replacement_error = "death replacement resolver returned an invalid decision"
+		elif decision_status == "unresolved":
+			replacement_error = String(replacement_decision.get(
+				"error", "applicable death replacement was unresolved"))
+		elif decision_status == "resolved" \
+				and typeof(replacement_decision.get("definition")) != TYPE_DICTIONARY:
+			replacement_error = "resolved death replacement has no definition"
+	if replacement_error != "":
+		push_error(replacement_error)
+		unit.life = 0
+		unit.alive = false
+		if battlefield.contains(position):
+			battlefield.remove_occupant(position)
+		_emit(events, event_sink, "death_resolution_failed", unit,
+			{"error": replacement_error})
+		return {"fatal_event": true, "final_alive": false,
+			"branch": "invalid_replacement", "transferred": false,
+			"error": replacement_error, "events": events}
+
+	## Morale reacts to a fatal event only after its lifecycle can complete.
 	if battlefield.contains(position) and original_side != null:
 		for adjacent in battlefield.adjacent_occupants(position):
 			if adjacent == unit or not adjacent.alive or adjacent.life <= 0:
@@ -165,20 +199,6 @@ static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
 				"target": adjacent.instance_id if adjacent.instance_id != "" else adjacent.name,
 				"delta": delta, "applied": applied, "morale": adjacent.morale,
 			})
-
-	var transfer_status := _runtime_marker(unit, TRANSFER)
-	var revive_status := _runtime_marker(unit, REVIVE)
-	var replacement_decision: Dictionary = (
-		replacement_resolver.call(unit)
-		if replacement_resolver.is_valid()
-		else {"status": "not_applicable"}
-	)
-	var decision_status := String(replacement_decision.get("status", ""))
-	if decision_status not in ["not_applicable", "resolved", "unresolved"]:
-		push_error("death replacement resolver returned an invalid decision")
-		replacement_decision = {"status": "unresolved",
-			"error": "death replacement resolver returned an invalid decision"}
-	var rollback_status := _runtime_marker(unit, ROLLBACK)
 
 	if rollback_status != null and not unit.original_definition.is_empty():
 		unit.restore_definition(unit.original_definition)
@@ -201,22 +221,9 @@ static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
 		unit.alive = true
 		unit.discarded = false
 		_emit(events, event_sink, "revived", unit, {"life": unit.life})
-	elif String(replacement_decision["status"]) == "unresolved":
-		var replacement_error := String(replacement_decision.get(
-			"error", "applicable death replacement was unresolved"))
-		push_error(replacement_error)
-		return {"fatal_event": true, "final_alive": false,
-			"branch": "invalid_replacement", "transferred": false,
-			"error": replacement_error, "events": events}
-	elif String(replacement_decision["status"]) == "resolved":
+	elif decision_status == "resolved":
 		branch = "replaced"
 		var definition_v: Variant = replacement_decision.get("definition")
-		if typeof(definition_v) != TYPE_DICTIONARY:
-			var replacement_error := "resolved death replacement has no definition"
-			push_error(replacement_error)
-			return {"fatal_event": true, "final_alive": false,
-				"branch": "invalid_replacement", "transferred": false,
-				"error": replacement_error, "events": events}
 		var replacement_id := int(replacement_decision.get("definition_id", -1))
 		var original_tier := int(replacement_decision.get("tier", unit.tier))
 		unit.restore_definition(normalize_definition(definition_v, replacement_id))

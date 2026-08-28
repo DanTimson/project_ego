@@ -273,6 +273,21 @@ func _run() -> void:
 		and not controller_source.contains('result.get("log"'),
 		"TacticalController does not determine acceptance by searching log text")
 
+	var invalid_aura_path := "user://cx018_invalid_aura.json"
+	var invalid_aura_spec := _environment_spec(2, "invalid-aura")
+	invalid_aura_spec["sides"][0]["units"][1]["auras"][0]["modifiers"][0]["semantics"] = [
+		"unknown.semantic"]
+	_write_json(invalid_aura_path, invalid_aura_spec)
+	controller.scenario_path = invalid_aura_path
+	var invalid_restart := controller.restart_battle()
+	_check(not invalid_restart and not controller.session.started
+			and controller.scenario.state == null
+			and controller.latest_feedback.contains("construction failed"),
+		"production tactical restart refuses an aura-invalid Scenario")
+	controller.scenario_path = PLAYABLE_SCENARIO
+	_check(controller.restart_battle(),
+		"production tactical restart recovers with a valid Scenario")
+
 	controller.restart_battle()
 	_check(controller.select_unit("azure-vanguard-01"),
 		"controller selects the melee actor for terminality integration")

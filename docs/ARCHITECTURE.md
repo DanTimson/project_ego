@@ -416,12 +416,17 @@ shape.
 The tactical received-damage sink owns channel accounting, explicit
 remove-on-damage status removal and life subtraction. On a fatal event it calls
 one battle-contextual `DeathLifecycle` resolver immediately. Generic
-`DeathLifecycle` owns adjacent death morale, the generic runtime-marker
-scan/clear, rollback, revival, application of an injected replacement decision,
-final living-occupancy removal and side transfer. It contains no Genesis source
-records, profile/content qualification, or universal `0x5B` assertion. The sink
-returns `fatal_event` separately from the resolver's final alive state; neither
-field is kill credit, reward, permanent-death policy or an R17 trigger.
+`DeathLifecycle` preflights the injected replacement decision before adjacent
+death morale, runtime-marker rollback or status clearing, then owns those
+successful-path mutations, revival/replacement/final living-occupancy removal
+and side transfer. An exercised unresolved/error decision fails visibly and
+coherently dead/nonoccupying while preserving the preflight-protected morale,
+definition and status state. The sink propagates that narrow runtime failure
+through exchange and Scenario command results and halts later commands. It
+contains no Genesis source records, profile/content qualification, or universal
+`0x5B` assertion. The sink returns `fatal_event` separately from the resolver's
+final alive state; neither field is kill credit, reward, permanent-death policy
+or an R17 trigger.
 
 The dedicated Genesis death-replacement resolver is constructed at the Scenario
 composition root. Only Genesis rules plus Genesis-compatible content make its
@@ -446,8 +451,17 @@ current tactical runtime has no strategy/army writeback object.
 
 Ordering is part of the mechanic. In particular, the recovered melee path
 processes secondary effects before committing the primary life loss. Fatal
-lifecycle order is death morale, runtime-marker scan with rollback, complete
-status clear, revival/replacement/finalization, then optional side transfer.
+lifecycle order is replacement-decision preflight, then—only on a completable
+decision—death morale, runtime-marker scan with rollback, complete status clear,
+revival/replacement/finalization, and optional side transfer. The preflight and
+fail-closed error surface are Project EGO failure containment, not a newly
+recovered Genesis ordering claim.
+
+CX-018 records APA-005A and APA-005B as confirmed immediate correctness defects:
+Scenario construction is now atomic across aura projection, and fatal replacement
+errors cannot publish phantom living state. This narrowly extends the existing
+IR-1/CX-011 containment boundaries; the other architecture-audit findings remain
+separate deliberation/deferred work and do not imply an engine rewrite.
 
 ## Determinism policy
 

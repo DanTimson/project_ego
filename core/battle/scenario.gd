@@ -57,6 +57,8 @@ var seed_value: int = 0
 ## Normalized rules-profile identity selected at this composition root.
 var profile: String = ""
 var construction_error: String = ""
+## Narrow fatal-lifecycle failure diagnostic. A battle with this set is halted.
+var runtime_error: String = ""
 var log: Array[String] = []
 ## Either Rng (named streams) or LegacyRng (Genesis compatibility).
 var catalogue: Dictionary = {}
@@ -379,6 +381,17 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null,
 	state = RoundLoop.BattleState.new()
 	state.sides = built["sides"]
 	auras_by_source = _build_auras(_side_specs)
+	if construction_error != "":
+		# Aura construction is part of the same atomic Scenario publication as
+		# side placement. Do not leave earlier staged indexes looking playable.
+		field = null
+		units = {}
+		state = null
+		unit_catalogues = {}
+		action_refusals = {}
+		auras_by_source = {}
+		push_error(construction_error)
+		return
 
 
 func _resolve_unit_actions(specs: Array) -> Dictionary:
@@ -593,6 +606,8 @@ func _round_upkeep() -> void:
 			DeathLifecycle.apply_aura_upkeep(unit, auras_by_source, field,
 				Callable(self, "side_of"), Callable(self, "_resolve_fatal_event"),
 				Callable(self, "_fell"), Callable(self, "emit"))
+			if runtime_error != "":
+				return
 
 # -- helpers -----------------------------------------------------------------
 
@@ -645,6 +660,12 @@ func _genesis_attack_command_charge(unit: Combatant, attacker_xy: Vector2i,
 ## use it for advisory highlights but may not treat a prior query as authority.
 func query_command(command: Dictionary) -> Dictionary:
 	var op := String(command.get("op", ""))
+	if construction_error != "":
+		return _command_query(false, _command_name(op),
+			"scenario construction failed: %s" % construction_error)
+	if runtime_error != "":
+		return _command_query(false, _command_name(op),
+			"battle halted after fatal resolution failure: %s" % runtime_error)
 	var command_name := _command_name(op)
 	if op == "end_phase":
 		return _command_query(true, command_name)
@@ -742,7 +763,11 @@ func execute_command(command: Dictionary) -> Dictionary:
 					units.get(String(command.get("target", ""))))
 			"rest":
 				cmd_rest(unit)
-	if RoundLoop.battle_over(state):
+	if runtime_error != "":
+		# The accepted command reached a fatal lifecycle error. Its narrow
+		# fail-closed state is retained, but no further phase machinery runs.
+		pass
+	elif RoundLoop.battle_over(state):
 		emit("== battle over ==")
 	elif op != "end_phase":
 		_auto_end_phase()
@@ -851,6 +876,8 @@ func _command_result(accepted: bool, command: String, reason: String,
 		"reason": reason,
 		"events": events,
 		"state_changed": state_changed,
+		"errored": runtime_error != "",
+		"runtime_error": runtime_error,
 		# Backward-compatible aliases for Slice 1 callers.
 		"ok": accepted,
 		"message": message,
@@ -959,8 +986,12 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	return true
 
 func _resolve_fatal_event(unit: Combatant) -> Dictionary:
-	return DeathLifecycle.resolve_for_scenario(unit, field, state.sides,
+	var result := DeathLifecycle.resolve_for_scenario(unit, field, state.sides,
 		Callable(_death_replacement_resolver, "decision_for"), log)
+	var failure := String(result.get("error", ""))
+	if failure != "":
+		runtime_error = failure
+	return result
 
 func _fell(unit: Combatant) -> void:
 	var h := field.find_unit(unit)
@@ -1166,7 +1197,7 @@ func cmd_end_phase() -> void:
 ## R7: exhaustion hands control over just like an explicit pass. Check after
 ## every unit command, matching the oracle and the recovered roster scan.
 func _auto_end_phase() -> void:
-	while not RoundLoop.battle_over(state) \
+	while runtime_error == "" and not RoundLoop.battle_over(state) \
 			and RoundLoop.phase_done(state, state.active_side):
 		var before: int = state.round_number
 		var new_round: bool = RoundLoop.end_phase(state)
@@ -1192,6 +1223,9 @@ func _auto_end_phase() -> void:
 ## vanish. The first version of this bound only the environment, so a scenario
 ## ran with every modifier inert while looking entirely healthy.
 func run() -> Dictionary:
+	if construction_error != "" or field == null or state == null:
+		return {"name": scenario_name, "seed": seed_value, "log": [],
+			"final": {}, "error": "scenario construction failed: %s" % construction_error}
 	var registry := AbilityRegistry.new()
 	Handlers.register_all(registry)
 	Damage.bind_pipeline(Pipeline.new(registry))
@@ -1246,6 +1280,8 @@ func _run() -> Dictionary:
 				cmd_extra_turn(unit, c)
 			_:
 				emit("unknown command '%s'" % op)
+		if runtime_error != "":
+			break
 		if RoundLoop.battle_over(state):
 			emit("== battle over ==")
 			break

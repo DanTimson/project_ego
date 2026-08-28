@@ -98,10 +98,14 @@ func restart_battle() -> bool:
 	var begun := session.begin()
 	selected_unit = null
 	input_mode = MODE_COMMAND
+	if not bool(begun["ok"]):
+		latest_feedback = String(begun.get("message", "Could not begin the battle."))
+		_refresh()
+		return false
 	latest_feedback = "Battle ready. Select an Azure Company unit."
 	battlefield_view.configure(session, asset_resolver)
 	_refresh()
-	return bool(begun["ok"])
+	return true
 
 
 func select_unit(instance_id: String) -> bool:
@@ -275,6 +279,10 @@ func _apply_visual_assets() -> void:
 
 func _refresh() -> void:
 	if not is_node_ready() or scenario == null:
+		return
+	if scenario.state == null:
+		feedback_label.text = latest_feedback
+		victory_label.text = ""
 		return
 	round_label.text = "R%d" % scenario.state.round_number
 	side_label.text = "Active: %s (#%d)" % [

@@ -375,7 +375,7 @@ class Side:
     passed: bool = False
 
     def living(self) -> list:
-        return [u for u in self.units if u.alive]
+        return [u for u in self.units if u.alive and u.life > 0]
 
 
 @dataclass
