@@ -212,45 +212,44 @@ func _test_rollback() -> void:
 		"rollback precedes revival and supplies revived maximum life")
 
 
-func _test_replacement_and_precedence() -> void:
-	print("\n[5] exact replacement mapping and revival precedence")
-	_check([DeathLifecycle.replacement_id_for_tier(1),
-		DeathLifecycle.replacement_id_for_tier(2),
-		DeathLifecycle.replacement_id_for_tier(3),
-		DeathLifecycle.replacement_id_for_tier(4)] == [21, 37, 56, 65],
-		"tiers 1..4 map exactly to 21/37/56/65")
-	for tier in range(1, 5):
-		var c := _setup()
-		c.victim.original_definition = _original_snapshot(tier)
-		_set_statuses(c.victim, [_marker(DeathLifecycle.REPLACE), _marker(2)])
-		c.victim.movement_remaining = 9
-		c.victim.action_spent = true
-		c.victim.morale_break_accumulator = 20
-		var outcome := _damage(c,
-			func(unit: Combatant):
-				return DeathLifecycle.resolve(unit, c.field, c.sides,
-					func(_replacement_unit: Combatant, definition_id: int):
-						return _replacement(definition_id)))
-		var expected := int(DeathLifecycle.REPLACEMENT_BY_TIER[tier])
-		_check(outcome.final_alive and c.victim.definition_id == expected,
-			"tier %d establishes exact replacement identity" % tier)
-		_check([c.victim.life, c.victim.stamina, c.victim.ammo, c.victim.morale]
-			== [20 + expected, 6, 7, 13],
-			"tier %d replacement resets declared resources" % tier)
-		_check(c.victim.statuses.is_empty()
-			and c.victim.morale_break_accumulator == 0,
-			"replacement clears statuses and morale break")
-		_check(c.victim.movement_remaining == 9 and c.victim.action_spent,
-			"replacement preserves capacity and action terminality")
-		_check(c.field.has_unit(c.victim), "replacement preserves battle position")
+func _synthetic_replacement_decision(_unit: Combatant) -> Dictionary:
+	return {"status": "resolved", "definition": _replacement(901),
+		"definition_id": 901, "tier": 3}
 
+
+func _test_replacement_and_precedence() -> void:
+	print("\n[5] synthetic replacement and revival precedence")
 	var c := _setup()
+	c.victim.original_definition = _original_snapshot(3)
+	_set_statuses(c.victim, [_marker(2)])
+	c.victim.movement_remaining = 9
+	c.victim.action_spent = true
+	c.victim.morale_break_accumulator = 20
+	var outcome := _damage(c,
+		func(unit: Combatant):
+			return DeathLifecycle.resolve(unit, c.field, c.sides,
+				Callable(self, "_synthetic_replacement_decision")))
+	_check(outcome.final_alive and c.victim.definition_id == 901,
+		"generic lifecycle consumes synthetic canonical replacement identity")
+	_check([c.victim.life, c.victim.stamina, c.victim.ammo, c.victim.morale]
+		== [921, 6, 7, 13],
+		"synthetic replacement resets declared resources")
+	_check(c.victim.statuses.is_empty()
+		and c.victim.morale_break_accumulator == 0,
+		"replacement clears statuses and morale break")
+	_check(c.victim.movement_remaining == 9 and c.victim.action_spent,
+		"replacement preserves capacity and action terminality")
+	_check(c.field.has_unit(c.victim), "replacement preserves battle position")
+
+	c = _setup()
 	c.victim.definition_id = 8
-	_set_statuses(c.victim, [_marker(DeathLifecycle.REVIVE),
-		_marker(DeathLifecycle.REPLACE)])
-	_damage(c)
-	_check(c.victim.alive and c.victim.definition_id == 8,
-		"0x4A revival takes precedence over 0x5B replacement")
+	_set_statuses(c.victim, [_marker(DeathLifecycle.REVIVE)])
+	var precedence := _damage(c,
+		func(unit: Combatant):
+			return DeathLifecycle.resolve(unit, c.field, c.sides,
+				Callable(self, "_synthetic_replacement_decision")))
+	_check(precedence.final_alive and c.victim.definition_id == 8,
+		"revival takes precedence over an injected replacement decision")
 
 
 func _test_transfer_and_battle_owned() -> void:

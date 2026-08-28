@@ -10,17 +10,6 @@ import turn
 TRANSFER = 0x49
 REVIVE = 0x4A
 ROLLBACK = 0x5A
-REPLACE = 0x5B
-REPLACEMENT_BY_TIER = {1: 21, 2: 37, 3: 56, 4: 65}
-
-
-def replacement_id_for_tier(tier: int) -> int:
-    try:
-        return REPLACEMENT_BY_TIER[int(tier)]
-    except KeyError as exc:
-        raise ValueError("death replacement requires original tier 1..4") from exc
-
-
 def _runtime_marker(unit, ability: int):
     """Return the owning runtime status, never an intrinsic/aura provider."""
     for status in unit.statuses:
@@ -70,7 +59,7 @@ def _emit(events: list, sink, kind: str, unit, **details) -> None:
         sink(event)
 
 
-def resolve(unit, battlefield, sides, definition_resolver=None, event_sink=None) -> dict:
+def resolve(unit, battlefield, sides, replacement_resolver=None, event_sink=None) -> dict:
     """Resolve exactly one fatal event after life has reached zero.
 
     Death morale precedes every survival branch. Runtime markers are read only
@@ -97,7 +86,12 @@ def resolve(unit, battlefield, sides, definition_resolver=None, event_sink=None)
 
     transfer_status = _runtime_marker(unit, TRANSFER)
     revive_status = _runtime_marker(unit, REVIVE)
-    replace_status = _runtime_marker(unit, REPLACE)
+    replacement_decision = (replacement_resolver(unit)
+                            if replacement_resolver is not None
+                            else {"status": "not_applicable"})
+    if not isinstance(replacement_decision, dict) or replacement_decision.get("status") not in (
+            "not_applicable", "resolved", "unresolved"):
+        raise ValueError("death replacement resolver returned an invalid decision")
     rollback_status = _runtime_marker(unit, ROLLBACK)
 
     if rollback_status is not None and unit.original_definition:
@@ -121,15 +115,16 @@ def resolve(unit, battlefield, sides, definition_resolver=None, event_sink=None)
         unit.alive = True
         unit.discarded = False
         _emit(events, event_sink, "revived", unit, life=unit.life)
-    elif replace_status is not None:
+    elif replacement_decision["status"] == "unresolved":
+        raise ValueError(str(replacement_decision.get(
+            "error", "applicable death replacement was unresolved")))
+    elif replacement_decision["status"] == "resolved":
         branch = "replaced"
-        original_tier = int(unit.original_definition.get("tier", unit.tier))
-        replacement_id = replacement_id_for_tier(original_tier)
-        if definition_resolver is None:
-            raise ValueError("death replacement requires a definition resolver")
-        definition = definition_resolver(unit, replacement_id)
+        definition = replacement_decision.get("definition")
         if not isinstance(definition, dict):
-            raise ValueError("replacement definition %d was not resolved" % replacement_id)
+            raise ValueError("resolved death replacement has no definition")
+        replacement_id = replacement_decision.get("definition_id")
+        original_tier = replacement_decision.get("tier")
         unit.restore_definition(_normalize_definition(definition, replacement_id))
         unit.original_definition = {}
         unit.life = unit.life_base

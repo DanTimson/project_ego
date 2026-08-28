@@ -307,6 +307,16 @@ or semantic compatibility. Portable synthetic scenario fixtures run on a fresh
 clone. Actual locally extracted pack checks are isolated in the `requires-pack`
 tier and skip clearly when `packs/<id>/data` is absent.
 
+Content compatibility is a separate provider contract with normalized
+`genesis`, `new_horizons`, or `unspecified` identity. It is never derived solely
+from arbitrary pack-id equality or a snapshot hash. A bindings manifest may
+declare it, and `ContentDb.load(..., legacy_profile=...)` /
+`ContentDb.load_pack(..., legacy_profile)` lets the existing legacy Genesis/NH
+loader make inherited compatibility explicit for stock-derived `.var`/supported
+`.dat` data, including differently named data mods. Scenario composition may
+explicitly assert `content_compatibility_override: "genesis"`; the normalized
+state records the override and its `load_override` source.
+
 Serialized identity has one owner per field: canonical `def` supplies
 `Combatant.content_id`, while scenario `id` supplies
 `Combatant.instance_id`. Inline units cannot serialize either runtime field;
@@ -392,11 +402,25 @@ shape.
 
 The tactical received-damage sink owns channel accounting, explicit
 remove-on-damage status removal and life subtraction. On a fatal event it calls
-one battle-contextual `DeathLifecycle` resolver immediately. That resolver owns
-adjacent death morale, runtime-marker scanning/clear, rollback, revival,
-replacement, final living-occupancy removal and side transfer. The sink returns
-`fatal_event` separately from the resolver's final alive state; neither field is
-kill credit, reward, permanent-death policy or an R17 trigger.
+one battle-contextual `DeathLifecycle` resolver immediately. Generic
+`DeathLifecycle` owns adjacent death morale, the generic runtime-marker
+scan/clear, rollback, revival, application of an injected replacement decision,
+final living-occupancy removal and side transfer. It contains no Genesis source
+records, profile/content qualification, or universal `0x5B` assertion. The sink
+returns `fatal_event` separately from the resolver's final alive state; neither
+field is kill credit, reward, permanent-death policy or an R17 trigger.
+
+The dedicated Genesis death-replacement resolver is constructed at the Scenario
+composition root. Only Genesis rules plus Genesis-compatible content make its
+Genesis marker applicable. It owns the fixed tier-to-source-record edge,
+qualified provider source lookup, canonical definition conversion, and upfront
+validation of all four targets. Strict/default construction fails before battle
+state on compatibility mismatch or any unresolved target. Explicit
+`death_replacement_load_mode: "permissive"` retains durable diagnostics and
+allows unrelated paths, but an applicable unresolved replacement returns an
+explicit runtime failure rather than disappearing or falling back to an equal
+number in another pack. Revival still precedes an already-injected replacement
+decision inside generic lifecycle ordering.
 
 `Combatant.original_definition` is a narrow static definition snapshot for
 battle transformation rollback. It excludes current resources, position,

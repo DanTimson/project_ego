@@ -77,6 +77,7 @@ func _profile_combat_spec(profile_name: String = "genesis",
 	}
 	return {
 		"name": "combat profile integration", "profile": profile_name, "seed": 1,
+		"death_replacement_load_mode": "permissive",
 		"battlefield": {"width": 8, "height": 3, "tiles": []},
 		"sides": [
 			{"id": 0, "is_attacker": true, "leader_initiative": 1,
@@ -300,6 +301,7 @@ func _test_melee_numeric_tranche_integration() -> void:
 	print("\n[integration] melee R3/R9/R10 ordering and live state")
 	var spec := {
 		"name": "numeric melee integration", "profile": "genesis", "seed": 1,
+		"death_replacement_load_mode": "permissive",
 		"battlefield": {"width": 8, "height": 3, "tiles": []},
 		"sides": [
 			{"id": 0, "is_attacker": true, "leader_initiative": 1, "units": [{
@@ -344,6 +346,7 @@ func _ranged_numeric_spec(base_ranged_attack: int = 20,
 		later_environment_provider: bool = false) -> Dictionary:
 	var spec := {
 		"name": "numeric ranged integration", "profile": "genesis", "seed": 1,
+		"death_replacement_load_mode": "permissive",
 		"battlefield": {"width": 8, "height": 3,
 			"tiles": [{"col": 1, "row": 0, "stam_cost": 2}]},
 		"sides": [
@@ -723,6 +726,7 @@ func _init() -> void:
 	var genesis_spec := base.duplicate(true)
 	genesis_spec.erase("rng")
 	genesis_spec["profile"] = "genesis"
+	genesis_spec["death_replacement_load_mode"] = "permissive"
 	var genesis := Scenario.new(genesis_spec)
 	_check(genesis.profile == "genesis", "explicit genesis identity is exposed")
 	_check(genesis.rng is LegacyRng, "explicit genesis selects LegacyRng")

@@ -69,7 +69,10 @@ boundaries are:
 |---|---|---|
 | AD-1 | Who supplies battle context and the persistent/intrinsic/runtime/aura providers for effective-speed modifier 7? | Engine architecture; preserve the implemented R8 live-capacity comparator while adding no guessed provider. |
 | AD-3 | How are production action definitions composed and source-bound, including per-unit availability/magnitude and Scenario injection? | Engine + content architecture; the Python fourteen-action reference catalogue is not production truth. |
-| AD-4 | Which pack owns Genesis death-replacement records 21/37/56/65? | Profile/content decision; do not use them as pack-independent canonical identities. |
+
+AD-4 is no longer architecture-unresolved. DELIB-0007 selected a dedicated
+profile/content-qualified resolver, and CX-016 implements its strict/default and
+permissive validation paths without granting authority to pack-id equality.
 
 AD-2 is no longer held. DELIB-0006 selected independent movement, ordinary
 melee, ordinary ranged, casting and activated-action restrictions, and CX-015

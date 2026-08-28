@@ -18,7 +18,7 @@ This is a coverage map, not a release claim.
 | round/side control | binary `004EC4C0`/`004E6530`/`004E0280`/`004DE2B0`; owner-confirmed terminality | implemented | implemented | whole-side phases and pre-action capacity-preserving reselection remain; successful consuming commands close only their actor's activation; explicit order fixture still needed |
 | melee execution | binary | partial compatibility model | counterattack path plus tactical fatal lifecycle implemented | EXP-CI11 fatal-event sequencing distinguishes first-strike survival from fatal-primary retaliation suppression; R17 secondary ordering remains excluded |
 | ranged execution | binary | partial compatibility model | partial | one-shot `cmd_shoot`, exact ranged early-provider zero cutoff, the R8 live-capacity comparator/restoration ordering, CX-009 terminality and central fatal lifecycle routing are implemented; modifier-7 provider aggregation into effective speed (AD-1), Extra Shot/two-shot action execution and special modes remain incomplete |
-| damage channels and death | binary | implemented tactical lifecycle + ranged calculator | implemented tactical lifecycle + ranged calculator | CX-012 covers exact `0x1C` resistance/channel-2, `0x5F`, `0x11`, `0x4D` and non-`0x1C` `0x3C` routing through the CX-011 sink; Genesis tier 1..4 replacement uses source records 21/37/56/65, not pack-independent identities; large-hit morale delta/`0x19`, hero-wide cohort, strategy writeback, corpses, rewards and R17 remain outside this tranche |
+| damage channels and death | binary + DELIB-0007 profile/content architecture | implemented tactical lifecycle + dedicated Genesis replacement resolver | implemented tactical lifecycle + dedicated Genesis replacement resolver | CX-016 qualifies the recovered tier 1..4 source records 21/37/56/65 by Genesis rules and an explicit/inherited Genesis-compatible content contract, validates canonical targets strictly by default, and supports diagnostic permissive loading; generic lifecycle owns no raw Genesis IDs or universal `0x5B` meaning; large-hit morale delta/`0x19`, hero-wide cohort, strategy writeback, corpses, rewards, NH replacement and R17 remain outside this tranche |
 | battle actions and target legality | public/data descriptions + selective binary evidence | adjacent enemy legality, exclusions and mutation-free refusal implemented for two unit actions | matching implementation | canonical typed unit-action command is covered; R16 stays retired and generic battle-action effects remain separate/unimplemented |
 | battlefield generation from terrain data | `.var` documentation | partial | model supports tiles | generator not complete |
 | scenario format and traces | Project EGO design | inline and canonical-definition units implemented | inline and canonical-definition units implemented | portable synthetic parity fixture covers provenance, merge and identity |
@@ -195,7 +195,14 @@ Adjacent death morale precedes all survival branches; runtime-status-only
 `0x49/0x4A/0x5A/0x5B` markers drive complete status clear, rollback, revival,
 exact Genesis tier replacement, final cleanup and transfer in the accepted order.
 The tier 1..4 source records 21/37/56/65 are Genesis-qualified and are not
-pack-independent canonical identities.
+pack-independent canonical identities. CX-016 moves their mapping and the
+Genesis-only replacement-marker applicability check into a dedicated resolver.
+Genesis rules require Genesis-compatible content under a manifest/legacy-loader
+contract or an observable explicit load override; strict construction validates
+all four selected-pack targets, while the separate permissive mode retains
+missing-target diagnostics and fails only an exercised unresolved replacement.
+Pack-id or file-hash equality grants no compatibility authority. Native rules do
+not activate this rule, and no New Horizons `0x5B` semantics are inferred.
 Persistent and battle-owned final deaths are distinct, and surviving branches do
 not refresh activation or advance status time. Aura upkeep routes only a newly
 caused living-to-dead transition, so a retained finalized dead record is not

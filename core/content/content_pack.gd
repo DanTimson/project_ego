@@ -76,6 +76,8 @@ var version: String = ""
 var build: String = ""
 var declared_fingerprint: String = ""
 var action_overlay: Dictionary = {}
+var compatibility: String = "unspecified"
+var compatibility_source: String = "unspecified"
 
 
 func _init(p_id: String = "") -> void:
@@ -105,6 +107,13 @@ func load_bindings(path: String) -> Array[String]:
 	version = String(payload.get("version", ""))
 	build = String(payload.get("build", ""))
 	declared_fingerprint = String(payload.get("fingerprint", ""))
+	if payload.has("compatibility"):
+		var declared_compatibility := String(payload.get("compatibility", ""))
+		if declared_compatibility not in ["genesis", "new_horizons", "unspecified"]:
+			errors.append("unsupported content compatibility '%s'" % declared_compatibility)
+		else:
+			compatibility = declared_compatibility
+			compatibility_source = "manifest"
 	var raw_actions: Variant = payload.get("actions", {})
 	if typeof(raw_actions) != TYPE_DICTIONARY:
 		errors.append("actions overlay must be an object")

@@ -2,7 +2,7 @@ class_name ScenarioContentProvider
 extends RefCounted
 
 ## Minimal scenario composition provider for synthetic definitions and callers.
-## ContentDb implements the same two-method seam for locally loaded packs.
+## ContentDb implements the same scenario-provider seam for locally loaded packs.
 
 var pack_id: String = ""
 var version: String = ""
@@ -11,19 +11,25 @@ var asserted_fingerprint: String = ""
 ## Last observed value, retained for fixture generation and diagnostics.
 ## content_provenance() always refreshes it from the current snapshot.
 var fingerprint: String = ""
+var compatibility: String = "unspecified"
+var compatibility_source: String = "explicit"
 var _definitions: Dictionary = {}
 var _action_overlay: Dictionary = {}
 
 
 func _init(p_pack: String = "", p_definitions: Dictionary = {},
 		p_version: String = "", p_build: String = "",
-		p_fingerprint: String = "", p_action_overlay: Dictionary = {}) -> void:
+		p_fingerprint: String = "", p_action_overlay: Dictionary = {},
+		p_compatibility: String = "unspecified",
+		p_compatibility_source: String = "explicit") -> void:
 	pack_id = p_pack
 	version = p_version
 	build = p_build
 	_definitions = p_definitions.duplicate(true)
 	asserted_fingerprint = p_fingerprint
 	_action_overlay = p_action_overlay.duplicate(true)
+	compatibility = p_compatibility.strip_edges().to_lower()
+	compatibility_source = p_compatibility_source
 	fingerprint = canonical_fingerprint(snapshot_payload())
 
 
@@ -91,6 +97,18 @@ func content_provenance() -> Dictionary:
 func resolve_definition(content_id: String) -> Variant:
 	var definition: Variant = _definitions.get(content_id)
 	return definition.duplicate(true) if typeof(definition) == TYPE_DICTIONARY else null
+
+
+func content_compatibility() -> Dictionary:
+	return {"identity": compatibility, "source": compatibility_source}
+
+
+func resolve_source_definition(kind: String, source_record: int) -> Variant:
+	var canonical_id := "%s:%s/%d" % [pack_id, kind, source_record]
+	var definition: Variant = resolve_definition(canonical_id)
+	if typeof(definition) != TYPE_DICTIONARY:
+		return null
+	return {"content_id": canonical_id, "definition": definition}
 
 
 func compose_actions(profile: String, mode: String = ActionDefinitionComposer.STRICT) -> Dictionary:

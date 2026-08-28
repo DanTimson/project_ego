@@ -66,6 +66,7 @@ def provider(pack="alpha", overlay=None, *, target=None):
 
 def spec_for(p, *, profile="native", mode="strict", commands=None):
     value = {"name": "cx014", "profile": profile, "seed": 7,
+             "death_replacement_load_mode": "permissive",
              "content": {"pack": p.pack_id, "version": "v1"},
              "battlefield": {"width": 3, "height": 2},
              "sides": [

@@ -29,13 +29,16 @@ def local_db():
             "python3 tools/extract/build_pack.py <path-to>/var genesis")
     registry = content.AbilityRegistry()
     handlers.register_all(registry)
-    return content.ContentDb.load("genesis", str(PACK_DIR), registry, TABLES)
+    return content.ContentDb.load(
+        "genesis", str(PACK_DIR), registry, TABLES, legacy_profile="genesis")
 
 
 def test_local_pack_discovery_provenance_and_one_definition():
     db = local_db()
     provenance = db.content_provenance()
     assert provenance["pack"] == "genesis"
+    assert db.content_compatibility() == {
+        "identity": "genesis", "source": "legacy_profile"}
     assert provenance["fingerprint"].startswith("sha256:")
     assert len(provenance["fingerprint"]) == 71
     # Same loaded snapshot must produce the same canonical fingerprint twice.

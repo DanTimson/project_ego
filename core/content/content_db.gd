@@ -21,12 +21,19 @@ func _init(p_pack: ContentPack, p_registry: AbilityRegistry,
 
 ## `tables` maps a table name to its filename under <pack_dir>/data/.
 static func load_pack(pack_id: String, pack_dir: String, registry: AbilityRegistry,
-		tables: Dictionary = {}) -> ContentDb:
+		tables: Dictionary = {}, legacy_profile: String = "") -> ContentDb:
 	var p := ContentPack.new(pack_id)
 	var errors: Array[String] = p.load_bindings(pack_dir.path_join("bindings.json"))
 	for name in tables:
 		errors.append_array(
 			p.load_table(String(name), pack_dir.path_join("data").path_join(String(tables[name]))))
+	var inherited := legacy_profile.strip_edges().to_lower()
+	if inherited != "":
+		if inherited not in ["genesis", "new_horizons"]:
+			errors.append("unsupported legacy compatibility profile '%s'" % inherited)
+		elif p.compatibility_source == "unspecified":
+			p.compatibility = inherited
+			p.compatibility_source = "legacy_profile"
 	return ContentDb.new(p, registry, p.report(registry, errors))
 
 
@@ -43,6 +50,18 @@ func resolve(opcode: int) -> Array:
 ## rules never load or branch on pack identity.
 func content_provenance() -> Dictionary:
 	return pack.provenance()
+
+
+func content_compatibility() -> Dictionary:
+	return {"identity": pack.compatibility, "source": pack.compatibility_source}
+
+
+func resolve_source_definition(kind: String, source_record: int) -> Variant:
+	var canonical_id := "%s:%s/%d" % [pack.id, kind, source_record]
+	var definition: Variant = resolve_definition(canonical_id)
+	if typeof(definition) != TYPE_DICTIONARY:
+		return null
+	return {"content_id": canonical_id, "definition": definition}
 
 
 func compose_actions(profile: String,

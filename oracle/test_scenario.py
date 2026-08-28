@@ -80,6 +80,7 @@ def profile_combat_spec(profile="genesis", attacker_at=(0, 0),
     }
     return {
         "name": "combat profile integration", "profile": profile, "seed": 1,
+        "death_replacement_load_mode": "permissive",
         "battlefield": {"width": 8, "height": 3, "tiles": []},
         "sides": [
             {"id": 0, "is_attacker": True, "leader_initiative": 1,
@@ -124,6 +125,8 @@ def test_profile_selection() -> None:
         selected.pop("profile", None)
         selected.pop("rng", None)
         selected.update(overrides)
+        if str(selected.get("profile", "")).strip().lower() == "genesis":
+            selected["death_replacement_load_mode"] = "permissive"
         return selected
 
     native = scenario.Scenario(configured(profile=" NATIVE "))
@@ -470,6 +473,7 @@ def test_melee_numeric_tranche_integration() -> None:
     print("\n[integration] melee R3/R9/R10 ordering and live state")
     spec = {
         "name": "numeric melee integration", "profile": "genesis", "seed": 1,
+        "death_replacement_load_mode": "permissive",
         "battlefield": {"width": 8, "height": 3, "tiles": []},
         "sides": [
             {"id": 0, "is_attacker": True, "leader_initiative": 1,
@@ -514,6 +518,7 @@ def ranged_numeric_spec(base_ranged_attack: int = 20,
                         later_environment_provider: bool = False) -> dict:
     spec = {
         "name": "numeric ranged integration", "profile": "genesis", "seed": 1,
+        "death_replacement_load_mode": "permissive",
         "battlefield": {"width": 8, "height": 3,
                         "tiles": [{"col": 1, "row": 0, "stam_cost": 2}]},
         "sides": [

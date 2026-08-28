@@ -64,6 +64,10 @@ var unit_catalogues: Dictionary = {}
 var action_refusals: Dictionary = {}
 var action_diagnostics: Array = []
 var action_load_mode: String = ActionDefinitionComposer.STRICT
+var death_replacement_load_mode: String = GenesisDeathReplacementResolver.STRICT
+var death_replacement_diagnostics: Array = []
+var death_replacement_state: Dictionary = {}
+var _death_replacement_resolver: GenesisDeathReplacementResolver
 var _action_composition: Dictionary = {}
 var _inline_action_ids: Dictionary = {}
 
@@ -276,6 +280,18 @@ func _init(p_spec: Dictionary, injected_rng: Variant = null,
 	if profile_error != "":
 		construction_error = profile_error
 		push_error(profile_error)
+		return
+	death_replacement_load_mode = String(spec.get(
+		"death_replacement_load_mode", GenesisDeathReplacementResolver.STRICT))
+	_death_replacement_resolver = GenesisDeathReplacementResolver.new(
+		profile, injected_content_provider,
+		String(spec.get("content_compatibility_override", "")),
+		death_replacement_load_mode)
+	death_replacement_diagnostics = _death_replacement_resolver.diagnostics.duplicate(true)
+	death_replacement_state = _death_replacement_resolver.normalized_state()
+	if _death_replacement_resolver.configuration_error != "":
+		construction_error = _death_replacement_resolver.configuration_error
+		push_error(construction_error)
 		return
 	action_load_mode = String(spec.get("action_load_mode", ActionDefinitionComposer.STRICT))
 	if action_load_mode != ActionDefinitionComposer.STRICT \
@@ -944,7 +960,8 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	return true
 
 func _resolve_fatal_event(unit: Combatant) -> Dictionary:
-	return DeathLifecycle.resolve_for_scenario(unit, field, state.sides, _content_provider, log)
+	return DeathLifecycle.resolve_for_scenario(unit, field, state.sides,
+		Callable(_death_replacement_resolver, "decision_for"), log)
 
 func _fell(unit: Combatant) -> void:
 	var h := field.find_unit(unit)

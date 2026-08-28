@@ -44,6 +44,7 @@ import handlers
 import identity
 import counterattack as ca
 import death_lifecycle
+import death_replacement
 import statuses as st
 import actions as actionsmod
 import content_actions
@@ -124,6 +125,15 @@ class Scenario:
         self.name = spec.get("name", "unnamed")
         self.seed = int(spec.get("seed", 0))
         self.profile = self.normalize_profile(spec)
+        self.death_replacement_load_mode = str(spec.get(
+            "death_replacement_load_mode", death_replacement.STRICT))
+        self.death_replacement_resolver = death_replacement.GenesisDeathReplacementResolver(
+            self.profile, content_provider,
+            compatibility_override=str(spec.get("content_compatibility_override", "")),
+            mode=self.death_replacement_load_mode)
+        self.death_replacement_state = self.death_replacement_resolver.normalized_state()
+        self.death_replacement_diagnostics = copy.deepcopy(
+            self.death_replacement_resolver.diagnostics)
         self.action_load_mode = str(spec.get("action_load_mode", content_actions.STRICT))
         if self.action_load_mode not in content_actions.MODES:
             raise ValueError("unknown action load mode %r" % self.action_load_mode)
@@ -669,38 +679,10 @@ class Scenario:
         self.emit("  [lifecycle] %s %s%s" %
                   (event["unit"], event["event"], suffix))
 
-    def _resolve_replacement_definition(self, unit: Combatant,
-                                        definition_id: int):
-        if self._content_provider is None:
-            return None
-        source_id = str(unit.original_definition.get("content_id", "")
-                        or unit.content_id)
-        if ":unit/" not in source_id:
-            return None
-        canonical_id = source_id.split(":unit/", 1)[0] + ":unit/" + str(definition_id)
-        definition = self._content_provider.resolve_definition(canonical_id)
-        if definition is not None:
-            definition = copy.deepcopy(definition)
-            definition["content_id"] = canonical_id
-            built_modifiers = []
-            for modifier in definition.get("modifiers", []):
-                if isinstance(modifier, Modifier):
-                    built_modifiers.append(modifier)
-                else:
-                    built_modifiers.append(Modifier(
-                        ability=int(modifier.get("ability", 0)),
-                        handler=modifier["handler"],
-                        hook=getattr(Hook, modifier.get("hook", "STAT_PASSIVE")),
-                        power=int(modifier.get("power", 0)),
-                        params=copy.deepcopy(modifier.get("params", {})),
-                        source=modifier.get("source", modifier["handler"])))
-            definition["modifiers"] = built_modifiers
-        return definition
-
     def _resolve_fatal_event(self, unit: Combatant) -> dict:
         return death_lifecycle.resolve(
             unit, self.field, self.sides,
-            self._resolve_replacement_definition,
+            self.death_replacement_resolver.decision_for,
             self._emit_lifecycle_event)
 
     def _fell(self, unit: Combatant) -> None:

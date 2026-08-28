@@ -6,16 +6,6 @@ extends RefCounted
 const TRANSFER := 0x49
 const REVIVE := 0x4A
 const ROLLBACK := 0x5A
-const REPLACE := 0x5B
-const REPLACEMENT_BY_TIER := {1: 21, 2: 37, 3: 56, 4: 65}
-
-
-static func replacement_id_for_tier(tier: int) -> int:
-	assert(REPLACEMENT_BY_TIER.has(tier),
-		"death replacement requires original tier 1..4")
-	return int(REPLACEMENT_BY_TIER.get(tier, 0))
-
-
 static func _runtime_marker(unit: Combatant, ability: int) -> Status:
 	## Search runtime Status-owned modifiers only, never effective providers.
 	for effect in unit.statuses:
@@ -66,39 +56,6 @@ static func normalize_definition(specification: Dictionary,
 	return out
 
 
-static func _replacement_definition(unit: Combatant, definition_id: int,
-		content_provider: Variant) -> Variant:
-	if content_provider == null:
-		return null
-	var source_id := String(unit.original_definition.get(
-		"content_id", unit.content_id))
-	var marker := ":unit/"
-	if source_id.find(marker) < 0:
-		return null
-	var canonical_id := source_id.split(marker)[0] + marker + str(definition_id)
-	var definition_v: Variant = content_provider.call(
-		"resolve_definition", canonical_id)
-	if typeof(definition_v) != TYPE_DICTIONARY:
-		return null
-	var definition: Dictionary = definition_v.duplicate(true)
-	definition["content_id"] = canonical_id
-	var built_modifiers: Array = []
-	for modifier_v in definition.get("modifiers", []):
-		if modifier_v is Modifier:
-			built_modifiers.append(modifier_v)
-		else:
-			var modifier: Dictionary = modifier_v
-			built_modifiers.append(Modifier.make(
-				int(modifier.get("ability", 0)),
-				StringName(String(modifier["handler"])),
-				Modifier.Hook[String(modifier.get("hook", "STAT_PASSIVE"))],
-				int(modifier.get("power", 0)),
-				modifier.get("params", {}).duplicate(true),
-				String(modifier.get("source", modifier["handler"]))))
-	definition["modifiers"] = built_modifiers
-	return definition
-
-
 static func _append_scenario_event(event: Dictionary, scenario_log: Array) -> void:
 	var keys: Array = event.keys()
 	keys.erase("event")
@@ -114,9 +71,9 @@ static func _append_scenario_event(event: Dictionary, scenario_log: Array) -> vo
 
 
 static func resolve_for_scenario(unit: Combatant, battlefield: Battlefield,
-		sides: Array, content_provider: Variant, scenario_log: Array) -> Dictionary:
-	return resolve(unit, battlefield, sides,
-		Callable(DeathLifecycle, "_replacement_definition").bind(content_provider),
+		sides: Array, replacement_resolver: Callable,
+		scenario_log: Array) -> Dictionary:
+	return resolve(unit, battlefield, sides, replacement_resolver,
 		Callable(DeathLifecycle, "_append_scenario_event").bind(scenario_log))
 
 
@@ -188,7 +145,7 @@ static func _emit(events: Array, sink: Callable, kind: String,
 
 
 static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
-		definition_resolver: Callable = Callable(),
+		replacement_resolver: Callable = Callable(),
 		event_sink: Callable = Callable()) -> Dictionary:
 	var events: Array = []
 	_emit(events, event_sink, "death_started", unit)
@@ -211,7 +168,16 @@ static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
 
 	var transfer_status := _runtime_marker(unit, TRANSFER)
 	var revive_status := _runtime_marker(unit, REVIVE)
-	var replace_status := _runtime_marker(unit, REPLACE)
+	var replacement_decision: Dictionary = (
+		replacement_resolver.call(unit)
+		if replacement_resolver.is_valid()
+		else {"status": "not_applicable"}
+	)
+	var decision_status := String(replacement_decision.get("status", ""))
+	if decision_status not in ["not_applicable", "resolved", "unresolved"]:
+		push_error("death replacement resolver returned an invalid decision")
+		replacement_decision = {"status": "unresolved",
+			"error": "death replacement resolver returned an invalid decision"}
 	var rollback_status := _runtime_marker(unit, ROLLBACK)
 
 	if rollback_status != null and not unit.original_definition.is_empty():
@@ -235,19 +201,24 @@ static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
 		unit.alive = true
 		unit.discarded = false
 		_emit(events, event_sink, "revived", unit, {"life": unit.life})
-	elif replace_status != null:
+	elif String(replacement_decision["status"]) == "unresolved":
+		var replacement_error := String(replacement_decision.get(
+			"error", "applicable death replacement was unresolved"))
+		push_error(replacement_error)
+		return {"fatal_event": true, "final_alive": false,
+			"branch": "invalid_replacement", "transferred": false,
+			"error": replacement_error, "events": events}
+	elif String(replacement_decision["status"]) == "resolved":
 		branch = "replaced"
-		var original_tier := int(unit.original_definition.get("tier", unit.tier))
-		var replacement_id := replacement_id_for_tier(original_tier)
-		assert(definition_resolver.is_valid(),
-			"death replacement requires a definition resolver")
-		var definition_v: Variant = definition_resolver.call(unit, replacement_id)
-		assert(typeof(definition_v) == TYPE_DICTIONARY,
-			"replacement definition %d was not resolved" % replacement_id)
+		var definition_v: Variant = replacement_decision.get("definition")
 		if typeof(definition_v) != TYPE_DICTIONARY:
+			var replacement_error := "resolved death replacement has no definition"
+			push_error(replacement_error)
 			return {"fatal_event": true, "final_alive": false,
 				"branch": "invalid_replacement", "transferred": false,
-				"events": events}
+				"error": replacement_error, "events": events}
+		var replacement_id := int(replacement_decision.get("definition_id", -1))
+		var original_tier := int(replacement_decision.get("tier", unit.tier))
 		unit.restore_definition(normalize_definition(definition_v, replacement_id))
 		unit.original_definition.clear()
 		unit.life = unit.life_base

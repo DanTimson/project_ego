@@ -55,6 +55,7 @@ def _run_action(action_id: str = "shield_bash", *, magnitude: int = 4,
     ]
     spec = {
         "name": "typed action vector", "profile": profile, "seed": 19,
+        "death_replacement_load_mode": "permissive",
         "battlefield": {"width": 6, "height": 4, "tiles": []},
         "actions": ([] if action_id == "nonesuch" else
                     [_action_dict(action_id, magnitude=magnitude)]),

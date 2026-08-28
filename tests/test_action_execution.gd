@@ -63,6 +63,7 @@ func _run_action(action_id: String = "shield_bash", magnitude: int = 4,
 		actions.append(_action(action_id, magnitude))
 	var spec := {
 		"name": "typed action vector", "profile": profile, "seed": 19,
+		"death_replacement_load_mode": "permissive",
 		"battlefield": {"width": 6, "height": 4, "tiles": []},
 		"actions": actions,
 		"sides": [

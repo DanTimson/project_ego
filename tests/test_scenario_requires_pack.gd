@@ -15,8 +15,13 @@ func _init() -> void:
 	var db := ContentDb.load_pack("genesis", pack_dir, registry, {
 		"unit": "unit.json", "unit_upg": "unit_upg.json",
 		"ability_num": "ability_num.json",
-	})
+	}, "genesis")
 	var provenance := db.content_provenance()
+	if db.content_compatibility() != {
+			"identity": "genesis", "source": "legacy_profile"}:
+		push_error("requires-pack loader did not inherit Genesis compatibility")
+		quit(1)
+		return
 	if provenance.get("pack") != "genesis" \
 			or not String(provenance.get("fingerprint", "")).begins_with("sha256:"):
 		push_error("requires-pack provider did not report deterministic Genesis provenance")

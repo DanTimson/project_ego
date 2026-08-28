@@ -44,6 +44,8 @@ def spec(**overrides) -> dict:
     with open(SPEC_PATH, encoding="utf-8") as fh:
         s = json.load(fh)
     s.update(overrides)
+    if s.get("profile") == "genesis":
+        s["death_replacement_load_mode"] = "permissive"
     return copy.deepcopy(s)
 
 

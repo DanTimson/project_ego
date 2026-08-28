@@ -64,7 +64,8 @@ def canonical_fingerprint(value) -> str:
 class ScenarioContentProvider:
     """Small in-memory provider for portable synthetic tests and callers.
 
-    ``ContentDb`` implements the same two-method seam for locally loaded packs;
+    ``ContentDb`` implements the same scenario-provider seam for locally loaded
+    packs;
     this container is not a second pack parser or registry.  A caller-supplied
     fingerprint is an assertion, never a substitute for observing the current
     canonical snapshot.
@@ -72,13 +73,28 @@ class ScenarioContentProvider:
 
     def __init__(self, pack: str, definitions: dict, *, version: str = "",
                  build: str = "", fingerprint: str = "",
-                 action_overlay: dict | None = None):
+                 action_overlay: dict | None = None,
+                 compatibility: str = "unspecified",
+                 compatibility_source: str = "explicit"):
         self.pack_id = str(pack)
         self.version = str(version)
         self.build = str(build)
         self._definitions = copy.deepcopy(definitions)
         self.asserted_fingerprint = str(fingerprint)
         self._action_overlay = copy.deepcopy(action_overlay or {})
+        self.compatibility = str(compatibility or "unspecified").strip().lower()
+        self.compatibility_source = str(compatibility_source or "explicit")
+
+    def content_compatibility(self) -> dict:
+        return {"identity": self.compatibility,
+                "source": self.compatibility_source}
+
+    def resolve_source_definition(self, kind: str, source_record: int):
+        canonical_id = "%s:%s/%d" % (self.pack_id, str(kind), int(source_record))
+        definition = self.resolve_definition(canonical_id)
+        if definition is None:
+            return None
+        return {"content_id": canonical_id, "definition": definition}
 
     def snapshot_payload(self) -> dict:
         payload = {
@@ -217,6 +233,8 @@ class ContentPack:
         self.build: str = ""
         self.declared_fingerprint: str = ""
         self.action_overlay: dict = {}
+        self.compatibility: str = "unspecified"
+        self.compatibility_source: str = "unspecified"
 
     # -- loading ------------------------------------------------------------
 
@@ -237,6 +255,13 @@ class ContentPack:
         self.version = str(payload.get("version", "") or "")
         self.build = str(payload.get("build", "") or "")
         self.declared_fingerprint = str(payload.get("fingerprint", "") or "")
+        if "compatibility" in payload:
+            compatibility = payload.get("compatibility")
+            if compatibility not in ("genesis", "new_horizons", "unspecified"):
+                errors.append("unsupported content compatibility %r" % compatibility)
+            else:
+                self.compatibility = str(compatibility)
+                self.compatibility_source = "manifest"
         raw_actions = payload.get("actions", {})
         if not isinstance(raw_actions, dict):
             errors.append("actions overlay must be an object")
@@ -355,11 +380,18 @@ class ContentDb:
 
     @classmethod
     def load(cls, pack_id: str, pack_dir: str, registry: AbilityRegistry,
-             tables: dict | None = None) -> "ContentDb":
+             tables: dict | None = None, *, legacy_profile: str = "") -> "ContentDb":
         pack = ContentPack(pack_id)
         errors = pack.load_bindings(os.path.join(pack_dir, "bindings.json"))
         for name, filename in (tables or {}).items():
             errors += pack.load_table(name, os.path.join(pack_dir, "data", filename))
+        inherited = str(legacy_profile or "").strip().lower()
+        if inherited:
+            if inherited not in ("genesis", "new_horizons"):
+                errors.append("unsupported legacy compatibility profile %r" % inherited)
+            elif pack.compatibility_source == "unspecified":
+                pack.compatibility = inherited
+                pack.compatibility_source = "legacy_profile"
         return cls(pack, registry, pack.report(registry, errors))
 
     def resolve(self, opcode: int):
@@ -374,6 +406,17 @@ class ContentDb:
     # model for scenarios.
     def content_provenance(self) -> dict:
         return self.pack.provenance()
+
+    def content_compatibility(self) -> dict:
+        return {"identity": self.pack.compatibility,
+                "source": self.pack.compatibility_source}
+
+    def resolve_source_definition(self, kind: str, source_record: int):
+        canonical_id = "%s:%s/%d" % (self.pack.id, str(kind), int(source_record))
+        definition = self.resolve_definition(canonical_id)
+        if definition is None:
+            return None
+        return {"content_id": canonical_id, "definition": definition}
 
     def compose_actions(self, profile: str,
                         mode: str = content_actions.STRICT):

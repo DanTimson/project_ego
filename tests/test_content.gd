@@ -101,6 +101,13 @@ func _init() -> void:
 	_check(String(g.resolve(30)[0]) == "magic_immunity"
 		and String(n.resolve(30)[0]) == "armor_pierce",
 		"opcode 30 means different things in each pack — no conditional in the rules")
+	var inherited := ContentDb.load_pack("genesis_like",
+		"user://test_packs/genesis_like", reg, {}, "genesis")
+	_check(inherited.content_compatibility() == {
+		"identity": "genesis", "source": "legacy_profile"},
+		"legacy loader profile inheritance is separate from pack id")
+	_check(g.content_compatibility().identity == "unspecified",
+		"pack id alone grants no compatibility authority")
 
 	print("\n[5] failures degrade rather than crash")
 	var absent := ContentDb.load_pack("nope", "user://test_packs/does_not_exist", reg)

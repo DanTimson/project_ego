@@ -152,34 +152,41 @@ def replacement_definition(definition_id):
     }
 
 
-def test_exact_replacement_mapping_resources_and_no_activation_refresh():
-    assert [death.replacement_id_for_tier(t) for t in range(1, 5)] == [21, 37, 56, 65]
-    for tier, expected in death.REPLACEMENT_BY_TIER.items():
-        field, sides, victim, _, _ = setup()
-        victim.original_definition = original_snapshot(tier=tier)
-        victim.statuses = [marker(death.REPLACE), statuses.StatusEffect(id="other")]
-        victim.movement_remaining = 9
-        victim.action_spent = True
-        victim.morale_break_accumulator = 20
-        result = combat.apply_received_damage(
-            victim, 1, 0,
-            lambda unit: death.resolve(
-                unit, field, sides,
-                lambda _unit, definition_id: replacement_definition(definition_id)))
-        assert result["fatal_event"] and result["final_alive"]
-        assert victim.definition_id == expected
-        assert (victim.life, victim.stamina, victim.ammo, victim.morale) == (
-            20 + expected, 6, 7, 13)
-        assert victim.morale_break_accumulator == 0 and victim.statuses == []
-        assert victim.movement_remaining == 9 and victim.action_spent
-        assert field.find(victim) == bfmod.offset_to_axial(2, 2)
+def synthetic_replacement_decision(definition_id=901, tier=3):
+    return lambda _unit: {
+        "status": "resolved", "definition": replacement_definition(definition_id),
+        "definition_id": definition_id, "tier": tier,
+    }
 
 
-def test_revival_precedes_replacement():
+def test_synthetic_replacement_resources_and_no_activation_refresh():
+    field, sides, victim, _, _ = setup()
+    victim.original_definition = original_snapshot(tier=3)
+    victim.statuses = [statuses.StatusEffect(id="other")]
+    victim.movement_remaining = 9
+    victim.action_spent = True
+    victim.morale_break_accumulator = 20
+    result = combat.apply_received_damage(
+        victim, 1, 0,
+        lambda unit: death.resolve(
+            unit, field, sides, synthetic_replacement_decision()))
+    assert result["fatal_event"] and result["final_alive"]
+    assert victim.definition_id == 901
+    assert (victim.life, victim.stamina, victim.ammo, victim.morale) == (
+        921, 6, 7, 13)
+    assert victim.morale_break_accumulator == 0 and victim.statuses == []
+    assert victim.movement_remaining == 9 and victim.action_spent
+    assert field.find(victim) == bfmod.offset_to_axial(2, 2)
+
+
+def test_revival_precedes_synthetic_replacement():
     field, sides, victim, _, _ = setup()
     victim.definition_id = 8
-    victim.statuses = [marker(death.REVIVE), marker(death.REPLACE)]
-    result = resolve_damage(field, sides, victim)
+    victim.statuses = [marker(death.REVIVE)]
+    victim.life = 0
+    victim.alive = False
+    result = death.resolve(victim, field, sides,
+                           synthetic_replacement_decision())
     assert result["final_alive"] and victim.definition_id == 8
     assert victim.life == victim.life_base
 

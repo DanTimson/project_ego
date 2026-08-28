@@ -29,6 +29,7 @@ def provider(pack="alpha", overlay=None):
 def spec_for(p, profile="native", commands=None):
     provenance = p.content_provenance()
     return {"name": "composition", "profile": profile, "seed": 3,
+            "death_replacement_load_mode": "permissive",
             "content": {"pack": provenance["pack"],
                         "version": provenance["version"]},
             "battlefield": {"width": 3, "height": 2},
@@ -192,6 +193,7 @@ def test_legacy_var_grant_inherits_genesis_stock_without_manifest(tmp_path):
          "ability_num": "ability_num.json"})
     provenance = db.content_provenance()
     spec = {"name": "legacy", "profile": "genesis", "seed": 1,
+            "death_replacement_load_mode": "permissive",
             "content": {"pack": "legacy", "version": "v1"},
             "battlefield": {"width": 2, "height": 1}, "sides": [
                 {"id": 0, "units": [{"id": "legacy-1", "def": "legacy:unit/1",
@@ -229,6 +231,7 @@ def test_malformed_legacy_action_quantity_stays_action_validation(
         {"unit": "unit.json", "unit_upg": "unit_upg.json",
          "ability_num": "ability_num.json"})
     spec = {"name": "legacy", "profile": "genesis", "seed": 1,
+            "death_replacement_load_mode": "permissive",
             "content": {"pack": "legacy", "version": "v1"},
             "battlefield": {"width": 2, "height": 1}, "sides": [
                 {"id": 0, "units": [{"id": "legacy-1", "def": "legacy:unit/1",

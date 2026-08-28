@@ -26,6 +26,7 @@ func _provider(pack: String, overlay: Dictionary) -> ScenarioContentProvider:
 
 func _spec(provider: ScenarioContentProvider, profile: String = "native") -> Dictionary:
 	return {"name": "composition", "profile": profile, "seed": 3,
+		"death_replacement_load_mode": "permissive",
 		"content": {"pack": provider.pack_id, "version": "v1"},
 		"battlefield": {"width": 3, "height": 2},
 		"sides": [
@@ -166,6 +167,7 @@ func _test_profile_and_legacy_inheritance() -> void:
 	Handlers.register_all(registry)
 	var db := ContentDb.new(pack, registry, pack.report(registry))
 	var spec := {"name": "legacy", "profile": "genesis", "seed": 1,
+		"death_replacement_load_mode": "permissive",
 		"content": {"pack": "legacy", "version": "v1"},
 		"battlefield": {"width": 2, "height": 1}, "sides": [
 			{"id": 0, "units": [{"id": "legacy-1", "def": "legacy:unit/1",
@@ -196,6 +198,7 @@ func _test_malformed_legacy_action_quantities() -> void:
 		Handlers.register_all(registry)
 		var db := ContentDb.new(pack, registry, pack.report(registry))
 		var spec := {"name": "legacy", "profile": "genesis", "seed": 1,
+		"death_replacement_load_mode": "permissive",
 				"content": {"pack": "legacy", "version": "v1"},
 				"battlefield": {"width": 2, "height": 1}, "sides": [
 					{"id": 0, "units": [{"id": "legacy-1", "def": "legacy:unit/1",

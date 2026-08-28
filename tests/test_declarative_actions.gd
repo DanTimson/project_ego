@@ -38,6 +38,7 @@ func _provider(pack: String, overlay: Dictionary,
 func _spec(provider: ScenarioContentProvider, profile: String = "native",
 		mode: String = "strict") -> Dictionary:
 	var out := {"name": "cx014", "profile": profile, "seed": 7,
+		"death_replacement_load_mode": "permissive",
 		"content": {"pack": provider.pack_id, "version": "v1"},
 		"battlefield": {"width": 3, "height": 2},
 		"sides": [
