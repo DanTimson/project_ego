@@ -62,10 +62,9 @@ No engine task is implicitly authorized by this queue.
 `docs/AUDIT_LEDGER.csv` is the canonical governance record for IR/AD/GV/PV/CL/RS
 findings. The post-0.2 remediation/resume gate is closed: AD-3 and CL-1 are
 implemented and review-accepted, while DELIB-0004 through DELIB-0007 record the
-accepted architecture decisions. AD-1 and AD-4 implementation remain
-separately fenced; AD-2's DELIB-0006 architecture is implemented by CX-015 and
-awaits review; PV-1 remains provenance-held; RS-1 remains deferred.
-CX-008 through CX-014 remain `DONE`. CX-015 is at `REVIEW` under DELIB-0006 and
-does not claim raw legacy restriction-ID binding, casting-command implementation,
-status lifecycle changes, AD-1 provider aggregation, AD-4 profile policy, or NH
-rules compatibility.
+accepted architecture decisions. AD-1 and AD-4 implementation remain separately fenced; AD-2's DELIB-0006
+architecture is implemented and review-accepted by CX-015; PV-1 remains
+provenance-held; RS-1 remains deferred. CX-008 through CX-015 are `DONE`.
+CX-015 does not claim raw legacy restriction-ID binding, casting-command
+implementation, status lifecycle changes, AD-1 provider aggregation, AD-4 profile
+policy, or NH rules compatibility.
