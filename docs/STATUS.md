@@ -29,6 +29,17 @@ This is a coverage map, not a release claim.
 | tactical AI scoring | decompilation corpus | not consolidated | scaffold only | deferred |
 | presentation | Project EGO Slice-3 contract + direct local visual inspection | n/a | playable hot-seat scene with layered field, inward facing, shadows, categorized ignored assets, and narrow tactical panel | real textured field/right panel and full authored fallback GUI-smoked; structural resemblance only, not original parity |
 
+## Python oracle scope
+
+DELIB-0008 is operational through `docs/ORACLE_SCOPE.csv` and
+`tools/check_oracle_scope.py`. The inventory classifies standing implementation and
+tool modules as O1 independent kernels, O2 capability-bounded integration harness,
+O3 maintenance-only mirrors, or O4 vector/specification/research provenance. These
+classes are current policy metadata, not public API promises: O3 does not imply
+deletion, O4 artifacts may remain for provenance, and no class authorizes silent
+feature expansion or reclassification. CX-019+ implementation tasks must make their
+Python-oracle scope explicit.
+
 ## Playable tactical slice and Milestone 0.2 release shell
 
 Ordinary project play opens the Milestone demo menu; packaged `BUILD.json`

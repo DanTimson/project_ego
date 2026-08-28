@@ -39,6 +39,7 @@ priority.
 | CX-016 | `SPEC_IMPLEMENTATION` | profile-qualified Genesis death replacement | engine | `DONE` | CX-015; DELIB-0007 accepted; AD-4 architecture resolved; RS-1/NH replacement and custom tier maps excluded |
 | CX-017 | `ARCHITECTURE_IMPLEMENTATION` | semantic modifier binding boundary v1 | engine/content | `DONE` | accepted legacy-boundary inventory/review; migrates only 0x12/0x26/0x13 query authority |
 | CX-018 | `CORRECTNESS_HARDENING` | Scenario/fatal-event failure containment | engine/rules | `DONE` | APA-005A/B confirmed by architecture audit and independent review |
+| CX-019 | `GOVERNANCE_HARDENING` | Python oracle O1-O4 inventory and scope guard | governance/tooling | `DONE` | DELIB-0008 operational follow-up |
 
 Task contracts live in `docs/codex/tasks/`.
 
@@ -51,6 +52,10 @@ CX-005 remains `BLOCKED` in this reconciliation. Its declared dependencies are
 now reviewed, but activating it also requires changing its own task-local state;
 `docs/codex/tasks/CX-005.md` is deliberately outside this patch's allowed paths.
 CX-006 and CX-007 therefore remain blocked as well.
+
+CX-019 has returned its inventory, validator, tests, and governance wiring for
+independent review. `REVIEW` does not imply acceptance or make an O1–O4
+classification permanent.
 
 ## Engine-directed Codex work
 

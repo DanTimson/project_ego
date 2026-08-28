@@ -181,6 +181,7 @@ required by the task contract. The common portable gate set is:
 python3 tools/run_godot_tests.py
 python3 -m pytest -q
 python3 oracle/test_fixtures_current.py
+python3 tools/check_oracle_scope.py
 python3 tools/check_deliberations.py
 python3 oracle/test_repository_hygiene.py
 git diff --check

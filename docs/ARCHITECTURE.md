@@ -65,14 +65,20 @@ Original game data and assets are not repository content.
 
 ### `oracle/`
 
-The Python reference implementation:
+The Python oracle is a permanent **selective** compatibility/reference layer, not a
+second complete production runtime. `docs/ORACLE_SCOPE.csv` records current O1–O4
+policy metadata for every standing implementation/tool module:
 
-- favors clarity and instrumentation over presentation concerns;
-- keeps rules executable before the GDScript port is complete;
-- produces fixtures and traces;
-- preserves known legacy arithmetic and random-call ordering.
+- O1 keeps independently grounded reference kernels;
+- O2 keeps a curated, capability-bounded scenario/log integration harness;
+- O3 keeps existing mirrors in maintenance-only status without implying deletion;
+- O4 keeps vector, specification, research, and provenance utilities without a
+  standing parity obligation.
 
-The oracle is permanent. It is not a temporary migration script.
+The inventory is not a public API or permanent module entitlement. No class permits
+feature expansion by default: a CX-019+ implementation contract must declare its
+Python-oracle scope, and reclassification requires deliberate review rather than
+silent drift. GDScript remains the only complete production runtime by default.
 
 ### `core/`
 

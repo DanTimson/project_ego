@@ -57,7 +57,9 @@ Every delegated task must name:
 - whether executable behaviour may change;
 - acceptance commands and expected properties;
 - escalation/stop conditions;
-- required handoff summary.
+- required handoff summary;
+- exactly one CX-019+ `PYTHON_ORACLE:` declaration following DELIB-0008 and
+  `docs/ORACLE_SCOPE.csv`.
 
 The reusable template is `docs/codex/TASK_TEMPLATE.md`. The `docs/codex/`
 namespace is retained for continuity even when Prime Agent or another executor
@@ -98,6 +100,7 @@ The common portable validation set is:
 python3 tools/run_godot_tests.py
 python3 -m pytest -q
 python3 oracle/test_fixtures_current.py
+python3 tools/check_oracle_scope.py
 python3 tools/check_deliberations.py
 python3 oracle/test_repository_hygiene.py
 git diff --check
@@ -178,3 +181,15 @@ Use human review for:
 - whether a disputed change is truly non-semantic;
 - contested architecture or profile policy;
 - entry into the public-lineage gate.
+
+## Oracle-scope validator review boundary
+
+`tools/check_oracle_scope.py` is a mechanical path/scope guard. A passing result does
+not prove that an `EXISTING_HARNESS_ONLY` change remains semantically inside the
+existing O2 capability envelope, nor that `REQUIRED` work satisfies its claimed
+independence/retention criterion. Review remains authoritative for those judgments
+under DELIB-0008.
+
+Under `EXISTING_HARNESS_ONLY`, the oracle inventory is frozen relative to the task's
+frozen base; reclassification requires `REQUIRED` or a dedicated
+governance/reclassification task.
