@@ -24,6 +24,8 @@ all current-side activations.
 
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -60,8 +62,8 @@ def effective_speed(u: Combatant) -> tuple[int, Trace]:
 
     ONE BEHAVIOURAL CHANGE: the previous implementation exempted «Неутомимый»
     from the penalty, reasoning that such a unit never loses stamina. the recovered effective-speed rule
-    contains no modifier `0x12` check, and stamina can also be set directly by an
-    effect, so the exemption is removed. Modifier `0x12` suppresses stamina
+    contains no stamina-suppression semantic check, and stamina can also be set directly by an
+    effect, so the exemption is removed. The stamina-suppression semantic suppresses stamina
     DEDUCTIONS (R8, and open question 8), not the speed penalty.
     """
     t = Trace(f"{u.name}.speed")
@@ -217,14 +219,14 @@ def can_move(u: Combatant, tiles: int = 1) -> Refusal:
     return Refusal.OK
 
 
-def _modifier_0x12_suppresses(
+def _stamina_mutation_suppressed(
         u: Combatant, resolved_effective_modifier: bool = False) -> bool:
-    return (resolved_effective_modifier or u.has_modifier_id(0x12)
+    return (resolved_effective_modifier or u.has_modifier_semantic(semantic.Query.STAMINA_MUTATION_SUPPRESSED)
             or u.has_flag("Неутомимый"))
 
 
 def spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0,
-               modifier_0x12_effective: bool = False) -> Trace:
+               semantic_suppression_effective: bool = False) -> Trace:
     """Move `tiles` steps. `stamina_cost` is the terrain drain the caller has
     already resolved from bf_object (hills and swamp cost 1 unless the unit has
     the matching Знание; flyers pay nothing).
@@ -246,8 +248,8 @@ def spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0,
     extra = tiles if effective_speed(u)[0] <= 0 else 0
     total_stamina = stamina_cost + extra
     if total_stamina:
-        if _modifier_0x12_suppresses(u, modifier_0x12_effective):
-            t.step("modifier 0x12 stamina mutation suppression",
+        if _stamina_mutation_suppressed(u, semantic_suppression_effective):
+            t.step("stamina.mutation_suppressed",
                    u.stamina, u.stamina,
                    "movement requested stamina cost %d" % total_stamina)
         else:
@@ -281,7 +283,7 @@ def attack_stamina_cost(u: Combatant) -> int:
 
 
 def _spend_attack(u: Combatant, *, ranged_executor: bool,
-                  modifier_0x12_effective: bool = False) -> Trace:
+                  semantic_suppression_effective: bool = False) -> Trace:
     label = "ranged_attack_cost" if ranged_executor else "attack_cost"
     t = Trace(f"{u.name}.{label}")
     speed = effective_speed(u)[0]
@@ -292,8 +294,8 @@ def _spend_attack(u: Combatant, *, ranged_executor: bool,
            "effective speed %d; strict capacity < speed is %s; "
            "selected base cost %d"
            % (speed, str(capacity < speed).lower(), cost))
-    if _modifier_0x12_suppresses(u, modifier_0x12_effective):
-        t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+    if _stamina_mutation_suppressed(u, semantic_suppression_effective):
+        t.step("stamina.mutation_suppressed", t.base, t.base,
                "requested attack stamina cost %d" % cost)
     else:
         u.stamina = max(0, u.stamina - cost)
@@ -306,8 +308,8 @@ def _spend_attack(u: Combatant, *, ranged_executor: bool,
         t.step("ranged activation capacity clear", before_capacity, 0,
                "ranged executor ends activation")
     if (u.stamina <= 0
-            and not _modifier_0x12_suppresses(
-                u, modifier_0x12_effective)):
+            and not _stamina_mutation_suppressed(
+                u, semantic_suppression_effective)):
         u.forced_rest = True
         t.step("exhausted", u.stamina, u.stamina, "forced Rest next round")
     t.result = u.stamina
@@ -315,18 +317,18 @@ def _spend_attack(u: Combatant, *, ranged_executor: bool,
 
 
 def spend_attack(u: Combatant,
-                 modifier_0x12_effective: bool = False) -> Trace:
+                 semantic_suppression_effective: bool = False) -> Trace:
     """Existing non-ranged callers retain their executor boundary."""
     return _spend_attack(
         u, ranged_executor=False,
-        modifier_0x12_effective=modifier_0x12_effective)
+        semantic_suppression_effective=semantic_suppression_effective)
 
 
 def spend_ranged_attack(u: Combatant,
-                        modifier_0x12_effective: bool = False) -> Trace:
+                        semantic_suppression_effective: bool = False) -> Trace:
     return _spend_attack(
         u, ranged_executor=True,
-        modifier_0x12_effective=modifier_0x12_effective)
+        semantic_suppression_effective=semantic_suppression_effective)
 
 
 def rest(u: Combatant) -> Trace:

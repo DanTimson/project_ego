@@ -55,7 +55,8 @@ func _test_effective_offensive_disable_and_live_exhaustion() -> void:
 	var disabled_status := Status.new()
 	disabled_status.id = &"numeric-0x26"
 	disabled_status.modifiers.append(Modifier.make(
-		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET))
+		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET,
+		0, {}, "", [ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED]))
 	status_disabled.statuses.append(disabled_status)
 	_check(not status_disabled.has_flag(&"Не сражается")
 			and Counterattack.why_no_counter(status_disabled, attacker,
@@ -64,7 +65,8 @@ func _test_effective_offensive_disable_and_live_exhaustion() -> void:
 
 	var aura_disabled := _unit({"name": "aura-disabled", "life": 50})
 	var aura_modifier := Modifier.make(
-		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET)
+		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET,
+		0, {}, "", [ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED])
 	Damage.bind_environment(func(candidate: Combatant) -> Array:
 		return [aura_modifier] if candidate == aura_disabled else [])
 	_check(Counterattack.why_no_counter(aura_disabled, attacker,
@@ -95,7 +97,8 @@ func _test_effective_offensive_disable_and_live_exhaustion() -> void:
 		var defender := _unit({"name": case["label"], "stamina": 0})
 		if bool(case["numeric"]):
 			defender.modifiers.append(Modifier.make(
-				0x12, &"modifier_0x12", Modifier.Hook.STAMINA))
+				0x12, &"modifier_0x12", Modifier.Hook.STAMINA,
+				0, {}, "", [ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED]))
 		if bool(case["flag"]):
 			defender.set_flag(&"Неутомимый")
 		_check(Counterattack.why_no_counter(defender, attacker,

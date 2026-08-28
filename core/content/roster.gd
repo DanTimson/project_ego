@@ -304,7 +304,8 @@ func _resolve_one(ref: int, upgrade_name: String, opcode_v: Variant,
 	if source == "":
 		source = ability_name if ability_name != "" else "opcode %d" % opcode
 	built.unit.modifiers.append(Modifier.make(
-		opcode, handler, hook, power, resolved[1], source))
+		opcode, handler, hook, power, resolved[1], source,
+		db.resolve_semantics(opcode)))
 	built.resolved.append([opcode, source])
 
 

@@ -249,16 +249,18 @@ def test_shield_bash_is_a_gated_stamina_delta_only() -> None:
 
     immune_target = _fighter("target", [2, 1], stamina=7, modifiers=[{
         "ability": 0x12, "handler": "grant_flag", "power": 1,
+        "semantics": ["stamina.mutation_suppressed"],
         "params": {"flag": "test-0x12"}}])
     immune, immune_result = _run_action(
         "shield_bash", magnitude=4, target=immune_target)
     assert immune.units["target"].stamina == 7
-    assert any("modifier 0x12 stamina mutation suppression" in line
+    assert any("stamina.mutation_suppressed" in line
                for line in immune_result["log"])
 
     aura_provider = {"auras": [{
         "id": "effective-0x12", "scope": "ADJACENT", "affects": "ENEMY",
         "modifiers": [{"ability": 0x12, "handler": "grant_flag", "power": 1,
+                       "semantics": ["stamina.mutation_suppressed"],
                        "params": {"flag": "aura-0x12"}}],
     }]}
     aura_immune, _ = _run_action(
@@ -272,13 +274,14 @@ def test_shield_bash_is_a_gated_stamina_delta_only() -> None:
     raw.modifiers.append(Modifier(0x12, "grant_flag", Hook.STAT_PASSIVE,
                                   power=1, params={"flag": "raw-0x12"}))
     combat.apply_tactical_stamina_drain(
-        raw, -2, modifier_0x12_effective=False)
+        raw, -2, semantic_suppression_effective=False)
     assert raw.stamina == 5
     with pytest.raises(ValueError, match="supports drains only"):
         combat.apply_tactical_stamina_drain(raw, 1)
 
     immune_actor = _fighter("actor", [1, 1], modifiers=[{
         "ability": 0x12, "handler": "grant_flag", "power": 1,
+        "semantics": ["stamina.mutation_suppressed"],
         "params": {"flag": "test-0x12"}}])
     actor_immune, _ = _run_action(
         "shield_bash", magnitude=4, actor=immune_actor)

@@ -10,6 +10,8 @@ Run: python3 test_combat.py [trials]
 
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 import os
 
 import collections
@@ -187,7 +189,8 @@ def test_modifier_0x26_entry_paths() -> None:
     u = Combatant(attack=7, counter_attack=7, ranged_attack=7, morale=10)
     u.modifiers.append(Modifier(
         ability=0x26, handler="modifier_0x26", hook=Hook.DAMAGE_VS_TARGET,
-        source="0x26"))
+        source="0x26",
+        semantics=(semantic.Query.MELEE_EXCHANGE_SUPPRESSED,)))
     melee, _ = current_attack(u, AttackKind.MELEE)
     counter, _ = current_attack(u, AttackKind.COUNTER)
     ranged, _ = current_attack(u, AttackKind.RANGED)
@@ -238,7 +241,8 @@ def test_modifier_0x12_stats_remain_live() -> None:
                   life_base=20, life=20, morale=10)
     u.modifiers.append(Modifier(
         ability=0x12, handler="modifier_0x12", hook=Hook.STAMINA,
-        source="0x12"))
+        source="0x12",
+        semantics=(semantic.Query.STAMINA_MUTATION_SUPPRESSED,)))
     attack, _ = current_attack(u, AttackKind.MELEE)
     ordinary, _ = current_defence(u, AttackKind.MELEE)
     ranged, _ = current_defence(u, AttackKind.RANGED)

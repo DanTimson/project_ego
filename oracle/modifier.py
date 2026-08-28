@@ -26,10 +26,12 @@ one.
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 from enum import IntEnum
 
 from combat import Trace
+import modifier_semantic as semantic
 
 
 class Hook(IntEnum):
@@ -85,6 +87,34 @@ class Modifier:
     params: dict = field(default_factory=dict)
     source: str = ""
     duration: int = -1          # -1 = permanent
+    semantics: tuple[semantic.Query, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "params", copy.deepcopy(self.params or {}))
+        object.__setattr__(self, "semantics", semantic.normalize(self.semantics))
+
+    def has_semantic(self, query: semantic.Query) -> bool:
+        return query in self.semantics
+
+    def copy(self) -> "Modifier":
+        return Modifier(
+            ability=self.ability, handler=self.handler, hook=self.hook,
+            power=self.power, params=copy.deepcopy(self.params), source=self.source,
+            duration=self.duration, outside_multipliers=self.outside_multipliers,
+            semantics=self.semantics)
+
+    def to_dict(self) -> dict:
+        out = {
+            "ability": self.ability,
+            "handler": self.handler,
+            "hook": self.hook.name,
+            "power": self.power,
+            "params": copy.deepcopy(self.params),
+            "source": self.source,
+        }
+        if self.semantics:
+            out["semantics"] = semantic.names(self.semantics)
+        return out
 
     ## Already-applicable conditional attack contributions marked here resolve
     ## after effective-stat multipliers. Modifier 0x3D placement is frozen by
@@ -152,7 +182,22 @@ class Pipeline:
 
 
 def from_binding(opcode: int, handler: str, params: dict, power: int,
-                 hook: Hook, source: str = "") -> Modifier:
-    """Build a Modifier from what ContentDb.resolve() returns."""
+                 hook: Hook, source: str = "", semantics=()) -> Modifier:
+    """Build a Modifier from independently resolved binding dimensions."""
     return Modifier(ability=opcode, handler=handler, hook=hook, power=power,
-                    params=dict(params or {}), source=source)
+                    params=dict(params or {}), source=source,
+                    semantics=semantics)
+
+
+def from_dict(specification: dict, *, default_power: int = 0,
+              default_source: str = "") -> Modifier:
+    """Strict normalized/synthetic construction from serialized scenario data."""
+    return Modifier(
+        ability=int(specification.get("ability", 0)),
+        handler=str(specification.get("handler", "")),
+        hook=Hook[specification.get("hook", "STAT_PASSIVE")],
+        power=int(specification.get("power", default_power)),
+        params=dict(specification.get("params", {})),
+        source=str(specification.get("source", default_source)),
+        semantics=specification.get("semantics", ()),
+    )

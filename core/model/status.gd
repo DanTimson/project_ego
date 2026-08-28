@@ -81,13 +81,10 @@ static func from_dict(specification: Dictionary) -> Status:
 	for tag in specification.get("tags", []):
 		status.tags.append(StringName(String(tag)))
 	for modifier_spec in specification.get("modifiers", []):
-		status.modifiers.append(Modifier.make(
-			int(modifier_spec.get("ability", 0)),
-			StringName(String(modifier_spec["handler"])),
-			Modifier.Hook[String(modifier_spec.get("hook", "STAT_PASSIVE"))],
-			int(modifier_spec.get("power", 0)),
-			modifier_spec.get("params", {}).duplicate(true),
-			String(modifier_spec.get("source", status.name))))
+		var modifier := Modifier.from_dict(modifier_spec, 0, status.name)
+		if modifier == null:
+			return null
+		status.modifiers.append(modifier)
 	return status
 
 
@@ -154,14 +151,17 @@ func _serialized_restrictions() -> Array:
 func to_dict() -> Dictionary:
 	var serialized_modifiers: Array = []
 	for modifier in modifiers:
-		serialized_modifiers.append({
+		var serialized := {
 			"ability": modifier.ability,
 			"handler": String(modifier.handler),
 			"hook": _enum_name(Modifier.Hook, modifier.hook),
 			"power": modifier.power,
 			"params": modifier.params.duplicate(true),
 			"source": modifier.source,
-		})
+		}
+		if not modifier.semantics.is_empty():
+			serialized["semantics"] = modifier.semantic_names()
+		serialized_modifiers.append(serialized)
 	var serialized_tags: Array[String] = []
 	for tag in tags:
 		serialized_tags.append(String(tag))
@@ -185,11 +185,7 @@ func to_dict() -> Dictionary:
 
 
 static func _copy_modifier(modifier: Modifier) -> Modifier:
-	var out := Modifier.make(modifier.ability, modifier.handler, modifier.hook,
-		modifier.power, modifier.params.duplicate(true), modifier.source)
-	out.duration = modifier.duration
-	out.outside_multipliers = modifier.outside_multipliers
-	return out
+	return modifier.copy()
 
 
 static func _enum_name(values: Dictionary, value: int) -> String:

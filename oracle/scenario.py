@@ -31,6 +31,8 @@ Command set, deliberately small:
 
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 import copy
 import json
 import re
@@ -51,7 +53,7 @@ import content_actions
 import action_execution
 import turn
 from battlefield import Battlefield
-from modifier import Hook, Modifier, Pipeline
+from modifier import Hook, Modifier, Pipeline, from_dict as modifier_from_dict
 from combat import AttackKind, Combatant, Rng
 
 
@@ -93,7 +95,7 @@ _ORDERING_TRACE_SOURCES = {
     "live-capacity stamina discriminator",
     "attack stamina mutation",
     "tactical stamina mutation",
-    "modifier 0x12 stamina mutation suppression",
+    "stamina.mutation_suppressed",
     "ranged activation capacity clear",
 }
 
@@ -451,12 +453,8 @@ class Scenario:
                 unit.content_id = str(u.get(_RESOLVED_CONTENT_ID, ""))
                 unit.flags = set(u.get("flags", []))
                 for m in u.get("modifiers", []) or []:
-                    unit.modifiers.append(Modifier(
-                        ability=int(m.get("ability", 0)), handler=m["handler"],
-                        hook=getattr(Hook, m.get("hook", "STAT_PASSIVE")),
-                        power=int(m.get("power", 0)),
-                        params=m.get("params", {}),
-                        source=m.get("source", m["handler"])))
+                    unit.modifiers.append(modifier_from_dict(
+                        m, default_source=str(m.get("handler", ""))))
                 for status_spec in u.get("statuses", []) or []:
                     st.apply(unit, self._build_status(status_spec))
                 unit.subtypes = set(u.get("subtypes", []))
@@ -507,14 +505,8 @@ class Scenario:
             tags=tuple(specification.get("tags", [])),
         )
         for modifier_spec in specification.get("modifiers", []):
-            status.modifiers.append(Modifier(
-                ability=int(modifier_spec.get("ability", 0)),
-                handler=modifier_spec["handler"],
-                hook=getattr(Hook, modifier_spec.get("hook", "STAT_PASSIVE")),
-                power=int(modifier_spec.get("power", 0)),
-                params=copy.deepcopy(modifier_spec.get("params", {})),
-                source=modifier_spec.get("source", status.name),
-            ))
+            status.modifiers.append(modifier_from_dict(
+                modifier_spec, default_source=status.name))
         return status
 
     def _build_auras(self, specs: list) -> dict:
@@ -538,13 +530,9 @@ class Scenario:
                         except_subtypes=tuple(a.get("except_subtypes", [])),
                         source=unit)
                     for m in a.get("modifiers", []):
-                        aura.modifiers.append(Modifier(
-                            ability=int(m.get("ability", 0)),
-                            handler=m["handler"],
-                            hook=getattr(Hook, m.get("hook", "STAT_PASSIVE")),
-                            power=int(m.get("power", a.get("power", 0))),
-                            params=m.get("params", {}),
-                            source=aura.name))
+                        aura.modifiers.append(modifier_from_dict(
+                            m, default_power=int(a.get("power", 0)),
+                            default_source=aura.name))
                     built.append(aura)
                 out[unit] = built
         return out
@@ -631,7 +619,7 @@ class Scenario:
         self.field.place(unit, goal)
         move_trace = turn.spend_move(
             unit, cost, stamina_cost=stam,
-            modifier_0x12_effective=combat.has_effective_modifier(unit, 0x12))
+            semantic_suppression_effective=combat.has_effective_modifier_semantic(unit, semantic.Query.STAMINA_MUTATION_SUPPRESSED))
         self._emit_ordering_traces([move_trace])
         self.emit("%s moves to %s (%d steps, %d total this round)"
                   % (unit.label(), self._at(unit), len(path), unit.steps_this_round))
@@ -664,7 +652,7 @@ class Scenario:
         self.field.place(unit, dest)
         move_trace = turn.spend_move(
             unit, cost, stamina_cost=stam,
-            modifier_0x12_effective=combat.has_effective_modifier(unit, 0x12))
+            semantic_suppression_effective=combat.has_effective_modifier_semantic(unit, semantic.Query.STAMINA_MUTATION_SUPPRESSED))
         self._emit_ordering_traces([move_trace])
         self.emit("%s closes to %s (%d steps)" % (unit.label(), self._at(unit), len(path)))
         return True
@@ -708,15 +696,15 @@ class Scenario:
             ca.bind_death_resolver(None)
         cost_trace = None
         if spend_attack_cost:
-            modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
+            stamina_suppressed = combat.has_effective_modifier_semantic(unit, semantic.Query.STAMINA_MUTATION_SUPPRESSED)
             if kind is AttackKind.RANGED:
                 cost_trace = turn.spend_ranged_attack(
-                    unit, modifier_0x12_effective=modifier_0x12)
+                    unit, semantic_suppression_effective=stamina_suppressed)
             else:
                 # R8 is not generalized here: non-ranged callers retain their
                 # established cost boundary; only ranged clears live capacity.
                 cost_trace = turn.spend_attack(
-                    unit, modifier_0x12_effective=modifier_0x12)
+                    unit, semantic_suppression_effective=stamina_suppressed)
         self._emit_ordering_traces(ex.traces)
         self._emit_ordering_traces([cost_trace])
 
@@ -900,7 +888,7 @@ class Scenario:
                   % operation.amount)
         trace = combat.apply_tactical_stamina_drain(
             target, operation.amount,
-            combat.has_effective_modifier(target, 0x12))
+            combat.has_effective_modifier_semantic(target, semantic.Query.STAMINA_MUTATION_SUPPRESSED))
         self._emit_ordering_traces([trace])
         self.emit("  [action] resource result %s stamina %d -> %d" % (
             target.label(), before, target.stamina))
@@ -940,8 +928,8 @@ class Scenario:
                       % (unit.label(), action.id, restriction))
             return
 
-        modifier_0x12 = combat.has_effective_modifier(unit, 0x12)
-        refusal = action.availability(unit, modifier_0x12)
+        stamina_suppressed = combat.has_effective_modifier_semantic(unit, semantic.Query.STAMINA_MUTATION_SUPPRESSED)
+        refusal = action.availability(unit, stamina_suppressed)
         if refusal is not actionsmod.Refusal.OK:
             self.emit("%s cannot use %s: %s"
                       % (unit.label(), action.id, refusal.value))
@@ -958,7 +946,7 @@ class Scenario:
         self.emit("%s requests action %s" % (unit.label(), action.id))
         self.emit("  [action] %s resolved plan [%s]" % (
             action.id, ", ".join(operation.kind for operation in plan.operations)))
-        action_cost_trace = action.pay(unit, modifier_0x12)
+        action_cost_trace = action.pay(unit, stamina_suppressed)
         self._emit_ordering_traces([action_cost_trace])
         self.emit("  [action] %s payment stamina %d -> %d; spent %s" % (
             action.id, before_stamina, unit.stamina,

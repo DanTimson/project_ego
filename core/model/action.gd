@@ -124,9 +124,9 @@ func resolved_consumes_action(actor: Combatant) -> bool:
 ## Decidable from the actor alone. Target legality belongs to the battle layer,
 ## which knows what is adjacent and what is dead.
 func availability(actor: Combatant,
-		modifier_0x12_effective: bool = false) -> Refusal:
-	var stamina_suppressed := (modifier_0x12_effective
-		or actor.has_modifier_id(0x12) or actor.has_flag(&"Неутомимый"))
+		semantic_suppression_effective: bool = false) -> Refusal:
+	var stamina_suppressed := (semantic_suppression_effective
+		or actor.has_modifier_semantic(ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED) or actor.has_flag(&"Неутомимый"))
 	if actor.action_spent and resolved_consumes_action(actor):
 		return Refusal.ACTION_SPENT
 	# At 0 stamina the unit is forced to Rest — «в свой следующий ход
@@ -142,19 +142,19 @@ func availability(actor: Combatant,
 
 
 func is_available(actor: Combatant,
-		modifier_0x12_effective: bool = false) -> bool:
-	return availability(actor, modifier_0x12_effective) == Refusal.OK
+		semantic_suppression_effective: bool = false) -> bool:
+	return availability(actor, semantic_suppression_effective) == Refusal.OK
 
 
 func pay(actor: Combatant,
-		modifier_0x12_effective: bool = false) -> Trace:
+		semantic_suppression_effective: bool = false) -> Trace:
 	var t := Trace.new("%s.action_stamina_cost" % actor.name)
-	var stamina_suppressed := (modifier_0x12_effective
-		or actor.has_modifier_id(0x12) or actor.has_flag(&"Неутомимый"))
+	var stamina_suppressed := (semantic_suppression_effective
+		or actor.has_modifier_semantic(ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED) or actor.has_flag(&"Неутомимый"))
 	var requested := resolved_stamina()
 	t.base = float(actor.stamina)
 	if requested > 0 and stamina_suppressed:
-		t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+		t.step("stamina.mutation_suppressed", t.base, t.base,
 			"requested action stamina cost %d" % requested)
 	elif requested > 0:
 		actor.stamina = maxi(0, actor.stamina - requested)

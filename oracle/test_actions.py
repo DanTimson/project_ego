@@ -10,6 +10,8 @@ Run: python3 test_actions.py
 
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 import os
 
 import sys
@@ -165,10 +167,11 @@ def test_modifier_0x12_action_payment() -> None:
     u = actor(stamina=4)
     u.modifiers.append(Modifier(
         ability=0x12, handler="modifier_0x12", hook=Hook.STAMINA,
-        source="0x12"))
+        source="0x12",
+        semantics=(semantic.Query.STAMINA_MUTATION_SUPPRESSED,)))
     trace = REFERENCE_CATALOGUE["forced_march"].pay(u)
     check(u.stamina == 4, "action-definition stamina cost is suppressed")
-    check(any(step[0] == "modifier 0x12 stamina mutation suppression"
+    check(any(step[0] == "stamina.mutation_suppressed"
               for step in trace.steps), "action suppression is trace-visible")
 
 

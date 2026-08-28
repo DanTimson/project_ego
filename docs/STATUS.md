@@ -5,10 +5,10 @@ This is a coverage map, not a release claim.
 | subsystem | evidence | Python oracle | GDScript core | parity status |
 |---|---|---|---|---|
 | attack randomisation and chip damage | published tables + binary | implemented with native stream model | native + `LegacyRng` vector-tested | exact CRT generator and adapters implemented in isolation; end-to-end legacy call ordering pending |
-| stamina and wound multipliers | published tables + binary; R11 complete `0x12` consumer audit | implemented | implemented | low-stamina penalties recovered; implemented tactical stamina mutation sites locally suppress writes under effective modifier `0x12` |
+| stamina and wound multipliers | published tables + binary; R11 complete source-consumer audit | implemented | implemented | low-stamina penalties remain live; CX-017 routes stamina-write suppression through `stamina.mutation_suppressed` across unit/status/environment providers |
 | effective ordinary/ranged defence | Genesis binary `004D0820`/`004D06B0` | implemented | implemented | R9 fixture-covered: all providers precede exact-zero-stamina trunc0 halving and final floor-zero clamp; provider sets remain distinct |
 | morale attack multiplier | Genesis binary + independent NH table | implemented + binary fixture | implemented | full curve and signed rounding recovered; R6 early-provider cutoff and distinct melee/counter minimum handling are fixture-covered |
-| modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | R10 numeric placement is fixture-covered after effective-stat/selected 1.5× processing and before randomisation/defence; target applicability and wider provider coverage remain incomplete |
+| modifier pipeline | docs, data, binary providers | implemented in part | implemented in part | CX-017 tranche 1 adds pack-qualified validated semantic identities and migrates stamina-write, melee-exchange and morale-underflow queries; other raw modifier consumers, target applicability and wider provider coverage remain incomplete |
 | activated actions | public/data families + selective binary edges | typed built-in plus bounded declarative pack plans | typed built-in plus bounded declarative pack plans | source ID → canonical `Action` → validated recipe → fresh immutable ordered plan → shared primitive is implemented; pack-namespaced v1 recipes may compose only melee `AttackOp` and drain-only stamina `ResourceDeltaOp`; the other twelve reference actions and generic battle effects remain unsupported |
 | runtime statuses | public/project stable policy + unresolved binary lifecycle | stable container, stacking/resistance, explicit manipulation and typed capability restrictions implemented | first-class `Status` model integrated through `Combatant`, later modifier providers, scenarios and capability-owning commands | stable container plus CX-015 typed capability parity coverage implemented; generic action prevention removed; automatic duration tick/expiry and `UNTIL_NEXT_TURN` clock remain open pending R13 |
 | tactical capability restrictions | DELIB-0006 project architecture | query-on-demand movement/melee/ranged/casting/activated-action authority; existing command surfaces integrated | matching typed authority; manual query/execution and direct command surfaces integrated | CX-015 implementation awaiting review; casting is query-only because no production casting command exists; no raw legacy restriction IDs are bound |
@@ -277,3 +277,15 @@ its logical UI geometry to the OS scale setting.
 accepted implementation findings remain separate future engine work; its held
 architecture, profile and provenance items remain unresolved. This governance
 post-0.2 remediation and the CX-014+ resume gate are closed; engine work still requires an explicit frozen task contract and this does not authorize G1+.
+
+
+## CX-017 semantic modifier boundary (tranche 1)
+
+CX-017 is implemented and awaiting independent complete-diff review. Binding
+metadata now translates three Genesis compatibility source opcodes into closed
+EGO semantic identities, while arbitrary packs and raw-only synthetic modifiers
+gain no meaning from numeric coincidence. Python/GDScript coverage includes
+binding validation, normalization, copy/serialization, all provider layers and
+negative controls. This does not complete the accepted standalone migration:
+death markers, charge, ranged modifiers, localized strings and modifier 7 remain
+outside this tranche.

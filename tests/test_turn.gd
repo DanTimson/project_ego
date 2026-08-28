@@ -217,7 +217,8 @@ func _init() -> void:
 	print("\n[R11] numeric modifier 0x12 suppresses local stamina mutations")
 	var immune := _unit({"stamina": 3, "stamina_base": 10, "speed": 3})
 	immune.modifiers.append(Modifier.make(
-		0x12, &"modifier_0x12", Modifier.Hook.STAMINA, 0, {}, "0x12"))
+		0x12, &"modifier_0x12", Modifier.Hook.STAMINA, 0, {}, "0x12",
+		[ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED]))
 	immune.movement_remaining = 3
 	var move_trace := ActionPoints.spend_move(immune, 1, 2)
 	_check(immune.stamina == 3, "movement stamina mutation is suppressed")
@@ -227,7 +228,7 @@ func _init() -> void:
 	var suppressed := false
 	for trace in [move_trace, ranged_trace]:
 		for step in (trace as Trace).steps:
-			if String(step["source"]) == "modifier 0x12 stamina mutation suppression":
+			if String(step["source"]) == "stamina.mutation_suppressed":
 				suppressed = true
 	_check(suppressed, "modifier 0x12 suppression is trace-visible")
 

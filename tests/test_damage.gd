@@ -119,7 +119,8 @@ func _init() -> void:
 	disabled.ranged_attack = 7
 	disabled.morale = 10
 	disabled.modifiers.append(Modifier.make(
-		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET, 0, {}, "0x26"))
+		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET, 0, {}, "0x26",
+		[ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED]))
 	_check(int(Damage.current_attack(disabled, Combatant.AttackKind.MELEE)[0]) == 0
 			and int(Damage.current_attack(disabled, Combatant.AttackKind.COUNTER)[0]) == 0
 			and int(Damage.current_attack(disabled, Combatant.AttackKind.RANGED)[0]) == 7,
@@ -154,7 +155,8 @@ func _init() -> void:
 	immune.stamina = 0
 	immune.morale = 10
 	immune.modifiers.append(Modifier.make(
-		0x12, &"modifier_0x12", Modifier.Hook.STAMINA, 0, {}, "0x12"))
+		0x12, &"modifier_0x12", Modifier.Hook.STAMINA, 0, {}, "0x12",
+		[ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED]))
 	_check(int(Damage.current_attack(immune, Combatant.AttackKind.MELEE)[0]) == 8
 			and int(Damage.current_defence(immune, Combatant.AttackKind.MELEE)[0]) == 3
 			and int(Damage.current_defence(immune, Combatant.AttackKind.RANGED)[0]) == 3,

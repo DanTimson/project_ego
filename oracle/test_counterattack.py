@@ -11,6 +11,8 @@ Run: python3 test_counterattack.py
 
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 import os
 
 import sys
@@ -95,7 +97,8 @@ def test_effective_offensive_disable_and_live_exhaustion() -> None:
     status_disabled.statuses = [statuses.StatusEffect(
         id="numeric-0x26",
         modifiers=[Modifier(ability=0x26, handler="modifier_0x26",
-                            hook=Hook.DAMAGE_VS_TARGET)])]
+                            hook=Hook.DAMAGE_VS_TARGET,
+                            semantics=(semantic.Query.MELEE_EXCHANGE_SUPPRESSED,))])]
     check(not status_disabled.has_flag("Не сражается")
           and ca.why_no_counter(status_disabled, attacker, AttackKind.MELEE)
           is NoCounter.CANNOT_FIGHT,
@@ -103,7 +106,8 @@ def test_effective_offensive_disable_and_live_exhaustion() -> None:
 
     aura_disabled = unit("aura-disabled", life=50)
     aura_modifier = Modifier(ability=0x26, handler="modifier_0x26",
-                             hook=Hook.DAMAGE_VS_TARGET)
+                             hook=Hook.DAMAGE_VS_TARGET,
+                             semantics=(semantic.Query.MELEE_EXCHANGE_SUPPRESSED,))
     combat.bind_environment(
         lambda candidate: [aura_modifier] if candidate is aura_disabled else [])
     try:

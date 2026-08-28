@@ -208,6 +208,17 @@ func has_modifier_id(ability: int) -> bool:
 				return true
 	return false
 
+func has_modifier_semantic(query: ModifierSemantic.Query) -> bool:
+	for m in modifiers:
+		if (m as Modifier).has_semantic(query):
+			return true
+	for effect in statuses:
+		for m in effect.modifiers:
+			if (m as Modifier).has_semantic(query):
+				return true
+	return false
+
+
 
 ## Every flag from every source. For display and for the AI.
 func all_flags() -> Array:

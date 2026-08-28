@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 import battlefield as bfmod
 import combat
 import death_lifecycle as death
@@ -65,7 +67,8 @@ def test_death_morale_precedes_revival_and_immunity():
     immune = Combatant(name="immune", instance_id="immune", life=10,
                        life_base=10, morale=5,
                        modifiers=[Modifier(ability=0x13, handler="add_flat",
-                                           hook=Hook.STAT_PASSIVE)])
+                                           hook=Hook.STAT_PASSIVE,
+                                           semantics=(semantic.Query.MORALE_UNDERFLOW_SUPPRESSED,))])
     sides[0].units.append(immune)
     field.place(immune, bfmod.offset_to_axial(2, 1))
     broken = Combatant(name="broken", instance_id="broken", life=10,

@@ -26,6 +26,8 @@ import math
 from dataclasses import dataclass, field
 from enum import Enum
 
+import modifier_semantic as modifier_semantic
+
 
 # ---------------------------------------------------------------------------
 # Deterministic RNG with named streams.
@@ -310,14 +312,17 @@ class Combatant:
         return False
 
     def has_modifier_id(self, ability: int) -> bool:
-        """Numeric modifier membership from the unit and active statuses.
-
-        Environment providers remain battle-contextual and are added by
-        ``has_effective_modifier`` at the combat seam.
-        """
+        """Transitional numeric membership for not-yet-migrated mechanics."""
         if any(m.ability == ability for m in self.modifiers):
             return True
         return any(m.ability == ability
+                   for effect in self.statuses for m in effect.modifiers)
+
+    def has_modifier_semantic(self, query: modifier_semantic.Query) -> bool:
+        """Semantic membership from innate modifiers and active statuses."""
+        if any(m.has_semantic(query) for m in self.modifiers):
+            return True
+        return any(m.has_semantic(query)
                    for effect in self.statuses for m in effect.modifiers)
 
     def all_flags(self) -> set:
@@ -373,17 +378,17 @@ def wound_mod(u: Combatant) -> tuple[float, str]:
 def stamina_mod(u: Combatant) -> tuple[float, str]:
     """«Усталость»: at stamina <= 5, 0.4 + 0.1 * stamina.
 
-    Derived from the LIVE stamina value. Modifier 0x12 «Неутомимость» is not
+    Derived from the LIVE stamina value. The stamina-mutation-suppression semantic is not
     consulted: R11's write audit found that every recovered tactical stamina
-    mutation queries 0x12, but no recovered effective-stat function does —
+    mutation queries the stamina-mutation-suppression semantic, but no recovered effective-stat function does —
     effective attack, counterattack, ranged attack, speed and both defences all
     derive their penalties from the current value.
 
     The previous flag check was an inference ("such a unit never loses stamina,
     so it never reaches the penalty band"). That is false whenever stamina is set
     directly by a script, an import, malformed content or a mod, and it produced
-    a unit that was simultaneously at low stamina and unpenalised. 0x12 is
-    stamina-mutation immunity, not penalty immunity.
+    a unit that was simultaneously at low stamina and unpenalised. That semantic is
+    stamina-mutation suppression, not penalty immunity.
     """
     if u.stamina > 5:
         return 1.0, ""
@@ -520,8 +525,14 @@ def effective_modifiers(u) -> list:
 
 
 def has_effective_modifier(u, ability: int) -> bool:
-    """Numeric modifier membership across every available provider."""
+    """Numeric membership for not-yet-migrated mechanics."""
     return any(m.ability == ability for m in effective_modifiers(u))
+
+
+def has_effective_modifier_semantic(
+        u, query: modifier_semantic.Query) -> bool:
+    """Semantic membership across unit, status, and environment providers."""
+    return any(m.has_semantic(query) for m in effective_modifiers(u))
 
 
 def effective_modifier_value(u, ability: int) -> int:
@@ -532,15 +543,15 @@ def effective_modifier_value(u, ability: int) -> int:
 
 def apply_tactical_stamina_drain(
         u: Combatant, amount: int,
-        modifier_0x12_effective: bool = False) -> Trace:
+        semantic_suppression_effective: bool = False) -> Trace:
     """Apply the bounded CX-013 drain; positive restoration is unsupported."""
     if amount > 0:
         raise ValueError("CX-013 tactical stamina operation supports drains only")
     t = Trace(f"{u.name}.stamina_delta")
     t.base = u.stamina
-    suppressed = modifier_0x12_effective or u.has_flag("Неутомимый")
+    suppressed = semantic_suppression_effective or u.has_flag("Неутомимый")
     if amount and suppressed:
-        t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+        t.step("stamina.mutation_suppressed", t.base, t.base,
                "requested tactical stamina drain %+d" % amount)
     elif amount < 0:
         u.stamina = max(0, u.stamina + int(amount))
@@ -551,7 +562,8 @@ def apply_tactical_stamina_drain(
 
 
 def _offensive_disabled(u) -> bool:
-    return has_effective_modifier(u, 0x26) or u.has_flag("Не сражается")
+    return has_effective_modifier_semantic(
+        u, modifier_semantic.Query.MELEE_EXCHANGE_SUPPRESSED) or u.has_flag("Не сражается")
 
 
 def _run_hook_for(base, mods, hook, ctx, label):
@@ -584,11 +596,11 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
 
     # R6: the three effective-attack functions do NOT share entry semantics.
     #
-    # Melee and counterattack test modifier 0x26
+    # Melee and counterattack test the melee-exchange-suppression semantic
     # «Не сражается» first and return zero outright. The final minimum-one clamp
     # is never reached on that path.
     if kind in (AttackKind.MELEE, AttackKind.COUNTER) and _offensive_disabled(u):
-        t.step("modifier 0x26 «Не сражается»", value, 0.0, "cannot attack")
+        t.step("combat.melee_exchange_suppressed", value, 0.0, "cannot attack")
         t.result = 0.0
         return 0.0, t
 
@@ -645,7 +657,7 @@ def current_attack(u: Combatant, kind: AttackKind) -> tuple[float, Trace]:
     #
     # The clamp is the shared final tail of all three functions, but it is only
     # REACHED on the paths above: melee and counterattack skip it entirely under
-    # modifier 0x26, and ranged attack skips it on a zero sum. A single
+    # the melee-exchange-suppression semantic, and ranged attack skips it on a zero sum. A single
     # unconditional clamp for all three kinds is not Genesis-compatible (R6).
     # On the reached path it does apply at neutral morale.
     pct, note = morale_percent(u)
@@ -912,7 +924,7 @@ def current_defence(u: Combatant, kind: AttackKind) -> tuple[int, Trace]:
     #
     #   - the stamina predicate is EQUALITY WITH ZERO, not `<= 0`. Negative
     #     stamina does not halve defence.
-    #   - modifier 0x12 «Неутомимость» is NOT consulted by either function. The
+    #   - the stamina-mutation-suppression semantic is NOT consulted by either function. The
     #     exemption belongs to stamina COSTS, not to the defence halving.
     #   - the signed divide is `CDQ; SUB EAX,EDX; SAR EAX,1`, which truncates
     #     toward zero. `floor` diverges for negative odd values; the clamp hides
@@ -957,13 +969,14 @@ def current_resistance(u: Combatant) -> tuple[int, Trace]:
 # ---------------------------------------------------------------------------
 
 def adjust_morale(unit: Combatant, delta: int) -> bool:
-    """Apply the recovered morale adjustment, including modifier 0x13.
+    """Apply the recovered morale adjustment, including morale-underflow-suppression semantic.
 
     Returns False when immunity suppressed the adjustment. Morale underflow is
     converted into ten-point break-accumulator steps and current morale floors
     at zero; positive morale remains unbounded because high-morale bands exist.
     """
-    if has_effective_modifier(unit, 0x13):
+    if has_effective_modifier_semantic(
+            unit, modifier_semantic.Query.MORALE_UNDERFLOW_SUPPRESSED):
         return False
     after = unit.morale + int(delta)
     if after < 0:

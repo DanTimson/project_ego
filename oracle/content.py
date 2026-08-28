@@ -30,6 +30,7 @@ import os
 
 import identity
 import content_actions
+import modifier_semantic as modifier_semantic
 from dataclasses import dataclass, field
 
 
@@ -166,6 +167,7 @@ class Binding:
     handler: str
     params: dict = field(default_factory=dict)
     uses: int = 0
+    semantics: tuple[modifier_semantic.Query, ...] = ()
 
     @property
     def is_bound(self) -> bool:
@@ -277,6 +279,11 @@ class ContentPack:
             except ValueError:
                 errors.append("non-numeric opcode key %r" % key)
                 continue
+            try:
+                semantics = modifier_semantic.normalize(entry.get("semantics", ()))
+            except ValueError as exc:
+                errors.append("opcode %d: %s" % (opcode, exc))
+                continue
             self.bindings[opcode] = Binding(
                 opcode=opcode,
                 name=entry.get("name", ""),
@@ -284,6 +291,7 @@ class ContentPack:
                 handler=entry.get("handler", "") or "",
                 params=entry.get("params") or {},
                 uses=int(entry.get("uses", 0)),
+                semantics=semantics,
             )
         self.loaded_from = path
         return errors
@@ -321,13 +329,16 @@ class ContentPack:
         """Canonical, machine-independent inputs to the local snapshot hash."""
         bindings = {}
         for opcode, binding in self.bindings.items():
-            bindings[str(opcode)] = {
+            entry = {
                 "name": binding.name,
                 "hook": binding.hook,
                 "handler": binding.handler,
                 "params": binding.params,
                 "uses": binding.uses,
             }
+            if binding.semantics:
+                entry["semantics"] = modifier_semantic.names(binding.semantics)
+            bindings[str(opcode)] = entry
         payload = {
             "pack": self.id,
             "version": self.version,
@@ -400,6 +411,11 @@ class ContentDb:
         if b is None or not b.is_bound or not self.registry.has(b.handler):
             return None, {}
         return b.handler, b.params
+
+    def resolve_semantics(self, opcode: int) -> tuple[modifier_semantic.Query, ...]:
+        """Resolve only this pack-qualified binding's semantic dimension."""
+        binding = self.pack.binding(opcode)
+        return binding.semantics if binding is not None else ()
 
     # Scenario composition seam.  Keeping this on the constructed ContentDb
     # reuses the existing pack/roster loader instead of creating a parallel pack
@@ -482,13 +498,6 @@ class ContentDb:
             "flags": sorted(unit.flags),
             "subtypes": sorted(unit.subtypes),
             "__scenario_action_grants": copy.deepcopy(built.action_grants),
-            "modifiers": [{
-                "ability": modifier.ability,
-                "handler": modifier.handler,
-                "hook": modifier.hook.name,
-                "power": modifier.power,
-                "params": copy.deepcopy(modifier.params),
-                "source": modifier.source,
-            } for modifier in unit.modifiers],
+            "modifiers": [modifier.to_dict() for modifier in unit.modifiers],
         }
         return copy.deepcopy(record)

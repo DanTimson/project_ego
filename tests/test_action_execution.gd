@@ -295,12 +295,12 @@ func _test_shield_bash() -> void:
 		"negative target stamina floors at zero")
 
 	var modifier := {"ability": 0x12, "handler": "grant_flag", "power": 1,
-		"params": {"flag": "test-0x12"}}
+		"semantics": ["stamina.mutation_suppressed"], "params": {"flag": "test-0x12"}}
 	var immune_target := _run_action("shield_bash", 4, {},
 		{"stamina": 7, "modifiers": [modifier]})
 	_check((immune_target[0].units["target"] as Combatant).stamina == 7
 		and _contains(immune_target[1]["log"],
-			"modifier 0x12 stamina mutation suppression"),
+			"stamina.mutation_suppressed"),
 		"effective target modifier 0x12 suppresses only the target delta")
 
 	var aura_immune := _run_action("shield_bash", 4, {

@@ -38,6 +38,8 @@ implemented and tested, because those are decidable from the actor alone.
 
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -131,11 +133,11 @@ class Action:
     declarative_recipe_error: str = ""
 
     def availability(self, actor,
-                     modifier_0x12_effective: bool = False) -> Refusal:
+                     semantic_suppression_effective: bool = False) -> Refusal:
         """Decidable from the actor alone. Target legality is checked by the
         battle layer, which knows what is adjacent and what is dead."""
-        stamina_suppressed = (modifier_0x12_effective
-                              or actor.has_modifier_id(0x12)
+        stamina_suppressed = (semantic_suppression_effective
+                              or actor.has_modifier_semantic(semantic.Query.STAMINA_MUTATION_SUPPRESSED)
                               or actor.has_flag("Неутомимый"))
         if actor.action_spent and self.cost.resolve(actor).consumes_action:
             return Refusal.ACTION_SPENT
@@ -151,19 +153,19 @@ class Action:
         return Refusal.OK
 
     def is_available(self, actor,
-                     modifier_0x12_effective: bool = False) -> bool:
-        return self.availability(actor, modifier_0x12_effective) is Refusal.OK
+                     semantic_suppression_effective: bool = False) -> bool:
+        return self.availability(actor, semantic_suppression_effective) is Refusal.OK
 
-    def pay(self, actor, modifier_0x12_effective: bool = False):
+    def pay(self, actor, semantic_suppression_effective: bool = False):
         from combat import Trace
         c = self.cost.resolve(actor)
         t = Trace(f"{actor.name}.action_stamina_cost")
         t.base = actor.stamina
-        stamina_suppressed = (modifier_0x12_effective
-                              or actor.has_modifier_id(0x12)
+        stamina_suppressed = (semantic_suppression_effective
+                              or actor.has_modifier_semantic(semantic.Query.STAMINA_MUTATION_SUPPRESSED)
                               or actor.has_flag("Неутомимый"))
         if c.stamina and stamina_suppressed:
-            t.step("modifier 0x12 stamina mutation suppression",
+            t.step("stamina.mutation_suppressed",
                    t.base, t.base,
                    "requested action stamina cost %d" % c.stamina)
         elif c.stamina:

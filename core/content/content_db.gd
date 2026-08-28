@@ -46,6 +46,14 @@ func resolve(opcode: int) -> Array:
 	return [b.handler, b.params]
 
 
+func resolve_semantics(opcode: int) -> Array[int]:
+	## Resolve only this pack-qualified binding's semantic dimension.
+	var b: ContentPack.Binding = pack.binding(opcode)
+	if b == null:
+		return []
+	return b.semantics.duplicate()
+
+
 ## Scenario composition seam.  This adapts the existing pack and roster loader;
 ## rules never load or branch on pack identity.
 func content_provenance() -> Dictionary:
@@ -100,14 +108,17 @@ func resolve_definition(content_id: String) -> Variant:
 	var unit := built.unit
 	var modifiers: Array = []
 	for modifier in unit.modifiers:
-		modifiers.append({
+		var serialized := {
 			"ability": modifier.ability,
 			"handler": String(modifier.handler),
 			"hook": Modifier.Hook.keys()[modifier.hook],
 			"power": modifier.power,
 			"params": modifier.params.duplicate(true),
 			"source": modifier.source,
-		})
+		}
+		if not modifier.semantics.is_empty():
+			serialized["semantics"] = modifier.semantic_names()
+		modifiers.append(serialized)
 	return {
 		"name": unit.name,
 		"attack": unit.attack,

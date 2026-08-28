@@ -268,7 +268,8 @@ class Roster:
             ability=opcode, handler=handler, hook=hook,
             power=power if isinstance(power, int) else 0,
             params=dict(params),
-            source=upgrade_name or ability_name or ("opcode %d" % opcode)))
+            source=upgrade_name or ability_name or ("opcode %d" % opcode),
+            semantics=self.db.resolve_semantics(opcode)))
         built.resolved.append((opcode, upgrade_name or ability_name))
 
     # -- reporting ----------------------------------------------------------

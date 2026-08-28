@@ -36,6 +36,15 @@ import hooks as H
 
 # Stat names as they appear in ability_num, mapped onto the parameter a single
 # `stat_delta` primitive takes. This is the largest unambiguous family.
+# RECOVERED Genesis compatibility knowledge. These source opcodes gain EGO
+# semantic identities only in a generated Genesis binding, never in generic rules.
+GENESIS_SEMANTICS = {
+    0x12: "stamina.mutation_suppressed",
+    0x26: "combat.melee_exchange_suppressed",
+    0x13: "morale.underflow_suppressed",
+}
+
+
 STATS = {
     "Жизнь": "life",
     "Здоровье": "life",
@@ -104,6 +113,8 @@ def build(var_dir: str, pack_id: str) -> dict:
         }
         if params:
             entry["params"] = params
+        if pack_id == "genesis" and n in GENESIS_SEMANTICS:
+            entry["semantics"] = [GENESIS_SEMANTICS[n]]
         if not handler:
             entry["hook_confidence"] = conf
         entries[str(n)] = entry

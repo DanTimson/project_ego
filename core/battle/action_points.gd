@@ -28,9 +28,9 @@ static func effective_speed(u: Combatant) -> Array:
 	# identical for every reachable input, but this is what the binary does.
 	#
 	# ONE BEHAVIOURAL CHANGE: the «Неутомимый» exemption is removed. The recovered effective-speed rule
-	# has no modifier 0x12 check; the exemption was inferred from "such a unit
+	# has no stamina-suppression semantic check; the exemption was inferred from "such a unit
 	# never loses stamina", which fails when an effect sets stamina directly.
-	# Modifier 0x12 suppresses stamina DEDUCTIONS, not the speed penalty.
+	# The stamina-suppression semantic suppresses stamina DEDUCTIONS, not the speed penalty.
 	var value: int = u.speed
 	if u.stamina < 5 and value > 1:
 		t.step("stamina %d < 5" % u.stamina, float(value), float(value - 1))
@@ -179,9 +179,9 @@ static func can_move(u: Combatant, tiles: int = 1) -> Refusal:
 	return Refusal.OK if u.movement_remaining >= tiles else Refusal.NO_MOVEMENT
 
 
-static func _modifier_0x12_suppresses(u: Combatant,
+static func _stamina_mutation_suppressed(u: Combatant,
 		resolved_effective_modifier: bool = false) -> bool:
-	return (resolved_effective_modifier or u.has_modifier_id(0x12)
+	return (resolved_effective_modifier or u.has_modifier_semantic(ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED)
 		or u.has_flag(&"Неутомимый"))
 
 
@@ -193,7 +193,7 @@ static func _modifier_0x12_suppresses(u: Combatant,
 ## starting tile still records every step, but neither Genesis charge nor the R8
 ## attack stamina cost consumes this counter.
 static func spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0,
-		modifier_0x12_effective: bool = false) -> Trace:
+		semantic_suppression_effective: bool = false) -> Trace:
 	var t := Trace.new("%s.move" % u.name)
 	t.base = float(u.movement_remaining)
 	u.movement_remaining -= tiles
@@ -207,8 +207,8 @@ static func spend_move(u: Combatant, tiles: int = 1, stamina_cost: int = 0,
 	var extra: int = tiles if int(effective_speed(u)[0]) <= 0 else 0
 	var total: int = stamina_cost + extra
 	if total > 0:
-		if _modifier_0x12_suppresses(u, modifier_0x12_effective):
-			t.step("modifier 0x12 stamina mutation suppression",
+		if _stamina_mutation_suppressed(u, semantic_suppression_effective):
+			t.step("stamina.mutation_suppressed",
 				float(u.stamina), float(u.stamina),
 				"movement requested stamina cost %d" % total)
 		else:
@@ -236,7 +236,7 @@ static func attack_stamina_cost(u: Combatant) -> int:
 
 
 static func _spend_attack(u: Combatant, ranged_executor: bool,
-		modifier_0x12_effective: bool = false) -> Trace:
+		semantic_suppression_effective: bool = false) -> Trace:
 	var label := "ranged_attack_cost" if ranged_executor else "attack_cost"
 	var t := Trace.new("%s.%s" % [u.name, label])
 	var speed := int(effective_speed(u)[0])
@@ -246,8 +246,8 @@ static func _spend_attack(u: Combatant, ranged_executor: bool,
 	t.step("live-capacity stamina discriminator", float(capacity), float(cost),
 		"effective speed %d; strict capacity < speed is %s; selected base cost %d"
 		% [speed, str(capacity < speed), cost])
-	if _modifier_0x12_suppresses(u, modifier_0x12_effective):
-		t.step("modifier 0x12 stamina mutation suppression", t.base, t.base,
+	if _stamina_mutation_suppressed(u, semantic_suppression_effective):
+		t.step("stamina.mutation_suppressed", t.base, t.base,
 			"requested attack stamina cost %d" % cost)
 	else:
 		u.stamina = maxi(0, u.stamina - cost)
@@ -259,8 +259,8 @@ static func _spend_attack(u: Combatant, ranged_executor: bool,
 		u.movement_remaining = 0
 		t.step("ranged activation capacity clear", float(before_capacity), 0.0,
 			"ranged executor ends activation")
-	if u.stamina <= 0 and not _modifier_0x12_suppresses(
-			u, modifier_0x12_effective):
+	if u.stamina <= 0 and not _stamina_mutation_suppressed(
+			u, semantic_suppression_effective):
 		u.forced_rest = true
 		t.step("exhausted", float(u.stamina), float(u.stamina),
 			"forced Rest next round")
@@ -269,14 +269,14 @@ static func _spend_attack(u: Combatant, ranged_executor: bool,
 
 
 static func spend_attack(u: Combatant,
-		modifier_0x12_effective: bool = false) -> Trace:
+		semantic_suppression_effective: bool = false) -> Trace:
 	# Existing non-ranged callers retain their established executor boundary.
-	return _spend_attack(u, false, modifier_0x12_effective)
+	return _spend_attack(u, false, semantic_suppression_effective)
 
 
 static func spend_ranged_attack(u: Combatant,
-		modifier_0x12_effective: bool = false) -> Trace:
-	return _spend_attack(u, true, modifier_0x12_effective)
+		semantic_suppression_effective: bool = false) -> Trace:
+	return _spend_attack(u, true, semantic_suppression_effective)
 
 
 ## Rest or skip: +(2 + Восстановление сил), capped at base. Under Зуд the

@@ -62,6 +62,14 @@ static func has_effective_modifier(u: Combatant, ability: int) -> bool:
 	return false
 
 
+static func has_effective_modifier_semantic(
+		u: Combatant, query: ModifierSemantic.Query) -> bool:
+	for modifier in effective_modifiers(u):
+		if (modifier as Modifier).has_semantic(query):
+			return true
+	return false
+
+
 static func effective_modifier_value(u: Combatant, ability: int) -> int:
 	## Signed numeric total for one modifier ID across represented providers.
 	var total := 0
@@ -72,7 +80,8 @@ static func effective_modifier_value(u: Combatant, ability: int) -> int:
 
 
 static func _offensive_disabled(u: Combatant) -> bool:
-	return has_effective_modifier(u, 0x26) or u.has_flag(&"Не сражается")
+	return has_effective_modifier_semantic(
+		u, ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED) or u.has_flag(&"Не сражается")
 
 
 ## Returns [value, trace] or [base, null] when nothing applies.
@@ -114,12 +123,12 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 
 	# R6: the three effective-attack functions do NOT share entry semantics.
 	#
-	# Melee and counterattack test modifier 0x26
+	# Melee and counterattack test the melee-exchange-suppression semantic
 	# «Не сражается» first and return zero outright; the final minimum-one clamp
 	# is never reached on that path.
 	if (kind == Combatant.AttackKind.MELEE or kind == Combatant.AttackKind.COUNTER) \
 			and _offensive_disabled(u):
-		t.step("modifier 0x26 «Не сражается»", value, 0.0, "cannot attack")
+		t.step("combat.melee_exchange_suppressed", value, 0.0, "cannot attack")
 		t.result = 0.0
 		return [0.0, t]
 
@@ -232,7 +241,7 @@ static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
 	#
 	# Three corrections against the previous implementation:
 	#   - the predicate is EQUALITY WITH ZERO, not "exhausted"/<= 0;
-	#   - modifier 0x12 «Неутомимость» is NOT consulted by either function — the
+	#   - the stamina-mutation-suppression semantic is NOT consulted by either function — the
 	#     exemption belongs to stamina COSTS, not to the defence halving;
 	#   - the signed divide truncates toward zero (CDQ; SUB; SAR), not floors.
 	var path_name := "ranged" if kind == Combatant.AttackKind.RANGED else "ordinary"
@@ -499,8 +508,9 @@ static func resolve_attack(attacker: Combatant, defender: Combatant,
 # ---------------------------------------------------------------------------
 
 static func adjust_morale(unit: Combatant, delta: int) -> bool:
-	## Apply recovered modifier-0x13 immunity and morale underflow accounting.
-	if has_effective_modifier(unit, 0x13):
+	## Apply recovered morale-underflow suppression and morale underflow accounting.
+	if has_effective_modifier_semantic(
+		unit, ModifierSemantic.Query.MORALE_UNDERFLOW_SUPPRESSED):
 		return false
 	var after := unit.morale + delta
 	if after < 0:

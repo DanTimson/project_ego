@@ -18,6 +18,7 @@ class Binding extends RefCounted:
 	var handler: StringName = &""
 	var params: Dictionary = {}
 	var uses: int = 0
+	var semantics: Array[int] = []
 
 	func is_bound() -> bool:
 		return handler != &""
@@ -135,6 +136,11 @@ func load_bindings(path: String) -> Array[String]:
 		b.handler = StringName(String(entry.get("handler", "")))
 		b.params = entry.get("params", {})
 		b.uses = int(entry.get("uses", 0))
+		var semantic_result := ModifierSemantic.parse_names(entry.get("semantics", []))
+		if not bool(semantic_result["ok"]):
+			errors.append("opcode %d: %s" % [b.opcode, semantic_result["reason"]])
+			continue
+		b.semantics.assign(semantic_result["semantics"])
 		bindings[b.opcode] = b
 	loaded_from = path
 	return errors
@@ -188,13 +194,16 @@ func snapshot_payload() -> Dictionary:
 	var serialized_bindings: Dictionary = {}
 	for opcode in bindings:
 		var entry: Binding = bindings[opcode]
-		serialized_bindings[str(opcode)] = {
+		var serialized := {
 			"name": entry.name,
 			"hook": entry.hook,
 			"handler": String(entry.handler),
 			"params": entry.params,
 			"uses": entry.uses,
 		}
+		if not entry.semantics.is_empty():
+			serialized["semantics"] = ModifierSemantic.names(entry.semantics)
+		serialized_bindings[str(opcode)] = serialized
 	var payload := {
 		"pack": id,
 		"version": version,

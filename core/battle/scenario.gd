@@ -490,11 +490,11 @@ func _build_sides(specs: Array) -> Dictionary:
 			for f in u.get("flags", []):
 				unit.set_flag(StringName(String(f)))
 			for m in u.get("modifiers", []):
-				unit.modifiers.append(Modifier.make(
-					int(m.get("ability", 0)), StringName(String(m["handler"])),
-					Modifier.Hook[String(m.get("hook", "STAT_PASSIVE"))],
-					int(m.get("power", 0)), m.get("params", {}),
-					String(m.get("source", m["handler"]))))
+				var modifier := Modifier.from_dict(m, 0, String(m.get("handler", "")))
+				if modifier == null:
+					return {"sides": [], "units": {}, "error":
+						"invalid modifier on unit '%s'" % unit.instance_id}
+				unit.modifiers.append(modifier)
 			for status_spec in u.get("statuses", []):
 				if status_spec.has("prevents_action"):
 					return {"sides": [], "units": {}, "error":
@@ -564,12 +564,11 @@ func _build_auras(specs: Array) -> Dictionary:
 					aura.except_subtypes.append(StringName(String(st)))
 				aura.source = unit
 				for m in a.get("modifiers", []):
-					aura.modifiers.append(Modifier.make(
-						int(m.get("ability", 0)),
-						StringName(String(m["handler"])),
-						Modifier.Hook[String(m.get("hook", "STAT_PASSIVE"))],
-						int(m.get("power", a.get("power", 0))),
-						m.get("params", {}), aura.name))
+					var modifier := Modifier.from_dict(m, int(a.get("power", 0)), aura.name)
+					if modifier == null:
+						construction_error = "invalid modifier in aura '%s'" % aura.name
+						return {}
+					aura.modifiers.append(modifier)
 				built.append(aura)
 			out[unit] = built
 	return out
@@ -796,7 +795,7 @@ func _resolve_action_command(unit: Combatant, action_id: String,
 	if restriction != "":
 		return {"reason": restriction, "refusal": "restriction"}
 	var refusal := action.availability(unit,
-		Damage.has_effective_modifier(unit, 0x12))
+		Damage.has_effective_modifier_semantic(unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
 	if refusal != Action.Refusal.OK:
 		return {"reason": Action.REFUSAL_TEXT[refusal]}
 	if target == null:
@@ -902,7 +901,7 @@ func cmd_move(unit: Combatant, col: int, row: int) -> void:
 	field.remove_occupant(start)
 	field.place(unit, goal)
 	var move_trace := ActionPoints.spend_move(unit, cost,
-		int(plan["stamina_cost"]), Damage.has_effective_modifier(unit, 0x12))
+		int(plan["stamina_cost"]), Damage.has_effective_modifier_semantic(unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
 	ScenarioNumericOrdering.append_traces(log, [move_trace])
 	emit("%s moves to %s (%d steps, %d total this round)"
 		% [unit.label(), _at(unit), path.size(), unit.steps_this_round])
@@ -954,7 +953,7 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	field.remove_occupant(here)
 	field.place(unit, destination)
 	var move_trace := ActionPoints.spend_move(unit, cost, _path_stamina(path),
-		Damage.has_effective_modifier(unit, 0x12))
+		Damage.has_effective_modifier_semantic(unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
 	ScenarioNumericOrdering.append_traces(log, [move_trace])
 	emit("%s closes to %s (%d steps)" % [unit.label(), _at(unit), path.size()])
 	return true
@@ -1100,7 +1099,7 @@ func _execute_action_resource_delta(
 		and operation.amount <= 0,
 		"unsupported internal ResourceDeltaOp parameters")
 	var trace := Stamina.apply_tactical_drain(target, operation.amount,
-		Damage.has_effective_modifier(target, 0x12))
+		Damage.has_effective_modifier_semantic(target, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
 	ScenarioNumericOrdering.append_traces(log, [trace])
 	return trace
 
@@ -1130,7 +1129,7 @@ func cmd_action(unit: Combatant, action_id: String,
 	emit("  [action] %s resolved plan [%s]" % [
 		action.id, ", ".join(operation_names)])
 	var action_cost_trace := action.pay(unit,
-		Damage.has_effective_modifier(unit, 0x12))
+		Damage.has_effective_modifier_semantic(unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
 	ScenarioNumericOrdering.append_traces(log, [action_cost_trace])
 	emit("  [action] %s payment stamina %d -> %d; spent %s" % [
 		action.id, before_stamina, unit.stamina, str(unit.action_spent)])

@@ -355,7 +355,8 @@ func _ranged_numeric_spec(base_ranged_attack: int = 20,
 				"shooting_range": 8, "ammo": 2, "counter_attack": 0,
 				"defence": 0, "life": 30, "stamina": 0, "stamina_base": 10,
 				"morale": 10, "speed": 4, "conditional_bonus": 5,
-				"modifiers": [_numeric_modifier(0x12)],
+				"modifiers": [_numeric_modifier(0x12).merged({
+					"semantics": ["stamina.mutation_suppressed"]})],
 			}]},
 			{"id": 1, "leader_initiative": 0, "units": [{
 				"name": "target", "at": [3, 0], "counter_attack": 0,
@@ -392,7 +393,7 @@ func _test_ranged_numeric_tranche_integration() -> void:
 	_check(discriminator >= 0 and "effective speed 2" in String(lines[discriminator])
 			and "selected base cost 2" in String(lines[discriminator]),
 		"R8 traces capacity 1 < effective speed 2 and selects cost 2")
-	_check(_trace_index(lines, "modifier 0x12 stamina mutation suppression") >= 0,
+	_check(_trace_index(lines, "stamina.mutation_suppressed") >= 0,
 		"R11 suppression is visible at covered mutation sites")
 	_check(_trace_index(lines, "defence provider total: 7 -> 7") >= 0
 			and _trace_index(lines, "zero-stamina defence halving: 7 -> 3") >= 0,

@@ -98,17 +98,7 @@ class StatusEffect:
                              if capability in self.restrictions],
             "hostile": self.hostile,
             "tags": list(self.tags),
-            "modifiers": [
-                {
-                    "ability": modifier.ability,
-                    "handler": modifier.handler,
-                    "hook": modifier.hook.name,
-                    "power": modifier.power,
-                    "params": copy.deepcopy(modifier.params),
-                    "source": modifier.source,
-                }
-                for modifier in self.modifiers
-            ],
+            "modifiers": [modifier.to_dict() for modifier in self.modifiers],
         }
         if self.remove_on_damage:
             out["remove_on_damage"] = True

@@ -37,6 +37,7 @@ priority.
 | CX-014 | `SPEC_IMPLEMENTATION` | declarative data-defined action plans v1 | engine | `DONE` | CX-013; DELIB-0004 decided; A-F pass in Python/GDScript; awaiting engine/human acceptance |
 | CX-015 | `SPEC_IMPLEMENTATION` | typed tactical capability restrictions | engine | `DONE` | CX-014; DELIB-0006 accepted; AD-2 architecture resolved; legacy restriction-id binding excluded |
 | CX-016 | `SPEC_IMPLEMENTATION` | profile-qualified Genesis death replacement | engine | `DONE` | CX-015; DELIB-0007 accepted; AD-4 architecture resolved; RS-1/NH replacement and custom tier maps excluded |
+| CX-017 | `ARCHITECTURE_IMPLEMENTATION` | semantic modifier binding boundary v1 | engine/content | `DONE` | accepted legacy-boundary inventory/review; migrates only 0x12/0x26/0x13 query authority |
 
 Task contracts live in `docs/codex/tasks/`.
 
@@ -66,7 +67,7 @@ implemented and review-accepted, while DELIB-0004 through DELIB-0007 record the
 accepted architecture decisions. AD-1 implementation remains separately fenced;
 AD-2 is review-accepted through CX-015, while AD-4 is implemented awaiting review
 through CX-016; PV-1 remains
-provenance-held; RS-1 remains deferred. CX-008 through CX-015 are `DONE`; CX-016 is `REVIEW`.
+provenance-held; RS-1 remains deferred. CX-008 through CX-015 are `DONE`; CX-016 and CX-017 are `REVIEW`.
 CX-015 does not claim raw legacy restriction-ID binding, casting-command
 implementation, status lifecycle changes, or AD-1 provider aggregation. CX-016
 does not claim NH replacement semantics or custom tier maps.

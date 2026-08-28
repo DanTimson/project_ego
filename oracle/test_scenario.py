@@ -529,7 +529,8 @@ def ranged_numeric_spec(base_ranged_attack: int = 20,
                  "ammo": 2, "counter_attack": 0, "defence": 0, "life": 30,
                  "stamina": 0, "stamina_base": 10, "morale": 10, "speed": 4,
                  "conditional_bonus": 5,
-                 "modifiers": [numeric_modifier(0x12)],
+                 "modifiers": [dict(numeric_modifier(0x12),
+                                    semantics=["stamina.mutation_suppressed"])],
              }]},
             {"id": 1, "leader_initiative": 0, "units": [{
                 "name": "target", "at": [3, 0], "counter_attack": 0,
@@ -566,7 +567,7 @@ def test_ranged_numeric_tranche_integration() -> None:
     check(discriminator >= 0 and "effective speed 2" in lines[discriminator]
           and "selected base cost 2" in lines[discriminator],
           "R8 traces capacity 1 < effective speed 2 and selects cost 2")
-    check(trace_index(lines, "modifier 0x12 stamina mutation suppression") >= 0,
+    check(trace_index(lines, "stamina.mutation_suppressed") >= 0,
           "R11 suppression is visible at covered mutation sites")
     check(trace_index(lines, "defence provider total: 7 -> 7") >= 0
           and trace_index(lines, "zero-stamina defence halving: 7 -> 3") >= 0,

@@ -145,13 +145,14 @@ def test_fixed_and_magnitude_stamina_recipes_reuse_drain_only_primitive():
 
     immune_provider = provider(overlay=magnitude_overlay, target=unit("Target", modifiers=[{
         "ability": 0x12, "handler": "grant_flag", "power": 1,
+        "semantics": ["stamina.mutation_suppressed"],
         "params": {"flag": "cx014-0x12"}}]))
     immune = scenario.Scenario(spec_for(immune_provider),
                                content_provider=immune_provider)
     immune.cmd_action(immune.units["actor"], "alpha:action/702",
                       immune.units["target"])
     assert immune.units["target"].stamina == 10
-    assert any("modifier 0x12 stamina mutation suppression" in line
+    assert any("stamina.mutation_suppressed" in line
                for line in immune.log)
 
 

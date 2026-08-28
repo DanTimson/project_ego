@@ -32,6 +32,8 @@ retaliation, and two units that both have it cancel out to the normal order.
 
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 from enum import Enum
 
 import combat
@@ -72,13 +74,14 @@ def why_no_counter(defender: Combatant, attacker: Combatant,
         return NoCounter.RANGED
     if not defender.alive or defender.life <= 0:
         return NoCounter.DEAD
-    if (combat.has_effective_modifier(defender, 0x26)
+    if (combat.has_effective_modifier_semantic(
+            defender, semantic.Query.MELEE_EXCHANGE_SUPPRESSED)
             or defender.has_flag("Не сражается")):
         return NoCounter.CANNOT_FIGHT
     if defender.counter_attack <= 0:
         return NoCounter.NO_STAT
     # Live exhaustion remains authoritative even when stamina mutation is
-    # suppressed by effective modifier 0x12 or its symbolic compatibility alias.
+    # suppressed by the effective stamina-mutation semantic or its symbolic compatibility alias.
     if defender.stamina <= 0:
         return NoCounter.EXHAUSTED
     if defender.resting:

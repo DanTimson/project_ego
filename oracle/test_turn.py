@@ -11,6 +11,8 @@ Run: python3 test_turn.py
 
 from __future__ import annotations
 
+import modifier_semantic as semantic
+
 import os
 
 import sys
@@ -343,14 +345,15 @@ def test_modifier_0x12_stamina_mutations() -> None:
     immune = unit(stamina=3, stamina_base=10, speed=3)
     immune.modifiers.append(Modifier(
         ability=0x12, handler="modifier_0x12", hook=Hook.STAMINA,
-        source="0x12"))
+        source="0x12",
+        semantics=(semantic.Query.STAMINA_MUTATION_SUPPRESSED,)))
     immune.movement_remaining = 3
     move_trace = turn.spend_move(immune, 1, stamina_cost=2)
     check(immune.stamina == 3, "movement stamina mutation is suppressed")
     ranged_trace = turn.spend_ranged_attack(immune)
     check(immune.stamina == 3 and immune.movement_remaining == 0,
           "ranged cost is suppressed while the executor still ends activation")
-    check(any(step[0] == "modifier 0x12 stamina mutation suppression"
+    check(any(step[0] == "stamina.mutation_suppressed"
               for trace in (move_trace, ranged_trace) for step in trace.steps),
           "modifier 0x12 suppression is trace-visible")
 

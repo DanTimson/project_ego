@@ -55,6 +55,8 @@ var power: int = 0
 var params: Dictionary = {}
 var source: String = ""
 var duration: int = -1        ## -1 = permanent
+## Canonical ModifierSemantic.Query values, distinct from the source opcode.
+var semantics: Array[int] = []
 
 ## Morale demonstrably does not multiply conditional damage (Сокрушение зла and
 ## similar). Whether stamina and wound skip them too is undocumented — see
@@ -63,21 +65,59 @@ var outside_multipliers: bool = false
 
 
 static func make(p_ability: int, p_handler: StringName, p_hook: Hook,
-		p_power: int = 0, p_params: Dictionary = {}, p_source: String = "") -> Modifier:
+		p_power: int = 0, p_params: Dictionary = {}, p_source: String = "",
+		p_semantics: Variant = []) -> Modifier:
+	var parsed := ModifierSemantic.parse(p_semantics)
+	if not bool(parsed["ok"]):
+		push_error(String(parsed["reason"]))
+		return null
 	var m := Modifier.new()
 	m.ability = p_ability
 	m.handler = p_handler
 	m.hook = p_hook
 	m.power = p_power
-	m.params = p_params.duplicate()
+	m.params = p_params.duplicate(true)
 	m.source = p_source
+	m.semantics.assign(parsed["semantics"])
 	return m
+
+
+static func from_dict(specification: Dictionary, default_power: int = 0,
+		default_source: String = "") -> Modifier:
+	var parsed := ModifierSemantic.parse_names(specification.get("semantics", []))
+	if not bool(parsed["ok"]):
+		push_error(String(parsed["reason"]))
+		return null
+	return make(
+		int(specification.get("ability", 0)),
+		StringName(String(specification.get("handler", ""))),
+		Hook[String(specification.get("hook", "STAT_PASSIVE"))],
+		int(specification.get("power", default_power)),
+		specification.get("params", {}),
+		String(specification.get("source", default_source)),
+		parsed["semantics"])
+
+
+func has_semantic(query: ModifierSemantic.Query) -> bool:
+	return semantics.has(int(query))
+
+
+func semantic_names() -> Array[String]:
+	return ModifierSemantic.names(semantics)
+
+
+func copy() -> Modifier:
+	var out := make(ability, handler, hook, power, params, source, semantics)
+	out.duration = duration
+	out.outside_multipliers = outside_multipliers
+	return out
 
 
 ## Build from what ContentDb.resolve() returns.
 static func from_binding(opcode: int, handler_name: StringName, p_params: Dictionary,
-		p_power: int, p_hook: Hook, p_source: String = "") -> Modifier:
-	return make(opcode, handler_name, p_hook, p_power, p_params, p_source)
+		p_power: int, p_hook: Hook, p_source: String = "",
+		p_semantics: Variant = []) -> Modifier:
+	return make(opcode, handler_name, p_hook, p_power, p_params, p_source, p_semantics)
 
 
 func describe() -> String:

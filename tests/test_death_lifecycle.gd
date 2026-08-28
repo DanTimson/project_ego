@@ -132,7 +132,8 @@ func _test_morale_and_revival() -> void:
 	immune.life_base = 10
 	immune.morale = 5
 	immune.modifiers.append(Modifier.make(
-		0x13, &"add_flat", Modifier.Hook.STAT_PASSIVE))
+		0x13, &"add_flat", Modifier.Hook.STAT_PASSIVE, 0, {}, "",
+		[ModifierSemantic.Query.MORALE_UNDERFLOW_SUPPRESSED]))
 	c.sides[0].units.append(immune)
 	c.field.place(immune, Battlefield.offset_to_axial(2, 1))
 	var broken := Combatant.new()

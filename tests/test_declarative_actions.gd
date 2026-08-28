@@ -151,12 +151,12 @@ func _test_resource_paths() -> void:
 
 	var protected_provider := _provider("alpha", magnitude_overlay, {"modifiers": [{
 		"ability": 0x12, "handler": "grant_flag", "power": 1,
-		"params": {"flag": "cx014-0x12"}}]})
+		"semantics": ["stamina.mutation_suppressed"], "params": {"flag": "cx014-0x12"}}]})
 	var protected := Scenario.new(_spec(protected_provider), null, protected_provider)
 	protected.cmd_action(protected.units["actor"], "alpha:action/702",
 		protected.units["target"])
 	_check(protected.units["target"].stamina == 10
-		and _contains(protected.log, "modifier 0x12 stamina mutation suppression"),
+		and _contains(protected.log, "stamina.mutation_suppressed"),
 		"effective target 0x12 remains authoritative for declarative drain")
 
 

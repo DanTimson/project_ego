@@ -26,7 +26,7 @@ const TRACE_SOURCES := {
 	"live-capacity stamina discriminator": true,
 	"attack stamina mutation": true,
 	"tactical stamina mutation": true,
-	"modifier 0x12 stamina mutation suppression": true,
+	"stamina.mutation_suppressed": true,
 	"ranged activation capacity clear": true,
 }
 
@@ -74,11 +74,12 @@ static func append_charge(log: Array, decision: Dictionary,
 
 static func spend_attack(unit: Combatant,
 		kind: Combatant.AttackKind) -> Trace:
-	var modifier_0x12 := Damage.has_effective_modifier(unit, 0x12)
+	var stamina_suppressed := Damage.has_effective_modifier_semantic(
+		unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED)
 	if kind == Combatant.AttackKind.RANGED:
-		return ActionPoints.spend_ranged_attack(unit, modifier_0x12)
+		return ActionPoints.spend_ranged_attack(unit, stamina_suppressed)
 	# R8 stays ranged-only; melee retains its established cost boundary.
-	return ActionPoints.spend_attack(unit, modifier_0x12)
+	return ActionPoints.spend_attack(unit, stamina_suppressed)
 
 
 static func resolve_exchange(log: Array, unit: Combatant, target: Combatant,

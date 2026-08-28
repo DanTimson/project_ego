@@ -90,7 +90,8 @@ static func why_no_counter(defender: Combatant, attacker: Combatant,
 		return NoCounter.RANGED
 	if not defender.alive or defender.life <= 0:
 		return NoCounter.DEAD
-	if Damage.has_effective_modifier(defender, 0x26) \
+	if Damage.has_effective_modifier_semantic(
+		defender, ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED) \
 			or defender.has_flag(&"Не сражается"):
 		return NoCounter.CANNOT_FIGHT
 	if defender.counter_attack <= 0:

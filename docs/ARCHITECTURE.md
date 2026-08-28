@@ -255,14 +255,27 @@ Ability, upgrade, action and unit identifiers are opaque pack-scoped values.
 Vanilla and New Horizons can assign different semantics to the same numeric
 opcode.
 
-Core code therefore resolves numeric IDs through pack bindings:
+Core code therefore resolves numeric IDs through pack bindings. Passive modifier
+bindings have two independent output dimensions:
 
 ```text
-numeric opcode → pack binding → stable handler name → implementation
+source opcode → pack/profile binding ─┬→ stable handler name → numeric hook
+                                      └→ validated EGO semantic identities → rule queries
 ```
 
-A missing binding or handler must be reported explicitly. It must not fall
-through to a plausible default.
+`Modifier` retains the source opcode while legacy consumers still require it,
+but semantic queries never derive meaning from that number, pack-id equality or
+a content fingerprint. The closed `ModifierSemantic.Query` vocabulary is
+normalized and serialized in canonical order; unknown semantic names fail the
+binding closed. Native and synthetic normalized modifiers may carry semantic
+identities with no legacy opcode. Unit, active-status and environment/aura
+providers are queried through the same effective semantic boundary.
+
+CX-017 establishes only the first three passive semantic queries (stamina-write,
+melee-exchange and morale-underflow suppression). Other raw modifier consumers
+remain explicitly transitional. A missing binding or handler must still be
+reported; semantic metadata neither invents a handler nor changes unbound-opcode
+behavior.
 
 ## Scenario profiles and content dependencies
 

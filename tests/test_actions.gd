@@ -110,12 +110,13 @@ func _init() -> void:
 	print("\n[R11] numeric modifier 0x12 suppresses action stamina payment")
 	var immune := _actor({"stamina": 4})
 	immune.modifiers.append(Modifier.make(
-		0x12, &"modifier_0x12", Modifier.Hook.STAMINA, 0, {}, "0x12"))
+		0x12, &"modifier_0x12", Modifier.Hook.STAMINA, 0, {}, "0x12",
+		[ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED]))
 	var cost_trace := (catalogue[&"forced_march"] as Action).pay(immune)
 	_check(immune.stamina == 4, "action-definition stamina cost is suppressed")
 	var suppression_traced := false
 	for step in (cost_trace as Trace).steps:
-		if String(step["source"]) == "modifier 0x12 stamina mutation suppression":
+		if String(step["source"]) == "stamina.mutation_suppressed":
 			suppression_traced = true
 	_check(suppression_traced, "action suppression is trace-visible")
 
