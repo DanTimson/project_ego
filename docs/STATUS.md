@@ -48,6 +48,22 @@ explicit development fallback. **Play Demo** enters the accepted Tactical Visual
 Slice 3 with automated Crimson phases (CX-024). Developers can still launch
 `game/tactical/tactical_main.tscn` directly for hot-seat play.
 
+CX-028 adds **Strategic Campaign**, a separate native six-province campaign with
+two routes from Home to Keep, persistent wounds/casualties, gold and province
+income, a 12-turn limit, paid Home recovery/recruitment, and one explicit map
+checkpoint. **Campaign Demo** retains the short Ford/Watchpost path. This milestone
+is at REVIEW; reviewer acceptance and an interactive WSL playthrough remain due.
+It composes existing native tactical combat and Crimson policy, with headless
+strategic command guards and value-only checkpoint validation. Strategic costs,
+income, balance and JSON persistence are Project EGO design; the legacy economy
+and original save compatibility entries remain unimplemented.
+
+Automated real-command routes cover a direct three-turn victory (51 gold), and
+a seven-turn return-to-Home route using recovery and recruitment (61 gold),
+including a casualty, wounds, checkpoint reconstruction, fresh tactical identities,
+and safe abandonment after a halt. Operational details and the reviewer route are
+in `docs/DEMO_RELEASE.md` and `docs/codex/tasks/CX-028.md`.
+
 The tracked Windows x86-64 export preset and authoritative `tools/build_demo.py`
 establish a tracked-HEAD-only public/private packaging pipeline. The 0.2 pair
 wrapper selects the released commit epoch unless `SOURCE_DATE_EPOCH` is explicit,

@@ -29,7 +29,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(520, 480)
+custom_minimum_size = Vector2(520, 508)
 layout_mode = 2
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel"]
@@ -41,7 +41,7 @@ theme_override_constants/margin_bottom = 20
 
 [node name="Buttons" type="VBoxContainer" parent="Center/Panel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="Title" type="Label" parent="Center/Panel/Margin/Buttons"]
 layout_mode = 2
@@ -61,34 +61,46 @@ autowrap_mode = 3
 
 [node name="PlayButton" type="Button" parent="Center/Panel/Margin/Buttons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 54)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Play Demo"
 
 [node name="CampaignButton" type="Button" parent="Center/Panel/Margin/Buttons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 54)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Campaign Demo"
 
-[node name="ControlsButton" type="Button" parent="Center/Panel/Margin/Buttons"]
+[node name="StrategicButton" type="Button" parent="Center/Panel/Margin/Buttons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
+text = "Strategic Campaign"
+
+[node name="UtilityActions" type="HBoxContainer" parent="Center/Panel/Margin/Buttons"]
+layout_mode = 2
+
+[node name="ControlsButton" type="Button" parent="Center/Panel/Margin/Buttons/UtilityActions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Controls"
 
-[node name="AboutButton" type="Button" parent="Center/Panel/Margin/Buttons"]
+[node name="AboutButton" type="Button" parent="Center/Panel/Margin/Buttons/UtilityActions"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "About This Build"
 
-[node name="QuitButton" type="Button" parent="Center/Panel/Margin/Buttons"]
+[node name="QuitButton" type="Button" parent="Center/Panel/Margin/Buttons/UtilityActions"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Quit"
 
 [node name="ControlsDialog" type="AcceptDialog" parent="."]

@@ -25,9 +25,9 @@ func _run() -> void:
 	var button_root := "Center/Panel/Margin/Buttons/"
 	_check(menu != null
 		and menu.get_node_or_null(button_root + "PlayButton") != null
-		and menu.get_node_or_null(button_root + "ControlsButton") != null
-		and menu.get_node_or_null(button_root + "AboutButton") != null
-		and menu.get_node_or_null(button_root + "QuitButton") != null,
+		and menu.get_node_or_null("%ControlsButton") != null
+		and menu.get_node_or_null("%AboutButton") != null
+		and menu.get_node_or_null("%QuitButton") != null,
 		"demo menu constructs its four obvious actions")
 	_check(menu.controls_text().contains("Ranged")
 		and menu.controls_text().contains("Space")
@@ -42,7 +42,8 @@ func _run() -> void:
 	_check(controls_opened and menu.about_dialog.visible,
 		"Controls and About actions open their dialogs")
 	_check(menu.about_dialog.dialog_text.contains("Incomplete engine reimplementation")
-		and menu.about_dialog.dialog_text.contains("Strategy play"),
+		and menu.about_dialog.dialog_text.contains("six-province campaign")
+		and menu.about_dialog.dialog_text.contains("Legacy strategy/AI parity"),
 		"About states the implemented and absent prototype boundary")
 
 	var metadata_path := "user://demo_build_metadata.json"

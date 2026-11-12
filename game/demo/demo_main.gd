@@ -3,6 +3,7 @@ extends Control
 
 const TACTICAL_SCENE := "res://game/tactical/tactical_vs_crimson.tscn"
 const CAMPAIGN_SCENE := "res://game/demo/campaign_demo.tscn"
+const STRATEGIC_SCENE := "res://game/campaign/strategic_main.tscn"
 const DEVELOPMENT_METADATA := {
 	"project": "Project EGO",
 	"milestone": "development",
@@ -20,6 +21,7 @@ var about_dialog: AcceptDialog
 func _ready() -> void:
 	%PlayButton.pressed.connect(play_demo)
 	%CampaignButton.pressed.connect(play_campaign)
+	%StrategicButton.pressed.connect(play_strategic)
 	%ControlsButton.pressed.connect(show_controls)
 	%AboutButton.pressed.connect(show_about)
 	%QuitButton.pressed.connect(quit_demo)
@@ -39,6 +41,10 @@ func play_demo() -> Error:
 
 func play_campaign() -> Error:
 	return get_tree().change_scene_to_file(CAMPAIGN_SCENE)
+
+
+func play_strategic() -> Error:
+	return get_tree().change_scene_to_file(STRATEGIC_SCENE)
 
 
 func _prepare_dialog(dialog: AcceptDialog) -> void:
@@ -65,7 +71,8 @@ func controls_text() -> String:
 		+ "R or Ranged button: ranged mode; click a magenta target.\n"
 		+ "Space or Pass button: end the side's phase.\n"
 		+ "Escape or Cancel button: clear the selection.\n"
-		+ "Campaign Demo: win Ford, then continue to Watchpost with the surviving roster.")
+		+ "Campaign Demo: win Ford, then continue to Watchpost with the surviving roster.\n"
+		+ "Strategic Campaign: choose adjacent provinces, capture Keep, and save on the map.")
 
 
 func milestone_subtitle(metadata: Dictionary) -> String:
@@ -85,10 +92,11 @@ func apply_build_metadata(metadata: Dictionary) -> void:
 func about_text(metadata: Dictionary) -> String:
 	return ("Project EGO — Tactical Prototype, Milestone %s\n\n"
 		+ "Incomplete engine reimplementation prototype. This build includes a "
-		+ "standalone tactical battle and a two-encounter campaign against Crimson, "
+		+ "standalone tactical battle, a short campaign and a native six-province campaign "
+		+ "against Crimson, "
 		+ "movement, melee, ranged "
-		+ "attacks, turn passing, and authored fallback presentation. Strategy play, "
-		+ "legacy AI, saving, audio, animation, and broad content parity are visibly absent."
+		+ "attacks, turn passing, map checkpoints, and authored fallback presentation. "
+		+ "Legacy strategy/AI parity, audio, animation, and broad content parity remain absent."
 		+ "\n\nCommit: %s\nGodot: %s\nMode: %s\nBuild: %s") % [
 		String(metadata.get("milestone", "unknown")),
 		String(metadata.get("commit", "unknown")),

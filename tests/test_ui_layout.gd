@@ -51,9 +51,9 @@ func _test_demo_size(logical_size: Vector2i) -> void:
 	_check(menu.get_rect().encloses(panel.get_rect()),
 		"demo panel stays inside %s" % logical_size,
 		"menu=%s panel=%s" % [menu.get_rect(), panel.get_rect()])
-	for button_name in ["PlayButton", "CampaignButton", "ControlsButton", "AboutButton", "QuitButton"]:
-		var button := menu.get_node(
-			"Center/Panel/Margin/Buttons/%s" % button_name) as Button
+	for button_name in ["PlayButton", "CampaignButton", "StrategicButton",
+			"ControlsButton", "AboutButton", "QuitButton"]:
+		var button := menu.get_node("%%%s" % button_name) as Button
 		_check(_positive(button) and button.size.x + 0.5 >= button.get_combined_minimum_size().x,
 			"%s has label-safe size at %s" % [button_name, logical_size])
 	var long_value := "metadata-" + "0123456789abcdef".repeat(24)

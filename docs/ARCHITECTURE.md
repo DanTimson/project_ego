@@ -195,10 +195,48 @@ Two kinds of proof are required:
 A matching final state can hide a different random call, path tie-break or
 status-expiry order. Ordered traces expose the first divergence.
 
+## Native strategic campaign (CX-028)
+
+`core/campaign/strategic_campaign.gd` is the headless authority for the six-province
+native campaign. The composition root injects the trusted project-authored values
+from `content/campaign/native_campaign.gd`; core performs no file or scene access.
+`query`, `travel`, `recover`, `recruit`, `finish`, and `abandon` are the shared UI/test
+command surface. Returned content, snapshots, and checkpoint values are detached.
+Only one exact in-flight `CampaignEncounter` can resolve. `finish` collects its
+completed tactical result and applies it through `CampaignRoster` before committing
+ownership, position, one turn, and income. Keep victory precedes turn exhaustion.
+Abandonment and rejected collection commit no roster, turn, capture, or income.
+An attempt serial changes on successful battle opening, including retries, to give
+both sides fresh encounter-local IDs; opening itself spends no strategic turn.
+
+Services and checkpoint reconstruction create a roster from persistent definitions,
+IDs and current life. They deliberately do not preserve tactical resources or old
+roster receipts/revisions. The exact in-flight bridge guard prevents old results
+from being replayed across these boundaries. Casualty records remain present and
+never deploy or recover. Definitions, deployment, seeds, economy, and the turn
+limit are native authored design, with no Genesis strategy compatibility claim.
+
+`game/campaign/strategic_main.tscn` owns input, map/roster presentation and the
+temporary tactical child. The tactical child inherits the existing controller and
+automated Crimson phase handoff; it can retry from the unchanged map roster or
+return safely after a halt. Explicit Apply Result returns a completed encounter to
+the model. The main menu keeps standalone tactical and short campaign entries.
+
+`CampaignCheckpointStore` owns one injectable local file path (normally
+`user://strategic_campaign.json`). Its version-1 JSON contains content identity and
+an observed hash of the full authored campaign, position/ownership, turn/gold,
+terminal status, allocation counters, and roster IDs/types/life. The model validates
+the entire payload into a separate replacement before the UI swaps its current
+run. No node, tactical session, tactical RNG, receipt, or mid-battle state is saved.
+The store writes, flushes, closes and verifies a same-directory temporary file,
+then renames it over the slot without deleting the prior slot first. A failed
+write/publication leaves the prior slot intact. New Campaign never writes a save;
+only the explicit map Save action replaces the checkpoint. There are no migrations.
+
 ## Distributable demo boundary
 
 The exported composition root is `game/demo/demo_main.tscn`; it is a small
-presentation shell that transitions to the existing tactical scene. Release
+presentation shell that transitions to the tactical and campaign entry scenes. Release
 metadata is external to the PCK and is read from `BUILD.json` beside the
 executable, with a development fallback when absent.
 

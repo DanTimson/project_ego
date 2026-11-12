@@ -4,6 +4,69 @@ Project EGO Milestone 0.2 has one Windows x86-64 engine payload and two package
 modes. Release packaging changes presentation and distribution only; it does not
 change combat rules.
 
+## Native strategic campaign review (CX-028)
+
+The main menu now offers **Strategic Campaign** alongside **Play Demo** (standalone
+Azure versus automated Crimson) and **Campaign Demo** (short Ford/Watchpost run).
+The direct `game/tactical/tactical_main.tscn` scene remains hot-seat. The strategic
+entry offers New Campaign and Resume Checkpoint; a new run does not save or
+overwrite a checkpoint. Owned provinces and current location are visible on the
+linked map, with Keep as the objective. Only adjacent destinations are available.
+Scroll the map screen vertically at the minimum window size if needed; roster
+records also scroll, so casualties remain inspectable after recruitment.
+
+The native authored opening is 12 gold, 12 turns, Vanguard 20/20 and Scout 4/4.
+Home income is 3; Ford/Quarry each 4; Watchpost/Mill each 5; Keep 8. Each friendly
+move, completed battle, recovery or recruit spends one turn and then credits all
+owned income, including a new capture. Home recovery costs 8 and heals each
+wounded survivor by 6; a Home Guard costs 10. Four living units may deploy.
+Casualties remain visible and cannot recover. Keep captured on turn 12 still wins.
+
+In battle, Azure uses the existing mouse/tactical controls and Crimson is
+automated. **Apply result • Return to map** collects and commits a completed
+battle exactly once. An unfinished, invalid or halted battle offers **Abandon •
+Return to map**, which commits no result, income or turn. Retry uses the opening
+map roster with fresh tactical objects/IDs and does not heal it. A completed
+campaign remains on the map; New Campaign starts another run.
+
+**Save checkpoint** explicitly replaces `user://strategic_campaign.json` on the
+map, including a terminal map. Godot resolves `user://` in its per-user Project EGO
+application-data directory. Leaving the run and restarting the process both use
+the same Resume action. Version/content mismatches, malformed JSON and invalid
+strategic/roster values display a reason and preserve the current run. Writes use
+a complete same-directory replacement; write/publication failure preserves the
+previous slot. This is native version-1 plain JSON, with no tactical RNG/session,
+mid-battle resume, legacy save import, or future-version migration. Tests inject
+unique temporary slots and do not touch the player's checkpoint.
+
+Reviewer interactive WSL route, after the entire patch is ready:
+
+1. Run `"$GODOT_BIN" --path .` and choose Strategic Campaign → New Campaign.
+   At Home expect 12 gold, turn 0/12, Vanguard 20/20, Scout 4/4.
+2. Choose Ford. Select Scout (the lower Azure unit), then click the adjacent
+   Crimson guard to attack. Scout falls. Select Vanguard, then attack the guard.
+   Choose Apply result • Return to map. Expect friendly Ford, position Ford,
+   **19 gold, turn 1/12, Vanguard 14/20 and Scout 0/4 CASUALTY**.
+3. Save checkpoint, return to Main Menu (or quit and restart), choose Strategic
+   Campaign → Resume Checkpoint. Expect exactly the same position, ownership,
+   **19 gold, turn 1/12, Vanguard 14/20, Scout casualty**. New Campaign before
+   Resume may also be used to confirm it never implicitly overwrites the slot.
+4. Move Home: 26 gold, turn 2. Recover: Vanguard 20/20, Scout stays a casualty,
+   25 gold, turn 3. Recruit: Home Guard 20/20, 22 gold, turn 4.
+5. Move Ford: 29 gold, turn 5. Choose Watchpost; select Vanguard and attack the
+   adjacent guard, then Apply result. Expect 41 gold, turn 6, Vanguard 18/20.
+6. Choose Keep; again attack with Vanguard and Apply result. Expect **Victory,
+   position Keep, 61 gold, turn 7/12, Vanguard 16/20, Home Guard 20/20, Scout
+   casualty**. Inspect the terminal map and verify New Campaign is available.
+
+Second route, without services: New Campaign → Quarry → Mill → Keep. In each
+battle select Vanguard, attack the adjacent guard, then Apply result. First
+capture: Quarry, 19 gold, turn 1, Vanguard 13/20, Scout 4/4. Save/Resume there
+preserves those values. Mill: 31 gold, turn 2, Vanguard 11/20. Keep: **Victory,
+51 gold, turn 3, Vanguard 9/20, Scout 4/4**. Both short routes were executed by
+the headless model and mouse-driven lifecycle tests; this protocol remains the
+reviewer's interactive visual/input acceptance, not an original-game observation.
+
 ## Prerequisites
 
 - a clean tracked worktree and index at the revision to release;

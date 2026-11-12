@@ -48,6 +48,7 @@ priority.
 | CX-025 | `CORRECTNESS_HARDENING` | stateful battle checks and occupied move refusal | engine | `DONE` | native demo seeds and replay invariants |
 | CX-026 | `SPEC_IMPLEMENTATION` | roster life across two native encounters | engine | `DONE` | detached roster and apply-once outcome |
 | CX-027 | `SPEC_IMPLEMENTATION` | playable Ford and Watchpost campaign demo | engine | `DONE` | menu entry, survivor handoff, and encounter retry |
+| CX-028 | `SPEC_IMPLEMENTATION` | playable six-province strategic campaign | engine | `DONE` | province capture, roster services, and map checkpoint |
 
 Task contracts live in `docs/codex/tasks/`.
 
