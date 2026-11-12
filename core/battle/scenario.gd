@@ -791,7 +791,10 @@ func movement_plan(unit: Combatant, col: int, row: int) -> Dictionary:
 			unit.label(), Statuses.restriction_reason(unit, Status.Capability.MOVEMENT)]}
 	var start := field.find_unit(unit)
 	var goal := Battlefield.offset_to_axial(col, row)
-	var path := [] if unit.action_spent else field.path(start, goal, false, unit.movement_remaining)
+	var destination := field.tile(goal)
+	var path: Array[Vector2i] = []
+	if not unit.action_spent and destination != null and destination.is_free():
+		path = field.path(start, goal, false, unit.movement_remaining)
 	if path.is_empty():
 		return {"ok": false, "reason": "%s cannot reach %d,%d" % [
 			unit.label(), col, row]}
