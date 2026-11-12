@@ -54,8 +54,8 @@ static func append_bound_traces(traces: Array, log: Array) -> void:
 
 
 static func genesis_charge(unit: Combatant, attacker_xy: Vector2i,
-		target_xy: Vector2i, movement_requested: bool) -> Dictionary:
-	var applicable := Damage.has_effective_modifier(unit, 0x25)
+		target_xy: Vector2i, movement_requested: bool, combat: CombatContext = null) -> Dictionary:
+	var applicable := Damage.has_effective_modifier(unit, 0x25, combat)
 	var value := Charge.command_entry_charge(
 		attacker_xy, target_xy, movement_requested) if applicable else 0
 	return {"applicable": applicable, "value": value}
@@ -73,9 +73,9 @@ static func append_charge(log: Array, decision: Dictionary,
 
 
 static func spend_attack(unit: Combatant,
-		kind: Combatant.AttackKind) -> Trace:
+		kind: Combatant.AttackKind, combat: CombatContext = null) -> Trace:
 	var stamina_suppressed := Damage.has_effective_modifier_semantic(
-		unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED)
+		unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat)
 	if kind == Combatant.AttackKind.RANGED:
 		return ActionPoints.spend_ranged_attack(unit, stamina_suppressed)
 	# R8 stays ranged-only; melee retains its established cost boundary.
@@ -85,12 +85,12 @@ static func spend_attack(unit: Combatant,
 static func resolve_exchange(log: Array, unit: Combatant, target: Combatant,
 		rng: Variant, kind: Combatant.AttackKind, action: Variant,
 		primary_melee_charge: Variant,
-		spend_attack_cost: bool = true) -> Counterattack.Exchange:
+		spend_attack_cost: bool = true, combat: CombatContext = null) -> Counterattack.Exchange:
 	var exchange := Counterattack.resolve(
-		unit, target, rng, kind, action, primary_melee_charge)
+		unit, target, rng, kind, action, primary_melee_charge, combat)
 	append_traces(log, exchange.traces)
 	if spend_attack_cost:
-		append_traces(log, [spend_attack(unit, kind)])
+		append_traces(log, [spend_attack(unit, kind, combat)])
 	return exchange
 
 

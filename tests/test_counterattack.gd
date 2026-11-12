@@ -67,12 +67,11 @@ func _test_effective_offensive_disable_and_live_exhaustion() -> void:
 	var aura_modifier := Modifier.make(
 		0x26, &"modifier_0x26", Modifier.Hook.DAMAGE_VS_TARGET,
 		0, {}, "", [ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED])
-	Damage.bind_environment(func(candidate: Combatant) -> Array:
+	var combat := CombatContext.new(null, func(candidate: Combatant) -> Array:
 		return [aura_modifier] if candidate == aura_disabled else [])
 	_check(Counterattack.why_no_counter(aura_disabled, attacker,
-			Combatant.AttackKind.MELEE) == Counterattack.NoCounter.CANNOT_FIGHT,
+			Combatant.AttackKind.MELEE, combat) == Counterattack.NoCounter.CANNOT_FIGHT,
 		"eligible environment/aura-provided 0x26 suppresses retaliation")
-	Damage.bind_environment(Callable())
 
 	_check(Counterattack.why_no_counter(_unit({"name": "positive", "life": 50}),
 			attacker, Combatant.AttackKind.MELEE) == Counterattack.NoCounter.NONE,
@@ -185,11 +184,11 @@ func _lifecycle_exchange(attacker: Combatant,
 	var sides: Array = [left, right]
 	field.place(attacker, Battlefield.offset_to_axial(0, 0))
 	field.place(defender, Battlefield.offset_to_axial(1, 0))
-	Counterattack.bind_death_resolver(
+	var combat := CombatContext.new(null, Callable(),
 		func(casualty: Combatant):
 			return DeathLifecycle.resolve(casualty, field, sides))
-	var exchange := Counterattack.resolve(attacker, defender, Rng.new(17))
-	Counterattack.bind_death_resolver(Callable())
+	var exchange := Counterattack.resolve(attacker, defender, Rng.new(17),
+		Combatant.AttackKind.MELEE, null, null, combat)
 	return exchange
 
 

@@ -1,5 +1,7 @@
 extends SceneTree
 
+var combat: CombatContext
+
 ## CX-012 independent deterministic vectors for DAMAGE-RANGED-001.
 
 var failures := 0
@@ -48,7 +50,7 @@ func _resolve(ranged_defence: int, resistance: int,
 	defender.stamina = 10
 	defender.morale = 10
 	defender.modifiers = target_modifiers.duplicate()
-	return Damage.resolve_ranged_attack(attacker, defender, MidpointRng.new())
+	return Damage.resolve_ranged_attack(attacker, defender, MidpointRng.new(), combat)
 
 
 func _sources(traces: Array) -> Array[String]:
@@ -76,7 +78,7 @@ func _represented_resistance(base: int, provider_power: int) -> Array:
 	defender.stamina = 0
 	defender.morale = 10
 	defender.modifiers = [_resistance_modifier(provider_power)]
-	return Damage.current_resistance(defender)
+	return Damage.current_resistance(defender, combat)
 
 
 func _test_effective_resistance_provider_and_final_clamp() -> void:
@@ -170,11 +172,10 @@ func _test_stage_controls() -> void:
 func _init() -> void:
 	var registry := AbilityRegistry.new()
 	Handlers.register_all(registry)
-	Damage.bind_pipeline(Pipeline.new(registry))
+	combat = CombatContext.new(Pipeline.new(registry))
 	_test_effective_resistance_provider_and_final_clamp()
 	_test_clamped_resistance_consumers()
 	_test_frozen_branches()
 	_test_stage_controls()
-	Damage.bind_pipeline(null)
 	print("\n%s" % ("ALL PASS" if failures == 0 else "%d FAILURES" % failures))
 	quit(1 if failures > 0 else 0)

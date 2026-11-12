@@ -57,15 +57,6 @@ const EVASIVE: Array[StringName] = [&"Ловкость", &"Касание вам
 ## whether an on-hit rider fires during a counter is a property of the rider.
 const COUNTER_SUPPRESSED_RIDERS: Array[StringName] = [&"Смертельное касание"]
 
-## Scoped by Scenario around one exchange, matching Damage's existing battle
-## pipeline/environment bindings. Direct handler tests may leave it invalid.
-static var _death_resolver: Callable = Callable()
-
-
-static func bind_death_resolver(resolver: Callable) -> void:
-	_death_resolver = resolver
-
-
 class Exchange extends RefCounted:
 	var attack_damage: int = 0
 	var ordinary_attack_damage: int = 0
@@ -87,13 +78,13 @@ class Exchange extends RefCounted:
 
 ## Decidable before any dice are rolled.
 static func why_no_counter(defender: Combatant, attacker: Combatant,
-		kind: Combatant.AttackKind) -> int:
+		kind: Combatant.AttackKind, combat: CombatContext = null) -> int:
 	if kind != Combatant.AttackKind.MELEE:
 		return NoCounter.RANGED
 	if not defender.alive or defender.life <= 0:
 		return NoCounter.DEAD
 	if Damage.has_effective_modifier_semantic(
-		defender, ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED) \
+		defender, ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED, combat) \
 			or defender.has_flag(&"Не сражается"):
 		return NoCounter.CANNOT_FIGHT
 	if defender.counter_attack <= 0:
@@ -109,8 +100,8 @@ static func why_no_counter(defender: Combatant, attacker: Combatant,
 
 
 static func will_counter(defender: Combatant, attacker: Combatant,
-		kind: Combatant.AttackKind) -> bool:
-	return why_no_counter(defender, attacker, kind) == NoCounter.NONE
+		kind: Combatant.AttackKind, combat: CombatContext = null) -> bool:
+	return why_no_counter(defender, attacker, kind, combat) == NoCounter.NONE
 
 
 ## «Это правило не действует, если противник тоже обладает первым ударом.»
@@ -126,22 +117,23 @@ static func strikes_first(defender: Combatant, attacker: Combatant) -> bool:
 ## suppresses ordinary retaliation even if its target survives the lifecycle.
 static func resolve(attacker: Combatant, defender: Combatant, rng: Variant,
 		kind: Combatant.AttackKind = Combatant.AttackKind.MELEE,
-		action: Variant = null, primary_melee_charge: Variant = null) -> Exchange:
+		action: Variant = null, primary_melee_charge: Variant = null,
+		combat: CombatContext = null) -> Exchange:
 	var ex := Exchange.new()
-	ex.reason = why_no_counter(defender, attacker, kind)
+	ex.reason = why_no_counter(defender, attacker, kind, combat)
 	ex.countered = ex.reason == NoCounter.NONE
 	ex.counter_first = ex.countered and strikes_first(defender, attacker)
 
 	if ex.counter_first:
-		_do_counter(ex, attacker, defender, rng)
+		_do_counter(ex, attacker, defender, rng, combat)
 		## First-strike continuation uses final post-lifecycle alive state.
 		if attacker.alive and attacker.life > 0:
-			_do_attack(ex, attacker, defender, rng, kind, action, primary_melee_charge)
+			_do_attack(ex, attacker, defender, rng, kind, action, primary_melee_charge, combat)
 	else:
-		_do_attack(ex, attacker, defender, rng, kind, action, primary_melee_charge)
+		_do_attack(ex, attacker, defender, rng, kind, action, primary_melee_charge, combat)
 		## A fatal primary stays on the fatal-event branch even after survival.
 		if ex.countered and not ex.defender_fatal_event and defender.alive:
-			_do_counter(ex, attacker, defender, rng)
+			_do_counter(ex, attacker, defender, rng, combat)
 		elif ex.countered:
 			ex.countered = false
 			ex.reason = NoCounter.DEAD
@@ -150,7 +142,7 @@ static func resolve(attacker: Combatant, defender: Combatant, rng: Variant,
 
 static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 		rng: Variant, kind: Combatant.AttackKind, action: Variant = null,
-		primary_melee_charge: Variant = null) -> void:
+		primary_melee_charge: Variant = null, combat: CombatContext = null) -> void:
 	# Resolve the ordinary strike completely before consuming R3 charge. The
 	# combined capped value feeds the exchange accumulator/order before life
 	# subtraction. Retaliation has its own charge-free path below.
@@ -162,12 +154,12 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 	var result: Array
 	var ranged_channel := 0
 	if kind == Combatant.AttackKind.RANGED:
-		result = Damage.resolve_ranged_attack(attacker, defender, rng)
+		result = Damage.resolve_ranged_attack(attacker, defender, rng, combat)
 		ranged_channel = int(result[2])
 	else:
 		result = Damage.resolve_attack(
 			attacker, defender, kind, rng, false,
-			scale_numerator, scale_denominator)
+			scale_numerator, scale_denominator, combat)
 	var ordinary_damage := int(result[0])
 	ex.ordinary_attack_damage = ordinary_damage
 	var damage := ordinary_damage
@@ -191,21 +183,21 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 	var outcome := Damage.apply_received_damage(
 		defender, damage,
 		ranged_channel if kind == Combatant.AttackKind.RANGED else 0,
-		_death_resolver)
+		(combat.fatal_resolver if combat != null else Callable()))
 	ex.defender_fatal_event = bool(outcome["fatal_event"])
 	ex.defender_died = bool(outcome["final_death"])
 	ex.runtime_error = String(outcome.get("error", ""))
 
 
 static func _do_counter(ex: Exchange, attacker: Combatant, defender: Combatant,
-		rng: Variant) -> void:
+		rng: Variant, combat: CombatContext = null) -> void:
 	var result: Array = Damage.resolve_attack(
-		defender, attacker, Combatant.AttackKind.COUNTER, rng)
+		defender, attacker, Combatant.AttackKind.COUNTER, rng, false, 1, 1, combat)
 	ex.counter_damage = int(result[0])
 	ex.traces.append_array(result[1])
 	ex.order.append(["counter", ex.counter_damage])
 	var outcome := Damage.apply_received_damage(
-		attacker, ex.counter_damage, 0, _death_resolver)
+		attacker, ex.counter_damage, 0, (combat.fatal_resolver if combat != null else Callable()))
 	ex.attacker_fatal_event = bool(outcome["fatal_event"])
 	ex.attacker_died = bool(outcome["final_death"])
 	ex.runtime_error = String(outcome.get("error", ""))

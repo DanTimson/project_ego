@@ -7,14 +7,10 @@ extends RefCounted
 
 var scenario: Scenario
 var started: bool = false
-var _pipeline: Pipeline
 
 
 func _init(p_scenario: Scenario) -> void:
 	scenario = p_scenario
-	var registry := AbilityRegistry.new()
-	Handlers.register_all(registry)
-	_pipeline = Pipeline.new(registry)
 
 
 func begin() -> Dictionary:
@@ -36,7 +32,6 @@ func begin() -> Dictionary:
 
 
 func end() -> void:
-	_unbind_rules()
 	started = false
 
 
@@ -145,39 +140,23 @@ func query_command(command: Dictionary) -> Dictionary:
 		String(query["reason"]), [], false)
 
 
-## Authoritative command execution. Damage's process-global bindings are scoped
-## to this call and cleared before returning so alternating sessions cannot
-## retain one another's environment.
+## Authoritative execution rechecks legality using the Scenario's live context.
 func issue_command(command: Dictionary) -> Dictionary:
 	var refusal := _session_refusal()
 	if refusal != "":
 		return _result(false, _command_name(command), refusal, [], false)
-	_bind_rules()
 	var result := scenario.execute_command(command)
-	_unbind_rules()
 	result["battle_over"] = battle_complete()
 	result["winner"] = winning_side_id()
 	return result
 
 
 ## Neutral presentation query used by inspection/tests. No formula is copied
-## here; it invokes Damage under this session's scoped environment.
+## here; it invokes Damage with this battle's explicit context.
 func current_attack(unit: Combatant,
 		kind: Combatant.AttackKind = Combatant.AttackKind.MELEE) -> float:
-	_bind_rules()
-	var result: Array = Damage.current_attack(unit, kind)
-	_unbind_rules()
+	var result: Array = Damage.current_attack(unit, kind, scenario.combat)
 	return float(result[0])
-
-
-func _bind_rules() -> void:
-	Damage.bind_pipeline(_pipeline)
-	Damage.bind_environment(Callable(scenario, "environment"))
-
-
-func _unbind_rules() -> void:
-	Damage.bind_environment(Callable())
-	Damage.bind_pipeline(null)
 
 
 func _session_refusal() -> String:

@@ -410,12 +410,11 @@ func _test_unresolved_replacement_fails_closed_before_mutation() -> void:
 	var exchange_context := _setup()
 	exchange_context.enemy.attack = 100
 	exchange_context.enemy.stamina = 10
-	Counterattack.bind_death_resolver(func(unit: Combatant):
+	var combat := CombatContext.new(null, Callable(), func(unit: Combatant):
 		return DeathLifecycle.resolve(unit, exchange_context.field,
 			exchange_context.sides, Callable(self, "_unresolved_replacement")))
 	var exchange := Counterattack.resolve(exchange_context.enemy,
-		exchange_context.victim, Rng.new(7), Combatant.AttackKind.MELEE)
-	Counterattack.bind_death_resolver(Callable())
+		exchange_context.victim, Rng.new(7), Combatant.AttackKind.MELEE, null, null, combat)
 	_check(exchange.runtime_error == "synthetic unresolved replacement",
 		"exchange retains the received-damage lifecycle failure")
 

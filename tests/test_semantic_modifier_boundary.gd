@@ -131,12 +131,11 @@ func _test_melee() -> void:
 	var semantic_modifier := _make(
 		ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED,
 		Modifier.Hook.DAMAGE_VS_TARGET)
-	Damage.bind_environment(func(unit: Combatant) -> Array:
+	var combat := CombatContext.new(null, func(unit: Combatant) -> Array:
 		return [semantic_modifier] if unit == protected else [])
-	var melee: float = Damage.current_attack(protected, Combatant.AttackKind.MELEE)[0]
-	var counter: float = Damage.current_attack(protected, Combatant.AttackKind.COUNTER)[0]
-	var ranged: float = Damage.current_attack(protected, Combatant.AttackKind.RANGED)[0]
-	Damage.bind_environment(Callable())
+	var melee: float = Damage.current_attack(protected, Combatant.AttackKind.MELEE, combat)[0]
+	var counter: float = Damage.current_attack(protected, Combatant.AttackKind.COUNTER, combat)[0]
+	var ranged: float = Damage.current_attack(protected, Combatant.AttackKind.RANGED, combat)[0]
 	_check(melee == 0 and counter == 0 and ranged == 7,
 		"melee semantic covers environment provider without broadening to ranged")
 	var raw := Combatant.new()

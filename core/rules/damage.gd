@@ -10,91 +10,69 @@ extends RefCounted
 ##
 ## Additive before multiplicative is documented and not negotiable.
 
-# ---------------------------------------------------------------------------
-# Pipeline wiring
-#
-# Set by Scenario.run() or by whatever owns the battle. `null` means "no content
-# loaded" — the scalar attack_bonus/defence_bonus path still works, which keeps
-# the pre-pipeline tests and scenarios valid.
-# ---------------------------------------------------------------------------
-
-static var _pipeline: Pipeline = null
-
-## Supplies modifiers that come from the unit's SURROUNDINGS rather than from the
-## unit — auras today, terrain later. Injected rather than imported, because those
-## need the battlefield and the side layout, and the rules must not depend on
-## either.
-static var _environment: Callable = Callable()
-
-
-static func bind_pipeline(p: Pipeline) -> void:
-	_pipeline = p
-
-
-## `provider(unit) -> Array[Modifier]`. Pass an empty Callable to detach.
-static func bind_environment(provider: Callable) -> void:
-	_environment = provider
-
+## Battle services are explicit. Omitting context keeps scalar rule calls usable.
 
 ## Runtime/status and environment/aura providers already have distinct storage.
 ## Keep that existing distinction available to ordering-sensitive rules (R6).
-static func _later_modifiers(u: Combatant) -> Array:
+static func _later_modifiers(u: Combatant, combat: CombatContext = null) -> Array:
 	# CX-008 R6 boundary: status/runtime modifiers enter only here, after the
 	# ranged definition + unit-owned early-provider zero check.
 	var out: Array = Statuses.active_modifiers(u)
-	if _environment.is_valid():
-		out.append_array(_environment.call(u))
+	if combat != null and combat.environment.is_valid():
+		out.append_array(combat.environment.call(u))
 	return out
 
 
 ## Every modifier acting on this unit, from every represented source.
-static func effective_modifiers(u: Combatant) -> Array:
+static func effective_modifiers(u: Combatant, combat: CombatContext = null) -> Array:
 	var out: Array = u.modifiers.duplicate()
-	out.append_array(_later_modifiers(u))
+	out.append_array(_later_modifiers(u, combat))
 	return out
 
 
 ## Numeric modifier membership across every currently available provider.
-static func has_effective_modifier(u: Combatant, ability: int) -> bool:
-	for modifier in effective_modifiers(u):
+static func has_effective_modifier(u: Combatant, ability: int,
+		combat: CombatContext = null) -> bool:
+	for modifier in effective_modifiers(u, combat):
 		if int((modifier as Modifier).ability) == ability:
 			return true
 	return false
 
 
 static func has_effective_modifier_semantic(
-		u: Combatant, query: ModifierSemantic.Query) -> bool:
-	for modifier in effective_modifiers(u):
+		u: Combatant, query: ModifierSemantic.Query, combat: CombatContext = null) -> bool:
+	for modifier in effective_modifiers(u, combat):
 		if (modifier as Modifier).has_semantic(query):
 			return true
 	return false
 
 
-static func effective_modifier_value(u: Combatant, ability: int) -> int:
+static func effective_modifier_value(u: Combatant, ability: int,
+		combat: CombatContext = null) -> int:
 	## Signed numeric total for one modifier ID across represented providers.
 	var total := 0
-	for modifier in effective_modifiers(u):
+	for modifier in effective_modifiers(u, combat):
 		if int((modifier as Modifier).ability) == ability:
 			total += int((modifier as Modifier).power)
 	return total
 
 
-static func _offensive_disabled(u: Combatant) -> bool:
+static func _offensive_disabled(u: Combatant, combat: CombatContext = null) -> bool:
 	return has_effective_modifier_semantic(
-		u, ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED) or u.has_flag(&"Не сражается")
+		u, ModifierSemantic.Query.MELEE_EXCHANGE_SUPPRESSED, combat) or u.has_flag(&"Не сражается")
 
 
 ## Returns [value, trace] or [base, null] when nothing applies.
 static func _run_hook_for(base: Variant, mods: Array, hook: int,
-		ctx: Dictionary, label: String) -> Array:
-	if _pipeline == null or mods.is_empty():
+		ctx: Dictionary, label: String, combat: CombatContext = null) -> Array:
+	if combat == null or combat.pipeline == null or mods.is_empty():
 		return [base, null]
-	return _pipeline.resolve(base, mods, hook, ctx, label)
+	return combat.pipeline.resolve(base, mods, hook, ctx, label)
 
 
 static func _run_hook(base: Variant, u: Combatant, hook: int, ctx: Dictionary,
-		label: String) -> Array:
-	return _run_hook_for(base, effective_modifiers(u), hook, ctx, label)
+		label: String, combat: CombatContext = null) -> Array:
+	return _run_hook_for(base, effective_modifiers(u, combat), hook, ctx, label, combat)
 
 
 static func _append_hook_steps(trace: Trace, resolved: Array, before: float) -> float:
@@ -112,7 +90,8 @@ const _STAT_FOR_KIND: Dictionary = {
 
 
 ## Returns [value: float, trace: Trace].
-static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
+static func current_attack(u: Combatant, kind: Combatant.AttackKind,
+		combat: CombatContext = null) -> Array:
 	var trace_stat := "ranged_attack" if kind == Combatant.AttackKind.RANGED else "melee_attack"
 	if kind == Combatant.AttackKind.COUNTER:
 		trace_stat = "counter_attack"
@@ -127,7 +106,7 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 	# «Не сражается» first and return zero outright; the final minimum-one clamp
 	# is never reached on that path.
 	if (kind == Combatant.AttackKind.MELEE or kind == Combatant.AttackKind.COUNTER) \
-			and _offensive_disabled(u):
+			and _offensive_disabled(u, combat):
 		t.step("combat.melee_exchange_suppressed", value, 0.0, "cannot attack")
 		t.result = 0.0
 		return [0.0, t]
@@ -138,7 +117,7 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 		# Resolve them into the accepted early sum before consulting the already
 		# separate status and environment channels.
 		var early := _run_hook_for(value, u.modifiers,
-			Modifier.Hook.STAT_PASSIVE, ctx, "early unit modifiers")
+			Modifier.Hook.STAT_PASSIVE, ctx, "early unit modifiers", combat)
 		value = _append_hook_steps(t, early, value)
 		t.step("ranged early provider total", float(base), value,
 			"definition plus unit modifiers; status/environment not consulted")
@@ -154,8 +133,8 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 			var later_value := value + float(u.attack_bonus)
 			t.step("later additive bonuses", value, later_value)
 			value = later_value
-		var later := _run_hook_for(value, _later_modifiers(u),
-			Modifier.Hook.STAT_PASSIVE, ctx, "status/environment modifiers")
+		var later := _run_hook_for(value, _later_modifiers(u, combat),
+			Modifier.Hook.STAT_PASSIVE, ctx, "status/environment modifiers", combat)
 		value = _append_hook_steps(t, later, value)
 	else:
 		# Preserve the established melee/counter provider behavior: scalar and all
@@ -165,7 +144,7 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 			t.step("additive bonuses", value, nv)
 			value = nv
 		var passive := _run_hook(value, u, Modifier.Hook.STAT_PASSIVE,
-			ctx, "modifiers")
+			ctx, "modifiers", combat)
 		value = _append_hook_steps(t, passive, value)
 
 	# Stamina and wound act inside the x100 scaled domain; morale is applied
@@ -214,7 +193,8 @@ static func current_attack(u: Combatant, kind: Combatant.AttackKind) -> Array:
 ## At stamina 0 both defence
 ## values are halved: «его Защита и Защита от выстрела уменьшаются в 2 раза».
 ## Returns [value: int, trace: Trace].
-static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
+static func current_defence(u: Combatant, kind: Combatant.AttackKind,
+		combat: CombatContext = null) -> Array:
 	var t := Trace.new("%s.defence" % u.name)
 	var base: int = u.base_defence_for(kind)
 	t.base = float(base)
@@ -228,7 +208,7 @@ static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
 	var stat: String = "ranged_defence" if kind == Combatant.AttackKind.RANGED \
 		else "defence"
 	var passive: Array = _run_hook(value, u, Modifier.Hook.STAT_PASSIVE,
-		{"stat": stat, "unit": u, "kind": kind}, "modifiers")
+		{"stat": stat, "unit": u, "kind": kind}, "modifiers", combat)
 	if passive[1] != null and float(passive[0]) != value:
 		for step in (passive[1] as Trace).steps:
 			t.steps.append(step)
@@ -259,13 +239,13 @@ static func current_defence(u: Combatant, kind: Combatant.AttackKind) -> Array:
 	return [final, t]
 
 
-static func current_resistance(u: Combatant) -> Array:
+static func current_resistance(u: Combatant, combat: CombatContext = null) -> Array:
 	## Represented effective resistance providers, without defence stamina rules.
 	var t := Trace.new("%s.resistance" % u.name)
 	t.base = float(u.resist)
 	var value := float(u.resist)
 	var resolved := _run_hook(value, u, Modifier.Hook.STAT_PASSIVE,
-		{"stat": "resist", "unit": u}, "modifiers")
+		{"stat": "resist", "unit": u}, "modifiers", combat)
 	value = _append_hook_steps(t, resolved, value)
 	var provider_total := int(value)
 	t.step("resistance provider total", value, float(provider_total),
@@ -330,8 +310,8 @@ static func trunc0_ratio(value: int, numerator: int, denominator: int) -> int:
 static func attack_power_before_randomisation(attacker: Combatant,
 		kind: Combatant.AttackKind, selected_ordinary_1_5x: bool = false,
 		initiating_scale_numerator: int = 1,
-		initiating_scale_denominator: int = 1) -> Array:
-	var atk: Array = current_attack(attacker, kind)
+		initiating_scale_denominator: int = 1, combat: CombatContext = null) -> Array:
+	var atk: Array = current_attack(attacker, kind, combat)
 	var atk_value: float = atk[0]
 	var atk_trace: Trace = atk[1]
 
@@ -402,13 +382,13 @@ static func trunc0_half(value: int) -> int:
 
 
 static func resolve_ranged_attack(attacker: Combatant, defender: Combatant,
-		rng: Variant) -> Array:
+		rng: Variant, combat: CombatContext = null) -> Array:
 	## Frozen DAMAGE-RANGED-001 calculator: [damage, traces, sink channel].
 	var attack_power := attack_power_before_randomisation(
-		attacker, Combatant.AttackKind.RANGED)
+		attacker, Combatant.AttackKind.RANGED, false, 1, 1, combat)
 	var attack_int := int(attack_power[0])
 	var atk_trace := attack_power[1] as Trace
-	var modifier_0x1c := effective_modifier_value(attacker, 0x1C)
+	var modifier_0x1c := effective_modifier_value(attacker, 0x1C, combat)
 	var channel := 2 if modifier_0x1c != 0 else 1
 	if attack_int == 0:
 		var channel_trace := Trace.new("ranged channel")
@@ -419,12 +399,12 @@ static func resolve_ranged_attack(attacker: Combatant, defender: Combatant,
 		return [0, [atk_trace, channel_trace], channel]
 
 	if modifier_0x1c != 0:
-		var resistance_pair := current_resistance(defender)
+		var resistance_pair := current_resistance(defender, combat)
 		var defence_input := int(resistance_pair[0])
 		var defence_trace := resistance_pair[1] as Trace
 		defence_trace.step("ranged resistance branch", float(defence_input),
 			float(defence_input), "effective modifier 0x1C is nonzero")
-		var modifier_0x5f := effective_modifier_value(attacker, 0x5F)
+		var modifier_0x5f := effective_modifier_value(attacker, 0x5F, combat)
 		var reduced := defence_input - modifier_0x5f
 		defence_trace.step("modifier 0x5F resistance subtraction",
 			float(defence_input), float(reduced),
@@ -441,19 +421,19 @@ static func resolve_ranged_attack(attacker: Combatant, defender: Combatant,
 		(resolved[1] as Array).append(channel_trace)
 		return [int(resolved[0]), resolved[1], 2]
 
-	var defence_pair := current_defence(defender, Combatant.AttackKind.RANGED)
+	var defence_pair := current_defence(defender, Combatant.AttackKind.RANGED, combat)
 	var defence_input := int(defence_pair[0])
 	var defence_trace := defence_pair[1] as Trace
 	defence_trace.step("ordinary ranged-defence branch", float(defence_input),
 		float(defence_input), "effective modifier 0x1C is zero")
-	var modifier_0x11 := effective_modifier_value(attacker, 0x11)
+	var modifier_0x11 := effective_modifier_value(attacker, 0x11, combat)
 	if modifier_0x11 != 0:
 		var halved := trunc0_half(defence_input)
 		defence_trace.step("modifier 0x11 ranged-defence halving",
 			float(defence_input), float(halved),
 			"signed truncation toward zero; before 0x4D")
 		defence_input = halved
-	var modifier_0x4d := effective_modifier_value(attacker, 0x4D)
+	var modifier_0x4d := effective_modifier_value(attacker, 0x4D, combat)
 	var reduced := defence_input - modifier_0x4d
 	defence_trace.step("modifier 0x4D ranged-defence subtraction",
 		float(defence_input), float(reduced),
@@ -464,8 +444,8 @@ static func resolve_ranged_attack(attacker: Combatant, defender: Combatant,
 		attack_int, atk_trace, attacker.name, defence_input, defence_trace, rng,
 		"selected defensive input")
 	var damage := int(resolved[0])
-	var modifier_0x3c := effective_modifier_value(attacker, 0x3C)
-	var target_resistance := int(current_resistance(defender)[0])
+	var modifier_0x3c := effective_modifier_value(attacker, 0x3C, combat)
+	var target_resistance := int(current_resistance(defender, combat)[0])
 	var excess := maxi(0, modifier_0x3c - target_resistance)
 	var post_trace := Trace.new("ranged post-resolver")
 	post_trace.base = float(damage)
@@ -485,19 +465,19 @@ static func resolve_attack(attacker: Combatant, defender: Combatant,
 		kind: Combatant.AttackKind, rng: Variant,
 		selected_ordinary_1_5x: bool = false,
 		initiating_scale_numerator: int = 1,
-		initiating_scale_denominator: int = 1) -> Array:
+		initiating_scale_denominator: int = 1, combat: CombatContext = null) -> Array:
 	if kind == Combatant.AttackKind.RANGED:
-		var ranged := resolve_ranged_attack(attacker, defender, rng)
+		var ranged := resolve_ranged_attack(attacker, defender, rng, combat)
 		return [ranged[0], ranged[1]]
 
 	var attack_power := attack_power_before_randomisation(
 		attacker, kind, selected_ordinary_1_5x,
-		initiating_scale_numerator, initiating_scale_denominator)
+		initiating_scale_numerator, initiating_scale_denominator, combat)
 	var attack_int := int(attack_power[0])
 	var atk_trace := attack_power[1] as Trace
-	if _offensive_disabled(attacker):
+	if _offensive_disabled(attacker, combat):
 		return [0, [atk_trace]]
-	var defence_pair := current_defence(defender, kind)
+	var defence_pair := current_defence(defender, kind, combat)
 	return _resolve_attack_against_defence(
 		attack_int, atk_trace, attacker.name, int(defence_pair[0]),
 		defence_pair[1], rng)
@@ -507,10 +487,10 @@ static func resolve_attack(attacker: Combatant, defender: Combatant,
 # Central received-damage sink (CX-011)
 # ---------------------------------------------------------------------------
 
-static func adjust_morale(unit: Combatant, delta: int) -> bool:
+static func adjust_morale(unit: Combatant, delta: int, combat: CombatContext = null) -> bool:
 	## Apply recovered morale-underflow suppression and morale underflow accounting.
 	if has_effective_modifier_semantic(
-		unit, ModifierSemantic.Query.MORALE_UNDERFLOW_SUPPRESSED):
+		unit, ModifierSemantic.Query.MORALE_UNDERFLOW_SUPPRESSED, combat):
 		return false
 	var after := unit.morale + delta
 	if after < 0:

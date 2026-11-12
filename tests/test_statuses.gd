@@ -168,17 +168,17 @@ func _init() -> void:
 	print("\n[4] numeric modifier reaches live stats and remains a later provider")
 	var registry := AbilityRegistry.new()
 	Handlers.register_all(registry)
-	Damage.bind_pipeline(Pipeline.new(registry))
+	var combat := CombatContext.new(Pipeline.new(registry))
 	var actor := _unit()
 	var boon := Status.new()
 	boon.id = &"attack_boon"
 	boon.duration = 4
 	boon.modifiers.append(_modifier("attack"))
 	Statuses.apply(actor, boon)
-	_check(float(Damage.current_attack(actor, Combatant.AttackKind.MELEE)[0]) == 8.0,
+	_check(float(Damage.current_attack(actor, Combatant.AttackKind.MELEE, combat)[0]) == 8.0,
 		"status raises live effective attack")
 	Statuses.remove(actor, &"attack_boon")
-	_check(float(Damage.current_attack(actor, Combatant.AttackKind.MELEE)[0]) == 5.0,
+	_check(float(Damage.current_attack(actor, Combatant.AttackKind.MELEE, combat)[0]) == 5.0,
 		"removal restores live effective attack")
 
 	var ranged := _unit()
@@ -188,7 +188,7 @@ func _init() -> void:
 	ranged_boon.duration = 4
 	ranged_boon.modifiers.append(_modifier("ranged_attack", 6))
 	Statuses.apply(ranged, ranged_boon)
-	var zero_result := Damage.current_attack(ranged, Combatant.AttackKind.RANGED)
+	var zero_result := Damage.current_attack(ranged, Combatant.AttackKind.RANGED, combat)
 	_check(int(zero_result[0]) == 0,
 		"status cannot resurrect the R6 zero early-provider sum")
 	var status_resolved := false
@@ -197,9 +197,8 @@ func _init() -> void:
 			status_resolved = true
 	_check(not status_resolved, "zero return precedes the status later provider")
 	ranged.ranged_attack = 1
-	_check(int(Damage.current_attack(ranged, Combatant.AttackKind.RANGED)[0]) == 7,
+	_check(int(Damage.current_attack(ranged, Combatant.AttackKind.RANGED, combat)[0]) == 7,
 		"a nonzero early sum then consumes the status provider")
-	Damage.bind_pipeline(null)
 
 	print("\n[5] status flag reaches an existing live consumer")
 	var wounded := _unit()

@@ -41,6 +41,7 @@ priority.
 | CX-018 | `CORRECTNESS_HARDENING` | Scenario/fatal-event failure containment | engine/rules | `DONE` | APA-005A/B confirmed by architecture audit and independent review |
 | CX-019 | `GOVERNANCE_HARDENING` | Python oracle O1-O4 inventory and scope guard | governance/tooling | `DONE` | DELIB-0008 operational follow-up |
 | CX-020 | `SPEC_IMPLEMENTATION` | playable granted action in the fallback tactical UI | engine | `DONE` | DELIB-0004; acceptance recorded in task |
+| CX-021 | `SPEC_IMPLEMENTATION` | battle-owned combat context | engine | `DONE` | APA-002; acceptance recorded in task |
 
 Task contracts live in `docs/codex/tasks/`.
 

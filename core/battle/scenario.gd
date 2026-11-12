@@ -69,6 +69,8 @@ var action_load_mode: String = ActionDefinitionComposer.STRICT
 var death_replacement_load_mode: String = GenesisDeathReplacementResolver.STRICT
 var death_replacement_diagnostics: Array = []
 var death_replacement_state: Dictionary = {}
+## Pipeline and live provider/fatal lookup belong to this battle.
+var combat: CombatContext
 var _death_replacement_resolver: GenesisDeathReplacementResolver
 var _action_composition: Dictionary = {}
 var _inline_action_ids: Dictionary = {}
@@ -270,6 +272,10 @@ static func prepare_content(p_spec: Dictionary, provider: Variant = null) -> Dic
 
 func _init(p_spec: Dictionary, injected_rng: Variant = null,
 		injected_content_provider: Variant = null) -> void:
+	var registry := AbilityRegistry.new()
+	Handlers.register_all(registry)
+	combat = CombatContext.new(Pipeline.new(registry),
+		Callable(self, "environment"), Callable(self, "_resolve_fatal_event"))
 	spec = p_spec
 	scenario_name = String(spec.get("name", "unnamed"))
 	seed_value = int(spec.get("seed", 0))
@@ -650,7 +656,7 @@ func _no_attack_command_charge(_unit: Combatant, _attacker_xy: Vector2i,
 func _genesis_attack_command_charge(unit: Combatant, attacker_xy: Vector2i,
 		target_xy: Vector2i, movement_requested: bool) -> Dictionary:
 	return ScenarioNumericOrdering.genesis_charge(
-		unit, attacker_xy, target_xy, movement_requested)
+		unit, attacker_xy, target_xy, movement_requested, combat)
 
 
 # -- authoritative manual-command boundary -----------------------------------
@@ -820,7 +826,8 @@ func _resolve_action_command(unit: Combatant, action_id: String,
 	if restriction != "":
 		return {"reason": restriction, "refusal": "restriction"}
 	var refusal := action.availability(unit,
-		Damage.has_effective_modifier_semantic(unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
+		Damage.has_effective_modifier_semantic(
+			unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	if refusal != Action.Refusal.OK:
 		return {"reason": Action.REFUSAL_TEXT[refusal]}
 	if target == null:
@@ -928,7 +935,8 @@ func cmd_move(unit: Combatant, col: int, row: int) -> void:
 	field.remove_occupant(start)
 	field.place(unit, goal)
 	var move_trace := ActionPoints.spend_move(unit, cost,
-		int(plan["stamina_cost"]), Damage.has_effective_modifier_semantic(unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
+		int(plan["stamina_cost"]), Damage.has_effective_modifier_semantic(
+			unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	ScenarioNumericOrdering.append_traces(log, [move_trace])
 	emit("%s moves to %s (%d steps, %d total this round)"
 		% [unit.label(), _at(unit), path.size(), unit.steps_this_round])
@@ -980,14 +988,15 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 	field.remove_occupant(here)
 	field.place(unit, destination)
 	var move_trace := ActionPoints.spend_move(unit, cost, _path_stamina(path),
-		Damage.has_effective_modifier_semantic(unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
+		Damage.has_effective_modifier_semantic(
+			unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	ScenarioNumericOrdering.append_traces(log, [move_trace])
 	emit("%s closes to %s (%d steps)" % [unit.label(), _at(unit), path.size()])
 	return true
 
 func _resolve_fatal_event(unit: Combatant) -> Dictionary:
 	var result := DeathLifecycle.resolve_for_scenario(unit, field, state.sides,
-		Callable(_death_replacement_resolver, "decision_for"), log)
+		Callable(_death_replacement_resolver, "decision_for"), log, combat)
 	var failure := String(result.get("error", ""))
 	if failure != "":
 		runtime_error = failure
@@ -1008,11 +1017,9 @@ func _fell(unit: Combatant) -> void:
 func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
 		attack_context: Variant = null, primary_melee_charge: Variant = null,
 		spend_attack_cost: bool = true) -> Counterattack.Exchange:
-	Counterattack.bind_death_resolver(Callable(self, "_resolve_fatal_event"))
 	var ex := ScenarioNumericOrdering.resolve_exchange(
 		log, unit, target, rng, kind, attack_context, primary_melee_charge,
-		spend_attack_cost)
-	Counterattack.bind_death_resolver(Callable())
+		spend_attack_cost, combat)
 
 	for entry in ex.order:
 		if String(entry[0]) == "attack":
@@ -1130,7 +1137,8 @@ func _execute_action_resource_delta(
 		and operation.amount <= 0,
 		"unsupported internal ResourceDeltaOp parameters")
 	var trace := Stamina.apply_tactical_drain(target, operation.amount,
-		Damage.has_effective_modifier_semantic(target, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
+		Damage.has_effective_modifier_semantic(
+			target, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	ScenarioNumericOrdering.append_traces(log, [trace])
 	return trace
 
@@ -1160,7 +1168,8 @@ func cmd_action(unit: Combatant, action_id: String,
 	emit("  [action] %s resolved plan [%s]" % [
 		action.id, ", ".join(operation_names)])
 	var action_cost_trace := action.pay(unit,
-		Damage.has_effective_modifier_semantic(unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED))
+		Damage.has_effective_modifier_semantic(
+			unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	ScenarioNumericOrdering.append_traces(log, [action_cost_trace])
 	emit("  [action] %s payment stamina %d -> %d; spent %s" % [
 		action.id, before_stamina, unit.stamina, str(unit.action_spent)])
@@ -1215,25 +1224,12 @@ func _auto_end_phase() -> void:
 
 # -- run ---------------------------------------------------------------------
 
-## Install the pipeline AND the environment, then run.
-##
-## Both are needed and forgetting either is silent. Without a pipeline,
-## Damage._run_hook returns immediately and NO modifier applies — innate
-## abilities, statuses and auras alike. Without an environment, auras alone
-## vanish. The first version of this bound only the environment, so a scenario
-## ran with every modifier inert while looking entirely healthy.
+## Run scripted commands using this battle's own live context.
 func run() -> Dictionary:
 	if construction_error != "" or field == null or state == null:
 		return {"name": scenario_name, "seed": seed_value, "log": [],
 			"final": {}, "error": "scenario construction failed: %s" % construction_error}
-	var registry := AbilityRegistry.new()
-	Handlers.register_all(registry)
-	Damage.bind_pipeline(Pipeline.new(registry))
-	Damage.bind_environment(Callable(self, "environment"))
-	var result := _run()
-	Damage.bind_environment(Callable())
-	Damage.bind_pipeline(null)
-	return result
+	return _run()
 
 
 func _run() -> Dictionary:

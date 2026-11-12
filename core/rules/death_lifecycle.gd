@@ -72,9 +72,9 @@ static func _append_scenario_event(event: Dictionary, scenario_log: Array) -> vo
 
 static func resolve_for_scenario(unit: Combatant, battlefield: Battlefield,
 		sides: Array, replacement_resolver: Callable,
-		scenario_log: Array) -> Dictionary:
+		scenario_log: Array, combat: CombatContext = null) -> Dictionary:
 	return resolve(unit, battlefield, sides, replacement_resolver,
-		Callable(DeathLifecycle, "_append_scenario_event").bind(scenario_log))
+		Callable(DeathLifecycle, "_append_scenario_event").bind(scenario_log), combat)
 
 
 static func apply_aura_upkeep(unit: Combatant, auras_by_source: Dictionary,
@@ -146,7 +146,7 @@ static func _emit(events: Array, sink: Callable, kind: String,
 
 static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
 		replacement_resolver: Callable = Callable(),
-		event_sink: Callable = Callable()) -> Dictionary:
+		event_sink: Callable = Callable(), combat: CombatContext = null) -> Dictionary:
 	var events: Array = []
 	_emit(events, event_sink, "death_started", unit)
 	var original_side: Variant = _side_of(unit, sides)
@@ -194,7 +194,7 @@ static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
 			if adjacent == unit or not adjacent.alive or adjacent.life <= 0:
 				continue
 			var delta := -1 if original_side.units.has(adjacent) else 1
-			var applied := Damage.adjust_morale(adjacent, delta)
+			var applied := Damage.adjust_morale(adjacent, delta, combat)
 			_emit(events, event_sink, "death_morale", unit, {
 				"target": adjacent.instance_id if adjacent.instance_id != "" else adjacent.name,
 				"delta": delta, "applied": applied, "morale": adjacent.morale,
