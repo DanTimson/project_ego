@@ -67,7 +67,7 @@ boundaries are:
 
 | ID | Held question | Closure owner/condition |
 |---|---|---|
-| AD-1 | Who supplies battle context and the persistent/intrinsic/runtime/aura providers for effective-speed modifier 7? | Engine architecture; preserve the implemented R8 live-capacity comparator while adding no guessed provider. |
+| AD-1 | Full modifier-7 parity: commander/squad eligibility, radius and stacking plus legacy provider binding/composition remain held. | DELIB-0005 resolves ownership; CX-022 partially implements live personal/unit and runtime/status normalized speed deltas. Tactical auras contribute zero; the future commander contract excludes battle-owned/nonpersistent tactical units. |
 | AD-3 | How are production action definitions composed and source-bound, including per-unit availability/magnitude and Scenario injection? | Engine + content architecture; the Python fourteen-action reference catalogue is not production truth. |
 
 AD-4 is no longer architecture-unresolved. DELIB-0007 selected a dedicated

@@ -22,7 +22,7 @@ func begin() -> Dictionary:
 		return {"ok": false,
 			"message": "scenario construction failed: %s" % detail,
 			"error": detail}
-	RoundLoop.begin_battle(scenario.state)
+	RoundLoop.begin_battle(scenario.state, scenario.combat)
 	scenario.emit("== %s (seed %d) ==" % [scenario.scenario_name, scenario.seed_value])
 	scenario.emit("-- round %d, side %d first --" % [
 		scenario.state.round_number, scenario.state.active_side])

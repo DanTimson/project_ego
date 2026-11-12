@@ -16,8 +16,10 @@ enum Refusal { OK, NO_MOVEMENT, ACTION_SPENT, EXHAUSTED, NOT_YOUR_PHASE, RESTRIC
 
 
 ## Speed after the documented stamina penalty: -1 at stamina 3-4, -2 at 2 or
-## below. Floors at 1. Returns [value: int, trace: Trace].
-static func effective_speed(u: Combatant) -> Array:
+## below. Adds the battle-resolved signed contribution before these guards.
+## Standalone callers default to zero contribution. Floors at 1.
+## Returns [value: int, trace: Trace].
+static func effective_speed(u: Combatant, contribution: int = 0) -> Array:
 	var t := Trace.new("%s.speed" % u.name)
 	t.base = float(u.speed)
 	# Recovered effective-speed form (R8):
@@ -31,7 +33,10 @@ static func effective_speed(u: Combatant) -> Array:
 	# has no stamina-suppression semantic check; the exemption was inferred from "such a unit
 	# never loses stamina", which fails when an effect sets stamina directly.
 	# The stamina-suppression semantic suppresses stamina DEDUCTIONS, not the speed penalty.
-	var value: int = u.speed
+	var value: int = u.speed + contribution
+	if contribution != 0:
+		t.step("speed provider contribution", float(u.speed), float(value),
+			"signed personal/runtime total before guarded stamina decrements")
 	if u.stamina < 5 and value > 1:
 		t.step("stamina %d < 5" % u.stamina, float(value), float(value - 1))
 		value -= 1
@@ -71,9 +76,9 @@ static func effective_speed(u: Combatant) -> Array:
 # ---------------------------------------------------------------------------
 
 ## True round boundary. THE ONLY place once-per-round limiters are cleared.
-static func begin_round(u: Combatant) -> Trace:
+static func begin_round(u: Combatant, contribution: int = 0) -> Trace:
 	var t := Trace.new("%s.begin_round" % u.name)
-	u.movement_remaining = effective_speed(u)[0]
+	u.movement_remaining = effective_speed(u, contribution)[0]
 	u.steps_this_round = 0
 	u.action_spent = false
 	u.resting = false
@@ -105,10 +110,10 @@ static func begin_round(u: Combatant) -> Trace:
 ## Never clears once_per_round, and never clears `resting`: a rest already taken
 ## is not undone by being handed another turn.
 static func refresh_for_extra_turn(u: Combatant, fire_round_start: bool = false,
-		reset_steps: bool = false) -> Trace:
+		reset_steps: bool = false, contribution: int = 0) -> Trace:
 	var t := Trace.new("%s.extra_turn" % u.name)
 	t.base = float(u.movement_remaining)
-	u.movement_remaining = effective_speed(u)[0]
+	u.movement_remaining = effective_speed(u, contribution)[0]
 	u.action_spent = false
 	if reset_steps:
 		t.step("steps reset", float(u.steps_this_round), 0.0)
@@ -137,7 +142,7 @@ static func mark_triggered(u: Combatant, source: StringName) -> void:
 ## Returns [granted: bool, trace: Trace].
 static func grant_extra_turn(u: Combatant, source: StringName = &"",
 		once_per_round: bool = false, fire_round_start: bool = false,
-		reset_steps: bool = false) -> Array:
+		reset_steps: bool = false, contribution: int = 0) -> Array:
 	if not u.alive:
 		return [false, Trace.new("%s.extra_turn refused: dead" % u.name)]
 	if once_per_round and not may_trigger_once(u, source):
@@ -146,7 +151,7 @@ static func grant_extra_turn(u: Combatant, source: StringName = &"",
 		return [false, t]
 	if once_per_round:
 		mark_triggered(u, source)
-	return [true, refresh_for_extra_turn(u, fire_round_start, reset_steps)]
+	return [true, refresh_for_extra_turn(u, fire_round_start, reset_steps, contribution)]
 
 
 ## Group grants: Искажение Хаоса (all friendly demons), Клич некроманта (all
@@ -236,10 +241,10 @@ static func attack_stamina_cost(u: Combatant) -> int:
 
 
 static func _spend_attack(u: Combatant, ranged_executor: bool,
-		semantic_suppression_effective: bool = false) -> Trace:
+		semantic_suppression_effective: bool = false, contribution: int = 0) -> Trace:
 	var label := "ranged_attack_cost" if ranged_executor else "attack_cost"
 	var t := Trace.new("%s.%s" % [u.name, label])
-	var speed := int(effective_speed(u)[0])
+	var speed := int(effective_speed(u, contribution)[0])
 	var capacity := u.movement_remaining
 	var cost: int = 2 if capacity < speed else 1
 	t.base = float(u.stamina)
@@ -275,8 +280,8 @@ static func spend_attack(u: Combatant,
 
 
 static func spend_ranged_attack(u: Combatant,
-		semantic_suppression_effective: bool = false) -> Trace:
-	return _spend_attack(u, true, semantic_suppression_effective)
+		semantic_suppression_effective: bool = false, contribution: int = 0) -> Trace:
+	return _spend_attack(u, true, semantic_suppression_effective, contribution)
 
 
 ## Rest or skip: +(2 + Восстановление сил), capped at base. Under Зуд the

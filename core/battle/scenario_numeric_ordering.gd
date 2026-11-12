@@ -77,7 +77,8 @@ static func spend_attack(unit: Combatant,
 	var stamina_suppressed := Damage.has_effective_modifier_semantic(
 		unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat)
 	if kind == Combatant.AttackKind.RANGED:
-		return ActionPoints.spend_ranged_attack(unit, stamina_suppressed)
+		return ActionPoints.spend_ranged_attack(unit, stamina_suppressed,
+			combat.speed_contribution(unit) if combat != null else 0)
 	# R8 stays ranged-only; melee retains its established cost boundary.
 	return ActionPoints.spend_attack(unit, stamina_suppressed)
 

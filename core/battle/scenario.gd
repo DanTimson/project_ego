@@ -1113,7 +1113,7 @@ func cmd_extra_turn(unit: Combatant, c: Dictionary) -> void:
 	var r: Array = ActionPoints.grant_extra_turn(
 		unit, StringName(String(c.get("source", ""))),
 		bool(c.get("once_per_round", false)),
-		bool(c.get("fire_round_start", false)))
+		bool(c.get("fire_round_start", false)), false, combat.speed_contribution(unit))
 	emit("%s %s an extra turn (movement %d, steps %d)"
 		% [unit.label(), "receives" if bool(r[0]) else "is refused",
 			unit.movement_remaining, unit.steps_this_round])
@@ -1196,7 +1196,7 @@ func cmd_action(unit: Combatant, action_id: String,
 
 
 func cmd_end_phase() -> void:
-	if RoundLoop.end_phase(state):
+	if RoundLoop.end_phase(state, combat):
 		emit("-- round %d, side %d first --" % [state.round_number, state.active_side])
 		_round_upkeep()
 	else:
@@ -1209,7 +1209,7 @@ func _auto_end_phase() -> void:
 	while runtime_error == "" and not RoundLoop.battle_over(state) \
 			and RoundLoop.phase_done(state, state.active_side):
 		var before: int = state.round_number
-		var new_round: bool = RoundLoop.end_phase(state)
+		var new_round: bool = RoundLoop.end_phase(state, combat)
 		if new_round:
 			emit("-- round %d, side %d first (both sides exhausted) --"
 				% [state.round_number, state.active_side])
@@ -1233,7 +1233,7 @@ func run() -> Dictionary:
 
 
 func _run() -> Dictionary:
-	RoundLoop.begin_battle(state)
+	RoundLoop.begin_battle(state, combat)
 	emit("== %s (seed %d) ==" % [scenario_name, seed_value])
 	emit("-- round %d, side %d first --" % [state.round_number, state.active_side])
 	var status_units: Array = units.keys()

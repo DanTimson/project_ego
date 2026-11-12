@@ -203,7 +203,8 @@ static func resolve(unit: Combatant, battlefield: Battlefield, sides: Array,
 	if rollback_status != null and not unit.original_definition.is_empty():
 		unit.restore_definition(unit.original_definition)
 		unit.original_definition.clear()
-		var restored_speed := int(ActionPoints.effective_speed(unit)[0])
+		var restored_speed := int(ActionPoints.effective_speed(unit,
+			combat.speed_contribution(unit) if combat != null else 0)[0])
 		unit.movement_remaining = mini(unit.movement_remaining, restored_speed)
 		unit.ammo = mini(unit.ammo, unit.ammo_base)
 		_emit(events, event_sink, "transformation_reverted", unit,

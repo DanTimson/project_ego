@@ -57,19 +57,19 @@ static func first_side(sides: Array) -> int:
 	return a.id if a.is_attacker else b.id
 
 
-static func begin_battle(state: BattleState) -> void:
+static func begin_battle(state: BattleState, combat: CombatContext = null) -> void:
 	state.round_number = 0
 	state.active_side = first_side(state.sides)
-	begin_new_round(state)
+	begin_new_round(state, combat)
 
 
-static func begin_new_round(state: BattleState) -> void:
+static func begin_new_round(state: BattleState, combat: CombatContext = null) -> void:
 	state.round_number += 1
 	for s in state.sides:
 		s.passed = false
 		for u in s.units:
 			if u.alive:
-				ActionPoints.begin_round(u)
+				ActionPoints.begin_round(u, combat.speed_contribution(u) if combat != null else 0)
 	state.active_side = first_side(state.sides)
 	state.log.append("round %d begins, side %d first" % [state.round_number, state.active_side])
 
@@ -102,20 +102,20 @@ static func phase_done(state: BattleState, side_id: int) -> bool:
 ## ran out of units stayed active until the driver passed for it.
 ##
 ## Returns true when a new round started, matching `end_phase`.
-static func auto_end_phase_if_exhausted(state: BattleState) -> bool:
+static func auto_end_phase_if_exhausted(state: BattleState, combat: CombatContext = null) -> bool:
 	if battle_over(state):
 		return false
 	if not phase_done(state, state.active_side):
 		return false
-	return end_phase(state)
+	return end_phase(state, combat)
 
 
-static func end_phase(state: BattleState) -> bool:
+static func end_phase(state: BattleState, combat: CombatContext = null) -> bool:
 	var current: RoundLoop.Side = state.side(state.active_side)
 	current.passed = true
 	var other: RoundLoop.Side = state.other(state.active_side)
 	if other.passed or phase_done(state, other.id):
-		begin_new_round(state)
+		begin_new_round(state, combat)
 		return true
 	state.active_side = other.id
 	state.log.append("side %d takes over" % state.active_side)
