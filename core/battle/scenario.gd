@@ -86,6 +86,8 @@ var state: RoundLoop.BattleState
 ## REACHES is recomputed on every query.
 var auras_by_source: Dictionary = {}
 var _side_specs: Array = []
+## Native setup-only restrictions, tracked by exact runtime instance and original side.
+var _opening_restrictions: Array[Dictionary] = []
 
 var _content_provider: Variant = null
 
@@ -1195,7 +1197,65 @@ func cmd_action(unit: Combatant, action_id: String,
 		action.id, str(unit.action_spent)])
 
 
+## Install a fresh restriction without stacking into or modifying an existing status.
+## Empty reason means success. No refused setup mutates battle state.
+func setup_opening_restriction(unit_id: String, effect: Status) -> String:
+	if construction_error != "" or runtime_error != "" or field == null or state == null:
+		return "opening restriction requires a valid battle"
+	if profile != PROFILE_NATIVE:
+		return "opening restriction requires the native profile"
+	if state.round_number != 0:
+		return "opening restriction must be installed before the first phase"
+	var unit: Combatant = units.get(unit_id)
+	if unit == null or not unit.alive or unit.life <= 0 or side_of(unit) == null:
+		return "opening restriction requires a living battle instance"
+	if effect == null or effect.id == &"" or effect.duration == 0 \
+			or effect.restrictions.is_empty():
+		return "opening restriction requires a nonzero-duration typed restriction"
+	for capability in effect.restrictions:
+		if not Status.is_capability(capability):
+			return "opening restriction contains an unknown capability"
+	# A private copy cannot alias a caller's or another unit's runtime status.
+	var installed := effect.copy()
+	installed.stacking = Status.Stacking.CUMULATIVE
+	Statuses.apply(unit, installed)
+	_opening_restrictions.append({"unit": unit, "effect": installed,
+		"side": side_of(unit).id})
+	return ""
+
+
+## Presentation reads expiry from the same exact-instance tracking as the clock.
+func opening_restriction_description(unit: Combatant) -> String:
+	var descriptions: Array[String] = []
+	for entry in _opening_restrictions:
+		if entry["unit"] == unit and unit.statuses.has(entry["effect"]):
+			var effect: Status = entry["effect"]
+			var side: RoundLoop.Side = state.side(int(entry["side"]))
+			descriptions.append("%s — expires at end of %s's opening side phase" % [
+				effect.describe(), side.name])
+	return "; ".join(descriptions)
+
+
+func _expire_opening_restrictions() -> void:
+	if profile != PROFILE_NATIVE:
+		return
+	var kept: Array[Dictionary] = []
+	for entry in _opening_restrictions:
+		var unit: Combatant = entry["unit"]
+		var effect: Status = entry["effect"]
+		if not unit.statuses.has(effect):
+			continue
+		if int(entry["side"]) != state.active_side:
+			kept.append(entry)
+			continue
+		unit.statuses.erase(effect)
+		emit("%s: %s expires at end of side %d's opening phase" % [
+			unit.label(), effect.describe(), state.active_side])
+	_opening_restrictions = kept
+
+
 func cmd_end_phase() -> void:
+	_expire_opening_restrictions()
 	if RoundLoop.end_phase(state, combat):
 		emit("-- round %d, side %d first --" % [state.round_number, state.active_side])
 		_round_upkeep()
@@ -1209,6 +1269,7 @@ func _auto_end_phase() -> void:
 	while runtime_error == "" and not RoundLoop.battle_over(state) \
 			and RoundLoop.phase_done(state, state.active_side):
 		var before: int = state.round_number
+		_expire_opening_restrictions()
 		var new_round: bool = RoundLoop.end_phase(state, combat)
 		if new_round:
 			emit("-- round %d, side %d first (both sides exhausted) --"

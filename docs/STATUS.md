@@ -315,3 +315,13 @@ unit dead/nonoccupying and absent from living/activation queries. Strict Genesis
 four-target validation and permissive deferred failure remain distinct. Python
 retains loud exception signaling after the same preflight and coherent cleanup.
 Broader APA-001/APA-006 command/event result-contract work remains deferred.
+
+
+CX-023 native timing coverage: Scenario setup can install an exact-instance
+opening capability restriction before the first native phase. It expires on its
+original side's first outgoing boundary, on pass or exhaustion, before the next
+phase and round refresh/upkeep. The fallback Azure Ranger's Tangled Bowstring
+restricts only ranged commands; UI shows its cause and side-phase expiry. Focused
+native vectors cover refusal purity, second-side timing, side changes, stale
+tracking after removal/death, same-ID isolation, and unchanged ordinary durations.
+This is a Project EGO native design choice; Genesis/NH timing and R13 remain OPEN.

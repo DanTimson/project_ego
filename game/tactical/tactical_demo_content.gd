@@ -25,3 +25,10 @@ static func provider_for(spec: Dictionary) -> ScenarioContentProvider:
 							"target": "selected_enemy", "resource": "stamina", "amount": -3}]}}],
 				"grants": {definition_id: [{"source_id": 1}]}})
 	return null
+
+
+static func setup_opening_restriction(scenario: Scenario) -> String:
+	return scenario.setup_opening_restriction("azure-ranger-17", Status.from_dict({
+		"id": "tactical_demo:tangled_bowstring", "name": "Tangled Bowstring",
+		"restrictions": ["ranged"],
+	}))

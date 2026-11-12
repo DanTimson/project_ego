@@ -43,6 +43,7 @@ priority.
 | CX-020 | `SPEC_IMPLEMENTATION` | playable granted action in the fallback tactical UI | engine | `DONE` | DELIB-0004; acceptance recorded in task |
 | CX-021 | `SPEC_IMPLEMENTATION` | battle-owned combat context | engine | `DONE` | APA-002; acceptance recorded in task |
 | CX-022 | `SPEC_IMPLEMENTATION` | effective speed from unit and runtime providers | engine | `DONE` | partial DELIB-0005; commander/squad held |
+| CX-023 | `SPEC_IMPLEMENTATION` | native opening-phase restriction | engine | `DONE` | DELIB-0006; legacy R13 timing remains open |
 
 Task contracts live in `docs/codex/tasks/`.
 

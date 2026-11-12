@@ -86,12 +86,6 @@ func _load_scenario_spec() -> Dictionary:
 
 
 func restart_battle() -> bool:
-	if session != null:
-		session.end()
-	# Reload the ignored local index/mapping so changing presentation assets does
-	# not require an editor restart.
-	asset_resolver.configure()
-	_apply_visual_assets()
 	var scenario_spec := _load_scenario_spec()
 	if scenario_spec.is_empty():
 		latest_feedback = "Could not load the playable scenario."
@@ -100,7 +94,20 @@ func restart_battle() -> bool:
 	var provider: ScenarioContentProvider
 	if scenario_path == "res://scenarios/playable_tactical_slice.json":
 		provider = DemoContent.provider_for(scenario_spec)
-	scenario = Scenario.new(scenario_spec, null, provider)
+	var next_scenario := Scenario.new(scenario_spec, null, provider)
+	if next_scenario.construction_error == "" \
+			and scenario_path == "res://scenarios/playable_tactical_slice.json":
+		var setup_refusal := DemoContent.setup_opening_restriction(next_scenario)
+		if setup_refusal != "":
+			latest_feedback = setup_refusal
+			feedback_label.text = setup_refusal
+			return false
+	if session != null:
+		session.end()
+	# Reload local presentation assets when replacing the battle.
+	asset_resolver.configure()
+	_apply_visual_assets()
+	scenario = next_scenario
 	session = ManualBattleSession.new(scenario)
 	var begun := session.begin()
 	selected_unit = null
@@ -215,6 +222,11 @@ func enter_command_mode() -> void:
 func enter_ranged_mode() -> void:
 	if selected_unit == null:
 		_set_feedback("Ranged mode refused: select a unit first.")
+		return
+	var restriction := Statuses.restriction_reason(selected_unit, Status.Capability.RANGED)
+	if restriction != "":
+		_set_feedback("Ranged mode refused: %s. %s" % [restriction,
+			scenario.opening_restriction_description(selected_unit)])
 		return
 	if session.legal_ranged_targets(selected_unit).is_empty():
 		_set_feedback("Ranged mode refused: no legal target, range, or ammunition.")
@@ -357,7 +369,10 @@ func _refresh() -> void:
 			selected_unit.defence, selected_unit.ranged_defence]
 		var effect_names: Array = selected_unit.all_flags()
 		if not selected_unit.statuses.is_empty():
-			effect_names.append("%d timed" % selected_unit.statuses.size())
+			effect_names.append(Statuses.describe_all(selected_unit))
+		var opening := scenario.opening_restriction_description(selected_unit)
+		if opening != "":
+			effect_names.append(opening)
 		effects_label.text = "EFFECTS / STATUS\n%s" % [
 			", ".join(effect_names) if not effect_names.is_empty() else "None"]
 		portrait_rect.texture = asset_resolver.texture_for_portrait(selected_unit)
