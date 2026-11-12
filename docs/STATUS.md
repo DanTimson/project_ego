@@ -45,8 +45,8 @@ Python-oracle scope explicit.
 Ordinary project play opens the Milestone demo menu; packaged `BUILD.json`
 metadata supplies the visible 0.2 identity while editor/development runs show an
 explicit development fallback. **Play Demo** enters the accepted Tactical Visual
-Slice 3. Developers can still launch `game/tactical/tactical_main.tscn` directly.
-The menu adds no battle semantics.
+Slice 3 with automated Crimson phases (CX-024). Developers can still launch
+`game/tactical/tactical_main.tscn` directly for hot-seat play.
 
 The tracked Windows x86-64 export preset and authoritative `tools/build_demo.py`
 establish a tracked-HEAD-only public/private packaging pipeline. The 0.2 pair
@@ -325,3 +325,12 @@ restricts only ranged commands; UI shows its cause and side-phase expiry. Focuse
 native vectors cover refusal purity, second-side timing, side changes, stale
 tracking after removal/death, same-ID isolation, and unchanged ordinary durations.
 This is a Project EGO native design choice; Genesis/NH timing and R13 remain OPEN.
+
+
+CX-024 native demo opponent coverage: Menu Play enables deterministic Crimson
+phases while the human controls Azure. The scene-independent policy uses existing
+session legality and commands, preferring shots, melee, then distance-reducing
+moves in instance-ID order. It stops at the phase boundary and caps a phase at
+64 non-pass commands. The UI reports Crimson moves/attacks and retains battle
+events. Restart preserves this mode; direct tactical_main.tscn remains hot-seat.
+This is a Project EGO demo policy; legacy tactical AI remains outside this coverage.

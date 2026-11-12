@@ -1,7 +1,7 @@
 class_name DemoMain
 extends Control
 
-const TACTICAL_SCENE := "res://game/tactical/tactical_main.tscn"
+const TACTICAL_SCENE := "res://game/tactical/tactical_vs_crimson.tscn"
 const DEVELOPMENT_METADATA := {
 	"project": "Project EGO",
 	"milestone": "development",
@@ -54,7 +54,7 @@ func quit_demo() -> void:
 
 
 func controls_text() -> String:
-	return ("Select an active-side unit with the mouse.\n"
+	return ("You control Azure; Crimson acts automatically. Select an Azure unit.\n"
 		+ "Green hex: move. Orange unit: melee.\n"
 		+ "R or Ranged button: ranged mode; click a magenta target.\n"
 		+ "Space or Pass button: end the side's phase.\n"
@@ -78,9 +78,10 @@ func apply_build_metadata(metadata: Dictionary) -> void:
 func about_text(metadata: Dictionary) -> String:
 	return ("Project EGO — Tactical Prototype, Milestone %s\n\n"
 		+ "Incomplete engine reimplementation prototype. This build includes a "
-		+ "playable deterministic hot-seat tactical battle, movement, melee, ranged "
+		+ "playable deterministic tactical battle against a simple Crimson opponent, "
+		+ "movement, melee, ranged "
 		+ "attacks, turn passing, and authored fallback presentation. Strategy play, "
-		+ "AI, saving, audio, animation, and broad content parity are visibly absent."
+		+ "legacy AI, saving, audio, animation, and broad content parity are visibly absent."
 		+ "\n\nCommit: %s\nGodot: %s\nMode: %s\nBuild: %s") % [
 		String(metadata.get("milestone", "unknown")),
 		String(metadata.get("commit", "unknown")),

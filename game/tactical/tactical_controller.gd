@@ -7,7 +7,11 @@ const MODE_RANGED := "Ranged"
 const MODE_ACTION := "Stamina Drain"
 const DemoContent = preload("res://game/tactical/tactical_demo_content.gd")
 
+@export var automated_crimson := false
+
 @export_file("*.json") var scenario_path := "res://scenarios/playable_tactical_slice.json"
+
+var last_crimson_report: Dictionary = {}
 
 var scenario: Scenario
 var session: ManualBattleSession
@@ -111,6 +115,7 @@ func restart_battle() -> bool:
 	session = ManualBattleSession.new(scenario)
 	var begun := session.begin()
 	selected_unit = null
+	last_crimson_report = {}
 	input_mode = MODE_COMMAND
 	if not bool(begun["ok"]):
 		latest_feedback = String(begun.get("message", "Could not begin the battle."))
@@ -130,7 +135,7 @@ func select_unit(instance_id: String) -> bool:
 	if unit == null:
 		_set_feedback("Selection refused: unknown unit '%s'." % instance_id)
 		return false
-	if not session.can_select(unit):
+	if not _human_phase() or not session.can_select(unit):
 		_set_feedback("Selection refused: %s is inactive, down, or spent." % unit.label())
 		return false
 	selected_unit = unit
@@ -140,7 +145,7 @@ func select_unit(instance_id: String) -> bool:
 
 
 func dispatch_move(cell: Vector2i) -> Dictionary:
-	if selected_unit == null:
+	if not _human_phase() or selected_unit == null:
 		return _controller_refusal("Select a unit before moving.")
 	var result := session.issue_command({
 		"op": "move", "unit": selected_unit.instance_id,
@@ -151,7 +156,7 @@ func dispatch_move(cell: Vector2i) -> Dictionary:
 
 
 func dispatch_melee(target_id: String) -> Dictionary:
-	if selected_unit == null:
+	if not _human_phase() or selected_unit == null:
 		return _controller_refusal("Select a unit before attacking.")
 	var result := session.issue_command({
 		"op": "attack", "unit": selected_unit.instance_id, "target": target_id,
@@ -161,7 +166,7 @@ func dispatch_melee(target_id: String) -> Dictionary:
 
 
 func dispatch_ranged(target_id: String) -> Dictionary:
-	if selected_unit == null:
+	if not _human_phase() or selected_unit == null:
 		return _controller_refusal("Select a unit before shooting.")
 	var result := session.issue_command({
 		"op": "shoot", "unit": selected_unit.instance_id, "target": target_id,
@@ -172,15 +177,17 @@ func dispatch_ranged(target_id: String) -> Dictionary:
 
 
 func dispatch_action(target_id: String) -> Dictionary:
-	if selected_unit == null:
+	if not _human_phase() or selected_unit == null:
 		return _controller_refusal("Select a unit before using an action.")
 	var target: Combatant = scenario.units.get(target_id)
 	var stamina_before := target.stamina if target != null else 0
+	var previous_report := last_crimson_report
 	var result := session.issue_command(_action_command(target_id))
 	if bool(result.get("accepted", false)):
 		input_mode = MODE_COMMAND
 	_apply_command_result(result)
-	if bool(result.get("accepted", false)) and target != null:
+	if bool(result.get("accepted", false)) and target != null \
+			and last_crimson_report == previous_report:
 		_set_feedback("Stamina Drain: %s stamina %d → %d" % [
 			target.name, stamina_before, target.stamina])
 	return result
@@ -205,8 +212,8 @@ func enter_action_mode() -> void:
 
 
 func pass_side() -> Dictionary:
-	if scenario == null:
-		return _controller_refusal("No battle is loaded.")
+	if scenario == null or not _human_phase():
+		return _controller_refusal("Wait for Azure control.")
 	var result := session.issue_command({"op": "end_phase"})
 	selected_unit = null
 	input_mode = MODE_COMMAND
@@ -252,6 +259,32 @@ func _controller_refusal(message: String) -> Dictionary:
 	}
 
 
+func _human_phase() -> bool:
+	return not automated_crimson or session.active_side_id() == 0
+
+
+func _run_crimson_if_needed() -> void:
+	if not automated_crimson or session.active_side_id() != CrimsonPolicy.CRIMSON:
+		return
+	selected_unit = null
+	input_mode = MODE_COMMAND
+	last_crimson_report = CrimsonPolicy.run_phase(session)
+	var moves := 0
+	var attacks := 0
+	for index in last_crimson_report.commands.size():
+		if not bool(last_crimson_report.results[index]["accepted"]):
+			continue
+		var command: Dictionary = last_crimson_report.commands[index]
+		if command.op == "move":
+			moves += 1
+		elif command.op in ["shoot", "attack"]:
+			attacks += 1
+	latest_feedback = "Crimson: %d moves, %d attacks. %s" % [moves, attacks,
+		"Azure control." if _human_phase() and not session.battle_complete() else "Phase ended."]
+	if last_crimson_report.reason != "":
+		latest_feedback += " " + String(last_crimson_report.reason)
+
+
 func _apply_command_result(result: Dictionary) -> void:
 	# Acceptance is a typed core field. Never infer it from event/log text.
 	if bool(result.get("accepted", false)):
@@ -264,6 +297,7 @@ func _apply_command_result(result: Dictionary) -> void:
 		selected_unit = null
 	if session.battle_complete():
 		selected_unit = null
+	_run_crimson_if_needed()
 	_refresh()
 
 
