@@ -44,6 +44,8 @@ priority.
 | CX-021 | `SPEC_IMPLEMENTATION` | battle-owned combat context | engine | `DONE` | APA-002; acceptance recorded in task |
 | CX-022 | `SPEC_IMPLEMENTATION` | effective speed from unit and runtime providers | engine | `DONE` | partial DELIB-0005; commander/squad held |
 | CX-023 | `SPEC_IMPLEMENTATION` | native opening-phase restriction | engine | `DONE` | DELIB-0006; legacy R13 timing remains open |
+| CX-024 | `SPEC_IMPLEMENTATION` | automated Crimson phases in the demo | engine | `DONE` | deterministic native demo policy; hot-seat scene preserved |
+| CX-025 | `CORRECTNESS_HARDENING` | stateful battle checks and occupied move refusal | engine | `DONE` | native demo seeds and replay invariants |
 
 Task contracts live in `docs/codex/tasks/`.
 

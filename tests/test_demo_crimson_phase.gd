@@ -57,10 +57,29 @@ func _run() -> void:
 		"direct tactical scene remains hot-seat")
 	manual.queue_free()
 	_test_policy()
+	_test_action_handoff(controller)
 	controller.queue_free()
 	menu.queue_free()
 	await process_frame
 	quit(0 if returned and failures == 0 else 1)
+
+
+func _test_action_handoff(controller: TacticalController) -> void:
+	_check(controller.restart_battle(), "restart for action handoff")
+	var battle := controller.scenario
+	var vanguard: Combatant = battle.units["azure-vanguard-01"]
+	battle.field.remove_occupant(battle.field.find_unit(vanguard))
+	_check(battle.field.place(vanguard, Battlefield.offset_to_axial(4, 1)),
+		"place Vanguard next to Guard")
+	battle.units["azure-ranger-17"].action_spent = true
+	_check(controller.select_unit(vanguard.instance_id), "select last Azure activation")
+	var result := controller.dispatch_action("crimson-guard-42")
+	_check(result["accepted"] and controller.session.active_side_id() == 0
+		and not controller.last_crimson_report.commands.is_empty(),
+		"terminal Stamina Drain hands off to Crimson and returns")
+	_check(controller.feedback_label.text.begins_with("Stamina Drain: Guard stamina 10 → 7\n")
+		and controller.feedback_label.text.contains("Crimson:"),
+		"handoff shows drain result before Crimson summary")
 
 
 func _check(ok: bool, message: String) -> void:

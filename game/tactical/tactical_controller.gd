@@ -181,15 +181,14 @@ func dispatch_action(target_id: String) -> Dictionary:
 		return _controller_refusal("Select a unit before using an action.")
 	var target: Combatant = scenario.units.get(target_id)
 	var stamina_before := target.stamina if target != null else 0
-	var previous_report := last_crimson_report
 	var result := session.issue_command(_action_command(target_id))
+	var action_feedback := ""
 	if bool(result.get("accepted", false)):
 		input_mode = MODE_COMMAND
-	_apply_command_result(result)
-	if bool(result.get("accepted", false)) and target != null \
-			and last_crimson_report == previous_report:
-		_set_feedback("Stamina Drain: %s stamina %d → %d" % [
-			target.name, stamina_before, target.stamina])
+		if target != null:
+			action_feedback = "Stamina Drain: %s stamina %d → %d" % [
+				target.name, stamina_before, target.stamina]
+	_apply_command_result(result, action_feedback)
 	return result
 
 
@@ -263,9 +262,9 @@ func _human_phase() -> bool:
 	return not automated_crimson or session.active_side_id() == 0
 
 
-func _run_crimson_if_needed() -> void:
+func _run_crimson_if_needed() -> String:
 	if not automated_crimson or session.active_side_id() != CrimsonPolicy.CRIMSON:
-		return
+		return ""
 	selected_unit = null
 	input_mode = MODE_COMMAND
 	last_crimson_report = CrimsonPolicy.run_phase(session)
@@ -279,13 +278,14 @@ func _run_crimson_if_needed() -> void:
 			moves += 1
 		elif command.op in ["shoot", "attack"]:
 			attacks += 1
-	latest_feedback = "Crimson: %d moves, %d attacks. %s" % [moves, attacks,
+	var summary := "Crimson: %d moves, %d attacks. %s" % [moves, attacks,
 		"Azure control." if _human_phase() and not session.battle_complete() else "Phase ended."]
 	if last_crimson_report.reason != "":
-		latest_feedback += " " + String(last_crimson_report.reason)
+		summary += " " + String(last_crimson_report.reason)
+	return summary
 
 
-func _apply_command_result(result: Dictionary) -> void:
+func _apply_command_result(result: Dictionary, action_feedback: String = "") -> void:
 	# Acceptance is a typed core field. Never infer it from event/log text.
 	if bool(result.get("accepted", false)):
 		var events: Array = result.get("events", [])
@@ -297,7 +297,12 @@ func _apply_command_result(result: Dictionary) -> void:
 		selected_unit = null
 	if session.battle_complete():
 		selected_unit = null
-	_run_crimson_if_needed()
+	var crimson_feedback := _run_crimson_if_needed()
+	if not crimson_feedback.is_empty():
+		latest_feedback = crimson_feedback if action_feedback.is_empty() else (
+			action_feedback + "\n" + crimson_feedback)
+	elif not action_feedback.is_empty():
+		latest_feedback = action_feedback
 	_refresh()
 
 
