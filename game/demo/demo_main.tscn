@@ -35,13 +35,13 @@ layout_mode = 2
 [node name="Margin" type="MarginContainer" parent="Center/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 54
-theme_override_constants/margin_top = 28
+theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 54
-theme_override_constants/margin_bottom = 28
+theme_override_constants/margin_bottom = 20
 
 [node name="Buttons" type="VBoxContainer" parent="Center/Panel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 8
 
 [node name="Title" type="Label" parent="Center/Panel/Margin/Buttons"]
 layout_mode = 2
@@ -59,16 +59,19 @@ text = "Tactical Prototype — Development Build"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Spacer" type="Control" parent="Center/Panel/Margin/Buttons"]
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
-
 [node name="PlayButton" type="Button" parent="Center/Panel/Margin/Buttons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Play Demo"
+
+[node name="CampaignButton" type="Button" parent="Center/Panel/Margin/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Campaign Demo"
 
 [node name="ControlsButton" type="Button" parent="Center/Panel/Margin/Buttons"]
 unique_name_in_owner = true

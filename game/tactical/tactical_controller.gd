@@ -106,13 +106,17 @@ func restart_battle() -> bool:
 			latest_feedback = setup_refusal
 			feedback_label.text = setup_refusal
 			return false
+	return _start_session(ManualBattleSession.new(next_scenario))
+
+
+func _start_session(next_session: ManualBattleSession) -> bool:
 	if session != null:
 		session.end()
 	# Reload local presentation assets when replacing the battle.
 	asset_resolver.configure()
 	_apply_visual_assets()
-	scenario = next_scenario
-	session = ManualBattleSession.new(scenario)
+	session = next_session
+	scenario = session.scenario
 	var begun := session.begin()
 	selected_unit = null
 	last_crimson_report = {}
@@ -320,7 +324,7 @@ func _unit_at(cell: Vector2i) -> Combatant:
 
 func _on_cell_clicked(cell: Vector2i) -> void:
 	if session.battle_complete():
-		_set_feedback("Battle complete. Use Restart Battle.")
+		_set_feedback("Battle complete.")
 		return
 	var occupant := _unit_at(cell)
 	if occupant != null:

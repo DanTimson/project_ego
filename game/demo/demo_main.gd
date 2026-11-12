@@ -2,6 +2,7 @@ class_name DemoMain
 extends Control
 
 const TACTICAL_SCENE := "res://game/tactical/tactical_vs_crimson.tscn"
+const CAMPAIGN_SCENE := "res://game/demo/campaign_demo.tscn"
 const DEVELOPMENT_METADATA := {
 	"project": "Project EGO",
 	"milestone": "development",
@@ -18,6 +19,7 @@ var about_dialog: AcceptDialog
 
 func _ready() -> void:
 	%PlayButton.pressed.connect(play_demo)
+	%CampaignButton.pressed.connect(play_campaign)
 	%ControlsButton.pressed.connect(show_controls)
 	%AboutButton.pressed.connect(show_about)
 	%QuitButton.pressed.connect(quit_demo)
@@ -33,6 +35,10 @@ func _ready() -> void:
 
 func play_demo() -> Error:
 	return get_tree().change_scene_to_file(TACTICAL_SCENE)
+
+
+func play_campaign() -> Error:
+	return get_tree().change_scene_to_file(CAMPAIGN_SCENE)
 
 
 func _prepare_dialog(dialog: AcceptDialog) -> void:
@@ -58,7 +64,8 @@ func controls_text() -> String:
 		+ "Green hex: move. Orange unit: melee.\n"
 		+ "R or Ranged button: ranged mode; click a magenta target.\n"
 		+ "Space or Pass button: end the side's phase.\n"
-		+ "Escape or Cancel button: clear the selection.")
+		+ "Escape or Cancel button: clear the selection.\n"
+		+ "Campaign Demo: win Ford, then continue to Watchpost with the surviving roster.")
 
 
 func milestone_subtitle(metadata: Dictionary) -> String:
@@ -78,7 +85,7 @@ func apply_build_metadata(metadata: Dictionary) -> void:
 func about_text(metadata: Dictionary) -> String:
 	return ("Project EGO — Tactical Prototype, Milestone %s\n\n"
 		+ "Incomplete engine reimplementation prototype. This build includes a "
-		+ "playable deterministic tactical battle against a simple Crimson opponent, "
+		+ "standalone tactical battle and a two-encounter campaign against Crimson, "
 		+ "movement, melee, ranged "
 		+ "attacks, turn passing, and authored fallback presentation. Strategy play, "
 		+ "legacy AI, saving, audio, animation, and broad content parity are visibly absent."

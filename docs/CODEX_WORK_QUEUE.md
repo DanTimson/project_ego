@@ -47,6 +47,7 @@ priority.
 | CX-024 | `SPEC_IMPLEMENTATION` | automated Crimson phases in the demo | engine | `DONE` | deterministic native demo policy; hot-seat scene preserved |
 | CX-025 | `CORRECTNESS_HARDENING` | stateful battle checks and occupied move refusal | engine | `DONE` | native demo seeds and replay invariants |
 | CX-026 | `SPEC_IMPLEMENTATION` | roster life across two native encounters | engine | `DONE` | detached roster and apply-once outcome |
+| CX-027 | `SPEC_IMPLEMENTATION` | playable Ford and Watchpost campaign demo | engine | `DONE` | menu entry, survivor handoff, and encounter retry |
 
 Task contracts live in `docs/codex/tasks/`.
 
