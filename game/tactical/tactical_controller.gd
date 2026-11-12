@@ -4,6 +4,8 @@ extends Control
 const BATTLEFIELD_LOGICAL_SIZE := Vector2(840.0, 720.0)
 const MODE_COMMAND := "Move / melee"
 const MODE_RANGED := "Ranged"
+const MODE_ACTION := "Stamina Drain"
+const DemoContent = preload("res://game/tactical/tactical_demo_content.gd")
 
 @export_file("*.json") var scenario_path := "res://scenarios/playable_tactical_slice.json"
 
@@ -37,6 +39,7 @@ var latest_feedback := "Select a highlighted active-side unit."
 @onready var panel_texture: TextureRect = %PanelTexture
 @onready var command_button: Button = %CommandButton
 @onready var ranged_button: Button = %RangedButton
+@onready var action_button: Button = %ActionButton
 @onready var pass_button: Button = %PassButton
 @onready var restart_button: Button = %RestartButton
 @onready var cancel_button: Button = %CancelButton
@@ -48,6 +51,7 @@ func _ready() -> void:
 	battlefield_view.cancel_requested.connect(cancel_selection)
 	command_button.pressed.connect(enter_command_mode)
 	ranged_button.pressed.connect(enter_ranged_mode)
+	action_button.pressed.connect(enter_action_mode)
 	pass_button.pressed.connect(pass_side)
 	restart_button.pressed.connect(restart_battle)
 	cancel_button.pressed.connect(cancel_selection)
@@ -93,7 +97,10 @@ func restart_battle() -> bool:
 		latest_feedback = "Could not load the playable scenario."
 		_refresh()
 		return false
-	scenario = Scenario.new(scenario_spec)
+	var provider: ScenarioContentProvider
+	if scenario_path == "res://scenarios/playable_tactical_slice.json":
+		provider = DemoContent.provider_for(scenario_spec)
+	scenario = Scenario.new(scenario_spec, null, provider)
 	session = ManualBattleSession.new(scenario)
 	var begun := session.begin()
 	selected_unit = null
@@ -155,6 +162,39 @@ func dispatch_ranged(target_id: String) -> Dictionary:
 	input_mode = MODE_COMMAND
 	_apply_command_result(result)
 	return result
+
+
+func dispatch_action(target_id: String) -> Dictionary:
+	if selected_unit == null:
+		return _controller_refusal("Select a unit before using an action.")
+	var target: Combatant = scenario.units.get(target_id)
+	var stamina_before := target.stamina if target != null else 0
+	var result := session.issue_command(_action_command(target_id))
+	if bool(result.get("accepted", false)):
+		input_mode = MODE_COMMAND
+	_apply_command_result(result)
+	if bool(result.get("accepted", false)) and target != null:
+		_set_feedback("Stamina Drain: %s stamina %d → %d" % [
+			target.name, stamina_before, target.stamina])
+	return result
+
+
+func _action_command(target_id: String) -> Dictionary:
+	return {"op": "action", "unit": selected_unit.instance_id,
+		"action": String(DemoContent.ACTION_ID), "target": target_id}
+
+
+func _has_drain_grant() -> bool:
+	return selected_unit != null and scenario.unit_catalogues.get(
+		selected_unit.instance_id, {}).has(DemoContent.ACTION_ID)
+
+
+func enter_action_mode() -> void:
+	if not _has_drain_grant():
+		_set_feedback("Stamina Drain is not granted to this unit.")
+		return
+	input_mode = MODE_ACTION
+	_set_feedback("Stamina Drain: click a highlighted adjacent enemy. Cancel [Esc].")
 
 
 func pass_side() -> Dictionary:
@@ -233,7 +273,9 @@ func _on_cell_clicked(cell: Vector2i) -> void:
 		return
 	var occupant := _unit_at(cell)
 	if occupant != null:
-		if scenario.side_of(occupant).id == session.active_side_id():
+		if selected_unit != null and input_mode == MODE_ACTION:
+			dispatch_action(occupant.instance_id)
+		elif scenario.side_of(occupant).id == session.active_side_id():
 			select_unit(occupant.instance_id)
 		elif selected_unit == null:
 			_set_feedback("Selection refused: that unit belongs to the inactive side.")
@@ -242,7 +284,9 @@ func _on_cell_clicked(cell: Vector2i) -> void:
 		else:
 			dispatch_melee(occupant.instance_id)
 		return
-	if input_mode == MODE_RANGED:
+	if input_mode == MODE_ACTION:
+		_set_feedback("Stamina Drain requires a highlighted adjacent enemy.")
+	elif input_mode == MODE_RANGED:
 		_set_feedback("Ranged mode requires a magenta enemy target.")
 	elif selected_unit != null:
 		dispatch_move(cell)
@@ -322,6 +366,8 @@ func _refresh() -> void:
 	victory_label.text = "Victory: %s" % session.side_name(winner) \
 		if winner >= 0 else ""
 	restart_button.visible = session.battle_complete()
+	action_button.visible = _has_drain_grant()
+	action_button.disabled = session.battle_complete()
 	ranged_button.disabled = session.battle_complete()
 	pass_button.disabled = session.battle_complete()
 	var recent_start := maxi(0, scenario.log.size() - 8)
@@ -333,6 +379,10 @@ func _refresh() -> void:
 		if input_mode == MODE_COMMAND:
 			move_cells = session.reachable_cells(selected_unit)
 			melee = session.legal_melee_targets(selected_unit)
+		elif input_mode == MODE_ACTION:
+			for target in session.living_units():
+				if bool(session.query_command(_action_command(target.instance_id))["accepted"]):
+					melee.append(target)
 		else:
 			ranged = session.legal_ranged_targets(selected_unit)
 	battlefield_view.refresh_highlights(selected_unit, move_cells, melee, ranged)

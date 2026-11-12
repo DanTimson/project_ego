@@ -289,6 +289,13 @@ expand_icon = true
 icon_max_width = 24
 text = "Ranged [R]"
 
+[node name="ActionButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 43)
+text = "Stamina Drain"
+
 [node name="PassButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 43)

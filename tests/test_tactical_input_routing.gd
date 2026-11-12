@@ -85,6 +85,62 @@ func _run() -> void:
 		and controller.latest_feedback == "Selection cancelled.",
 		"viewport-routed right click requests battlefield cancellation")
 
+	controller.select_unit("azure-ranger-17")
+	_check(not controller.action_button.visible, "ungranted Ranger has no drain button")
+	controller.select_unit(ACTIVE_UNIT_ID)
+	_check(controller.action_button.visible, "Vanguard shows composed drain grant")
+	var target: Combatant = controller.scenario.units["crimson-guard-42"]
+	var before := [unit.stamina, unit.action_spent, target.stamina,
+		controller.scenario.rng.calls.duplicate(true)]
+	controller.action_button.pressed.emit()
+	_check(controller.input_mode == controller.MODE_ACTION, "button enters drain targeting")
+	controller.cancel_button.pressed.emit()
+	_check(controller.selected_unit == null and [unit.stamina, unit.action_spent,
+		target.stamina, controller.scenario.rng.calls] == before,
+		"normal Cancel exits targeting without payment or RNG")
+	controller.select_unit(ACTIVE_UNIT_ID)
+	controller.action_button.pressed.emit()
+	controller._on_cell_clicked(controller.session.unit_position(target))
+	_check(controller.input_mode == controller.MODE_ACTION
+		and [unit.stamina, unit.action_spent, target.stamina,
+			controller.scenario.rng.calls] == before,
+		"distant target refuses without stamina, activation, or RNG changes")
+	controller.enter_command_mode()
+	var moved := controller.dispatch_move(Vector2i(3, 1))
+	_check(bool(moved["accepted"]), "Vanguard approaches by normal movement")
+	controller.pass_side()
+	controller.select_unit(target.instance_id)
+	_check(bool(controller.dispatch_move(Vector2i(4, 1))["accepted"]),
+		"Guard approaches by normal movement")
+	controller.pass_side()
+	controller.select_unit(ACTIVE_UNIT_ID)
+	controller.action_button.pressed.emit()
+	_check(controller.session.query_command(controller._action_command(
+		target.instance_id))["accepted"], "adjacent target query accepts")
+	_check(controller.battlefield_view.melee_targets.has(target),
+		"eligible adjacent enemy receives action highlight")
+	var stamina_before := target.stamina
+	_check(stamina_before >= 3, "target has at least three stamina")
+	var target_pixel := controller.battlefield_view.to_global(
+		controller.battlefield_view.adapter.cell_to_pixel(
+			controller.session.unit_position(target)))
+	_push_mouse_motion(viewport, target_pixel)
+	await _settle()
+	_push_mouse_button(viewport, target_pixel, MOUSE_BUTTON_LEFT, true)
+	_push_mouse_button(viewport, target_pixel, MOUSE_BUTTON_LEFT, false)
+	await _settle()
+	_check(target.stamina == stamina_before - 3 and unit.action_spent,
+		"target click drains exactly three and consumes actor activation")
+	var expected_feedback := "Stamina Drain: Guard stamina %d → %d" % [
+		stamina_before, target.stamina]
+	_check(controller.feedback_label.text == expected_feedback
+		and controller.latest_feedback == expected_feedback,
+		"successful drain shows target display name and observed stamina change")
+	_check("ResourceDeltaOp" in controller.events_label.text,
+		"successful drain preserves detailed operation events in the event log")
+	_check(controller.restart_battle() and controller.select_unit(ACTIVE_UNIT_ID)
+		and controller.action_button.visible, "restart restores granted action")
+
 	viewport.queue_free()
 	await process_frame
 	print("\n%s" % ["ALL PASS" if failures == 0 else "%d FAILURES" % failures])
