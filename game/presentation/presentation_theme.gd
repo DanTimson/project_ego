@@ -62,6 +62,12 @@ static func apply_menu_button(button: Button, resolver: TacticalAssetResolver) -
 	var hover := resolver.texture_for_named("ui", "menu_hover")
 	if hover != null:
 		button.add_theme_stylebox_override("hover", textured(hover, 10))
-		button.add_theme_stylebox_override("pressed", textured(hover, 10))
-		for state in ["font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+
+		for state in ["font_hover_color", "font_hover_pressed_color"]:
 			button.add_theme_color_override(state, ink)
+
+	for state in ["pressed", "disabled"]:
+		var texture := resolver.texture_for_named("ui", "menu_" + state)
+		if texture != null:
+			button.add_theme_stylebox_override(state, textured(texture, 10))
+			button.add_theme_color_override("font_" + state + "_color", ink)

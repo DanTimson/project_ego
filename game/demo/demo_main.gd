@@ -13,6 +13,7 @@ const DEVELOPMENT_METADATA := {
 	"built_at": "not a packaged build",
 }
 
+var sound: InteractionAudio
 var build_metadata: Dictionary = {}
 var controls_dialog: AcceptDialog
 var about_dialog: AcceptDialog
@@ -20,12 +21,14 @@ var about_dialog: AcceptDialog
 
 func _ready() -> void:
 	_present_menu()
+	sound = InteractionAudio.controls(get_node("Center/Panel/Margin/Buttons"))
 	%PlayButton.pressed.connect(play_demo)
 	%CampaignButton.pressed.connect(play_campaign)
 	%StrategicButton.pressed.connect(play_strategic)
 	%ControlsButton.pressed.connect(show_controls)
 	%AboutButton.pressed.connect(show_about)
 	%QuitButton.pressed.connect(quit_demo)
+	%PlayButton.grab_focus()
 	controls_dialog = %ControlsDialog
 	about_dialog = %AboutDialog
 	_prepare_dialog(controls_dialog)
@@ -97,7 +100,7 @@ func about_text(metadata: Dictionary) -> String:
 		+ "against Crimson, "
 		+ "movement, melee, ranged "
 		+ "attacks, turn passing, map checkpoints, and authored fallback presentation. "
-		+ "Legacy strategy/AI parity, audio, animation, and broad content parity remain absent."
+		+ "Legacy strategy/AI parity and broad content parity remain absent."
 		+ "\n\nCommit: %s\nGodot: %s\nMode: %s\nBuild: %s") % [
 		String(metadata.get("milestone", "unknown")),
 		String(metadata.get("commit", "unknown")),
@@ -154,11 +157,22 @@ func _present_menu() -> void:
 	landscape.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(landscape)
 	move_child(landscape, 1)
+	var chrome := Panel.new()
+	chrome.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chrome.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	chrome.anchor_top = 0.24
+	chrome.add_theme_stylebox_override("panel", PresentationTheme.frame(Color("30201c")))
+	add_child(chrome)
+	move_child(chrome, 2)
 	var panel := get_node("Center/Panel") as PanelContainer
 	panel.add_theme_stylebox_override("panel", PresentationTheme.frame(Color(0.08, 0.06, 0.045, 0.93)))
 	for id in ["PlayButton", "CampaignButton", "StrategicButton",
 		"ControlsButton", "AboutButton", "QuitButton"]:
-		PresentationTheme.apply_menu_button(get_node("%" + id), resolver)
+		var button := get_node("%" + id) as Button
+		PresentationTheme.apply_menu_button(button, resolver)
+		button.focus_entered.connect(func() -> void: sound.cue("select"))
+		button.mouse_entered.connect(func() -> void: sound.cue("select"))
+		button.button_down.connect(func() -> void: sound.cue("confirm"))
 	var frame_texture := resolver.texture_for_named("ui", "menu_frame")
 	if frame_texture != null:
 		var border := TextureRect.new()
@@ -167,6 +181,14 @@ func _present_menu() -> void:
 		border.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		border.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		border.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		border.anchor_top = 0.24
+		border.anchor_bottom = 0.24
 		border.offset_bottom = 48
 		add_child(border)
-	%PlayButton.grab_focus()
+		move_child(border, 3)
+	var title := get_node("Center/Panel/Margin/Buttons/Title") as Label
+	title.reparent(self)
+	title.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	title.position.y = 24
+	var center := get_node("Center") as CenterContainer
+	center.anchor_top = 0.24

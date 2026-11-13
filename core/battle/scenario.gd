@@ -70,6 +70,8 @@ var death_replacement_load_mode: String = GenesisDeathReplacementResolver.STRICT
 var death_replacement_diagnostics: Array = []
 var death_replacement_state: Dictionary = {}
 ## Pipeline and live provider/fatal lookup belong to this battle.
+## Additive detached facts; text traces remain the deterministic contract.
+var observations: Array[BattleObservation] = []
 var combat: CombatContext
 var _death_replacement_resolver: GenesisDeathReplacementResolver
 var _action_composition: Dictionary = {}
@@ -745,8 +747,13 @@ func query_command(command: Dictionary) -> Dictionary:
 	return _command_query(true, command_name)
 
 
+func _observe(kind: BattleObservation.Kind, source := "", target := "") -> void:
+	observations.append(BattleObservation.new(kind, _command_state(), source, target))
+
+
 ## Decide and apply a manual command through one authoritative core path.
 func execute_command(command: Dictionary) -> Dictionary:
+	observations = []
 	var before_log := log.size()
 	var query := query_command(command)
 	if not bool(query["accepted"]):
@@ -779,6 +786,7 @@ func execute_command(command: Dictionary) -> Dictionary:
 		emit("== battle over ==")
 	elif op != "end_phase":
 		_auto_end_phase()
+	_observe(BattleObservation.Kind.PHASE)
 	var events: Array = log.slice(before_log)
 	return _command_result(true, String(query["command"]), "", events,
 		before_state != _command_state())
@@ -888,6 +896,7 @@ func _command_result(accepted: bool, command: String, reason: String,
 		"reason": reason,
 		"events": events,
 		"state_changed": state_changed,
+		"observations": observations.duplicate() if accepted else [],
 		"errored": runtime_error != "",
 		"runtime_error": runtime_error,
 		# Backward-compatible aliases for Slice 1 callers.
@@ -943,6 +952,7 @@ func cmd_move(unit: Combatant, col: int, row: int) -> void:
 		int(plan["stamina_cost"]), Damage.has_effective_modifier_semantic(
 			unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	ScenarioNumericOrdering.append_traces(log, [move_trace])
+	_observe(BattleObservation.Kind.MOVE, unit.instance_id, unit.instance_id)
 	emit("%s moves to %s (%d steps, %d total this round)"
 		% [unit.label(), _at(unit), path.size(), unit.steps_this_round])
 
@@ -996,6 +1006,7 @@ func _approach(unit: Combatant, target: Combatant) -> bool:
 		Damage.has_effective_modifier_semantic(
 			unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	ScenarioNumericOrdering.append_traces(log, [move_trace])
+	_observe(BattleObservation.Kind.MOVE, unit.instance_id, unit.instance_id)
 	emit("%s closes to %s (%d steps)" % [unit.label(), _at(unit), path.size()])
 	return true
 
@@ -1022,11 +1033,31 @@ func _fell(unit: Combatant) -> void:
 func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
 		attack_context: Variant = null, primary_melee_charge: Variant = null,
 		spend_attack_cost: bool = true) -> Counterattack.Exchange:
+	var visual_state := _command_state()
 	var ex := ScenarioNumericOrdering.resolve_exchange(
 		log, unit, target, rng, kind, attack_context, primary_melee_charge,
 		spend_attack_cost, combat)
 
-	for entry in ex.order:
+	for index in ex.order.size():
+		var entry: Array = ex.order[index]
+		var source := unit.instance_id if entry[0] == "attack" else target.instance_id
+		var recipient := target.instance_id if entry[0] == "attack" else unit.instance_id
+		var facts: Dictionary = ex.observations[index]
+		for id in facts.before:
+			visual_state.units[id].merge(facts.before[id], true)
+		observations.append(BattleObservation.new(
+			BattleObservation.Kind.STRIKE, visual_state, source, recipient))
+		if int(entry[1]) > 0:
+			observations.append(BattleObservation.new(
+				BattleObservation.Kind.IMPACT, visual_state, source, recipient, int(entry[1])))
+		for id in facts.after:
+			visual_state.units[id].merge(facts.after[id], true)
+		observations.append(BattleObservation.new(
+			BattleObservation.Kind.RESOURCE, visual_state, source, recipient))
+		for id in facts.after:
+			if facts.before[id].alive and not facts.after[id].alive:
+				observations.append(BattleObservation.new(
+					BattleObservation.Kind.DEFEAT, visual_state, source, id))
 		if String(entry[0]) == "attack":
 			emit("%s hits %s for %d (%s at %d/%d, stamina %d)"
 				% [unit.label(), target.label(), int(entry[1]), target.label(),
@@ -1044,6 +1075,7 @@ func _strike(unit: Combatant, target: Combatant, kind: Combatant.AttackKind,
 			and ex.reason != Counterattack.NoCounter.DEAD:
 		emit("  (%s does not counter: %s)"
 			% [target.label(), Counterattack.REASON_TEXT[ex.reason]])
+	_observe(BattleObservation.Kind.RESOURCE, unit.instance_id, unit.instance_id)
 	return ex
 
 
@@ -1145,6 +1177,7 @@ func _execute_action_resource_delta(
 		Damage.has_effective_modifier_semantic(
 			target, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	ScenarioNumericOrdering.append_traces(log, [trace])
+	_observe(BattleObservation.Kind.EFFECT, "", target.instance_id)
 	return trace
 
 
@@ -1176,6 +1209,7 @@ func cmd_action(unit: Combatant, action_id: String,
 		Damage.has_effective_modifier_semantic(
 			unit, ModifierSemantic.Query.STAMINA_MUTATION_SUPPRESSED, combat))
 	ScenarioNumericOrdering.append_traces(log, [action_cost_trace])
+	_observe(BattleObservation.Kind.RESOURCE, unit.instance_id, unit.instance_id)
 	emit("  [action] %s payment stamina %d -> %d; spent %s" % [
 		action.id, before_stamina, unit.stamina, str(unit.action_spent)])
 

@@ -303,6 +303,8 @@ func texture_for_key(logical_key: String) -> Texture2D:
 		_report("could not load local tactical image %s (error %d)" % [path, error])
 		return null
 	apply_color_key(image)
+	# Bleed opaque edge RGB into transparent texels before linear filtering.
+	image.fix_alpha_edges()
 	var texture := ImageTexture.create_from_image(image)
 	_texture_cache[logical_key] = texture
 	return texture

@@ -359,3 +359,13 @@ moves in instance-ID order. It stops at the phase boundary and caps a phase at
 64 non-pass commands. The UI reports Crimson moves/attacks and retains battle
 events. Restart preserves this mode; direct tactical_main.tscn remains hot-seat.
 This is a Project EGO demo policy; legacy tactical AI remains outside this coverage.
+
+
+### CX-030 audiovisual interaction — DONE
+
+Menu panning, map/Home feedback, authored cues and battle playback are implemented.
+Detached observations retain strike ordering and intermediate state.
+Normal/Fast/Instant preserve command, state and RNG behavior. The clean WSL
+Godot gate passed with 40 scripts and one expected skip. Host review used the
+live layout matrix and one local-artwork audiovisual recording. See
+`CX030_INTERACTION.md` for the scope of that review and the capture command.

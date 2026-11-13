@@ -23,15 +23,15 @@ color = Color(0.055, 0.073, 0.086, 1)
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
-anchor_left = 0.46
+anchor_left = 0.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = -24.0
+offset_right = 0.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(450, 500)
+custom_minimum_size = Vector2(450, 380)
 layout_mode = 2
 
 [node name="Margin" type="MarginContainer" parent="Center/Panel"]

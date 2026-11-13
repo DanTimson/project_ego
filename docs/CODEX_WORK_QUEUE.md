@@ -51,6 +51,8 @@ priority.
 | CX-028 | `SPEC_IMPLEMENTATION` | playable six-province strategic campaign | engine | `DONE` | province capture, roster services, and map checkpoint |
 | CX-029 | `SPEC_IMPLEMENTATION` | campaign-wide visual presentation | engine | `DONE` | local artwork, public fallback and WSL visual review |
 
+| CX-030 | `SPEC_IMPLEMENTATION` | audiovisual interaction and battle playback | Daniel Timson | `DONE` | WSL clean gate, live matrix review, and local audiovisual recording |
+
 Task contracts live in `docs/codex/tasks/`.
 
 ## Assignment rule

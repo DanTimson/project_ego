@@ -89,10 +89,16 @@ func _check(ok: bool, message: String) -> void:
 
 
 func _snapshot(controller: TacticalController) -> Dictionary:
+	var report := controller.last_crimson_report.duplicate(true)
+	for result in report.get("results", []):
+		var detached: Array = []
+		for observation in result.get("observations", []):
+			detached.append(observation.to_dict())
+		result["observations"] = detached
 	return {"state": controller.scenario.final_state(),
 		"log": controller.scenario.log.duplicate(),
 		"rng": controller.scenario.rng.calls.duplicate(true),
-		"report": controller.last_crimson_report.duplicate(true)}
+		"report": report}
 
 
 class RefusingSession extends ManualBattleSession:

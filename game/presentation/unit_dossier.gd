@@ -18,33 +18,7 @@ func _draw() -> void:
 	var panel := resolver.texture_for_named("ui", "panel")
 	if panel != null and panel.get_size() == Vector2(140, 768):
 		draw_texture_rect_region(panel, Rect2(0, 0, 140, 120), Rect2(0, 0, 140, 120))
-		var values := (
-			[
-				str(maxi(0, unit.life)),
-				str(unit.stamina),
-				str(unit.morale),
-				str(unit.movement_remaining)
-			]
-			if unit != null
-			else ["—", "—", "—", "—"]
-		)
-		for index in 4:
-			# Bind known Ability icons explicitly instead of inferring panel glyph semantics.
-			var at := Vector2(78, 18 + index * 25)
-			if index < 3:
-				draw_rect(Rect2(at, Vector2(55, 24)), Color("181710"))
-				var icon := resolver.texture_for_named("ui", ["life", "stamina", "morale"][index])
-				if icon != null:
-					draw_texture_rect(icon, Rect2(at, Vector2(21, 21)), false)
-			draw_string(
-				ThemeDB.fallback_font,
-				at + Vector2(25, 18),
-				values[index],
-				HORIZONTAL_ALIGNMENT_CENTER,
-				29,
-				13,
-				Color("fff1c5")
-			)
+
 	else:
 		# Authored portrait silhouette; the foreground texture takes precedence.
 		draw_rect(Rect2(4, 4, 132, 112), Color("263530"))

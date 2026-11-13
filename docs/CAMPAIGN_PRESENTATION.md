@@ -76,3 +76,11 @@ All five host capture modes passed, and the interactive WSL playthrough
 confirmed the campaign flow. Windows exported-build and DPI verification
 remain separate platform checks. Use the CX-028 service route in
 `DEMO_RELEASE.md` to repeat the interactive review.
+
+
+## CX-030 interaction handoff
+
+CX-030 adds menu panorama motion, landmark/service feedback, authored audio
+and ordered battle playback. See [the interaction review](CX030_INTERACTION.md)
+for host acceptance and the normal-WSL recording command. Playback timings are
+native tuning values.

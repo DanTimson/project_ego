@@ -18,8 +18,11 @@ var session: ManualBattleSession
 var selected_unit: Combatant
 var input_mode := MODE_COMMAND
 var asset_resolver := TacticalAssetResolver.new()
+var playback: BattlePlayback
+var sound: InteractionAudio
 var dossier: UnitDossier
 var latest_feedback := "Select a highlighted active-side unit."
+var _presentation_before: Dictionary = {}
 
 @onready var battlefield_region: Control = %BattlefieldRegion
 @onready var battlefield_view: TacticalBattlefieldView = %BattlefieldView
@@ -53,6 +56,36 @@ var latest_feedback := "Select a highlighted active-side unit."
 func _ready() -> void:
 	theme = PresentationTheme.create()
 	_prepare_dossier()
+	playback = BattlePlayback.new()
+	add_child(playback)
+	if DisplayServer.get_name() == "headless":
+		playback.speed = "Instant"
+	var controls := get_node("RightPanel/Frame/Margin/PanelScroll/VBox")
+	sound = InteractionAudio.controls(controls)
+	var speeds := OptionButton.new()
+	for speed in ["Normal", "Fast", "Instant"]:
+		speeds.add_item(speed)
+	speeds.selected = 2 if playback.speed == "Instant" else 0
+	speeds.item_selected.connect(func(index: int) -> void:
+		playback.speed = speeds.get_item_text(index)
+		if playback.speed == "Instant":
+			playback.skip())
+	controls.add_child(speeds)
+	var reduce := CheckButton.new()
+	reduce.text = "Reduced motion"
+	reduce.toggled.connect(func(value: bool) -> void: playback.reduced_motion = value)
+	controls.add_child(reduce)
+	var skip := Button.new()
+	skip.text = "Skip playback"
+	skip.pressed.connect(playback.skip)
+	controls.add_child(skip)
+	playback.beat.connect(_present_beat)
+	playback.finished.connect(_finish_playback)
+	effects_label.focus_mode = Control.FOCUS_ALL
+	effects_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	effects_label.focus_entered.connect(func() -> void:
+		feedback_label.text = effects_label.tooltip_text)
+
 	resized.connect(_queue_layout_presentation)
 	battlefield_view.cell_clicked.connect(_on_cell_clicked)
 	battlefield_view.cancel_requested.connect(cancel_selection)
@@ -116,6 +149,10 @@ func restart_battle() -> bool:
 
 
 func _start_session(next_session: ManualBattleSession) -> bool:
+	playback.cancel()
+	battlefield_view.visual_state = {}
+	battlefield_view.current_beat = null
+	battlefield_view.motion_target = ""
 	if session != null:
 		session.end()
 	# Reload local presentation assets when replacing the battle.
@@ -139,7 +176,7 @@ func _start_session(next_session: ManualBattleSession) -> bool:
 
 
 func select_unit(instance_id: String) -> bool:
-	if scenario == null or session.battle_complete():
+	if playback.busy or scenario == null or session.battle_complete():
 		_set_feedback("Selection refused: the battle is over.")
 		return false
 	var unit: Combatant = scenario.units.get(instance_id)
@@ -149,6 +186,7 @@ func select_unit(instance_id: String) -> bool:
 	if not _human_phase() or not session.can_select(unit):
 		_set_feedback("Selection refused: %s is inactive, down, or spent." % unit.label())
 		return false
+	sound.cue("select")
 	selected_unit = unit
 	input_mode = MODE_COMMAND
 	_set_feedback("Selected %s." % unit.label())
@@ -158,7 +196,7 @@ func select_unit(instance_id: String) -> bool:
 func dispatch_move(cell: Vector2i) -> Dictionary:
 	if not _human_phase() or selected_unit == null:
 		return _controller_refusal("Select a unit before moving.")
-	var result := session.issue_command({
+	var result := _issue_command({
 		"op": "move", "unit": selected_unit.instance_id,
 		"to": [cell.x, cell.y],
 	})
@@ -169,7 +207,7 @@ func dispatch_move(cell: Vector2i) -> Dictionary:
 func dispatch_melee(target_id: String) -> Dictionary:
 	if not _human_phase() or selected_unit == null:
 		return _controller_refusal("Select a unit before attacking.")
-	var result := session.issue_command({
+	var result := _issue_command({
 		"op": "attack", "unit": selected_unit.instance_id, "target": target_id,
 	})
 	_apply_command_result(result)
@@ -179,7 +217,7 @@ func dispatch_melee(target_id: String) -> Dictionary:
 func dispatch_ranged(target_id: String) -> Dictionary:
 	if not _human_phase() or selected_unit == null:
 		return _controller_refusal("Select a unit before shooting.")
-	var result := session.issue_command({
+	var result := _issue_command({
 		"op": "shoot", "unit": selected_unit.instance_id, "target": target_id,
 	})
 	input_mode = MODE_COMMAND
@@ -192,7 +230,7 @@ func dispatch_action(target_id: String) -> Dictionary:
 		return _controller_refusal("Select a unit before using an action.")
 	var target: Combatant = scenario.units.get(target_id)
 	var stamina_before := target.stamina if target != null else 0
-	var result := session.issue_command(_action_command(target_id))
+	var result := _issue_command(_action_command(target_id))
 	var action_feedback := ""
 	if bool(result.get("accepted", false)):
 		input_mode = MODE_COMMAND
@@ -224,7 +262,7 @@ func enter_action_mode() -> void:
 func pass_side() -> Dictionary:
 	if scenario == null or not _human_phase():
 		return _controller_refusal("Wait for Azure control.")
-	var result := session.issue_command({"op": "end_phase"})
+	var result := _issue_command({"op": "end_phase"})
 	selected_unit = null
 	input_mode = MODE_COMMAND
 	_apply_command_result(result)
@@ -253,6 +291,8 @@ func enter_ranged_mode() -> void:
 
 
 func cancel_selection() -> void:
+	if playback.busy:
+		return
 	selected_unit = null
 	input_mode = MODE_COMMAND
 	_set_feedback("Selection cancelled.")
@@ -270,7 +310,7 @@ func _controller_refusal(message: String) -> Dictionary:
 
 
 func _human_phase() -> bool:
-	return not automated_crimson or session.active_side_id() == 0
+	return not playback.busy and (not automated_crimson or session.active_side_id() == 0)
 
 
 func _run_crimson_if_needed() -> String:
@@ -308,13 +348,63 @@ func _apply_command_result(result: Dictionary, action_feedback: String = "") -> 
 		selected_unit = null
 	if session.battle_complete():
 		selected_unit = null
+	var beats: Array[BattleObservation] = []
+	beats.assign(result.get("observations", []))
+	last_crimson_report = {}
 	var crimson_feedback := _run_crimson_if_needed()
+	for response in last_crimson_report.get("results", []):
+		beats.append_array(response.get("observations", []))
 	if not crimson_feedback.is_empty():
 		latest_feedback = crimson_feedback if action_feedback.is_empty() else (
 			action_feedback + "\n" + crimson_feedback)
 	elif not action_feedback.is_empty():
 		latest_feedback = action_feedback
+	if result.get("accepted", false):
+		battlefield_view.visual_state = _presentation_before.duplicate(true)
+		playback.start(beats)
+	else:
+		sound.cue("refuse")
 	_refresh()
+
+
+func _issue_command(command: Dictionary) -> Dictionary:
+	_presentation_before = scenario._command_state()
+	return session.issue_command(command)
+
+
+func _present_beat(observation: BattleObservation) -> void:
+	battlefield_view.motion_from = battlefield_view.visual_state
+	battlefield_view.motion_target = (observation.target
+		if observation.kind == BattleObservation.Kind.MOVE else "")
+	battlefield_view.motion_elapsed = 0
+	battlefield_view.motion_duration = float(playback.timings[BattleObservation.Kind.MOVE]) / (
+		3 if playback.speed == "Fast" else 1)
+	battlefield_view.visual_state = observation.state
+	battlefield_view.current_beat = observation
+	battlefield_view.reduced_motion = playback.reduced_motion
+	battlefield_view.queue_redraw()
+	var cue: String = {BattleObservation.Kind.MOVE: "movement",
+		BattleObservation.Kind.IMPACT: "impact"}.get(observation.kind, "")
+	if cue != "" and not playback.skipping:
+		sound.cue(cue)
+	feedback_label.text = "%s • %s → %s%s" % [
+		BattleObservation.Kind.keys()[observation.kind].capitalize(),
+		observation.source, observation.target,
+		" (%d)" % observation.amount if observation.kind == BattleObservation.Kind.IMPACT else ""]
+	round_label.text = "R%d" % observation.state.round
+	side_label.text = "Active: %s" % session.side_name(observation.state.active_side)
+
+
+func _finish_playback() -> void:
+	battlefield_view.visual_state = {}
+	battlefield_view.current_beat = null
+	battlefield_view.motion_target = ""
+	_refresh()
+
+
+func _exit_tree() -> void:
+	if playback != null:
+		playback.cancel()
 
 
 func _set_feedback(message: String) -> void:
@@ -330,6 +420,8 @@ func _unit_at(cell: Vector2i) -> Combatant:
 
 
 func _on_cell_clicked(cell: Vector2i) -> void:
+	if playback.busy:
+		return
 	if session.battle_complete():
 		_set_feedback("Battle complete.")
 		return
@@ -378,14 +470,6 @@ func _apply_visual_assets() -> void:
 	panel_texture.hide()
 	for region_name in ["StatsRegion", "ActionRegion", "EffectsRegion"]:
 		(get_node("%" + region_name) as Control).remove_theme_stylebox_override("panel")
-	if panel != null and panel.get_size() == Vector2(140, 768):
-		for item in [["StatsRegion", Rect2(0, 120, 140, 124)],
-			["ActionRegion", Rect2(0, 496, 140, 204)],
-			["EffectsRegion", Rect2(0, 244, 140, 230)]]:
-			var region := get_node("%" + item[0]) as PanelContainer
-			var border := PresentationTheme.textured(PresentationTheme.crop(panel, item[1]), 7)
-			border.draw_center = false
-			region.add_theme_stylebox_override("panel", border)
 	command_button.icon = asset_resolver.texture_for_named("ui", "command")
 	ranged_button.icon = asset_resolver.texture_for_named("ui", "ranged")
 	cancel_button.icon = asset_resolver.texture_for_named("ui", "cancel")
@@ -478,6 +562,17 @@ func _refresh() -> void:
 			", ".join(effect_names) if not effect_names.is_empty() else "None"]
 		portrait_rect.texture = asset_resolver.texture_for_portrait(selected_unit)
 		portrait_fallback_label.text = selected_unit.name.substr(0, 1).to_upper()
+	effects_label.tooltip_text = effects_label.text
+	if selected_unit != null:
+		var descriptions := {
+			"Первый удар": "Retaliates before the melee hit unless both units have first strike.",
+			"Ловкость": "Avoids melee retaliation.",
+			"Касание вампира": "Avoids melee retaliation.",
+			"Не сражается": "Cannot attack or retaliate in melee.",
+		}
+		for flag in selected_unit.all_flags():
+			if descriptions.has(String(flag)):
+				effects_label.tooltip_text += "\n" + String(descriptions[String(flag)])
 	dossier.unit = selected_unit
 	dossier.queue_redraw()
 	portrait_fallback_label.visible = portrait_rect.texture == null
@@ -485,13 +580,25 @@ func _refresh() -> void:
 	victory_label.text = "Victory: %s" % session.side_name(winner) \
 		if winner >= 0 else ""
 	restart_button.visible = session.battle_complete()
+	command_button.disabled = false
+	cancel_button.disabled = false
 	action_button.visible = _has_drain_grant()
 	action_button.disabled = session.battle_complete()
 	ranged_button.disabled = session.battle_complete()
 	pass_button.disabled = session.battle_complete()
+	for control in [command_button, ranged_button, action_button, pass_button, cancel_button]:
+		control.disabled = control.disabled or playback.busy
+	get_node("%StatsRegion").visible = not playback.busy
+	get_node("%EffectsRegion").visible = not playback.busy
+	if playback.busy:
+		victory_label.text = ""
+		round_label.text = "R%d" % _presentation_before.get("round", 1)
+		side_label.text = "Playback • input locked"
 	_update_pass_art()
 	var recent_start := maxi(0, scenario.log.size() - 8)
 	events_label.text = "\n".join(scenario.log.slice(recent_start))
+	if playback.busy:
+		events_label.text = "Playback in progress • Skip to final state"
 	var move_cells: Array[Vector2i] = []
 	var melee: Array[Combatant] = []
 	var ranged: Array[Combatant] = []

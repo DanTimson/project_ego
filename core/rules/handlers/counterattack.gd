@@ -73,6 +73,7 @@ class Exchange extends RefCounted:
 	## Narrow propagation for a fatal lifecycle that could not resolve.
 	var runtime_error: String = ""
 	var traces: Array = []
+	var observations: Array = []
 	var order: Array = []      ## [["attack"|"counter", damage], ...]
 
 
@@ -146,6 +147,8 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 	# Resolve the ordinary strike completely before consuming R3 charge. The
 	# combined capped value feeds the exchange accumulator/order before life
 	# subtraction. Retaliation has its own charge-free path below.
+	var before_attacker := BattleObservation.unit_state(attacker)
+	var before_defender := BattleObservation.unit_state(defender)
 	var scale_numerator := 1
 	var scale_denominator := 1
 	if action != null and action.get("initiating_attack_scale_numerator") != null:
@@ -187,10 +190,16 @@ static func _do_attack(ex: Exchange, attacker: Combatant, defender: Combatant,
 	ex.defender_fatal_event = bool(outcome["fatal_event"])
 	ex.defender_died = bool(outcome["final_death"])
 	ex.runtime_error = String(outcome.get("error", ""))
+	ex.observations.append({"before": {attacker.instance_id: before_attacker,
+		defender.instance_id: before_defender},
+		"after": {attacker.instance_id: BattleObservation.unit_state(attacker),
+		defender.instance_id: BattleObservation.unit_state(defender)}})
 
 
 static func _do_counter(ex: Exchange, attacker: Combatant, defender: Combatant,
 		rng: Variant, combat: CombatContext = null) -> void:
+	var before_attacker := BattleObservation.unit_state(attacker)
+	var before_defender := BattleObservation.unit_state(defender)
 	var result: Array = Damage.resolve_attack(
 		defender, attacker, Combatant.AttackKind.COUNTER, rng, false, 1, 1, combat)
 	ex.counter_damage = int(result[0])
@@ -201,6 +210,10 @@ static func _do_counter(ex: Exchange, attacker: Combatant, defender: Combatant,
 	ex.attacker_fatal_event = bool(outcome["fatal_event"])
 	ex.attacker_died = bool(outcome["final_death"])
 	ex.runtime_error = String(outcome.get("error", ""))
+	ex.observations.append({"before": {attacker.instance_id: before_attacker,
+		defender.instance_id: before_defender},
+		"after": {attacker.instance_id: BattleObservation.unit_state(attacker),
+		defender.instance_id: BattleObservation.unit_state(defender)}})
 
 
 ## «При убийстве противника контратакой или выстрелом воин дополнительно

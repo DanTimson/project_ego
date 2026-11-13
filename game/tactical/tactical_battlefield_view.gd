@@ -18,6 +18,13 @@ const FIELD_RECT := Rect2(Vector2(-8.0, -8.0), Vector2(848.0, 736.0))
 const UNIT_HEIGHT := 94.0
 const UNIT_FOOT_Y := 39.0
 
+var visual_state: Dictionary = {}
+var current_beat: BattleObservation
+var reduced_motion := false
+var motion_from: Dictionary = {}
+var motion_target := ""
+var motion_duration := 0.32
+var motion_elapsed := 0.0
 var scenario: Scenario
 var session: ManualBattleSession
 var adapter := TacticalCoordinateAdapter.new(Vector2(58.0, 174.0), 50.0)
@@ -116,7 +123,10 @@ func sprite_rect(texture: Texture2D) -> Rect2:
 	return Rect2(Vector2(-size.x * 0.5, -UNIT_HEIGHT + UNIT_FOOT_Y), size)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if motion_elapsed < motion_duration:
+		motion_elapsed += delta
+		queue_redraw()
 	if scenario == null:
 		return
 	var next := hit_test_local(get_local_mouse_position())
@@ -141,12 +151,13 @@ func _draw() -> void:
 	_draw_base_terrain()
 	_draw_tile_variation_and_decoration()
 	_draw_grid()
-	for unit in session.living_units():
+	for unit in _visible_units():
 		_draw_unit_shadow(unit)
-	for unit in session.living_units():
+	for unit in _visible_units():
 		_draw_unit_sprite(unit)
-	for unit in session.living_units():
+	for unit in _visible_units():
 		_draw_unit_overlays(unit)
+	_draw_beat()
 
 
 func _draw_base_terrain() -> void:
@@ -207,7 +218,7 @@ func _draw_unit_shadow(unit: Combatant) -> void:
 	if not _shadow_textures.has(unit.instance_id):
 		_shadow_textures[unit.instance_id] = asset_resolver.texture_for_shadow(unit)
 	var texture: Texture2D = _shadow_textures[unit.instance_id]
-	var centre := adapter.cell_to_pixel(session.unit_position(unit))
+	var centre := _visual_center(unit)
 	if texture == null:
 		draw_set_transform(centre + Vector2(0, 30), 0, Vector2(1, 0.3))
 		draw_circle(Vector2.ZERO, 27, Color(0.04, 0.06, 0.03, 0.35))
@@ -224,7 +235,7 @@ func _draw_unit_sprite(unit: Combatant) -> void:
 	if not _textures.has(unit.instance_id):
 		_textures[unit.instance_id] = asset_resolver.texture_for_unit(unit)
 	var texture: Texture2D = _textures[unit.instance_id]
-	var centre := adapter.cell_to_pixel(session.unit_position(unit))
+	var centre := _visual_center(unit)
 	var side_id := scenario.side_of(unit).id
 	if texture != null:
 		draw_set_transform(centre, 0.0, Vector2(facing_scale_x_for_side(side_id), 1.0))
@@ -255,7 +266,7 @@ func _draw_placeholder_unit(unit: Combatant, centre: Vector2, side_id: int) -> v
 
 
 func _draw_unit_overlays(unit: Combatant) -> void:
-	var centre := adapter.cell_to_pixel(session.unit_position(unit))
+	var centre := _visual_center(unit)
 	var side_id := scenario.side_of(unit).id
 	var color: Color = SIDE_COLORS.get(side_id, Color.GRAY)
 	if melee_targets.has(unit):
@@ -265,7 +276,7 @@ func _draw_unit_overlays(unit: Combatant) -> void:
 	if melee_targets.has(unit) or ranged_targets.has(unit):
 		_draw_overlay("target", centre + Vector2(0, 30), Vector2(71, 24), color)
 	draw_arc(centre + Vector2(0.0, 30.0), 27.0, 0.0, TAU, 32, color, 3.0, true)
-	var life_ratio := clampf(float(maxi(0, unit.life)) / float(unit.life_base), 0.0, 1.0)
+	var life_ratio := clampf(float(maxi(0, _visual_life(unit))) / float(unit.life_base), 0.0, 1.0)
 	var bar_position := centre + Vector2(-25.0, 43.0)
 	draw_rect(Rect2(bar_position, Vector2(50.0, 7.0)), Color("17130f"))
 	draw_rect(Rect2(bar_position + Vector2(1.0, 1.0),
@@ -284,3 +295,50 @@ func _draw_overlay(slot: String, centre: Vector2, extent: Vector2, tint: Color) 
 	var texture: Texture2D = _overlay_textures.get(slot)
 	if texture != null:
 		draw_texture_rect(texture, Rect2(centre - extent * 0.5, extent), false, tint)
+
+
+func _visible_units() -> Array[Combatant]:
+	if visual_state.is_empty():
+		return session.living_units()
+	var result: Array[Combatant] = []
+	for id in visual_state.units:
+		if visual_state.units[id].alive:
+			result.append(scenario.units[id])
+	return result
+
+
+func _visual_position(unit: Combatant) -> Vector2i:
+	if visual_state.is_empty():
+		return session.unit_position(unit)
+	return visual_state.units[unit.instance_id].position
+
+
+func _visual_life(unit: Combatant) -> int:
+	if visual_state.is_empty():
+		return unit.life
+	return int(visual_state.units[unit.instance_id].life)
+
+
+func _draw_beat() -> void:
+	if current_beat == null or current_beat.target == "":
+		return
+	var target: Dictionary = current_beat.state.units.get(current_beat.target, {})
+	if target.is_empty() or target.position.x < 0:
+		return
+	var at := adapter.cell_to_pixel(target.position)
+	var label: String = BattleObservation.Kind.keys()[current_beat.kind].capitalize()
+	if current_beat.kind == BattleObservation.Kind.IMPACT:
+		label = "−%d" % current_beat.amount
+	if not reduced_motion and current_beat.kind in [BattleObservation.Kind.IMPACT,
+		BattleObservation.Kind.EFFECT, BattleObservation.Kind.STRIKE]:
+		draw_arc(at + Vector2(0, -15), 34, 0, TAU, 24, Color("ffe5a1"), 4, true)
+	draw_string(ThemeDB.fallback_font, at + Vector2(-30, -70), label,
+		HORIZONTAL_ALIGNMENT_CENTER, 100, 18, Color("fff0bc"))
+
+
+func _visual_center(unit: Combatant) -> Vector2:
+	var destination := adapter.cell_to_pixel(_visual_position(unit))
+	if reduced_motion or unit.instance_id != motion_target or motion_from.is_empty():
+		return destination
+	var start := adapter.cell_to_pixel(motion_from.units[unit.instance_id].position)
+	return start.lerp(destination, clampf(motion_elapsed / motion_duration, 0, 1))

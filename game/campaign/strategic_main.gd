@@ -4,6 +4,9 @@ const Authored = preload("res://content/campaign/native_campaign.gd")
 const MapView = preload("res://game/campaign/province_map.gd")
 const BattleView = preload("res://game/campaign/strategic_battle.tscn")
 const MENU := "res://game/demo/demo_main.tscn"
+var sound: InteractionAudio
+var service_feedback := ""
+var row_feedback: Dictionary = {}
 var campaign: StrategicCampaign
 var store := CampaignCheckpointStore.new()
 var battle: TacticalController
@@ -92,6 +95,7 @@ func _build_screen() -> void:
 	var sidebar := VBoxContainer.new()
 	sidebar.custom_minimum_size.x = 286
 	columns.add_child(sidebar)
+	sound = InteractionAudio.controls(sidebar)
 	_label(sidebar, "Campaign", 22)
 	new_button = _button(sidebar, "New Campaign", new_campaign)
 	resume_button = _button(sidebar, "Resume Checkpoint", resume_checkpoint)
@@ -131,6 +135,7 @@ func _button(parent: Node, text: String, action: Callable) -> Button:
 func new_campaign() -> void:
 	if battle != null:
 		return
+	row_feedback = {}
 	campaign = StrategicCampaign.create(Authored.definition())
 	_refresh("New run. An existing checkpoint stays unchanged until you explicitly save.")
 
@@ -140,6 +145,7 @@ func resume_checkpoint() -> Dictionary:
 		return {"ok": false, "reason": "Return to the map first."}
 	var loaded := store.load_campaign(Authored.definition())
 	if loaded.ok:
+		row_feedback = {}
 		campaign = loaded.campaign
 	_refresh("Checkpoint resumed." if loaded.ok else loaded.reason)
 	return loaded
@@ -156,8 +162,12 @@ func save_checkpoint() -> Dictionary:
 func travel(destination: String) -> Dictionary:
 	if campaign == null:
 		return {"ok": false, "reason": "Start a campaign first."}
+	map_view.mark(destination, "Selected")
+	sound.cue("select")
 	var result := campaign.travel(destination)
 	_refresh(result.reason)
+	sound.cue("movement" if result.ok else "refuse")
+	map_view.mark(destination, "Travel" if result.ok else "Refused")
 	if result.ok and result.has("encounter"):
 		battle = BattleView.instantiate()
 		battle.campaign = campaign
@@ -172,10 +182,15 @@ func travel(destination: String) -> Dictionary:
 func return_from_battle(commit: bool) -> Dictionary:
 	if battle == null:
 		return {"ok": false, "reason": "No active battle."}
+	var captured: bool = commit and battle.session.winning_side_id() == 0
 	var result := (
 		campaign.finish(battle.encounter) if commit else campaign.abandon(battle.encounter)
 	)
 	if result.ok:
+		var marker := "Captured" if captured else ("Defeated" if commit else "Returned")
+		map_view.mark(battle.destination, marker)
+		sound.cue("capture" if captured else ("refuse" if commit else "confirm"))
+		battle.playback.cancel()
 		battle.session.end()
 		battle.queue_free()
 		battle = null
@@ -187,16 +202,28 @@ func return_from_battle(commit: bool) -> Dictionary:
 func recover() -> Dictionary:
 	if campaign == null:
 		return {"ok": false, "reason": "Start a campaign first."}
+	var before: Dictionary = campaign.snapshot().roster.entries
 	var result := campaign.recover()
+	_record_roster_feedback(before)
+	service_feedback = "Recovered" if result.ok else "Refused"
+	sound.cue("confirm" if result.ok else "refuse")
 	_refresh(result.reason)
+	map_view.mark("home", service_feedback)
+	roster_details.text = service_feedback + " • " + result.reason
 	return result
 
 
 func recruit() -> Dictionary:
 	if campaign == null:
 		return {"ok": false, "reason": "Start a campaign first."}
+	var before: Dictionary = campaign.snapshot().roster.entries
 	var result := campaign.recruit()
+	_record_roster_feedback(before)
+	service_feedback = "Recruited" if result.ok else "Refused"
+	sound.cue("confirm" if result.ok else "refuse")
 	_refresh(result.reason)
+	map_view.mark("home", service_feedback)
+	roster_details.text = service_feedback + " • " + result.reason
 	return result
 
 
@@ -276,13 +303,6 @@ func _build_home(parent: Control) -> void:
 	service_frame.add_theme_stylebox_override(
 		"panel", PresentationTheme.frame(Color(0.08, 0.07, 0.05, 0.93))
 	)
-	var dialog := resolver.texture_for_named("ui", "dialog")
-	if dialog != null:
-		# The inspected lower marble tray keeps light service text readable.
-		service_frame.add_theme_stylebox_override(
-			"panel",
-			PresentationTheme.textured(PresentationTheme.crop(dialog, Rect2(0, 156, 300, 64)), 6)
-		)
 	columns.add_child(service_frame)
 	var services := VBoxContainer.new()
 	services.custom_minimum_size.x = 280
@@ -342,6 +362,8 @@ func _add_roster_row(member: Dictionary) -> void:
 			)
 		]
 	)
+	if row_feedback.has(member.id):
+		row.text += "\n" + String(row_feedback[member.id])
 	row.custom_minimum_size.y = 82
 	row.add_theme_font_size_override("font_size", 15)
 	var key: String = resolver.content_keys_by_category.get("portraits", {}).get(member.def, "")
@@ -359,5 +381,18 @@ func _add_roster_row(member: Dictionary) -> void:
 			member.definition.life
 		]
 	)
-	row.pressed.connect(func() -> void: roster_details.text = row.tooltip_text)
+	row.pressed.connect(func() -> void:
+		roster_details.text = row.tooltip_text
+		sound.cue("select"))
+	row.focus_entered.connect(func() -> void: roster_details.text = row.tooltip_text)
 	roster_rows.add_child(row)
+
+
+func _record_roster_feedback(before: Dictionary) -> void:
+	row_feedback = {}
+	for id in campaign.snapshot().roster.entries:
+		var member: Dictionary = campaign.snapshot().roster.entries[id]
+		if not before.has(id):
+			row_feedback[id] = "Recruited"
+		elif member.life > before[id].life:
+			row_feedback[id] = "Recovered +%d life" % (member.life - before[id].life)

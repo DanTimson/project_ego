@@ -10,6 +10,9 @@ const LOCATIONS := {
 	"mill": Vector2(0.67, 0.85),
 	"keep": Vector2(1.0, 0.5),
 }
+var marked := ""
+var mark_text := ""
+var mark_time := 0.0
 var buttons: Dictionary = {}
 var resolver: TacticalAssetResolver
 var _content: Dictionary = {}
@@ -32,6 +35,8 @@ func _ready() -> void:
 			"hover", PresentationTheme.frame(Color(0.9, 0.8, 0.5, 0.13))
 		)
 		button.add_theme_stylebox_override("pressed", PresentationTheme.frame(Color(0, 0, 0, 0.2)))
+		button.focus_entered.connect(func() -> void: mark(id, "Selected"))
+		button.mouse_entered.connect(func() -> void: mark(id, "Selected"))
 		button.pressed.connect(func() -> void: destination_chosen.emit(id))
 		add_child(button)
 		buttons[id] = button
@@ -113,6 +118,14 @@ func _draw() -> void:
 					_art("route_marker", start.lerp(end, 0.5), Vector2(22, 12))
 	for id in buttons:
 		var centre: Vector2 = buttons[id].position + Vector2(57, 35)
+		if id == marked:
+			draw_arc(centre, 42, 0, TAU, 32, Color("ffe5a1"), 3, true)
+			draw_string(ThemeDB.fallback_font, centre + Vector2(-57, -31),
+				("HERE • " if id == _state.position else "") + mark_text,
+				HORIZONTAL_ALIGNMENT_CENTER, 114, 12, Color("fff3ca"))
+		if not buttons[id].disabled:
+			draw_string(ThemeDB.fallback_font, centre + Vector2(-45, 90), "TRAVEL", 1,
+				90, 12, Color("fff3ca"))
 		draw_rect(Rect2(centre + Vector2(-57, 26), Vector2(114, 49)), Color(0.06, 0.09, 0.06, 0.85))
 		if id == _state.position:
 			if not _art("position_ring", centre + Vector2(0, 22), Vector2(90, 30)):
@@ -120,7 +133,7 @@ func _draw() -> void:
 			draw_string(
 				ThemeDB.fallback_font,
 				centre + Vector2(-24, -31),
-				"HERE",
+				"HERE" if id != marked else "",
 				0,
 				-1,
 				12,
@@ -215,3 +228,19 @@ func _draw_landmark(at: Vector2, id: String) -> void:
 	if id == "mill":
 		for direction in [Vector2(25, 25), Vector2(25, -25)]:
 			draw_line(at - direction, at + direction, Color("e2d3a5"), 5, true)
+
+
+func mark(id: String, text: String) -> void:
+	marked = id
+	mark_text = text
+	mark_time = 2.0
+	queue_redraw()
+
+
+func _process(delta: float) -> void:
+	if mark_time <= 0:
+		return
+	mark_time -= delta
+	if mark_time <= 0:
+		marked = ""
+		queue_redraw()
