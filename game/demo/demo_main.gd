@@ -19,6 +19,7 @@ var about_dialog: AcceptDialog
 
 
 func _ready() -> void:
+	_present_menu()
 	%PlayButton.pressed.connect(play_demo)
 	%CampaignButton.pressed.connect(play_campaign)
 	%StrategicButton.pressed.connect(play_strategic)
@@ -142,3 +143,30 @@ func _run_export_smoke() -> void:
 		return
 	push_error("DEMO_SMOKE tactical scene failed to initialize")
 	get_tree().quit(1)
+
+
+func _present_menu() -> void:
+	theme = PresentationTheme.create()
+	var resolver := TacticalAssetResolver.new()
+	resolver.configure()
+	var landscape := PresentationLandscape.new()
+	landscape.resolver = resolver
+	landscape.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(landscape)
+	move_child(landscape, 1)
+	var panel := get_node("Center/Panel") as PanelContainer
+	panel.add_theme_stylebox_override("panel", PresentationTheme.frame(Color(0.08, 0.06, 0.045, 0.93)))
+	for id in ["PlayButton", "CampaignButton", "StrategicButton",
+		"ControlsButton", "AboutButton", "QuitButton"]:
+		PresentationTheme.apply_menu_button(get_node("%" + id), resolver)
+	var frame_texture := resolver.texture_for_named("ui", "menu_frame")
+	if frame_texture != null:
+		var border := TextureRect.new()
+		border.texture = PresentationTheme.crop(frame_texture, Rect2(0, 0, 1024, 82))
+		border.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		border.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		border.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		border.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		border.offset_bottom = 48
+		add_child(border)
+	%PlayButton.grab_focus()

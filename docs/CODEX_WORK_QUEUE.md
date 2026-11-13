@@ -49,6 +49,7 @@ priority.
 | CX-026 | `SPEC_IMPLEMENTATION` | roster life across two native encounters | engine | `DONE` | detached roster and apply-once outcome |
 | CX-027 | `SPEC_IMPLEMENTATION` | playable Ford and Watchpost campaign demo | engine | `DONE` | menu entry, survivor handoff, and encounter retry |
 | CX-028 | `SPEC_IMPLEMENTATION` | playable six-province strategic campaign | engine | `DONE` | province capture, roster services, and map checkpoint |
+| CX-029 | `SPEC_IMPLEMENTATION` | campaign-wide visual presentation | engine | `DONE` | local artwork, public fallback and WSL visual review |
 
 Task contracts live in `docs/codex/tasks/`.
 

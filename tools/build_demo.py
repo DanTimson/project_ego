@@ -166,8 +166,10 @@ def mapping_references(mapping: dict[str, Any]) -> set[str]:
     return references
 
 
-def load_source_index(asset_root: Path) -> dict[str, dict[str, Any]]:
-    index = load_json(asset_root / INDEX_NAME)
+def load_source_index(asset_root: Path, index_name: str = INDEX_NAME) -> dict[str, dict[str, Any]]:
+    if not index_name or Path(index_name).name != index_name:
+        raise BuildError("source index name must be a filename inside the asset root")
+    index = load_json(asset_root / index_name)
     require_keys(index, {"version", "assets"}, "asset index")
     if index["version"] != 1 or not isinstance(index["assets"], list):
         raise BuildError("asset index must be version 1 with an assets array")
@@ -202,14 +204,20 @@ def load_source_index(asset_root: Path) -> dict[str, dict[str, Any]]:
     return entries
 
 
-def prepare_minimal_asset_bundle(asset_root: Path, destination: Path) -> set[str]:
+def prepare_minimal_asset_bundle(
+    asset_root: Path, destination: Path, *,
+    index_name: str = INDEX_NAME, mapping_name: str = MAPPING_NAME,
+) -> set[str]:
     if asset_root.is_symlink() or not asset_root.is_dir():
         raise BuildError(f"asset root is missing or is a symlink: {asset_root}")
-    mapping = load_json(asset_root / MAPPING_NAME)
+    for name in (index_name, mapping_name):
+        if not name or Path(name).name != name:
+            raise BuildError("source JSON name must be a filename inside the asset root")
+    mapping = load_json(asset_root / mapping_name)
     references = mapping_references(mapping)
     if not references:
         raise BuildError("mapping references no playable presentation assets")
-    entries = load_source_index(asset_root)
+    entries = load_source_index(asset_root, index_name)
     missing = references - set(entries)
     if missing:
         raise BuildError(f"mapping references missing assets: {sorted(missing)}")

@@ -18,6 +18,7 @@ var session: ManualBattleSession
 var selected_unit: Combatant
 var input_mode := MODE_COMMAND
 var asset_resolver := TacticalAssetResolver.new()
+var dossier: UnitDossier
 var latest_feedback := "Select a highlighted active-side unit."
 
 @onready var battlefield_region: Control = %BattlefieldRegion
@@ -50,6 +51,8 @@ var latest_feedback := "Select a highlighted active-side unit."
 
 
 func _ready() -> void:
+	theme = PresentationTheme.create()
+	_prepare_dossier()
 	resized.connect(_queue_layout_presentation)
 	battlefield_view.cell_clicked.connect(_on_cell_clicked)
 	battlefield_view.cancel_requested.connect(cancel_selection)
@@ -57,6 +60,9 @@ func _ready() -> void:
 	ranged_button.pressed.connect(enter_ranged_mode)
 	action_button.pressed.connect(enter_action_mode)
 	pass_button.pressed.connect(pass_side)
+	for signal_name in ["mouse_entered", "mouse_exited", "button_down", "button_up",
+		"focus_entered", "focus_exited"]:
+		pass_button.connect(signal_name, _update_pass_art.call_deferred)
 	restart_button.pressed.connect(restart_battle)
 	cancel_button.pressed.connect(cancel_selection)
 	restart_battle()
@@ -117,6 +123,7 @@ func _start_session(next_session: ManualBattleSession) -> bool:
 	_apply_visual_assets()
 	session = next_session
 	scenario = session.scenario
+	_bind_presentation_roles()
 	var begun := session.begin()
 	selected_unit = null
 	last_crimson_report = {}
@@ -364,16 +371,67 @@ func _unhandled_input(event: InputEvent) -> void:
 func _apply_visual_assets() -> void:
 	if not is_node_ready():
 		return
-	panel_texture.texture = asset_resolver.texture_for_named(
-		TacticalAssetResolver.CATEGORY_UI, "panel")
-	command_button.icon = asset_resolver.texture_for_named(
-		TacticalAssetResolver.CATEGORY_UI, "command")
-	ranged_button.icon = asset_resolver.texture_for_named(
-		TacticalAssetResolver.CATEGORY_UI, "ranged")
-	pass_button.icon = asset_resolver.texture_for_named(
-		TacticalAssetResolver.CATEGORY_UI, "pass")
-	cancel_button.icon = asset_resolver.texture_for_named(
-		TacticalAssetResolver.CATEGORY_UI, "cancel")
+	# The original 140x768 panel is never stretched beneath the sidebar.
+	# Use native portrait/value cells and separately cropped group frames.
+	var panel := asset_resolver.texture_for_named("ui", "panel")
+	panel_texture.texture = panel
+	panel_texture.hide()
+	for region_name in ["StatsRegion", "ActionRegion", "EffectsRegion"]:
+		(get_node("%" + region_name) as Control).remove_theme_stylebox_override("panel")
+	if panel != null and panel.get_size() == Vector2(140, 768):
+		for item in [["StatsRegion", Rect2(0, 120, 140, 124)],
+			["ActionRegion", Rect2(0, 496, 140, 204)],
+			["EffectsRegion", Rect2(0, 244, 140, 230)]]:
+			var region := get_node("%" + item[0]) as PanelContainer
+			var border := PresentationTheme.textured(PresentationTheme.crop(panel, item[1]), 7)
+			border.draw_center = false
+			region.add_theme_stylebox_override("panel", border)
+	command_button.icon = asset_resolver.texture_for_named("ui", "command")
+	ranged_button.icon = asset_resolver.texture_for_named("ui", "ranged")
+	cancel_button.icon = asset_resolver.texture_for_named("ui", "cancel")
+	for item in [[life_label, "life"], [stamina_label, "stamina"],
+		[attack_label, "attack"], [defence_label, "defence"], [ammo_label, "ammo"]]:
+		_set_stat_icon(item[0], item[1])
+	pass_button.expand_icon = true
+	pass_button.add_theme_constant_override("icon_max_width", 28)
+	_update_pass_art()
+	dossier.resolver = asset_resolver
+	dossier.queue_redraw()
+
+
+func _prepare_dossier() -> void:
+	var stage := portrait_rect.get_parent() as Control
+	stage.custom_minimum_size = Vector2(140, 132)
+	dossier = UnitDossier.new()
+	stage.add_child(dossier)
+	stage.move_child(dossier, 1)
+	dossier.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	portrait_rect.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	portrait_rect.position = Vector2(9, 18)
+	portrait_rect.size = Vector2(64, 80)
+	identity_label.hide()
+	identity_label.tooltip_text = "Battle instance identity (diagnostics only)"
+
+
+func _set_stat_icon(label: Label, slot: String) -> void:
+	var icon := label.get_node_or_null("StatIcon") as TextureRect
+	if icon == null:
+		icon = TextureRect.new()
+		icon.name = "StatIcon"
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.size = Vector2(20, 20)
+		label.add_child(icon)
+		var margin := StyleBoxEmpty.new()
+		margin.content_margin_left = 24
+		label.add_theme_stylebox_override("normal", margin)
+	icon.texture = asset_resolver.texture_for_named("ui", slot)
+
+
+func _bind_presentation_roles() -> void:
+	# Entry points override only the view-side art assignment.
+	pass
 
 
 func _refresh() -> void:
@@ -420,6 +478,9 @@ func _refresh() -> void:
 			", ".join(effect_names) if not effect_names.is_empty() else "None"]
 		portrait_rect.texture = asset_resolver.texture_for_portrait(selected_unit)
 		portrait_fallback_label.text = selected_unit.name.substr(0, 1).to_upper()
+	dossier.unit = selected_unit
+	dossier.queue_redraw()
+	portrait_fallback_label.visible = portrait_rect.texture == null
 	var winner := session.winning_side_id()
 	victory_label.text = "Victory: %s" % session.side_name(winner) \
 		if winner >= 0 else ""
@@ -428,6 +489,7 @@ func _refresh() -> void:
 	action_button.disabled = session.battle_complete()
 	ranged_button.disabled = session.battle_complete()
 	pass_button.disabled = session.battle_complete()
+	_update_pass_art()
 	var recent_start := maxi(0, scenario.log.size() - 8)
 	events_label.text = "\n".join(scenario.log.slice(recent_start))
 	var move_cells: Array[Vector2i] = []
@@ -444,3 +506,15 @@ func _refresh() -> void:
 		else:
 			ranged = session.legal_ranged_targets(selected_unit)
 	battlefield_view.refresh_highlights(selected_unit, move_cells, melee, ranged)
+
+
+func _update_pass_art() -> void:
+	var state := "normal"
+	if pass_button.disabled:
+		state = "disabled"
+	elif pass_button.get_draw_mode() in [BaseButton.DRAW_PRESSED, BaseButton.DRAW_HOVER_PRESSED]:
+		state = "pressed"
+	elif pass_button.get_draw_mode() == BaseButton.DRAW_HOVER or pass_button.has_focus():
+		state = "hover"
+	var texture := asset_resolver.texture_for_named("ui", "pass_" + state)
+	pass_button.icon = texture if texture != null else asset_resolver.texture_for_named("ui", "pass")

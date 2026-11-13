@@ -28,11 +28,14 @@ var content_keys_by_category: Dictionary = {}
 var instance_keys_by_category: Dictionary = {}
 var named_keys_by_category: Dictionary = {}
 var status_messages: Array[String] = []
+# View-owned assignments; never added to model definitions, identities or saves.
+var presentation_roles: Dictionary = {}
 var _texture_cache: Dictionary = {}
 
 
 func configure(p_index_path: String = "", p_mapping_path: String = "") -> bool:
 	status_messages.clear()
+	presentation_roles.clear()
 	var paths := discovery_paths(p_index_path, p_mapping_path)
 	var loaded := load_index(String(paths["index"]))
 	if loaded:
@@ -238,7 +241,10 @@ func logical_key_for_unit(unit: Combatant, category: String = CATEGORY_UNITS) ->
 	if unit.content_id != "" and category_content.has(unit.content_id):
 		return String(category_content[unit.content_id])
 	var category_instances: Dictionary = instance_keys_by_category.get(category, {})
-	return String(category_instances.get(unit.instance_id, ""))
+	if category_instances.has(unit.instance_id):
+		return String(category_instances[unit.instance_id])
+	var role: String = presentation_roles.get(unit, "")
+	return logical_key_for_named(CATEGORY_UI, role + "_" + category) if role != "" else ""
 
 
 func logical_key_for_named(category: String, id: String) -> String:
@@ -400,3 +406,7 @@ func _reject_mapping(reason: String) -> bool:
 func _report(message: String) -> void:
 	status_messages.append(message)
 	print("TacticalAssetResolver: %s" % message)
+
+
+func assign_role(unit: Combatant, role: String) -> void:
+	presentation_roles[unit] = role

@@ -277,7 +277,7 @@ custom_minimum_size = Vector2(0, 43)
 layout_mode = 2
 size_flags_horizontal = 3
 expand_icon = true
-icon_max_width = 24
+theme_override_constants/icon_max_width = 24
 text = "Move / Melee"
 
 [node name="RangedButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
@@ -286,7 +286,7 @@ custom_minimum_size = Vector2(0, 43)
 layout_mode = 2
 size_flags_horizontal = 3
 expand_icon = true
-icon_max_width = 24
+theme_override_constants/icon_max_width = 24
 text = "Ranged [R]"
 
 [node name="ActionButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
@@ -302,7 +302,7 @@ custom_minimum_size = Vector2(0, 43)
 layout_mode = 2
 size_flags_horizontal = 3
 expand_icon = true
-icon_max_width = 24
+theme_override_constants/icon_max_width = 24
 text = "Pass [Space]"
 
 [node name="CancelButton" type="Button" parent="RightPanel/Frame/Margin/PanelScroll/VBox/ActionRegion/ActionGrid"]
@@ -311,7 +311,7 @@ custom_minimum_size = Vector2(0, 43)
 layout_mode = 2
 size_flags_horizontal = 3
 expand_icon = true
-icon_max_width = 24
+theme_override_constants/icon_max_width = 24
 text = "Cancel [Esc]"
 
 [node name="EffectsRegion" type="PanelContainer" parent="RightPanel/Frame/Margin/PanelScroll/VBox"]

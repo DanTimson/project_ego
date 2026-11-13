@@ -32,6 +32,7 @@ var _shadow_textures: Dictionary = {}
 var _terrain_texture: Texture2D
 var _variation_textures: Array[Texture2D] = []
 var _decoration_textures: Array[Texture2D] = []
+var _overlay_textures: Dictionary = {}
 
 
 func configure(p_session: ManualBattleSession, p_resolver: TacticalAssetResolver) -> void:
@@ -55,6 +56,8 @@ func configure(p_session: ManualBattleSession, p_resolver: TacticalAssetResolver
 		var decoration := asset_resolver.texture_for_key(key)
 		if decoration != null:
 			_decoration_textures.append(decoration)
+	for slot in ["unit_bar", "target", "selection"]:
+		_overlay_textures[slot] = asset_resolver.texture_for_named("ui", slot)
 	refresh_highlights(null, [], [], [])
 
 
@@ -204,9 +207,12 @@ func _draw_unit_shadow(unit: Combatant) -> void:
 	if not _shadow_textures.has(unit.instance_id):
 		_shadow_textures[unit.instance_id] = asset_resolver.texture_for_shadow(unit)
 	var texture: Texture2D = _shadow_textures[unit.instance_id]
-	if texture == null:
-		return
 	var centre := adapter.cell_to_pixel(session.unit_position(unit))
+	if texture == null:
+		draw_set_transform(centre + Vector2(0, 30), 0, Vector2(1, 0.3))
+		draw_circle(Vector2.ZERO, 27, Color(0.04, 0.06, 0.03, 0.35))
+		draw_set_transform(Vector2.ZERO)
+		return
 	var side_id := scenario.side_of(unit).id
 	draw_set_transform(centre, 0.0, Vector2(facing_scale_x_for_side(side_id), 1.0))
 	draw_texture_rect(texture, sprite_rect(texture), false,
@@ -231,17 +237,21 @@ func _draw_unit_sprite(unit: Combatant) -> void:
 func _draw_placeholder_unit(unit: Combatant, centre: Vector2, side_id: int) -> void:
 	var direction := facing_scale_x_for_side(side_id)
 	var color: Color = SIDE_COLORS.get(side_id, Color.GRAY)
-	var body := PackedVector2Array([
-		centre + Vector2(-20.0 * direction, -27.0),
-		centre + Vector2(23.0 * direction, 0.0),
-		centre + Vector2(-20.0 * direction, 27.0),
-	])
-	draw_colored_polygon(body, color.darkened(0.2))
-	draw_polyline(body, color.lightened(0.25), 3.0, true)
-	draw_circle(centre + Vector2(-5.0 * direction, -3.0), 15.0, color)
-	draw_string(ThemeDB.fallback_font, centre + Vector2(-7.0, 6.0),
-		unit.name.substr(0, 1).to_upper(), HORIZONTAL_ALIGNMENT_CENTER,
-		14.0, 17, Color.WHITE)
+	# Authored shield-bearer silhouette. Facing is presentation only.
+	draw_set_transform(centre, 0, Vector2(direction, 1))
+	draw_circle(Vector2(0, -35), 12, Color("d3c6a3"))
+	draw_rect(Rect2(-12, -48, 24, 14), Color("b4bdaf"))
+	draw_rect(Rect2(-10, -37, 20, 4), Color("263331"))
+	draw_colored_polygon(PackedVector2Array([Vector2(-15, -21), Vector2(13, -21),
+		Vector2(22, 21), Vector2(-23, 21)]), color)
+	draw_line(Vector2(-10, 20), Vector2(-13, 34), Color("252b26"), 7, true)
+	draw_line(Vector2(10, 20), Vector2(14, 34), Color("252b26"), 7, true)
+	draw_line(Vector2(21, 9), Vector2(21, -48), Color("d5d7be"), 4, true)
+	draw_colored_polygon(PackedVector2Array([Vector2(-24, -15), Vector2(-3, -15),
+		Vector2(-3, 9), Vector2(-14, 22), Vector2(-25, 9)]), color.darkened(0.35))
+	draw_set_transform(Vector2.ZERO)
+	draw_string(ThemeDB.fallback_font, centre + Vector2(-8, 7),
+		unit.name.substr(0, 1).to_upper(), HORIZONTAL_ALIGNMENT_CENTER, 14, 16, Color.WHITE)
 
 
 func _draw_unit_overlays(unit: Combatant) -> void:
@@ -252,12 +262,25 @@ func _draw_unit_overlays(unit: Combatant) -> void:
 		color = Color("f5a524")
 	elif ranged_targets.has(unit):
 		color = Color("d75bdc")
+	if melee_targets.has(unit) or ranged_targets.has(unit):
+		_draw_overlay("target", centre + Vector2(0, 30), Vector2(71, 24), color)
 	draw_arc(centre + Vector2(0.0, 30.0), 27.0, 0.0, TAU, 32, color, 3.0, true)
 	var life_ratio := clampf(float(maxi(0, unit.life)) / float(unit.life_base), 0.0, 1.0)
 	var bar_position := centre + Vector2(-25.0, 43.0)
 	draw_rect(Rect2(bar_position, Vector2(50.0, 7.0)), Color("17130f"))
 	draw_rect(Rect2(bar_position + Vector2(1.0, 1.0),
 		Vector2(48.0 * life_ratio, 5.0)), Color("51b847"))
+	if _overlay_textures.get("unit_bar") != null:
+		# Only the inspected empty frame; the model ratio above supplies the fill.
+		draw_texture_rect_region(_overlay_textures.unit_bar,
+			Rect2(bar_position - Vector2(2, 2), Vector2(54, 2)), Rect2(0, 0, 48, 2))
 	if unit == selected:
+		_draw_overlay("selection", centre + Vector2(0, 30), Vector2(71, 25), Color.WHITE)
 		draw_arc(centre + Vector2(0.0, 30.0), 32.0, 0.0, TAU, 32,
 			Color("70e6ef"), 4.0, true)
+
+
+func _draw_overlay(slot: String, centre: Vector2, extent: Vector2, tint: Color) -> void:
+	var texture: Texture2D = _overlay_textures.get(slot)
+	if texture != null:
+		draw_texture_rect(texture, Rect2(centre - extent * 0.5, extent), false, tint)

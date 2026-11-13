@@ -1,8 +1,6 @@
 # gdlint: disable=max-returns
 extends SceneTree
 
-const INDEX := "res://.local/eador_assets/index.json"
-const MAPPING := "res://.local/eador_assets/mapping.json"
 const SCENARIO := "res://scenarios/playable_tactical_slice.json"
 
 
@@ -11,20 +9,23 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	if not FileAccess.file_exists(INDEX):
-		print("SKIP local-real-assets: .local/eador_assets/index.json is absent")
+	var resolver := TacticalAssetResolver.new()
+	var paths := resolver.discovery_paths()
+	var index := String(paths.index)
+	var mapping := String(paths.mapping)
+	if not FileAccess.file_exists(index):
+		print("SKIP local-real-assets: optional configured index is absent")
 		quit(0)
 		return
-	var resolver := TacticalAssetResolver.new()
-	if not resolver.load_index(INDEX):
+	if not resolver.load_index(index):
 		print("FAIL local real asset index rejected: %s" % resolver.status_text())
 		quit(1)
 		return
-	if not FileAccess.file_exists(MAPPING):
+	if not FileAccess.file_exists(mapping):
 		print("SKIP local-real-assets: index exists but mapping.json is absent")
 		quit(0)
 		return
-	if not resolver.load_mapping(MAPPING):
+	if not resolver.load_mapping(mapping):
 		print("FAIL local real asset mapping rejected: %s" % resolver.status_text())
 		quit(1)
 		return

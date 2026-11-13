@@ -105,3 +105,11 @@ func _return_to_menu() -> void:
 	var error := get_tree().change_scene_to_file(MENU)
 	if error != OK:
 		_show_error(error_string(error))
+
+
+func _bind_presentation_roles() -> void:
+	# All enemies in this authored encounter family have the guard visual role.
+	# This uses side membership, with no display-name or attempt-ID parsing.
+	for unit in scenario.units.values():
+		if scenario.side_of(unit).id == 1:
+			asset_resolver.assign_role(unit, "campaign_guard")

@@ -56,7 +56,7 @@ set). In the synthetic scenario side 0 deploys on the left and retains the
 natural facing. Side 1 deploys on the right and receives render-state scale
 `x = -1`. One unit mapping therefore remains one asset. Its mapped shadow is
 mirrored in the same local sprite transform; rings and bars are drawn only after
-the transform is reset. Placeholder arrow-shaped units apply the same side
+the transform is reset. Authored shield-bearer fallback figures apply the same side
 rule. Model coordinates and hit tests are unchanged.
 
 ## Shadow findings
@@ -78,8 +78,7 @@ most commonly 64×80). Direct paired-image inspection shows:
 
 The suffix alone does not establish a gameplay mode. The local synthetic demo
 explicitly maps `Unit_shadow`; the resolver can map either archive, but Project
-EGO does not infer a flying/stance rule for `Unit_shadowf`. Missing shadows are
-simply omitted. Shadows are rendered at reduced opacity and have no model role.
+EGO does not infer a flying/stance rule for `Unit_shadowf`. Missing shadows use an authored ground ellipse. Shadows are rendered at reduced opacity and have no model role.
 
 ## Real battlefield reconnaissance
 
@@ -137,22 +136,23 @@ can still leave a one-pixel color fringe.
 | `Spells` | 78 | 77 | all 52×52; repeated spell-icon frames |
 
 The extracted `Battlefield:02Panel` is directly recognizable as the original
-narrow segmented battle column and is used, when mapped, as a translucent panel
-backdrop. Explicit local UI slots also use directly recognizable attack/ranged,
-hourglass/end, and X/cancel visuals. Project-authored Godot controls remain on
-top so current supported actions stay legible; no legacy slot or button is
-assigned an unsupported gameplay meaning.
+narrow segmented battle column. CX-029 uses its native portrait/value cells and
+separate border crops for stats, actions and effects; the complete panel is not
+stretched underneath the sidebar. Explicit Ability icons and hourglass Pass
+states accompany readable current action/status text. No unused original slot
+or button grants an unsupported gameplay meaning.
 
 `Portraits` and `SmallPort` depict hero subjects, not the four synthetic unit
 instances. For this battle the local profile therefore maps the corresponding
 `Unit_icons` object as selected-unit visual identity. That is an explicit
 instance presentation choice, not a claim that `Unit01` is a canonical content
-ID. Unmapped selection shows a project-authored initial tile.
+ID. Unmapped selection shows an authored helmet silhouette and initial.
 
 ## Local index and visual mapping
 
 Original files, exports, the generated index/mapping, reports, screenshots, and
-movies stay below ignored `.local/eador_assets/`. The deterministic index remains
+movies stay below ignored `.local/eador_assets/` or an explicitly supplied external
+private root (`EGO_ASSET_INDEX` / `EGO_ASSET_MAPPING`). The deterministic index remains
 version 1 and archive-qualified. Slice 3 mapping version 2 separates meanings:
 
 ```json
@@ -168,7 +168,9 @@ version 1 and archive-qualified. Slice 3 mapping version 2 separates meanings:
 ```
 
 Identity categories retain canonical-content priority over battle-instance
-mapping. Named categories use explicit presentation slots. All categories
+mapping. A game entry point can also assign a view-owned stable presentation
+role, resolved through named UI slots after those existing identity bindings.
+Named categories use explicit presentation slots. All categories
 require known indexed images and reject duplicates, malformed slots, raw data,
 unknown keys, and traversal. Slice-2 version-1 `content`/`instances` mappings
 remain accepted as the `units` category; every new category then falls back.
@@ -222,11 +224,11 @@ a compatibility conclusion. Known deliberate debt includes:
 
 - the current sidebar is considerably wider than the roughly 140-pixel legacy
   reference;
-- legacy panel artwork functions partly as a backdrop rather than authoritative
-  cell geometry;
-- generic Godot text and widgets overlay the legacy imagery;
-- exact portrait/stat/icon/action/item/effect slot positions, separators, and
-  frames remain unreconstructed;
+- CX-029 reconstructs the native portrait/value geometry and independently crops
+  group borders, while keeping a wider readable command surface;
+- Godot text and widgets provide supported commands alongside inspected imagery;
+- unsupported item/spell/other original slots remain absent; broader original
+  geometry and animation remain unreconstructed;
 - battlefield hex density and some proportions remain different;
 - animation, alpha treatment, and additional visual fidelity remain deferred.
 
@@ -236,3 +238,11 @@ generic new UI. That tranche must recover the original proportions and geometry,
 portrait/stat cells, action/item/effect slots, separators/frames, and bindings of
 current model state into those cells. It must remain separate from combat
 semantics and from this Milestone 0.1.1 hardening tranche.
+
+
+## Campaign-wide presentation (CX-029)
+
+See [CAMPAIGN_PRESENTATION.md](CAMPAIGN_PRESENTATION.md) for the reproducible
+Genesis selection, stable campaign roles, menu/map/Home composition, private
+closure workflow and capture procedure. CX-029 passed rendered capture and
+interactive WSL review. It is a presentation milestone for Project EGO.

@@ -254,3 +254,18 @@ godot --path . game/tactical/tactical_main.tscn
 ```
 
 The normal project launch opens the milestone menu.
+
+
+## CX-029 graphics review
+
+The current presentation patch is at REVIEW, independently of the accepted 0.2
+artifact record. See [CAMPAIGN_PRESENTATION.md](CAMPAIGN_PRESENTATION.md) for its
+local mapping/bundle/capture commands. Run the existing CX-028 service route
+above with the Province Map / Home tabs: recovery and recruitment now occupy
+Home's separate view. Roster rows show portraits, life and casualty state and can
+be selected for inspection. Map ownership shields and the HERE ring are separate.
+
+The executor validated automated local/fallback/partial input and layout at all
+three logical sizes. All five rendered capture modes passed outside the
+sandbox and the interactive WSL playthrough passed. Windows export and DPI
+verification remain separate platform checks.

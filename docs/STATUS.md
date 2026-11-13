@@ -29,6 +29,16 @@ This is a coverage map, not a release claim.
 | tactical AI scoring | decompilation corpus | not consolidated | scaffold only | deferred |
 | presentation | Project EGO Slice-3 contract + direct local visual inspection | n/a | playable hot-seat scene with layered field, inward facing, shadows, categorized ignored assets, and narrow tactical panel | real textured field/right panel and full authored fallback GUI-smoked; structural resemblance only, not original parity |
 
+## CX-029 presentation review
+
+CX-029 extends the existing private visual boundary to menu, province graph,
+Home services and all tactical entry points, with authored fallback presentation.
+It is **DONE** after host capture and interactive WSL review. Canonical content IDs
+and explicit view-owned roles select campaign figures across retries; model,
+checkpoint/fingerprint, economy and combat rules are unchanged. The private
+selection and exact image closure have been inspected and validated. All five
+host capture modes passed. See `CAMPAIGN_PRESENTATION.md` and the task closeout. Contested strategic opposition is a separate follow-up milestone.
+
 ## Python oracle scope
 
 DELIB-0008 is operational through `docs/ORACLE_SCOPE.csv` and
@@ -51,8 +61,7 @@ Slice 3 with automated Crimson phases (CX-024). Developers can still launch
 CX-028 adds **Strategic Campaign**, a separate native six-province campaign with
 two routes from Home to Keep, persistent wounds/casualties, gold and province
 income, a 12-turn limit, paid Home recovery/recruitment, and one explicit map
-checkpoint. **Campaign Demo** retains the short Ford/Watchpost path. This milestone
-is at REVIEW; reviewer acceptance and an interactive WSL playthrough remain due.
+checkpoint. **Campaign Demo** retains the short Ford/Watchpost path. CX-028 is DONE after interactive WSL acceptance.
 It composes existing native tactical combat and Crimson policy, with headless
 strategic command guards and value-only checkpoint validation. Strategic costs,
 income, balance and JSON persistence are Project EGO design; the legacy economy
