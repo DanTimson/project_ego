@@ -2,9 +2,10 @@ extends TacticalController
 
 signal map_requested(commit: bool)
 
-var campaign: StrategicCampaign
+var campaign: RefCounted
 var encounter: CampaignEncounter
 var destination: String
+var army_id := ""
 var return_button: Button
 var _initial := true
 
@@ -29,12 +30,20 @@ func restart_battle() -> bool:
 	if not _initial:
 		if not campaign.abandon(encounter).ok:
 			return false
-		var opened := campaign.travel(destination)
+		var opened: Dictionary
+		if campaign is ContestedCampaign:
+			opened = campaign.execute({"op": "travel", "army": army_id, "to": destination})
+		else:
+			opened = campaign.travel(destination)
 		if not opened.ok:
 			return false
 		encounter = opened.encounter
 	_initial = false
-	return _start_session(encounter.session)
+	var begun := _start_session(encounter.session)
+	if begun and campaign is ContestedCampaign and session.active_side_id() == 1:
+		_presentation_before = scenario._command_state()
+		_apply_command_result({"accepted": true, "events": [], "observations": []})
+	return begun
 
 
 func _refresh() -> void:
@@ -46,6 +55,9 @@ func _refresh() -> void:
 		"Apply result • Return to map" if collectable else "Abandon • Return to map"
 	)
 	restart_button.visible = true
+	if campaign is ContestedCampaign and campaign.contest().get("defense", false):
+		return_button.text = "Apply defense result" if collectable else "Concede province and defenders"
+		restart_button.visible = false
 	if scenario.runtime_error != "":
 		feedback_label.text = (
 			"Battle halted: " + scenario.runtime_error + ". Return to map without applying."

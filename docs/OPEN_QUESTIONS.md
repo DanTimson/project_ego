@@ -98,7 +98,10 @@ compatibility; Scenario construction deliberately rejects the incomplete profile
 - **`.var` schemas.** Lexical primitives are recovered and authoring tools
   exist, but startup-loader record schemas have not been extracted
   systematically.
-- **Strategic economy.** Upkeep, recruitment and province-income functions are
+- **Strategic economy compatibility.** CX-033 adds native faction orchestration,
+  armies/garrisons and contested saves under its own authored policy; this does
+  not resolve original strategy, upkeep, AI or original-save compatibility.
+  Upkeep, recruitment and province-income functions are
   understood in fragments but lack normalized compatibility pseudocode and
   golden vectors.
 - **Tactical AI.** Large scoring functions are collected but not consolidated.

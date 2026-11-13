@@ -1097,3 +1097,25 @@ base price
 Province gold and gem income include population/development tier, active site
 modifiers, ruler structure modifiers and stationed-army provider modifier
 `0x3A`. Exact normalized formulas and golden vectors are still required.
+
+
+## Native contested round accounting (CX-033)
+
+**Project EGO design**, scoped to `ContestedCampaign`; no recovered strategy claim.
+Player commands precede sorted rival phases. All rival defenses must resolve (or
+be explicitly conceded) before one payout per faction and completed round:
+
+```text
+faction payout(N) = sum(owned province base income after rivals)
+                 + sum(owned income facilities with build_round < N)
+next gold = pre-payout gold + faction payout(N)
+```
+
+One paid Home service per faction round spends current treasury before payout.
+Build N activates recovery/recruit effects immediately, but income starts at N+1's
+payout. Each army can cross one edge; troop movement flags survive free transfers.
+New armies have zero moves in their formation round. Only the next player round
+refreshes all army and troop budgets. Objective capture in the last playable round
+wins before exhaustion; an unfinished victory round pays no extra income. Rival
+attacks suspend their cursor before payout, and resolution resumes exactly once.
+See `CX033_CONTESTED_CAMPAIGN.md` for survivor placement and full ordering.

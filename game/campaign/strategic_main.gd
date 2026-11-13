@@ -137,6 +137,8 @@ func _build_screen() -> void:
 	new_button = _button(actions, "New Campaign", new_campaign)
 	resume_button = _button(actions, "Resume Checkpoint", resume_checkpoint)
 	save_button = _button(actions, "Save checkpoint", save_checkpoint)
+	_button(actions, "Contested factions & armies", func() -> void:
+		get_tree().change_scene_to_file.call_deferred("res://game/campaign/contested_main.tscn"))
 	_button(actions, "Main Menu", return_to_menu)
 	sound = InteractionAudio.controls(actions)
 	_label(actions, "Moves, resolved battles and paid services use one turn.\n"
@@ -295,7 +297,7 @@ func recruit(type: String = "") -> Dictionary:
 
 
 func return_to_menu() -> void:
-	get_tree().change_scene_to_file(MENU)
+	get_tree().change_scene_to_file.call_deferred(MENU)
 
 
 func _refresh(message: String) -> void:

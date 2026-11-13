@@ -102,6 +102,28 @@ func hit_test_local(pixel: Vector2) -> Vector2i:
 	return adapter.pixel_to_cell(pixel, scenario.field.width, scenario.field.height)
 
 
+func _pointer_cell(pixel: Vector2) -> Vector2i:
+	var cell := hit_test_local(pixel)
+	if scenario == null or cell in reachable:
+		return cell
+	var units := _visible_units()
+	# An occupied hex wins over any overlapping sprite from another row.
+	for unit in units:
+		if _visual_position(unit) == cell:
+			return cell
+	# Sprites are drawn in this order. Check the topmost body first.
+	for index in range(units.size() - 1, -1, -1):
+		var unit: Combatant = units[index]
+		var body := Rect2(-24.0, -UNIT_HEIGHT + UNIT_FOOT_Y, 48.0, UNIT_HEIGHT)
+		var texture: Texture2D = _textures.get(unit.instance_id)
+		if texture != null:
+			body = sprite_rect(texture)
+		body.position += _visual_center(unit)
+		if body.has_point(pixel):
+			return _visual_position(unit)
+	return cell
+
+
 func terrain_source() -> String:
 	return "local" if _terrain_texture != null else "fallback"
 
@@ -129,7 +151,7 @@ func _process(delta: float) -> void:
 		queue_redraw()
 	if scenario == null:
 		return
-	var next := hit_test_local(get_local_mouse_position())
+	var next := _pointer_cell(get_local_mouse_position())
 	if next != hovered:
 		hovered = next
 		queue_redraw()
@@ -140,9 +162,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			cancel_requested.emit()
 			get_viewport().set_input_as_handled()
-		elif event.button_index == MOUSE_BUTTON_LEFT and hovered.x >= 0:
-			cell_clicked.emit(hovered)
-			get_viewport().set_input_as_handled()
+		elif event.button_index == MOUSE_BUTTON_LEFT:
+			var local: Vector2 = get_global_transform_with_canvas().affine_inverse() * event.position
+			var cell := _pointer_cell(local)
+			if cell.x >= 0:
+				cell_clicked.emit(cell)
+				get_viewport().set_input_as_handled()
 
 
 func _draw() -> void:

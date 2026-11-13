@@ -249,6 +249,40 @@ The Home construction view and optional settlement layers define no mechanics.
 Native checkpoints validate action-turn uniqueness, prerequisite/unlock ordering,
 committed-action bounds and bonus eligibility in the conservative gold ceiling.
 
+## Contested strategic campaign (CX-033)
+
+`ContestedCampaign` is the injected authority for faction treasuries, province
+control/buildings, independently identified armies, living unit containers and
+persistent casualties. `contested_validation.gd` validates both authored graphs
+and detached checkpoint replacements. `strategic_policy.gd` chooses legal visible
+board commands with authored weights and stable ties; it consumes no tactical RNG.
+`content/campaign/contested_campaign.gd` authors both six-province and coast graphs.
+
+Contested commands use explicit End Turn. Each army and troop has a per-round
+movement constraint; free transfers, formation and disbanding preserve it. Services
+spend before income and are limited to one per faction round at its controlled
+Home. Rival phases suspend at player defenses and continue once from their saved
+cursor after resolution. Payout follows all rivals once; income facilities built
+this round begin contributing next round. Refresh happens only on the next player
+round. Last-round objective capture precedes exhaustion.
+
+`CampaignEncounter.open_contest/collect_contest` extends the detached tactical
+boundary to both rosters. Azure stays side zero during defense while the actual
+attacker flag controls initiative. The existing tactical policy accepts an optional
+side for NPC contests; existing callers retain Crimson defaults. Completed results
+validate all participants before one strategic publication. Player attacks support
+abandon/retry; defense requires a result or explicit concession. Survivor placement,
+concession, balance and exact transition order are in `CX033_CONTESTED_CAMPAIGN.md`.
+
+`game/campaign/contested_main.tscn` has graph-independent map, army selection,
+individual transfer/formation, services, defense/concession and explicit checkpoint
+controls. It reuses the tactical child and presentation theme. Its distinct
+`user://contested_campaign.json` slot uses version 3, explicit mode/content hash,
+service chronology, formation rounds and spent troop/army budgets, through the
+existing atomic store. Pending tactical and rival states cannot save. Original
+native entry, slot and v1/v2 reconstruction stay available. These are native
+strategic rules, with no expansion of original compatibility or Python scope.
+
 ## Distributable demo boundary
 
 The exported composition root is `game/demo/demo_main.tscn`; it is a small

@@ -6,9 +6,10 @@ const CRIMSON := 1
 const COMMAND_LIMIT := 64
 
 
-static func _live(session: ManualBattleSession, round_number: int) -> bool:
+static func _live(session: ManualBattleSession, round_number: int,
+		side_id: int = CRIMSON) -> bool:
 	return session.started and session.scenario.runtime_error == "" \
-		and not session.battle_complete() and session.active_side_id() == CRIMSON \
+		and not session.battle_complete() and session.active_side_id() == side_id \
 		and session.scenario.state.round_number == round_number
 
 
@@ -16,18 +17,18 @@ static func _by_id(a: Combatant, b: Combatant) -> bool:
 	return a.instance_id < b.instance_id
 
 
-static func _nearest(session: ManualBattleSession, cell: Vector2i) -> int:
+static func _nearest(session: ManualBattleSession, cell: Vector2i, side_id: int) -> int:
 	var distance := 2147483647
 	for enemy in session.living_units():
-		if session.scenario.side_of(enemy).id != CRIMSON:
+		if session.scenario.side_of(enemy).id != side_id:
 			distance = mini(distance, Battlefield.distance(
 				Battlefield.offset_to_axial(cell.x, cell.y),
 				session.scenario.field.find_unit(enemy)))
 	return distance
 
 
-static func choose_command(session: ManualBattleSession) -> Dictionary:
-	if not _live(session, session.scenario.state.round_number):
+static func choose_command(session: ManualBattleSession, side_id: int = CRIMSON) -> Dictionary:
+	if not _live(session, session.scenario.state.round_number, side_id):
 		return {}
 	var units := session.selectable_units()
 	units.sort_custom(_by_id)
@@ -39,11 +40,11 @@ static func choose_command(session: ManualBattleSession) -> Dictionary:
 			if not targets.is_empty():
 				return {"op": op, "unit": unit.instance_id,
 					"target": targets[0].instance_id}
-		var best_distance := _nearest(session, session.unit_position(unit))
+		var best_distance := _nearest(session, session.unit_position(unit), side_id)
 		var best := Vector2i(-1, -1)
 		# reachable_cells is row/column ordered; equal distances retain that order.
 		for cell in session.reachable_cells(unit):
-			var distance := _nearest(session, cell)
+			var distance := _nearest(session, cell, side_id)
 			if distance < best_distance:
 				best_distance = distance
 				best = cell

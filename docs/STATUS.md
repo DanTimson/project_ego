@@ -39,6 +39,22 @@ checkpoint/fingerprint, economy and combat rules are unchanged. The private
 selection and exact image closure have been inspected and validated. All five
 host capture modes passed. See `CAMPAIGN_PRESENTATION.md` and the task closeout. Contested strategic opposition is a separate follow-up milestone.
 
+## CX-033 contested strategic milestone
+
+CX-033 is **DONE**: reusable faction turns, multiple armies/garrisons, free
+individual transfers with persistent troop movement limits, explicit End Turn,
+shared-rule rival commands, interactive defense/concession, two-sided tactical
+persistence, contested ownership and a distinct version-3 map checkpoint. Both
+six-province and five-province coast content run without engine edits. The full
+route builds, recruits, forms/stations and wins three defenses before capital
+capture in round 3 at 15g. A concession/save/resume route rebuilds, wins twice at
+Home and reclaims Ford with a 14-life Guard in round 3 at 18g.
+
+The clean WSL Godot gate passed 48 scripts with one expected missing-pack skip.
+Daniel confirmed the interactive defense worked. `CX033_CONTESTED_CAMPAIGN.md` combines exact WSL
+routes, native-entry regression steps, design decisions, validation and host commands.
+The handoff also records Eador province and settlement interactions for future work.
+
 ## Python oracle scope
 
 DELIB-0008 is operational through `docs/ORACLE_SCOPE.csv` and

@@ -9,7 +9,7 @@ func _init(save_path: String = "user://strategic_campaign.json") -> void:
 	path = save_path
 
 
-func load_campaign(content: Dictionary) -> Dictionary:
+func load_campaign(content: Dictionary, contested := false) -> Dictionary:
 	if not FileAccess.file_exists(path):
 		return {"ok": false, "reason": "No campaign checkpoint found."}
 	var file := FileAccess.open(path, FileAccess.READ)
@@ -23,11 +23,13 @@ func load_campaign(content: Dictionary) -> Dictionary:
 	file.close()
 	if error != OK:
 		return {"ok": false, "reason": "Malformed checkpoint JSON: " + parser.get_error_message()}
+	if contested:
+		return ContestedCampaign.from_checkpoint(content, parser.data)
 	return StrategicCampaign.from_checkpoint(content, parser.data)
 
 
-func save_campaign(campaign: StrategicCampaign) -> Dictionary:
-	var exported := campaign.checkpoint()
+func save_campaign(campaign: RefCounted) -> Dictionary:
+	var exported: Dictionary = campaign.checkpoint()
 	if not exported.ok:
 		return exported
 	var temporary := path + ".tmp"
