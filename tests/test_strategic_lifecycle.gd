@@ -58,6 +58,8 @@ func click(battle: TacticalController, cell: Vector2i) -> void:
 
 func battle_win(screen: Main, province: String, sacrifice := false) -> CampaignEncounter:
 	(screen.map_view.buttons[province] as Button).pressed.emit()
+	check(screen.inspected == province and screen.battle == null, "inspect before campaign travel")
+	screen.travel_button.pressed.emit()
 	await settle()
 	var battle := screen.battle
 	check(
@@ -234,7 +236,7 @@ func _run() -> void:
 	await battle_win(screen, "keep")
 	check(
 		(
-			screen.heading.text.contains("Victory")
+			screen.objective_label.text.contains("Victory")
 			and screen.heading.text.contains("7 / 12")
 			and screen.heading.text.contains("Gold 61")
 		),

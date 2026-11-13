@@ -161,14 +161,16 @@ func _draw() -> void:
 
 
 func _draw_base_terrain() -> void:
+	# Extend the same terrain through the letterbox around the playable hexes.
+	var bounds := Rect2(-position / scale, (get_parent() as Control).size / scale)
 	if _terrain_texture != null:
-		draw_texture_rect(_terrain_texture, FIELD_RECT, true,
+		draw_texture_rect(_terrain_texture, bounds, true,
 			Color(0.78, 0.78, 0.72, 1.0))
 		return
-	draw_rect(FIELD_RECT, Color("31402f"))
+	draw_rect(bounds, Color("31402f"))
 	# Project-authored deterministic fallback texture keeps the full field usable.
-	for y in range(-8, 728, 32):
-		for x in range(-8, 840, 32):
+	for y in range(int(bounds.position.y), int(bounds.end.y) + 32, 32):
+		for x in range(int(bounds.position.x), int(bounds.end.x) + 32, 32):
 			var alternate := posmod((x + 8) / 32 + (y + 8) / 32, 2) == 0
 			var color := Color("40533a") if alternate else Color("374832")
 			draw_rect(Rect2(Vector2(x, y), Vector2(32.0, 32.0)), color)
@@ -281,6 +283,9 @@ func _draw_unit_overlays(unit: Combatant) -> void:
 	draw_rect(Rect2(bar_position, Vector2(50.0, 7.0)), Color("17130f"))
 	draw_rect(Rect2(bar_position + Vector2(1.0, 1.0),
 		Vector2(48.0 * life_ratio, 5.0)), Color("51b847"))
+	var stamina_ratio := clampf(float(_visual_stamina(unit)) / maxf(1, unit.stamina_base), 0, 1)
+	draw_rect(Rect2(bar_position + Vector2(0, 9), Vector2(50, 5)), Color("17130f"))
+	draw_rect(Rect2(bar_position + Vector2(1, 10), Vector2(48 * stamina_ratio, 3)), Color("66b8df"))
 	if _overlay_textures.get("unit_bar") != null:
 		# Only the inspected empty frame; the model ratio above supplies the fill.
 		draw_texture_rect_region(_overlay_textures.unit_bar,
@@ -342,3 +347,9 @@ func _visual_center(unit: Combatant) -> Vector2:
 		return destination
 	var start := adapter.cell_to_pixel(motion_from.units[unit.instance_id].position)
 	return start.lerp(destination, clampf(motion_elapsed / motion_duration, 0, 1))
+
+
+func _visual_stamina(unit: Combatant) -> int:
+	if visual_state.is_empty():
+		return unit.stamina
+	return int(visual_state.units[unit.instance_id].stamina)

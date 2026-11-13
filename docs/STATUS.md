@@ -369,3 +369,13 @@ Normal/Fast/Instant preserve command, state and RNG behavior. The clean WSL
 Godot gate passed with 40 scripts and one expected skip. Host review used the
 live layout matrix and one local-artwork audiovisual recording. See
 `CX030_INTERACTION.md` for the scope of that review and the capture command.
+
+
+### CX-031 reference layout — DONE
+
+The menu uses a proportional panorama and compact navigation. Map and Home
+share a persistent resource strip, and battle keeps core commands below a
+scrollable status rail. The action chooser exposes existing legal commands and
+labels unavailable features. The clean Godot suite passed with 41 tests and
+one expected skip. See `CX031_REFERENCE_LAYOUT.md` for rendered WSL review
+and layout measurements.

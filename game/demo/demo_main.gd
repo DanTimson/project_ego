@@ -17,11 +17,15 @@ var sound: InteractionAudio
 var build_metadata: Dictionary = {}
 var controls_dialog: AcceptDialog
 var about_dialog: AcceptDialog
+var options_dialog: AcceptDialog
+var options_button: Button
+var menu_chrome: Panel
+var menu_buttons: VBoxContainer
 
 
 func _ready() -> void:
 	_present_menu()
-	sound = InteractionAudio.controls(get_node("Center/Panel/Margin/Buttons"))
+	sound = InteractionAudio.controls(options_dialog)
 	%PlayButton.pressed.connect(play_demo)
 	%CampaignButton.pressed.connect(play_campaign)
 	%StrategicButton.pressed.connect(play_strategic)
@@ -55,6 +59,10 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	var message := dialog.get_label()
 	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	message.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	dialog.confirmed.connect(func() -> void:
+		(%ControlsButton if dialog == controls_dialog else %AboutButton).grab_focus())
+	dialog.canceled.connect(func() -> void:
+		(%ControlsButton if dialog == controls_dialog else %AboutButton).grab_focus())
 
 
 func show_controls() -> void:
@@ -155,40 +163,84 @@ func _present_menu() -> void:
 	var landscape := PresentationLandscape.new()
 	landscape.resolver = resolver
 	landscape.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	landscape.anchor_bottom = 0.62
 	add_child(landscape)
 	move_child(landscape, 1)
-	var chrome := Panel.new()
-	chrome.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chrome.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	chrome.anchor_top = 0.24
-	chrome.add_theme_stylebox_override("panel", PresentationTheme.frame(Color("30201c")))
-	add_child(chrome)
-	move_child(chrome, 2)
-	var panel := get_node("Center/Panel") as PanelContainer
-	panel.add_theme_stylebox_override("panel", PresentationTheme.frame(Color(0.08, 0.06, 0.045, 0.93)))
-	for id in ["PlayButton", "CampaignButton", "StrategicButton",
-		"ControlsButton", "AboutButton", "QuitButton"]:
-		var button := get_node("%" + id) as Button
-		PresentationTheme.apply_menu_button(button, resolver)
-		button.focus_entered.connect(func() -> void: sound.cue("select"))
-		button.mouse_entered.connect(func() -> void: sound.cue("select"))
-		button.button_down.connect(func() -> void: sound.cue("confirm"))
+	menu_chrome = Panel.new()
+	menu_chrome.name = "LowerFrame"
+	menu_chrome.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	menu_chrome.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	menu_chrome.anchor_top = 0.62
+	menu_chrome.add_theme_stylebox_override("panel", PresentationTheme.frame(Color("491e1c")))
+	add_child(menu_chrome)
+	move_child(menu_chrome, 2)
 	var frame_texture := resolver.texture_for_named("ui", "menu_frame")
 	if frame_texture != null:
 		var border := TextureRect.new()
-		border.texture = PresentationTheme.crop(frame_texture, Rect2(0, 0, 1024, 82))
+		border.texture = PresentationTheme.crop(frame_texture, Rect2(0, 0, 1024, 24))
 		border.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		border.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		border.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		border.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-		border.anchor_top = 0.24
-		border.anchor_bottom = 0.24
-		border.offset_bottom = 48
-		add_child(border)
-		move_child(border, 3)
-	var title := get_node("Center/Panel/Margin/Buttons/Title") as Label
+		border.offset_bottom = 10
+		menu_chrome.add_child(border)
+	var panel := get_node("Center/Panel") as PanelContainer
+	panel.custom_minimum_size = Vector2.ZERO
+	panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	var margin := panel.get_node("Margin") as MarginContainer
+	for side in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 0)
+	menu_buttons = margin.get_node("Buttons") as VBoxContainer
+	menu_buttons.add_theme_constant_override("separation", 3)
+	var title := menu_buttons.get_node("Title") as Label
 	title.reparent(self)
 	title.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	title.position.y = 24
+	title.position.y = 22
+	var subtitle := %Subtitle as Label
+	subtitle.reparent(self)
+	subtitle.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	subtitle.position.y = 68
+	var multiplayer := Button.new()
+	multiplayer.text = "Multiplayer — unavailable"
+	multiplayer.disabled = true
+	multiplayer.tooltip_text = "Multiplayer is not implemented."
+	menu_buttons.add_child(multiplayer)
+	menu_buttons.move_child(multiplayer, 3)
+	options_button = Button.new()
+	options_button.name = "OptionsButton"
+	options_button.text = "Options"
+	menu_buttons.add_child(options_button)
+	menu_buttons.move_child(options_button, 4)
+	options_dialog = AcceptDialog.new()
+	options_dialog.title = "Options • Sound"
+	add_child(options_dialog)
+	options_button.pressed.connect(show_options)
+	options_dialog.confirmed.connect(func() -> void: options_button.grab_focus())
+	options_dialog.canceled.connect(func() -> void: options_button.grab_focus())
+	%AboutButton.text = "About"
+	for button in [ %PlayButton, %CampaignButton, %StrategicButton,
+		%ControlsButton, %AboutButton, %QuitButton, multiplayer, options_button ]:
+		PresentationTheme.apply_menu_button(button, resolver)
+		button.add_theme_font_size_override("font_size", 15)
+		button.focus_entered.connect(func() -> void: sound.cue("select"))
+		button.mouse_entered.connect(func() -> void: sound.cue("select"))
+		button.button_down.connect(func() -> void: sound.cue("confirm"))
 	var center := get_node("Center") as CenterContainer
-	center.anchor_top = 0.24
+	center.anchor_top = 0.62
+	resized.connect(_layout_menu)
+	_layout_menu.call_deferred()
+
+
+func _layout_menu() -> void:
+	var panel := get_node("Center/Panel") as PanelContainer
+	panel.custom_minimum_size.x = roundf(size.x * 0.27)
+	var row_height := floorf((size.y * 0.38 - 28) / 6)
+	for child in menu_buttons.get_children():
+		if child is Button:
+			child.custom_minimum_size.y = row_height
+		elif child is HBoxContainer:
+			for button in child.get_children():
+				button.custom_minimum_size.y = row_height
+
+
+func show_options() -> void:
+	options_dialog.popup_centered_clamped(Vector2i(320, 120), 0.85)

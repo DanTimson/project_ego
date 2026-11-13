@@ -1,6 +1,8 @@
 extends Control
 
 signal destination_chosen(id: String)
+signal province_inspected(id: String)
+
 
 const LOCATIONS := {
 	"home": Vector2(0.0, 0.5),
@@ -10,6 +12,8 @@ const LOCATIONS := {
 	"mill": Vector2(0.67, 0.85),
 	"keep": Vector2(1.0, 0.5),
 }
+var travel_available: Dictionary = {}
+var inspected := "home"
 var marked := ""
 var mark_text := ""
 var mark_time := 0.0
@@ -35,9 +39,9 @@ func _ready() -> void:
 			"hover", PresentationTheme.frame(Color(0.9, 0.8, 0.5, 0.13))
 		)
 		button.add_theme_stylebox_override("pressed", PresentationTheme.frame(Color(0, 0, 0, 0.2)))
-		button.focus_entered.connect(func() -> void: mark(id, "Selected"))
-		button.mouse_entered.connect(func() -> void: mark(id, "Selected"))
-		button.pressed.connect(func() -> void: destination_chosen.emit(id))
+		button.focus_entered.connect(func() -> void: inspect(id))
+		button.mouse_entered.connect(func() -> void: inspect(id))
+		button.pressed.connect(func() -> void: inspect(id))
 		add_child(button)
 		buttons[id] = button
 	resized.connect(_layout)
@@ -51,7 +55,7 @@ func display(campaign: StrategicCampaign) -> void:
 		var province: Dictionary = _content.provinces[id]
 
 		var query := campaign.query("travel", id)
-		buttons[id].disabled = not query.ok
+		travel_available[id] = query.ok
 		buttons[id].tooltip_text = (
 			("You are here. " if id == _state.position else "")
 			+ (
@@ -118,12 +122,12 @@ func _draw() -> void:
 					_art("route_marker", start.lerp(end, 0.5), Vector2(22, 12))
 	for id in buttons:
 		var centre: Vector2 = buttons[id].position + Vector2(57, 35)
-		if id == marked:
+		if id == marked or id == inspected:
 			draw_arc(centre, 42, 0, TAU, 32, Color("ffe5a1"), 3, true)
 			draw_string(ThemeDB.fallback_font, centre + Vector2(-57, -31),
-				("HERE • " if id == _state.position else "") + mark_text,
+				("HERE • " if id == _state.position else "") + (mark_text if id == marked else "INSPECTED"),
 				HORIZONTAL_ALIGNMENT_CENTER, 114, 12, Color("fff3ca"))
-		if not buttons[id].disabled:
+		if travel_available.get(id, false):
 			draw_string(ThemeDB.fallback_font, centre + Vector2(-45, 90), "TRAVEL", 1,
 				90, 12, Color("fff3ca"))
 		draw_rect(Rect2(centre + Vector2(-57, 26), Vector2(114, 49)), Color(0.06, 0.09, 0.06, 0.85))
@@ -244,3 +248,9 @@ func _process(delta: float) -> void:
 	if mark_time <= 0:
 		marked = ""
 		queue_redraw()
+
+
+func inspect(id: String) -> void:
+	inspected = id
+	province_inspected.emit(id)
+	queue_redraw()

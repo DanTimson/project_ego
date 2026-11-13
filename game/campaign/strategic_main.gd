@@ -3,6 +3,7 @@ extends Control
 const Authored = preload("res://content/campaign/native_campaign.gd")
 const MapView = preload("res://game/campaign/province_map.gd")
 const BattleView = preload("res://game/campaign/strategic_battle.tscn")
+const COMPANY_PORTRAIT = preload("res://game/presentation/art/company_portrait.svg")
 const MENU := "res://game/demo/demo_main.tscn"
 var sound: InteractionAudio
 var service_feedback := ""
@@ -25,6 +26,19 @@ var home_view: PanelContainer
 var roster_rows: VBoxContainer
 var roster_details: Label
 var home_button: Button
+var map_button: Button
+var footer: PanelContainer
+var context_panel: PanelContainer
+var context_title: Label
+var context_status: Label
+var travel_button: Button
+var services: VBoxContainer
+var campaign_dialog: AcceptDialog
+var inspected := "home"
+var construction_button: Button
+var recovery_reason: Label
+var recruit_reason: Label
+var objective_label: Label
 
 
 func _ready() -> void:
@@ -35,83 +49,126 @@ func _ready() -> void:
 
 
 func _build_screen() -> void:
-	var background := ColorRect.new()
-	background.color = Color("161c19")
-	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(background)
 	screen = MarginContainer.new()
 	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left", "top", "right", "bottom"]:
-		screen.add_theme_constant_override("margin_" + side, 16)
 	add_child(screen)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	screen.add_child(scroll)
+	var layout := VBoxContainer.new()
+	layout.add_theme_constant_override("separation", 0)
+	screen.add_child(layout)
 	var columns := HBoxContainer.new()
-	columns.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	columns.add_theme_constant_override("separation", 16)
-	scroll.add_child(columns)
-	var main := VBoxContainer.new()
-	main.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	columns.add_child(main)
-	var title_row := HBoxContainer.new()
-	main.add_child(title_row)
-	var gold_icon := TextureRect.new()
-	gold_icon.texture = resolver.texture_for_named("ui", "gold")
-	if gold_icon.texture == null:
-		gold_icon.texture = preload("res://game/presentation/art/gold.svg")
-	gold_icon.custom_minimum_size = Vector2(28, 28)
-	gold_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	gold_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	title_row.add_child(gold_icon)
-	heading = _label(title_row, "The road to Keep", 22)
-	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_label(main, "Objective: capture Keep. Links allow travel in both directions.", 16)
+	columns.add_theme_constant_override("separation", 0)
+	layout.add_child(columns)
+	var field := Control.new()
+	field.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columns.add_child(field)
 	map_view = MapView.new()
 	map_view.resolver = resolver
-	main.add_child(map_view)
-	map_view.destination_chosen.connect(travel)
-	var tabs := HBoxContainer.new()
-	main.add_child(tabs)
-	_button(tabs, "Province Map", show_map)
-	home_button = _button(tabs, "Home • Roster & services", show_home)
-	_build_home(main)
-	feedback = _label(main, "", 16)
-	feedback.custom_minimum_size.y = 56
-	var actions := HBoxContainer.new()
-	main.add_child(actions)
-	save_button = _button(actions, "Save checkpoint", save_checkpoint)
-	_label(
-		main,
-		(
-			"Each move, resolved battle or paid service costs one turn, "
-			+ "then all owned provinces pay income.\nBattles deploy survivors only. "
-			+ "Casualties remain on your roster. Recovery and recruitment: Home only."
-		),
-		14
-	)
-	var sidebar := VBoxContainer.new()
-	sidebar.custom_minimum_size.x = 286
-	columns.add_child(sidebar)
-	sound = InteractionAudio.controls(sidebar)
-	_label(sidebar, "Campaign", 22)
-	new_button = _button(sidebar, "New Campaign", new_campaign)
-	resume_button = _button(sidebar, "Resume Checkpoint", resume_checkpoint)
-	_button(sidebar, "Main Menu", return_to_menu)
-	_label(sidebar, "Roster • persistent life", 20)
-	var roster_scroll := ScrollContainer.new()
-	roster_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	roster_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	sidebar.add_child(roster_scroll)
+	map_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	field.add_child(map_view)
+	map_view.province_inspected.connect(inspect_province)
+	_build_home(field)
+	feedback = _label(field, "", 14)
+	feedback.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	feedback.offset_top = -52
+	feedback.offset_left = 14
+	feedback.offset_right = -14
+	feedback.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	feedback.add_theme_color_override("font_shadow_color", Color.BLACK)
+	feedback.add_theme_constant_override("shadow_offset_x", 2)
+	feedback.add_theme_constant_override("shadow_offset_y", 2)
+	context_panel = PanelContainer.new()
+	columns.add_child(context_panel)
+	resized.connect(_layout_context)
+	_layout_context()
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	context_panel.add_child(scroll)
+	var card := VBoxContainer.new()
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(card)
+	context_title = _label(card, "The road to Keep", 22)
+	var portrait := TextureRect.new()
+	portrait.texture = COMPANY_PORTRAIT
+	portrait.custom_minimum_size.y = 58
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	card.add_child(portrait)
+	context_status = _label(card, "Start or resume a campaign.", 15)
+	travel_button = _button(card, "Travel", _travel_inspected)
+	_build_services(card)
+	roster_label = _label(card, "Company", 17)
 	roster_rows = VBoxContainer.new()
-	roster_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	roster_scroll.add_child(roster_rows)
-	roster_label = _label(roster_rows, "Start or resume a campaign.", 14)
-	roster_details = _label(
-		sidebar, "Select a roster row to inspect.\nLife persists between battles.", 14
-	)
+	card.add_child(roster_rows)
+	roster_details = _label(card, "Select a roster member to inspect persistent life.", 14)
+	footer = PanelContainer.new()
+	layout.add_child(footer)
+	var strip := HBoxContainer.new()
+	footer.add_child(strip)
+	var gold_icon := _resource_icon(strip, "gold")
+	gold_icon.tooltip_text = "Gold"
+	heading = _label(strip, "Gold — • Turn —", 14)
+	heading.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_resource_icon(strip, "crystal")
+	strip.add_theme_constant_override("separation", 8)
+	var crystal := _label(strip, "Crystals —", 14)
+	crystal.autowrap_mode = TextServer.AUTOWRAP_OFF
+	crystal.tooltip_text = "Unavailable: this campaign has no crystal resource."
+	objective_label = _label(strip, "Objective: capture Keep", 14)
+	objective_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	objective_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	map_button = _button(strip, "Map", show_map)
+	home_button = _button(strip, "Home", show_home)
+	for button in [map_button, home_button]:
+		button.toggle_mode = true
+	_button(strip, "Campaign", show_campaign_controls)
+	campaign_dialog = AcceptDialog.new()
+	campaign_dialog.title = "Campaign controls"
+	add_child(campaign_dialog)
+	var actions := VBoxContainer.new()
+	campaign_dialog.add_child(actions)
+	new_button = _button(actions, "New Campaign", new_campaign)
+	resume_button = _button(actions, "Resume Checkpoint", resume_checkpoint)
+	save_button = _button(actions, "Save checkpoint", save_checkpoint)
+	_button(actions, "Main Menu", return_to_menu)
+	sound = InteractionAudio.controls(actions)
+	_label(actions, "Moves, resolved battles and paid services use one turn.\n"
+		+ "Owned provinces then pay income. Save explicitly on the map.", 14)
+	campaign_dialog.confirmed.connect(func() -> void: map_button.grab_focus())
+	campaign_dialog.canceled.connect(func() -> void: map_button.grab_focus())
+	show_map()
+
+
+func _layout_context() -> void:
+	context_panel.custom_minimum_size.x = clampf(size.x * 0.24, 264, 320)
+
+
+func show_campaign_controls() -> void:
+	campaign_dialog.popup_centered_clamped(Vector2i(420, 340), 0.85)
+
+
+func inspect_province(id: String) -> void:
+	inspected = id
+	map_view.inspected = id
+	map_view.queue_redraw()
+	if campaign == null:
+		return
+	var state := campaign.snapshot()
+	var province: Dictionary = campaign.content().provinces[id]
+	context_title.text = province.name + " • inspected"
+	objective_label.text = province.name + " • Objective: Keep"
+	context_status.text = "%s • Income +%dg\nArmy at %s\n%s" % [
+		"Allied" if id in state.owned else "Hostile", province.income,
+		campaign.content().provinces[state.position].name, campaign.query("travel", id).reason]
+	travel_button.text = ("Travel to " if id in state.owned else "Battle for ") + province.name
+	travel_button.disabled = not campaign.query("travel", id).ok
+	travel_button.tooltip_text = campaign.query("travel", id).reason
+
+
+func _travel_inspected() -> void:
+	travel(inspected)
 
 
 func _label(parent: Node, text: String, font_size: int) -> Label:
@@ -126,7 +183,7 @@ func _label(parent: Node, text: String, font_size: int) -> Label:
 func _button(parent: Node, text: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size.y = 38
+	button.custom_minimum_size.y = 32
 	button.pressed.connect(action)
 	parent.add_child(button)
 	return button
@@ -136,6 +193,8 @@ func new_campaign() -> void:
 	if battle != null:
 		return
 	row_feedback = {}
+	service_feedback = ""
+	inspected = "home"
 	campaign = StrategicCampaign.create(Authored.definition())
 	_refresh("New run. An existing checkpoint stays unchanged until you explicitly save.")
 
@@ -147,6 +206,8 @@ func resume_checkpoint() -> Dictionary:
 	if loaded.ok:
 		row_feedback = {}
 		campaign = loaded.campaign
+		service_feedback = ""
+		inspected = campaign.snapshot().position
 	_refresh("Checkpoint resumed." if loaded.ok else loaded.reason)
 	return loaded
 
@@ -162,6 +223,7 @@ func save_checkpoint() -> Dictionary:
 func travel(destination: String) -> Dictionary:
 	if campaign == null:
 		return {"ok": false, "reason": "Start a campaign first."}
+	inspected = destination
 	map_view.mark(destination, "Selected")
 	sound.cue("select")
 	var result := campaign.travel(destination)
@@ -233,7 +295,8 @@ func return_to_menu() -> void:
 
 func _refresh(message: String) -> void:
 	feedback.text = message
-	map_view.visible = campaign != null and not home_view.visible
+	map_view.visible = not home_view.visible
+	travel_button.disabled = campaign == null
 	save_button.disabled = campaign == null or campaign.in_battle()
 	recovery_button.disabled = campaign == null or not campaign.query("recover").ok
 	recruit_button.disabled = campaign == null or not campaign.query("recruit").ok
@@ -241,23 +304,23 @@ func _refresh(message: String) -> void:
 		return
 	var state := campaign.snapshot()
 	var content := campaign.content()
-	heading.text = (
-		"%s • %s\nGold %d • Turns %d / %d"
-		% [
-			content.provinces[state.position].name,
-			state.status.capitalize(),
-			state.gold,
-			state.turn,
-			content.turn_limit
-		]
-	)
+	heading.text = "Gold %d • Turn %d / %d" % [state.gold, state.turn, content.turn_limit]
+	if home_view.visible:
+		context_title.text = "Home • Company"
+		objective_label.text = "Home • Objective: Keep"
+		context_status.text = "Army at %s • %s" % [
+			content.provinces[state.position].name, state.status.capitalize()]
+	else:
+		inspect_province(inspected)
 	recovery_button.text = "Recover +%d (%dg)" % [content.recovery_life, content.recovery_cost]
 	recruit_button.text = "Recruit (%dg)" % content.recruit_cost
 	recovery_button.tooltip_text = campaign.query("recover").reason
+	recovery_reason.text = recovery_button.tooltip_text
 	recruit_button.tooltip_text = campaign.query("recruit").reason
+	recruit_reason.text = recruit_button.tooltip_text
 	for child in roster_rows.get_children():
-		if child != roster_label:
-			child.queue_free()
+		roster_rows.remove_child(child)
+		child.queue_free()
 	var rows: PackedStringArray = []
 	for member in state.roster.entries.values():
 		rows.append(
@@ -277,73 +340,73 @@ func _refresh(message: String) -> void:
 		"Company • %d records%s"
 		% [rows.size(), " • CASUALTY recorded" if "CASUALTY" in " ".join(rows) else ""]
 	)
+	if state.status != "active":
+		objective_label.text = "%s • %s" % [
+			state.status.capitalize(), content.provinces[state.position].name]
 	map_view.display(campaign)
 
 
 func _build_home(parent: Control) -> void:
 	home_view = PanelContainer.new()
-	home_view.custom_minimum_size = Vector2(580, 300)
-	home_view.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	home_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	parent.add_child(home_view)
 	home_view.hide()
 	var backdrop := PresentationLandscape.new()
 	backdrop.mode = "home"
 	backdrop.resolver = resolver
 	home_view.add_child(backdrop)
-	var columns := HBoxContainer.new()
-	home_view.add_child(columns)
-	var estate := TextureRect.new()
-	estate.custom_minimum_size = Vector2(180, 160)
-	estate.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	estate.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	estate.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	estate.texture = resolver.texture_for_named("ui", "home_estate")
-	columns.add_child(estate)
-	var service_frame := PanelContainer.new()
-	service_frame.add_theme_stylebox_override(
-		"panel", PresentationTheme.frame(Color(0.08, 0.07, 0.05, 0.93))
-	)
-	columns.add_child(service_frame)
-	var services := VBoxContainer.new()
-	services.custom_minimum_size.x = 280
-	service_frame.add_child(services)
-	_label(services, "HOME", 26)
-	_label(services, "Recovery & recruitment", 20)
-	_label(services, "Care for wounded survivors.\nCasualties cannot be revived.", 15)
+	var estate_texture := resolver.texture_for_named("ui", "home_estate")
+	if estate_texture != null:
+		var composition := CenterContainer.new()
+		composition.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		home_view.add_child(composition)
+		var estate := TextureRect.new()
+		estate.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		estate.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		estate.texture = estate_texture
+		# Preserve the small sprite's proportions and leave the settlement visible.
+		estate.custom_minimum_size = estate_texture.get_size() * 2.0
+		estate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		composition.add_child(estate)
+
+
+func _build_services(parent: Control) -> void:
+	services = VBoxContainer.new()
+	parent.add_child(services)
+	_label(services, "Recovery & recruitment", 17)
+	_label(services, "Wounded survivors only. Casualties cannot be revived.", 14)
 	recovery_button = _button(services, "Recover", recover)
-	recovery_button.icon = resolver.texture_for_named("ui", "home_recovery")
-	recovery_button.add_theme_constant_override("icon_max_width", 38)
-	recovery_button.expand_icon = true
+	recovery_reason = _label(services, "Start a campaign first.", 13)
 	var content := Authored.definition()
-	var recruit_definition: Dictionary = content.definitions[content.recruit_def]
-	_label(
-		services,
-		(
-			"Recruit a %s • full life %d/%d\nMaximum %d living company members."
-			% [
-				recruit_definition.name,
-				recruit_definition.life,
-				recruit_definition.life,
-				content.living_cap
-			]
-		),
-		15
-	)
+	var definition: Dictionary = content.definitions[content.recruit_def]
+	_label(services, "Recruit %s • %d/%d life. Maximum %d living members." % [
+		definition.name, definition.life, definition.life, content.living_cap], 14)
 	recruit_button = _button(services, "Recruit", recruit)
-	recruit_button.icon = resolver.texture_for_named("ui", "home_recruit")
-	recruit_button.add_theme_constant_override("icon_max_width", 38)
-	recruit_button.expand_icon = true
-	_label(services, "Each service uses one turn.\nAvailable while stationed at Home.", 14)
+	recruit_reason = _label(services, "Start a campaign first.", 13)
+	_label(services, "Each service uses one turn. Available while stationed at Home.", 14)
+	construction_button = _button(services, "Construction — unavailable", func() -> void: pass)
+	construction_button.disabled = true
+	_label(services, "Construction is not implemented.", 14)
 
 
 func show_home() -> void:
 	home_view.show()
 	map_view.hide()
+	services.show()
+	travel_button.hide()
+	home_button.set_pressed_no_signal(true)
+	map_button.set_pressed_no_signal(false)
+	_refresh(service_feedback)
 
 
 func show_map() -> void:
 	home_view.hide()
-	map_view.visible = campaign != null
+	map_view.show()
+	services.hide()
+	travel_button.show()
+	home_button.set_pressed_no_signal(false)
+	map_button.set_pressed_no_signal(true)
+	_refresh(service_feedback)
 
 
 func _add_roster_row(member: Dictionary) -> void:
@@ -364,12 +427,12 @@ func _add_roster_row(member: Dictionary) -> void:
 	)
 	if row_feedback.has(member.id):
 		row.text += "\n" + String(row_feedback[member.id])
-	row.custom_minimum_size.y = 82
-	row.add_theme_font_size_override("font_size", 15)
+	row.custom_minimum_size.y = 60
+	row.add_theme_font_size_override("font_size", 14)
 	var key: String = resolver.content_keys_by_category.get("portraits", {}).get(member.def, "")
 	row.icon = resolver.texture_for_key(key)
 	if row.icon == null:
-		row.icon = preload("res://game/presentation/art/company_portrait.svg")
+		row.icon = COMPANY_PORTRAIT
 	row.add_theme_constant_override("icon_max_width", 48)
 	row.expand_icon = true
 	row.tooltip_text = (
@@ -396,3 +459,15 @@ func _record_roster_feedback(before: Dictionary) -> void:
 			row_feedback[id] = "Recruited"
 		elif member.life > before[id].life:
 			row_feedback[id] = "Recovered +%d life" % (member.life - before[id].life)
+
+
+func _resource_icon(parent: Control, slot: String) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.texture = resolver.texture_for_named("ui", slot)
+	icon.custom_minimum_size = Vector2(24, 24)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	if icon.texture == null and slot == "gold":
+		icon.texture = preload("res://game/presentation/art/gold.svg")
+	parent.add_child(icon)
+	return icon

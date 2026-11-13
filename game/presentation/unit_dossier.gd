@@ -1,9 +1,9 @@
 class_name UnitDossier
 extends Control
 
-# Inspected Battlefield:02Panel: portrait [9,18,64,80]; value cells at
-# [78,18,55,24], [78,43,55,24], [78,69,55,24]. The remaining native
-# panel is split into independently framed stat/action/effect groups.
+# Inspected Battlefield:02Panel portrait at [9,18,64,80]. The rail uses
+# source [0,10,74,88] at native size, excluding the legacy value cells.
+# EGO's authoritative labels and authored frames supply the other groups.
 var resolver: TacticalAssetResolver
 var unit: Combatant
 
@@ -17,9 +17,10 @@ func _draw() -> void:
 		return
 	var panel := resolver.texture_for_named("ui", "panel")
 	if panel != null and panel.get_size() == Vector2(140, 768):
-		draw_texture_rect_region(panel, Rect2(0, 0, 140, 120), Rect2(0, 0, 140, 120))
+		draw_texture_rect_region(panel, Rect2(0, 0, 74, 88), Rect2(0, 10, 74, 88))
 
 	else:
+		draw_set_transform(Vector2.ZERO, 0, Vector2(0.53, 0.75))
 		# Authored portrait silhouette; the foreground texture takes precedence.
 		draw_rect(Rect2(4, 4, 132, 112), Color("263530"))
 		draw_circle(Vector2(70, 42), 21, Color("b8b6a0"))

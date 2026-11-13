@@ -52,6 +52,7 @@ priority.
 | CX-029 | `SPEC_IMPLEMENTATION` | campaign-wide visual presentation | engine | `DONE` | local artwork, public fallback and WSL visual review |
 
 | CX-030 | `SPEC_IMPLEMENTATION` | audiovisual interaction and battle playback | Daniel Timson | `DONE` | WSL clean gate, live matrix review, and local audiovisual recording |
+| CX-031 | `SPEC_IMPLEMENTATION` | reference layout and visible feature gaps | Daniel Timson | `DONE` | clean Godot run and rendered WSL review |
 
 Task contracts live in `docs/codex/tasks/`.
 

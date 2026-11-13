@@ -55,7 +55,7 @@ func _run() -> void:
 	metadata_file.close()
 	var parsed: Dictionary = menu.load_build_metadata(metadata_path)
 	menu.apply_build_metadata(parsed)
-	var subtitle: Label = menu.get_node(button_root + "Subtitle") as Label
+	var subtitle: Label = menu.get_node("%Subtitle") as Label
 	_check(parsed["commit"] == "abc123" and parsed["mode"] == "public"
 		and subtitle.text == "Tactical Prototype — Milestone 0.2",
 		"packaged metadata drives the visible milestone")

@@ -164,7 +164,7 @@ func _run() -> void:
 	root.add_child(controller)
 	await process_frame
 	await process_frame
-	var panel_vbox := controller.get_node("RightPanel/Frame/Margin/PanelScroll/VBox")
+	var panel_vbox := controller.get_node("%ActionRegion").get_parent()
 	_check(panel_vbox.get_node_or_null("IdentityRegion") != null
 		and panel_vbox.get_node_or_null("StatsRegion") != null
 		and panel_vbox.get_node_or_null("ActionRegion") != null

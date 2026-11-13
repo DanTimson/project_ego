@@ -22,6 +22,17 @@ var playback: BattlePlayback
 var sound: InteractionAudio
 var dossier: UnitDossier
 var latest_feedback := "Select a highlighted active-side unit."
+var details_dialog: AcceptDialog
+var details_content: VBoxContainer
+var picker: AcceptDialog
+var picker_description: RichTextLabel
+var picker_actions: Array[Button] = []
+var picker_button: Button
+var details_button: Button
+var skip_button: Button
+var rail_footer: VBoxContainer
+var picker_portrait: TextureRect
+var picker_frame: PanelContainer
 var _presentation_before: Dictionary = {}
 
 @onready var battlefield_region: Control = %BattlefieldRegion
@@ -55,12 +66,13 @@ var _presentation_before: Dictionary = {}
 
 func _ready() -> void:
 	theme = PresentationTheme.create()
+	_compose_rail()
 	_prepare_dossier()
 	playback = BattlePlayback.new()
 	add_child(playback)
 	if DisplayServer.get_name() == "headless":
 		playback.speed = "Instant"
-	var controls := get_node("RightPanel/Frame/Margin/PanelScroll/VBox")
+	var controls := details_content
 	sound = InteractionAudio.controls(controls)
 	var speeds := OptionButton.new()
 	for speed in ["Normal", "Fast", "Instant"]:
@@ -75,10 +87,6 @@ func _ready() -> void:
 	reduce.text = "Reduced motion"
 	reduce.toggled.connect(func(value: bool) -> void: playback.reduced_motion = value)
 	controls.add_child(reduce)
-	var skip := Button.new()
-	skip.text = "Skip playback"
-	skip.pressed.connect(playback.skip)
-	controls.add_child(skip)
 	playback.beat.connect(_present_beat)
 	playback.finished.connect(_finish_playback)
 	effects_label.focus_mode = Control.FOCUS_ALL
@@ -99,6 +107,10 @@ func _ready() -> void:
 	restart_button.pressed.connect(restart_battle)
 	cancel_button.pressed.connect(cancel_selection)
 	restart_battle()
+	for signal_name in ["mouse_entered", "mouse_exited", "button_down", "button_up",
+		"focus_entered", "focus_exited"]:
+		cancel_button.connect(signal_name, _update_cancel_art.call_deferred)
+	_update_cancel_art()
 	_layout_presentation.call_deferred()
 
 
@@ -109,6 +121,10 @@ func _queue_layout_presentation() -> void:
 func _layout_presentation() -> void:
 	if not is_node_ready():
 		return
+	var rail_width := clampf(size.x * 0.20, 240, 288)
+	right_panel.custom_minimum_size.x = rail_width
+	right_panel.offset_left = -rail_width
+	battlefield_region.offset_right = -rail_width
 	var available := battlefield_region.size
 	var presentation_scale := minf(
 		available.x / BATTLEFIELD_LOGICAL_SIZE.x,
@@ -118,6 +134,8 @@ func _layout_presentation() -> void:
 	battlefield_view.position = Vector2(
 		maxf(0.0, (available.x - BATTLEFIELD_LOGICAL_SIZE.x * presentation_scale) * 0.5),
 		maxf(0.0, (available.y - BATTLEFIELD_LOGICAL_SIZE.y * presentation_scale) * 0.5))
+	if picker.visible:
+		_fit_picker()
 
 
 func _load_scenario_spec() -> Dictionary:
@@ -252,6 +270,8 @@ func _has_drain_grant() -> bool:
 
 
 func enter_action_mode() -> void:
+	if playback.busy:
+		return
 	if not _has_drain_grant():
 		_set_feedback("Stamina Drain is not granted to this unit.")
 		return
@@ -270,11 +290,15 @@ func pass_side() -> Dictionary:
 
 
 func enter_command_mode() -> void:
+	if playback.busy:
+		return
 	input_mode = MODE_COMMAND
 	_set_feedback("Command mode: select, move, or click an orange melee target.")
 
 
 func enter_ranged_mode() -> void:
+	if playback.busy:
+		return
 	if selected_unit == null:
 		_set_feedback("Ranged mode refused: select a unit first.")
 		return
@@ -393,6 +417,7 @@ func _present_beat(observation: BattleObservation) -> void:
 		" (%d)" % observation.amount if observation.kind == BattleObservation.Kind.IMPACT else ""]
 	round_label.text = "R%d" % observation.state.round
 	side_label.text = "Active: %s" % session.side_name(observation.state.active_side)
+	_present_vitals(observation.state)
 
 
 func _finish_playback() -> void:
@@ -448,8 +473,12 @@ func _on_cell_clicked(cell: Vector2i) -> void:
 		_set_feedback("Select a living active-side unit first.")
 
 
-func _unhandled_input(event: InputEvent) -> void:
+# Battle hotkeys keep their meaning after a command button takes focus.
+# Dialogs own their own keyboard input, including Escape and Space.
+func _input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if picker.visible or details_dialog.visible:
 		return
 	match event.keycode:
 		KEY_ESCAPE:
@@ -458,18 +487,19 @@ func _unhandled_input(event: InputEvent) -> void:
 			enter_ranged_mode()
 		KEY_SPACE:
 			pass_side()
+		_:
+			return
+	get_viewport().set_input_as_handled()
 
 
 func _apply_visual_assets() -> void:
 	if not is_node_ready():
 		return
 	# The original 140x768 panel is never stretched beneath the sidebar.
-	# Use native portrait/value cells and separately cropped group frames.
+	# Use a native portrait crop, model labels and authored group frames.
 	var panel := asset_resolver.texture_for_named("ui", "panel")
 	panel_texture.texture = panel
 	panel_texture.hide()
-	for region_name in ["StatsRegion", "ActionRegion", "EffectsRegion"]:
-		(get_node("%" + region_name) as Control).remove_theme_stylebox_override("panel")
 	command_button.icon = asset_resolver.texture_for_named("ui", "command")
 	ranged_button.icon = asset_resolver.texture_for_named("ui", "ranged")
 	cancel_button.icon = asset_resolver.texture_for_named("ui", "cancel")
@@ -485,13 +515,13 @@ func _apply_visual_assets() -> void:
 
 func _prepare_dossier() -> void:
 	var stage := portrait_rect.get_parent() as Control
-	stage.custom_minimum_size = Vector2(140, 132)
+	stage.custom_minimum_size = Vector2(74, 88)
 	dossier = UnitDossier.new()
 	stage.add_child(dossier)
 	stage.move_child(dossier, 1)
 	dossier.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	portrait_rect.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	portrait_rect.position = Vector2(9, 18)
+	portrait_rect.position = Vector2(9, 8)
 	portrait_rect.size = Vector2(64, 80)
 	identity_label.hide()
 	identity_label.tooltip_text = "Battle instance identity (diagnostics only)"
@@ -526,9 +556,12 @@ func _refresh() -> void:
 		victory_label.text = ""
 		return
 	round_label.text = "R%d" % scenario.state.round_number
-	side_label.text = "Active: %s (#%d)" % [
-		session.side_name(session.active_side_id()), session.active_side_id()]
+	side_label.text = "Active: %s" % session.side_name(session.active_side_id())
 	mode_label.text = "Mode: %s" % input_mode
+	if input_mode == MODE_ACTION:
+		mode_label.text += "\nChoose adjacent enemy • Esc cancels"
+	elif input_mode == MODE_RANGED:
+		mode_label.text += "\nChoose magenta enemy • Esc cancels"
 	feedback_label.text = latest_feedback
 	portrait_rect.texture = null
 	portrait_fallback_label.text = "✦"
@@ -545,12 +578,12 @@ func _refresh() -> void:
 	else:
 		name_label.text = selected_unit.name
 		identity_label.text = selected_unit.instance_id
-		life_label.text = "Life: %d / %d" % [maxi(0, selected_unit.life), selected_unit.life_base]
-		stamina_label.text = "Stamina: %d / %d" % [selected_unit.stamina, selected_unit.stamina_base]
+		life_label.text = "Life %d/%d" % [maxi(0, selected_unit.life), selected_unit.life_base]
+		stamina_label.text = "Stamina %d/%d" % [selected_unit.stamina, selected_unit.stamina_base]
 		movement_label.text = "Move: %d" % selected_unit.movement_remaining
 		ammo_label.text = "Ammo: %d" % selected_unit.ammo
-		attack_label.text = "Atk: %d / Rng: %d" % [selected_unit.attack, selected_unit.ranged_attack]
-		defence_label.text = "Def: %d / RDef: %d" % [
+		attack_label.text = "Atk %d • Rng %d" % [selected_unit.attack, selected_unit.ranged_attack]
+		defence_label.text = "Def %d • RDef %d" % [
 			selected_unit.defence, selected_unit.ranged_defence]
 		var effect_names: Array = selected_unit.all_flags()
 		if not selected_unit.statuses.is_empty():
@@ -579,21 +612,33 @@ func _refresh() -> void:
 	var winner := session.winning_side_id()
 	victory_label.text = "Victory: %s" % session.side_name(winner) \
 		if winner >= 0 else ""
+	victory_label.visible = winner >= 0 and not playback.busy
 	restart_button.visible = session.battle_complete()
 	command_button.disabled = false
 	cancel_button.disabled = false
 	action_button.visible = _has_drain_grant()
-	action_button.disabled = session.battle_complete()
-	ranged_button.disabled = session.battle_complete()
+	action_button.disabled = session.battle_complete() or not _action_available()
+	action_button.tooltip_text = _action_reason()
+	ranged_button.disabled = session.battle_complete() or selected_unit == null
+	if selected_unit != null:
+		ranged_button.disabled = (ranged_button.disabled
+			or session.legal_ranged_targets(selected_unit).is_empty())
+	ranged_button.tooltip_text = _ranged_reason()
+	command_button.tooltip_text = "Select an active unit; green cells move, orange targets attack."
+	cancel_button.tooltip_text = "Clear selection and return to Move / melee [Esc]."
+	pass_button.tooltip_text = "End the active side's phase [Space]."
 	pass_button.disabled = session.battle_complete()
 	for control in [command_button, ranged_button, action_button, pass_button, cancel_button]:
 		control.disabled = control.disabled or playback.busy
+	skip_button.disabled = not playback.busy
+	picker_button.disabled = playback.busy or session.battle_complete()
 	get_node("%StatsRegion").visible = not playback.busy
 	get_node("%EffectsRegion").visible = not playback.busy
 	if playback.busy:
 		victory_label.text = ""
 		round_label.text = "R%d" % _presentation_before.get("round", 1)
 		side_label.text = "Playback • input locked"
+		_present_vitals(battlefield_view.visual_state)
 	_update_pass_art()
 	var recent_start := maxi(0, scenario.log.size() - 8)
 	events_label.text = "\n".join(scenario.log.slice(recent_start))
@@ -625,3 +670,281 @@ func _update_pass_art() -> void:
 		state = "hover"
 	var texture := asset_resolver.texture_for_named("ui", "pass_" + state)
 	pass_button.icon = texture if texture != null else asset_resolver.texture_for_named("ui", "pass")
+
+
+func _compose_rail() -> void:
+	# Preserve the inherited scene paths and command nodes; disclose long content.
+	var rail := get_node("RightPanel/Frame/Margin/PanelScroll/VBox") as VBoxContainer
+	rail.add_theme_constant_override("separation", 3)
+	rail.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var margin := get_node("RightPanel/Frame/Margin") as MarginContainer
+	for side in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 0)
+	var rail_scroll := get_node("RightPanel/Frame/Margin/PanelScroll") as ScrollContainer
+	var rail_stack := VBoxContainer.new()
+	margin.add_child(rail_stack)
+	rail_scroll.reparent(rail_stack)
+	rail_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	rail_scroll.follow_focus = true
+	rail_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	var title := rail.get_node("Header/HUDTitle") as Label
+	title.text = "BATTLE"
+	title.add_theme_font_size_override("font_size", 14)
+	details_dialog = AcceptDialog.new()
+	details_dialog.title = "Battle details • Events & settings"
+	add_child(details_dialog)
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(400, 280)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	details_dialog.add_child(scroll)
+	details_content = VBoxContainer.new()
+	details_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(details_content)
+	var campaign_controls: Array[Control] = []
+	for child in rail.get_children():
+		if child == get("return_button"):
+			campaign_controls.append(child)
+		elif child.name == "CampaignActions":
+			for button in child.get_children():
+				campaign_controls.append(button)
+			child.reparent(details_content)
+		elif child.name in ["FeedbackLabel", "EventsLabel", "RestartButton"]:
+			child.reparent(details_content)
+		elif child.name not in ["Header", "SideLabel", "IdentityRegion", "StatsRegion",
+			"ActionRegion", "EffectsRegion", "VictoryLabel"]:
+			# Campaign-specific heading, return/retry and continuation controls.
+			child.reparent(details_content)
+	feedback_label.custom_minimum_size.y = 88
+	events_label.custom_minimum_size.y = 180
+	var identity := get_node("%IdentityRegion") as Control
+	identity.custom_minimum_size.y = 0
+	name_label.reparent(rail)
+	rail.move_child(name_label, 2)
+	name_label.add_theme_font_size_override("font_size", 14)
+	for label in [life_label, stamina_label, movement_label, ammo_label, attack_label,
+		defence_label, side_label]:
+		label.add_theme_font_size_override("font_size", 13)
+	for group in ["IdentityRegion", "StatsRegion", "ActionRegion", "EffectsRegion"]:
+		var style := PresentationTheme.frame()
+		style.content_margin_left = 3
+		style.content_margin_right = 3
+		style.content_margin_top = 3
+		style.content_margin_bottom = 3
+		(get_node("%" + group) as PanelContainer).add_theme_stylebox_override("panel", style)
+	mode_label.reparent(rail)
+	rail.move_child(mode_label, rail.get_child_count() - 1)
+	mode_label.add_theme_font_size_override("font_size", 13)
+	(get_node("%EffectsRegion") as Control).custom_minimum_size.y = 48
+	effects_label.add_theme_font_size_override("normal_font_size", 13)
+	var grid := get_node("%ActionRegion").get_child(0)
+	rail_footer = VBoxContainer.new()
+	rail_stack.add_child(rail_footer)
+	for button in campaign_controls:
+		button.reparent(rail_footer)
+		button.custom_minimum_size.y = 32
+		button.add_theme_font_size_override("font_size", 13)
+	if campaign_controls.is_empty():
+		_rail_button(details_content, "Main Menu", func() -> void:
+			get_tree().change_scene_to_file("res://game/demo/demo_main.tscn"))
+	var commands := HBoxContainer.new()
+	rail_footer.add_child(commands)
+	for button in [pass_button, cancel_button]:
+		button.reparent(commands)
+	pass_button.text = "Pass"
+	cancel_button.text = "Cancel"
+	command_button.text = "Move / melee"
+	ranged_button.text = "Ranged [R]"
+	action_button.text = "Stamina Drain"
+	picker_button = _rail_button(grid, "Actions…", show_action_picker)
+	var utilities := HBoxContainer.new()
+	rail_footer.add_child(utilities)
+	details_button = _rail_button(utilities, "Details…", show_details)
+	skip_button = _rail_button(utilities, "Skip", func() -> void: playback.skip())
+	for button in [command_button, ranged_button, action_button, pass_button, cancel_button]:
+		button.custom_minimum_size.y = 32
+		button.add_theme_font_size_override("font_size", 13)
+	details_dialog.confirmed.connect(func() -> void: details_button.grab_focus())
+	details_dialog.canceled.connect(func() -> void: details_button.grab_focus())
+	_build_picker()
+
+
+func _rail_button(parent: Node, text: String, action: Callable) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.custom_minimum_size.y = 32
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.add_theme_font_size_override("font_size", 13)
+	button.pressed.connect(action)
+	parent.add_child(button)
+	return button
+
+
+func show_details() -> void:
+	details_dialog.popup_centered_clamped(Vector2i(540, 440), 0.85)
+
+
+func _build_picker() -> void:
+	picker = AcceptDialog.new()
+	picker.title = "Unit actions"
+	add_child(picker)
+	picker.ok_button_text = "Close"
+	picker_frame = PanelContainer.new()
+	picker.add_child(picker_frame)
+	var columns := HBoxContainer.new()
+	picker_frame.add_child(columns)
+	var slots := GridContainer.new()
+	slots.columns = 2
+	columns.add_child(slots)
+	for text in ["Move / melee", "Ranged", "Stamina Drain", "Spells — unavailable"]:
+		var index := picker_actions.size()
+		var button := _rail_button(slots, text, func() -> void: _choose_action(index))
+		picker_actions.append(button)
+		button.custom_minimum_size.y = 48
+		button.focus_entered.connect(func() -> void: _describe_picker(button))
+		button.mouse_entered.connect(func() -> void: _describe_picker(button))
+	for index in 2:
+		var empty := PanelContainer.new()
+		empty.custom_minimum_size.y = 32
+		empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slots.add_child(empty)
+	var detail := VBoxContainer.new()
+	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columns.add_child(detail)
+	picker_portrait = TextureRect.new()
+	picker_portrait.custom_minimum_size = Vector2(64, 64)
+	picker_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picker_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	detail.add_child(picker_portrait)
+	picker_description = RichTextLabel.new()
+	picker_description.custom_minimum_size = Vector2(160, 120)
+	picker_description.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	picker_description.focus_mode = Control.FOCUS_ALL
+	picker_description.selection_enabled = true
+	picker_description.scroll_active = true
+	picker_description.add_theme_font_size_override("normal_font_size", 14)
+	picker_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail.add_child(picker_description)
+	picker.confirmed.connect(func() -> void: picker_button.grab_focus())
+	picker.canceled.connect(func() -> void: picker_button.grab_focus())
+
+
+func show_action_picker() -> void:
+	if playback.busy:
+		return
+	picker.title = "Unit actions • " + (
+		selected_unit.name if selected_unit != null else "No selection")
+	picker_portrait.texture = (asset_resolver.texture_for_portrait(selected_unit)
+		if selected_unit != null else null)
+	if picker_portrait.texture == null:
+		picker_portrait.texture = preload("res://game/presentation/art/company_portrait.svg")
+	for index in 3:
+		picker_actions[index].icon = asset_resolver.texture_for_named(
+			"ui", ["attack", "ranged", "stamina"][index])
+		picker_actions[index].expand_icon = true
+		picker_actions[index].add_theme_constant_override("icon_max_width", 24)
+	picker_actions[0].disabled = selected_unit == null
+	picker_actions[0].tooltip_text = ("Select a unit first." if selected_unit == null
+		else "Move to a green cell or attack an orange adjacent enemy.")
+	picker_actions[1].disabled = ranged_button.disabled
+	picker_actions[1].tooltip_text = ranged_button.tooltip_text
+	picker_actions[2].disabled = not _action_available()
+	picker_actions[2].tooltip_text = _action_reason()
+	picker_actions[3].disabled = true
+	picker_actions[3].icon = asset_resolver.texture_for_named("ui", "spell_disabled")
+	picker_actions[3].expand_icon = true
+	picker_actions[3].add_theme_constant_override("icon_max_width", 24)
+	picker_actions[3].tooltip_text = "Unavailable: spell casting is not implemented."
+	picker.popup_centered_clamped(_picker_size(), 0.90)
+	_fit_picker()
+	for button in picker_actions:
+		if not button.disabled:
+			_describe_picker(button)
+			button.grab_focus()
+			return
+	_describe_picker(picker_actions[0])
+	picker_description.grab_focus()
+
+
+func _picker_size() -> Vector2i:
+	var content_size := picker_frame.get_combined_minimum_size()
+	return Vector2i(Vector2(maxf(content_size.x, size.x * 0.48), content_size.y))
+
+
+func _fit_picker() -> void:
+	picker.size = _picker_size()
+	picker.position = Vector2i((size - Vector2(picker.size)) * 0.5)
+
+
+func _choose_action(index: int) -> void:
+	if index >= 3 or picker_actions[index].disabled:
+		return
+	picker.hide()
+	if index == 0:
+		enter_command_mode()
+	elif index == 1:
+		enter_ranged_mode()
+	else:
+		enter_action_mode()
+	picker_button.grab_focus()
+
+
+func _action_available() -> bool:
+	if not _has_drain_grant() or session.battle_complete():
+		return false
+	for target in session.living_units():
+		if session.query_command(_action_command(target.instance_id)).accepted:
+			return true
+	return false
+
+
+func _action_reason() -> String:
+	if selected_unit == null:
+		return "Stamina Drain: select a unit to inspect its granted action."
+	if not _has_drain_grant():
+		return "Stamina Drain is not granted to this unit."
+	if not _action_available():
+		return "Stamina Drain is granted; temporarily illegal: no legal adjacent enemy or action spent."
+	return ("Stamina Drain: granted action. Choose a highlighted adjacent enemy "
+		+ "using the normal action targeting path.")
+
+
+func _update_cancel_art() -> void:
+	var state := "normal"
+	if cancel_button.get_draw_mode() in [BaseButton.DRAW_PRESSED, BaseButton.DRAW_HOVER_PRESSED]:
+		state = "pressed"
+	elif cancel_button.is_hovered() or cancel_button.has_focus():
+		state = "hover"
+	cancel_button.icon = asset_resolver.texture_for_named("ui", "cancel_" + state)
+	cancel_button.expand_icon = true
+	cancel_button.add_theme_constant_override("icon_max_width", 20)
+
+
+func _describe_picker(button: Button) -> void:
+	var descriptions: PackedStringArray = [button.tooltip_text]
+	for action in picker_actions:
+		if action != button and action.disabled and not action.tooltip_text.is_empty():
+			descriptions.append(action.tooltip_text)
+	picker_description.text = "\n\n".join(descriptions)
+	picker_description.scroll_to_line(0)
+
+
+func _present_vitals(state: Dictionary) -> void:
+	if selected_unit == null or state.is_empty():
+		return
+	var unit: Dictionary = state.units.get(selected_unit.instance_id, {})
+	if unit.is_empty():
+		return
+	life_label.text = "Life %d/%d" % [maxi(0, unit.life), selected_unit.life_base]
+	stamina_label.text = "Stamina %d/%d" % [unit.stamina, selected_unit.stamina_base]
+	movement_label.text = "Move: %d" % unit.movement_remaining
+
+
+func _ranged_reason() -> String:
+	if selected_unit == null:
+		return "Ranged: select a unit first."
+	var restriction := Statuses.restriction_reason(selected_unit, Status.Capability.RANGED)
+	if restriction != "":
+		return "Ranged: " + restriction + ". " + scenario.opening_restriction_description(selected_unit)
+	if session.legal_ranged_targets(selected_unit).is_empty():
+		return "Ranged: temporarily illegal; no legal target, range or ammunition."
+	return "Ranged: click a magenta enemy target."

@@ -53,15 +53,31 @@ static func textured(texture: Texture2D, border := 5) -> StyleBoxTexture:
 
 
 static func apply_menu_button(button: Button, resolver: TacticalAssetResolver) -> void:
+	# Authored parchment states also serve missing and partial private mappings.
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var fill := Color("c7b07c")
+		if state == "hover":
+			fill = Color("e2ca91")
+		elif state == "pressed":
+			fill = Color("a38b60")
+		elif state == "disabled":
+			fill = Color("80745a")
+		var style := frame(fill)
+		style.content_margin_top = 2
+		style.content_margin_bottom = 2
+		button.add_theme_stylebox_override(state, style)
 	var ink := Color("26190c")
+	button.add_theme_color_override("font_disabled_color", Color("302819"))
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		button.add_theme_color_override(state, ink)
 	var normal := resolver.texture_for_named("ui", "menu_normal")
 	if normal != null:
-		button.add_theme_stylebox_override("normal", textured(normal, 10))
+		button.add_theme_stylebox_override("normal", _menu_style(normal))
 		button.add_theme_color_override("font_color", ink)
 		button.add_theme_color_override("font_focus_color", ink)
 	var hover := resolver.texture_for_named("ui", "menu_hover")
 	if hover != null:
-		button.add_theme_stylebox_override("hover", textured(hover, 10))
+		button.add_theme_stylebox_override("hover", _menu_style(hover))
 
 		for state in ["font_hover_color", "font_hover_pressed_color"]:
 			button.add_theme_color_override(state, ink)
@@ -69,5 +85,14 @@ static func apply_menu_button(button: Button, resolver: TacticalAssetResolver) -
 	for state in ["pressed", "disabled"]:
 		var texture := resolver.texture_for_named("ui", "menu_" + state)
 		if texture != null:
-			button.add_theme_stylebox_override(state, textured(texture, 10))
+			button.add_theme_stylebox_override(state, _menu_style(texture))
 			button.add_theme_color_override("font_" + state + "_color", ink)
+
+
+static func _menu_style(texture: Texture2D) -> StyleBoxTexture:
+	var style := textured(texture, 10)
+	style.content_margin_top = 2
+	style.content_margin_bottom = 2
+	style.content_margin_left = 8
+	style.content_margin_right = 8
+	return style

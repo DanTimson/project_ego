@@ -81,6 +81,8 @@ func run_size(dimensions: Vector2i, mode: String) -> void:
 	screen.new_campaign()
 	await settle()
 	var checkpoint: Dictionary = screen.campaign.checkpoint().data
+	check(screen.footer.size.y <= 60 and screen.map_view.size.y >= dimensions.y - 60,
+		"terrain dominates above a compact full-width resource strip")
 	check(screen.map_view.size.x >= 580, "map retains landmark and route space")
 	for id in screen.map_view.buttons:
 		var button: Button = screen.map_view.buttons[id]
@@ -96,9 +98,9 @@ func run_size(dimensions: Vector2i, mode: String) -> void:
 				)
 	check(
 		(
-			screen.map_view.buttons.home.disabled
-			and not screen.map_view.buttons.ford.disabled
-			and screen.map_view.buttons.keep.disabled
+			not screen.map_view.travel_available.home
+			and screen.map_view.travel_available.ford
+			and not screen.map_view.travel_available.keep
 		),
 		"current, adjacent and distant map states"
 	)
@@ -132,6 +134,8 @@ func run_size(dimensions: Vector2i, mode: String) -> void:
 	await settle()
 	var ford: Button = screen.map_view.buttons.ford
 	await click(ford.get_global_rect().get_center())
+	check(screen.battle == null and screen.inspected == "ford", "province inspection precedes travel")
+	await click(screen.travel_button.get_global_rect().get_center())
 	check(screen.battle != null, "map landmark hit opens the adjacent battle")
 	if screen.battle != null:
 		var battle: TacticalController = screen.battle
@@ -168,6 +172,16 @@ func run_size(dimensions: Vector2i, mode: String) -> void:
 				),
 				"partial mapping mixes mapped figure and authored fallback"
 			)
+		battle.show_action_picker()
+		await settle()
+		check(Rect2(Vector2.ZERO, Vector2(dimensions)).encloses(
+			Rect2(Vector2(battle.picker.position), Vector2(battle.picker.size))),
+			"local, missing and partial picker bounds")
+		check(battle.picker_actions[3].disabled and battle.picker_actions[2].disabled,
+			"spell unavailable and campaign unit without drain grant stays disabled")
+		battle.picker.hide()
+		battle.picker.canceled.emit()
+		check(battle.picker_button.has_focus(), "picker focus returns in each asset mode")
 		battle.restart_battle()
 		check(
 			keys(battle) == before and battle.scenario.units.keys() != old_ids,
@@ -184,6 +198,8 @@ func run_size(dimensions: Vector2i, mode: String) -> void:
 
 
 func _run() -> void:
+	# Dummy headless windows are 64px wide; avoid downsampled font metrics.
+	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	directory = "user://cx029-presentation-%d" % OS.get_process_id()
 	DirAccess.make_dir_recursive_absolute(directory)
 	var image := Image.create(8, 8, false, Image.FORMAT_RGBA8)

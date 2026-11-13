@@ -11,6 +11,9 @@ from pathlib import Path
 from build_demo import mapping_references, load_source_index, prepare_minimal_asset_bundle
 
 UI = {
+    'crystal': 'Interface:77Crystal',
+    'cancel_normal': 'Buttons:84CancelN', 'cancel_hover': 'Buttons:85CancelA',
+    'cancel_pressed': 'Buttons:86CancelP', 'spell_disabled': 'Buttons:24ButtSpellI',
     'menu_panorama': 'Interface:85Eador', 'menu_frame': 'Interface:84MainMenu',
     'menu_normal': 'Interface:86MenuStrN', 'menu_hover': 'Interface:87MenuStrA',
     'home_background': 'Castle:000Background', 'home_estate': 'Castle:001Estate',

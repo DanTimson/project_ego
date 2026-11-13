@@ -112,8 +112,7 @@ func _test_tactical_size(logical_size: Vector2i) -> void:
 		"long model/status/event strings remain untruncated")
 	var panel := controller.right_panel
 	var region := controller.battlefield_region
-	var vbox := controller.get_node(
-		"RightPanel/Frame/Margin/PanelScroll/VBox") as VBoxContainer
+	var vbox := controller.get_node("%ActionRegion").get_parent() as VBoxContainer
 	_check(controller.size == Vector2(logical_size),
 		"tactical scene follows logical size %s" % logical_size,
 		str(controller.size))
@@ -131,14 +130,24 @@ func _test_tactical_size(logical_size: Vector2i) -> void:
 		"scaled battlefield stays inside its region at %s" % logical_size)
 	for control in [controller.command_button, controller.ranged_button,
 		controller.pass_button, controller.cancel_button]:
-		_check(_positive(control) and _inside_x(control, vbox)
+		_check(_positive(control) and _inside_x(control, panel)
 			and control.size.x + 0.5 >= control.get_combined_minimum_size().x,
 			"%s remains label-safe in panel at %s" % [control.name, logical_size])
 	for control in [controller.side_label, controller.name_label,
 		controller.identity_label, controller.attack_label, controller.defence_label,
-		controller.effects_label, controller.feedback_label, controller.events_label]:
+		controller.effects_label]:
 		_check(_positive(control) and _inside_x(control, vbox),
 			"%s has valid wrapped/scrollable geometry at %s" % [control.name, logical_size])
+	var scroll := vbox.get_parent() as ScrollContainer
+	for control in [controller.pass_button, controller.cancel_button, controller.skip_button]:
+		_check(panel.get_global_rect().encloses(control.get_global_rect())
+			and control.get_global_rect().position.y >= scroll.get_global_rect().end.y,
+			"%s stays outside the scrolling rail body at %s" % [control.name, logical_size])
+	controller.show_details()
+	await _settle()
+	for control in [controller.feedback_label, controller.events_label]:
+		_check(_positive(control) and _inside_x(control, controller.details_content),
+			"long details remain inside their disclosure")
 	_check(controller.feedback_label.scroll_active
 		and controller.events_label.scroll_active
 		and controller.effects_label.scroll_active,
@@ -181,6 +190,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	print("\n[Milestone 0.1.1 UI logical-size hardening]")
 	for logical_size in [DEFAULT_SIZE, MINIMUM_SIZE, LARGE_SIZE]:
 		await _test_demo_size(logical_size)
