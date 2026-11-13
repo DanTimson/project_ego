@@ -51,6 +51,7 @@ func _ready() -> void:
 func display(campaign: StrategicCampaign) -> void:
 	_content = campaign.content()
 	_state = campaign.snapshot()
+	_content.provinces.home.income = campaign.province_income("home")
 	for id in buttons:
 		var province: Dictionary = _content.provinces[id]
 

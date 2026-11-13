@@ -946,5 +946,5 @@ func _ranged_reason() -> String:
 	if restriction != "":
 		return "Ranged: " + restriction + ". " + scenario.opening_restriction_description(selected_unit)
 	if session.legal_ranged_targets(selected_unit).is_empty():
-		return "Ranged: temporarily illegal; no legal target, range or ammunition."
+		return "Ranged: needs ammunition and a non-adjacent enemy within range."
 	return "Ranged: click a magenta enemy target."

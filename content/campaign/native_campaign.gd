@@ -3,6 +3,38 @@ extends RefCounted
 
 ## Project-authored native design; no recovered strategic values or save format.
 static func definition() -> Dictionary:
+	var result := baseline_v1()
+	result.id = "ego-six-provinces-v2"
+	result["legacy_v1"] = baseline_v1()
+	result.definitions.merge({
+		"campaign:unit/4": {"name": "Spearman", "life": 16, "attack": 14, "defence": 2},
+		"campaign:unit/5": {"name": "Home Archer", "life": 12, "attack": 4,
+			"ranged_attack": 12, "shooting_range": 4, "ammo": 3, "ammo_base": 3},
+		"campaign:unit/6": {"name": "Veteran Guard", "life": 24, "attack": 20, "defence": 3},
+	})
+	result["recruits"] = {
+		"campaign:unit/3": {"cost": 10, "requires": ""},
+		"campaign:unit/4": {"cost": 10, "requires": "barracks"},
+		"campaign:unit/5": {"cost": 12, "requires": "archery_range"},
+		"campaign:unit/6": {"cost": 14, "requires": "guard_tower"},
+	}
+	result["buildings"] = {
+		"market": _building("Market", 8, [], "income", 2),
+		"granary": _building("Granary", 8, [], "recovery", 2),
+		"barracks": _building("Barracks", 8, [], "recruit", "campaign:unit/4"),
+		"archery_range": _building("Archery Range", 10, [], "recruit", "campaign:unit/5"),
+		"workshop": _building("Workshop", 8, ["market"], "income", 2),
+		"guard_tower": _building("Guard Tower", 12, ["barracks"], "recruit", "campaign:unit/6"),
+	}
+	return result
+
+
+static func _building(title: String, cost: int, requires: Array, effect: String,
+		value: Variant) -> Dictionary:
+	return {"name": title, "cost": cost, "requires": requires, "effect": effect, "value": value}
+
+
+static func baseline_v1() -> Dictionary:
 	return {
 		"id": "ego-six-provinces-v1",
 		"rules": "native-strategy-cx028-v1",

@@ -53,6 +53,7 @@ priority.
 
 | CX-030 | `SPEC_IMPLEMENTATION` | audiovisual interaction and battle playback | Daniel Timson | `DONE` | WSL clean gate, live matrix review, and local audiovisual recording |
 | CX-031 | `SPEC_IMPLEMENTATION` | reference layout and visible feature gaps | Daniel Timson | `DONE` | clean Godot run and rendered WSL review |
+| CX-032 | `SPEC_IMPLEMENTATION` | Home castle construction, economy and recruitment | Daniel Timson | `DONE` | clean Godot gate and WSL Archer playthrough |
 
 Task contracts live in `docs/codex/tasks/`.
 

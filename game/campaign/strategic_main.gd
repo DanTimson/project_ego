@@ -37,7 +37,12 @@ var campaign_dialog: AcceptDialog
 var inspected := "home"
 var construction_button: Button
 var recovery_reason: Label
-var recruit_reason: Label
+var castle_view: PanelContainer
+var castle_notice: Label
+var castle_scroll: ScrollContainer
+var castle_rows: Dictionary = {}
+var recruit_rows: Dictionary = {}
+var settlement: Control
 var objective_label: Label
 
 
@@ -160,7 +165,7 @@ func inspect_province(id: String) -> void:
 	context_title.text = province.name + " • inspected"
 	objective_label.text = province.name + " • Objective: Keep"
 	context_status.text = "%s • Income +%dg\nArmy at %s\n%s" % [
-		"Allied" if id in state.owned else "Hostile", province.income,
+		"Allied" if id in state.owned else "Hostile", campaign.province_income(id),
 		campaign.content().provinces[state.position].name, campaign.query("travel", id).reason]
 	travel_button.text = ("Travel to " if id in state.owned else "Battle for ") + province.name
 	travel_button.disabled = not campaign.query("travel", id).ok
@@ -275,11 +280,11 @@ func recover() -> Dictionary:
 	return result
 
 
-func recruit() -> Dictionary:
+func recruit(type: String = "") -> Dictionary:
 	if campaign == null:
 		return {"ok": false, "reason": "Start a campaign first."}
 	var before: Dictionary = campaign.snapshot().roster.entries
-	var result := campaign.recruit()
+	var result := campaign.recruit(type)
 	_record_roster_feedback(before)
 	service_feedback = "Recruited" if result.ok else "Refused"
 	sound.cue("confirm" if result.ok else "refuse")
@@ -295,29 +300,33 @@ func return_to_menu() -> void:
 
 func _refresh(message: String) -> void:
 	feedback.text = message
-	map_view.visible = not home_view.visible
+	feedback.visible = not castle_view.visible
+	castle_notice.text = message if message != "" else (
+		"Pay before income • One turn • Benefits activate after the build turn")
+	map_view.visible = not home_view.visible and not castle_view.visible
 	travel_button.disabled = campaign == null
 	save_button.disabled = campaign == null or campaign.in_battle()
 	recovery_button.disabled = campaign == null or not campaign.query("recover").ok
-	recruit_button.disabled = campaign == null or not campaign.query("recruit").ok
+	construction_button.disabled = campaign == null
 	if campaign == null:
+		for widgets in recruit_rows.values():
+			widgets.button.disabled = true
+			widgets.reason.text = "Start a campaign first."
 		return
 	var state := campaign.snapshot()
 	var content := campaign.content()
 	heading.text = "Gold %d • Turn %d / %d" % [state.gold, state.turn, content.turn_limit]
-	if home_view.visible:
+	if home_view.visible or castle_view.visible:
 		context_title.text = "Home • Company"
 		objective_label.text = "Home • Objective: Keep"
 		context_status.text = "Army at %s • %s" % [
 			content.provinces[state.position].name, state.status.capitalize()]
+		context_status.text += "\nHome income +%dg" % campaign.province_income("home")
 	else:
 		inspect_province(inspected)
-	recovery_button.text = "Recover +%d (%dg)" % [content.recovery_life, content.recovery_cost]
-	recruit_button.text = "Recruit (%dg)" % content.recruit_cost
+	recovery_button.text = "Recover +%d (%dg)" % [campaign.recovery_life(), content.recovery_cost]
 	recovery_button.tooltip_text = campaign.query("recover").reason
 	recovery_reason.text = recovery_button.tooltip_text
-	recruit_button.tooltip_text = campaign.query("recruit").reason
-	recruit_reason.text = recruit_button.tooltip_text
 	for child in roster_rows.get_children():
 		roster_rows.remove_child(child)
 		child.queue_free()
@@ -344,6 +353,7 @@ func _refresh(message: String) -> void:
 		objective_label.text = "%s • %s" % [
 			state.status.capitalize(), content.provinces[state.position].name]
 	map_view.display(campaign)
+	_refresh_castle()
 
 
 func _build_home(parent: Control) -> void:
@@ -368,28 +378,41 @@ func _build_home(parent: Control) -> void:
 		estate.custom_minimum_size = estate_texture.get_size() * 2.0
 		estate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		composition.add_child(estate)
+	settlement = preload("res://game/campaign/castle_settlement.gd").new()
+	settlement.resolver = resolver
+	home_view.add_child(settlement)
+	_build_castle(parent)
 
 
 func _build_services(parent: Control) -> void:
 	services = VBoxContainer.new()
 	parent.add_child(services)
 	_label(services, "Recovery & recruitment", 17)
-	_label(services, "Wounded survivors only. Casualties cannot be revived.", 14)
+	_label(services, "Wounded survivors only. Casualties cannot be revived. "
+		+ "Maximum four living members.", 14)
 	recovery_button = _button(services, "Recover", recover)
 	recovery_reason = _label(services, "Start a campaign first.", 13)
 	var content := Authored.definition()
-	var definition: Dictionary = content.definitions[content.recruit_def]
-	_label(services, "Recruit %s • %d/%d life. Maximum %d living members." % [
-		definition.name, definition.life, definition.life, content.living_cap], 14)
-	recruit_button = _button(services, "Recruit", recruit)
-	recruit_reason = _label(services, "Start a campaign first.", 13)
-	_label(services, "Each service uses one turn. Available while stationed at Home.", 14)
-	construction_button = _button(services, "Construction — unavailable", func() -> void: pass)
-	construction_button.disabled = true
-	_label(services, "Construction is not implemented.", 14)
+	for type in content.recruits:
+		var definition: Dictionary = content.definitions[type]
+		var option: Dictionary = content.recruits[type]
+		_label(services, "%s • %d life • Attack %d%s" % [definition.name,
+			definition.life, definition.attack,
+			" • Ranged %d / range %d / ammo %d" % [definition.ranged_attack,
+			definition.shooting_range, definition.ammo] if definition.has("ranged_attack") else ""], 14)
+		var button := _button(services, "Recruit", func() -> void: recruit(type))
+		var reason := _label(services, "", 13)
+		recruit_rows[type] = {"button": button, "reason": reason}
+		if type == content.recruit_def:
+			recruit_button = button
+		button.tooltip_text = "Unlock: " + ("Always available" if option.requires == ""
+			else content.buildings[option.requires].name)
+	_label(services, "Each service uses one turn. Requires the army at Home.", 14)
+	construction_button = _button(services, "Castle construction", show_construction)
 
 
 func show_home() -> void:
+	castle_view.hide()
 	home_view.show()
 	map_view.hide()
 	services.show()
@@ -400,6 +423,7 @@ func show_home() -> void:
 
 
 func show_map() -> void:
+	castle_view.hide()
 	home_view.hide()
 	map_view.show()
 	services.hide()
@@ -471,3 +495,104 @@ func _resource_icon(parent: Control, slot: String) -> TextureRect:
 		icon.texture = preload("res://game/presentation/art/gold.svg")
 	parent.add_child(icon)
 	return icon
+
+
+func _build_castle(parent: Control) -> void:
+	castle_view = PanelContainer.new()
+	castle_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	parent.add_child(castle_view)
+	castle_view.hide()
+	var layout := VBoxContainer.new()
+	castle_view.add_child(layout)
+	_label(layout, "Home • Castle construction", 24)
+	castle_notice = _label(layout, "", 14)
+	_button(layout, "Return to settlement", func() -> void:
+		show_home()
+		construction_button.grab_focus())
+	castle_scroll = ScrollContainer.new()
+	castle_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	castle_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	castle_scroll.follow_focus = true
+	layout.add_child(castle_scroll)
+	var rows := GridContainer.new()
+	rows.columns = 2
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	castle_scroll.add_child(rows)
+	for id in Authored.definition().buildings:
+		var panel := PanelContainer.new()
+		panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		rows.add_child(panel)
+		var row := VBoxContainer.new()
+		panel.add_child(row)
+		var title := _label(row, "", 18)
+		var detail := _label(row, "", 14)
+		var reason := _label(row, "", 14)
+		# The inspection control remains keyboard accessible when Build is disabled.
+		var actions := HBoxContainer.new()
+		row.add_child(actions)
+		var inspect := _button(actions, "Inspect", func() -> void:
+			castle_notice.text = reason.text)
+		inspect.focus_entered.connect(func() -> void: castle_notice.text = reason.text)
+		var button := _button(actions, "Build", func() -> void: construct(id))
+		castle_rows[id] = {"title": title, "detail": detail, "reason": reason,
+			"inspect": inspect, "button": button}
+
+
+func show_construction() -> void:
+	castle_view.show()
+	home_view.hide()
+	map_view.hide()
+	services.show()
+	travel_button.hide()
+	_refresh("")
+	if not castle_rows.is_empty():
+		castle_rows.values()[0].inspect.grab_focus()
+
+
+func construct(id: String) -> Dictionary:
+	if campaign == null:
+		return {"ok": false, "reason": "Start a campaign first."}
+	var result := campaign.build(id)
+	sound.cue("confirm" if result.ok else "refuse")
+	_refresh(result.reason)
+	if castle_rows.has(id):
+		castle_rows[id].inspect.grab_focus()
+	return result
+
+
+func _refresh_castle() -> void:
+	var content := campaign.content()
+	var catalogue := campaign.catalogue()
+	for index in catalogue.size():
+		var row: Dictionary = catalogue[index]
+		row["settlement_slot"] = index
+		var widgets: Dictionary = castle_rows[row.id]
+		widgets.title.text = "%s • %dg • %s" % [row.name, row.cost, row.state]
+		var names: PackedStringArray = []
+		for id in row.requires:
+			names.append(content.buildings[id].name)
+		var benefit: String
+		match row.effect:
+			"income": benefit = "+%d Home gold income" % row.value
+			"recovery": benefit = "+%d life per survivor during paid recovery" % row.value
+			"recruit": benefit = "Unlocks " + content.definitions[row.value].name + " recruitment"
+		widgets.detail.text = "Requires: %s\n%s" % [
+			"None" if names.is_empty() else ", ".join(names), benefit]
+		widgets.reason.text = row.legality.reason if not row.legality.ok else "Available to build."
+		widgets.button.disabled = not row.legality.ok
+		widgets.inspect.text = "Inspect"
+		widgets.inspect.tooltip_text = widgets.reason.text
+	var recruits := campaign.recruit_options()
+	for type in recruits:
+		var query := campaign.query("recruit", type)
+		var option: Dictionary = recruits[type]
+		var widgets: Dictionary = recruit_rows[type]
+		widgets.button.text = "Recruit %s (%dg)" % [content.definitions[type].name, option.cost]
+		widgets.button.disabled = not query.ok
+		widgets.reason.text = ("Unlock: Always available" if option.requires == "" else
+			"Unlock: " + content.buildings[option.requires].name) + "\n" + query.reason
+		widgets.button.tooltip_text = widgets.reason.text
+	settlement.catalogue_size = catalogue.size()
+	settlement.buildings = catalogue.filter(func(row: Dictionary) -> bool:
+		return row.state == "Built")
+	settlement.queue_redraw()

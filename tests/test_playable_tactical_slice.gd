@@ -178,6 +178,23 @@ func _run() -> void:
 			and ranger.ammo == ranged_ammo - 1,
 		"manual session refuses a second shot without spending more ammo")
 
+	var contact_spec := _scenario_spec()
+	contact_spec.sides[0].units[0].at = [0, 1]
+	contact_spec.sides[0].units[1].at = [0, 0]
+	contact_spec.sides[1].units[0].at = [1, 0]
+	contact_spec.sides[1].units[1].at = [2, 0]
+	var contact := ManualBattleSession.new(Scenario.new(contact_spec))
+	contact.begin()
+	var contact_ranger: Combatant = contact.scenario.units["azure-ranger-17"]
+	var near_enemy: Combatant = contact.scenario.units["crimson-guard-42"]
+	var far_enemy: Combatant = contact.scenario.units["crimson-marksman-88"]
+	var targets := contact.legal_ranged_targets(contact_ranger)
+	_check(near_enemy not in targets and far_enemy in targets,
+		"adjacent enemy is excluded without preventing a farther shot")
+	_check(contact.issue_command({"op": "shoot", "unit": contact_ranger.instance_id,
+		"target": far_enemy.instance_id}).accepted,
+		"ranged attack executes while a different enemy is adjacent")
+
 	var refusal_session := _fresh_session()
 	var inactive: Combatant = refusal_session.scenario.units["crimson-guard-42"]
 	var inactive_result := refusal_session.issue_command({

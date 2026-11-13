@@ -787,6 +787,10 @@ class Scenario:
             self.emit("%s is out of ammunition" % unit.label())
             return
         dist = self.field.find(unit).distance(self.field.find(target))
+        if dist == 1:
+            self.emit("%s is adjacent to %s; choose a non-adjacent ranged target"
+                      % (target.label(), unit.label()))
+            return
         if dist > unit.shooting_range:
             self.emit("%s is out of range of %s (%d > %d)"
                       % (target.label(), unit.label(), dist, unit.shooting_range))

@@ -73,6 +73,20 @@ including a casualty, wounds, checkpoint reconstruction, fresh tactical identiti
 and safe abandonment after a halt. Operational details and the reviewer route are
 in `docs/DEMO_RELEASE.md` and `docs/codex/tasks/CX-028.md`.
 
+CX-032 is **DONE**: Home now has a six-facility construction catalogue,
+prerequisite chains, effective income/recovery effects, and selected recruitment
+of Spearman, Home Archer and Veteran Guard alongside Home Guard. Version 2 saves
+construction and actual recruit definitions; matching v1 checkpoints resume through
+the unchanged authored baseline and upgrade only on explicit Save. Real-command
+Market/recovery/Guard and Range/Archer routes reach Keep on turns 8/7 with 70/53g;
+the Archer steps back before the Mill shot, which reduces the guard from 8 life
+to zero and uses one ammo. Ordinary shots require a non-adjacent target; a
+different adjacent enemy does not prevent shooting.
+The baseline three-turn routes remain covered. See `CX032_HOME_CASTLE.md` for exact
+manual steps, validation and the host capture command. Clean import and rendered
+WSL review remain host checks because this sandbox blocks editor/display sockets.
+No original catalogue/economy or original-save compatibility claim is added.
+
 The tracked Windows x86-64 export preset and authoritative `tools/build_demo.py`
 establish a tracked-HEAD-only public/private packaging pipeline. The 0.2 pair
 wrapper selects the released commit epoch unless `SOURCE_DATE_EPOCH` is explicit,

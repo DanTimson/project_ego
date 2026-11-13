@@ -739,12 +739,19 @@ func query_command(command: Dictionary) -> Dictionary:
 	if unit.shooting_range <= 0:
 		return _command_query(false, command_name,
 			"%s cannot make ranged attacks" % unit.label())
+	var range_refusal := _ranged_distance_refusal(unit, target)
+	return _command_query(range_refusal.is_empty(), command_name, range_refusal)
+
+
+func _ranged_distance_refusal(unit: Combatant, target: Combatant) -> String:
 	var distance := Battlefield.distance(field.find_unit(unit), field.find_unit(target))
+	if distance == 1:
+		return "%s is adjacent to %s; choose a non-adjacent ranged target" % [
+			target.label(), unit.label()]
 	if distance > unit.shooting_range:
-		return _command_query(false, command_name,
-			"%s is out of range of %s (%d > %d)" % [
-				target.label(), unit.label(), distance, unit.shooting_range])
-	return _command_query(true, command_name)
+		return "%s is out of range of %s (%d > %d)" % [
+			target.label(), unit.label(), distance, unit.shooting_range]
+	return ""
 
 
 func _observe(kind: BattleObservation.Kind, source := "", target := "") -> void:
@@ -1129,10 +1136,9 @@ func cmd_shoot(unit: Combatant, target: Combatant) -> void:
 	if unit.ammo <= 0:
 		emit("%s is out of ammunition" % unit.label())
 		return
-	var dist := Battlefield.distance(field.find_unit(unit), field.find_unit(target))
-	if dist > unit.shooting_range:
-		emit("%s is out of range of %s (%d > %d)"
-			% [target.label(), unit.label(), dist, unit.shooting_range])
+	var range_refusal := _ranged_distance_refusal(unit, target)
+	if not range_refusal.is_empty():
+		emit(range_refusal)
 		return
 	unit.ammo -= 1
 	_strike(unit, target, Combatant.AttackKind.RANGED)

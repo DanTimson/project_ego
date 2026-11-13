@@ -200,7 +200,7 @@ status-expiry order. Ordered traces expose the first divergence.
 `core/campaign/strategic_campaign.gd` is the headless authority for the six-province
 native campaign. The composition root injects the trusted project-authored values
 from `content/campaign/native_campaign.gd`; core performs no file or scene access.
-`query`, `travel`, `recover`, `recruit`, `finish`, and `abandon` are the shared UI/test
+`query`, `travel`, `build`, `recover`, `recruit`, `finish`, and `abandon` are the shared UI/test
 command surface. Returned content, snapshots, and checkpoint values are detached.
 Only one exact in-flight `CampaignEncounter` can resolve. `finish` collects its
 completed tactical result and applies it through `CampaignRoster` before committing
@@ -223,15 +223,31 @@ return safely after a halt. Explicit Apply Result returns a completed encounter 
 the model. The main menu keeps standalone tactical and short campaign entries.
 
 `CampaignCheckpointStore` owns one injectable local file path (normally
-`user://strategic_campaign.json`). Its version-1 JSON contains content identity and
+`user://strategic_campaign.json`). Its version-2 JSON contains content identity and
 an observed hash of the full authored campaign, position/ownership, turn/gold,
-terminal status, allocation counters, and roster IDs/types/life. The model validates
+terminal status, allocation counters, ordered building/turn records, recruit turn
+bounds, and roster IDs/actual definitions/life. The model validates
 the entire payload into a separate replacement before the UI swaps its current
 run. No node, tactical session, tactical RNG, receipt, or mid-battle state is saved.
 The store writes, flushes, closes and verifies a same-directory temporary file,
 then renames it over the slot without deleting the prior slot first. A failed
 write/publication leaves the prior slot intact. New Campaign never writes a save;
-only the explicit map Save action replaces the checkpoint. There are no migrations.
+only the explicit map Save action replaces the checkpoint. CX-032 accepts matching,
+fully validated version-1 native checkpoints through the shared frozen baseline
+constructor. Resume does not rewrite the slot; explicit Save upgrades it to v2.
+Version 1 supplies zero buildings and earliest conservative turn bounds for its
+always-available Home Guards. Other versions or content mismatches fail closed.
+
+The injected native building catalogue owns prices, prerequisites and closed
+income/recovery/recruit effects. The model rejects missing/cyclic prerequisites
+and invalid effect/unlock references. `catalogue`, `query`, `province_income` and
+`recovery_life` provide detached previews/effective values to presentation.
+Construction spends before income, commits one turn using prior benefits, then
+activates the facility. Recruitment uses the selected definition and the existing
+roster/cap/deployment path, with Home Guard as the default for existing callers.
+The Home construction view and optional settlement layers define no mechanics.
+Native checkpoints validate action-turn uniqueness, prerequisite/unlock ordering,
+committed-action bounds and bonus eligibility in the conservative gold ceiling.
 
 ## Distributable demo boundary
 
