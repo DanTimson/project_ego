@@ -139,6 +139,8 @@ func _build_screen() -> void:
 	save_button = _button(actions, "Save checkpoint", save_checkpoint)
 	_button(actions, "Contested factions & armies", func() -> void:
 		get_tree().change_scene_to_file.call_deferred("res://game/campaign/contested_main.tscn"))
+	_button(actions, "Province exploration & heroes", func() -> void:
+		get_tree().change_scene_to_file.call_deferred("res://game/campaign/province_main.tscn"))
 	_button(actions, "Main Menu", return_to_menu)
 	sound = InteractionAudio.controls(actions)
 	_label(actions, "Moves, resolved battles and paid services use one turn.\n"

@@ -55,6 +55,22 @@ Daniel confirmed the interactive defense worked. `CX033_CONTESTED_CAMPAIGN.md` c
 routes, native-entry regression steps, design decisions, validation and host commands.
 The handoff also records Eador province and settlement interactions for future work.
 
+## CX-034 province economy and hero armies — DONE
+
+The opt-in native province campaign composes CX-033 command/round/battle paths
+with faction knowledge, exploration, resource/site discovery, gold/crystals,
+province-local districts, stability, heroes, equipment, XP and ordered deployment.
+Neutral/site tribute decisions and persistent site defense use real commands.
+Version-4 province checkpoints verify coupled state through deterministic input
+replay in a distinct slot; older native/contested save modes remain separate.
+The integrated route reaches the objective in round 12 at 133g/34c with a
+level-3 equipped leader and locally recruited troops. This is authored native
+design, not recovered Genesis/NH economy or hero parity.
+
+The clean WSL Godot gate passed with 52 scripts and one expected skip. Daniel
+confirmed the manual playthrough. See `CX034_PROVINCE_CAMPAIGN.md` for review
+results and `CX034_PLAYTHROUGH.md` for the printable checklist.
+
 ## Python oracle scope
 
 DELIB-0008 is operational through `docs/ORACLE_SCOPE.csv` and

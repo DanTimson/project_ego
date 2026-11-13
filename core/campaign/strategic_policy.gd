@@ -2,6 +2,8 @@ extends RefCounted
 
 ## Visible-state native policy. Stable string keys break ties; no tactical RNG.
 static func choose(model: RefCounted, faction: String) -> Dictionary:
+	if model.content().has("province_rules"):
+		return model.choose_province_action(faction)
 	var s: Dictionary = model.snapshot()
 	var c: Dictionary = model.content()
 	var candidates: Array = []
@@ -86,4 +88,4 @@ static func _distance(c: Dictionary, s: Dictionary, start: String, faction: Stri
 ## Existing tactical policy, selected side explicit for NPC/NPC contests and tests.
 static func tactical_command(session: ManualBattleSession) -> Dictionary:
 	var command := CrimsonPolicy.choose_command(session, session.active_side_id())
-	return command if not command.is_empty() else {"op": "pass"}
+	return command if not command.is_empty() else {"op": "end_phase"}

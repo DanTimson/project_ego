@@ -7,6 +7,8 @@ extends RefCounted
 
 var scenario: Scenario
 var started: bool = false
+# Accepted inputs support deterministic map-checkpoint verification.
+var command_history: Array = []
 
 
 func _init(p_scenario: Scenario) -> void:
@@ -22,6 +24,7 @@ func begin() -> Dictionary:
 		return {"ok": false,
 			"message": "scenario construction failed: %s" % detail,
 			"error": detail}
+	command_history.clear()
 	RoundLoop.begin_battle(scenario.state, scenario.combat)
 	scenario.emit("== %s (seed %d) ==" % [scenario.scenario_name, scenario.seed_value])
 	scenario.emit("-- round %d, side %d first --" % [
@@ -146,6 +149,8 @@ func issue_command(command: Dictionary) -> Dictionary:
 	if refusal != "":
 		return _result(false, _command_name(command), refusal, [], false)
 	var result := scenario.execute_command(command)
+	if result.accepted:
+		command_history.append(command.duplicate(true))
 	result["battle_over"] = battle_complete()
 	result["winner"] = winning_side_id()
 	return result

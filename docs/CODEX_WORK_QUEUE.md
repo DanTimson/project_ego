@@ -55,6 +55,7 @@ priority.
 | CX-031 | `SPEC_IMPLEMENTATION` | reference layout and visible feature gaps | Daniel Timson | `DONE` | clean Godot run and rendered WSL review |
 | CX-032 | `SPEC_IMPLEMENTATION` | Home castle construction, economy and recruitment | Daniel Timson | `DONE` | clean Godot gate and WSL Archer playthrough |
 | CX-033 | `SPEC_IMPLEMENTATION` | strategic factions, armies and garrisons | Daniel Timson | `DONE` | clean Godot gate and WSL defensive playthrough |
+| CX-034 | `SPEC_IMPLEMENTATION` | province economy, settlements and hero-led armies | Daniel Timson | `DONE` | clean WSL Godot gate and manual playthrough |
 
 Task contracts live in `docs/codex/tasks/`.
 

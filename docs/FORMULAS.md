@@ -1119,3 +1119,44 @@ refreshes all army and troop budgets. Objective capture in the last playable rou
 wins before exhaustion; an unfinished victory round pays no extra income. Rival
 attacks suspend their cursor before payout, and resolution resumes exactly once.
 See `CX033_CONTESTED_CAMPAIGN.md` for survivor placement and full ordering.
+
+
+## Native province accounting and progression (CX-034)
+
+**Project EGO design**, opt-in `province_rules` only. The CX-033 formula above
+and older native modes retain their own timing. No original strategic arithmetic
+or binary compatibility claim is made.
+
+```text
+Explore: progress = min(100, progress + authored_increment)
+discovered[faction, feature] |= progress >= authored_threshold
+resource_yield = authored_yield if discovered[current_owner, resource] else 0
+eligible_facilities(N) = facilities with build_round < N
+raw_yield[currency] = base + eligible_facilities + resource_yield
+payout[currency] = trunc(raw_yield[currency] * stability_scale / 100)
+```
+
+Gold and crystals truncate separately. The current owner's discovery determines
+resource eligibility, with no independent resource payout event. Capturing a
+province preserves facilities and each faction's discovery/progress. Starting
+stability is authored; each control change subtracts the configured capture loss
+from the surviving value and stamps the round. After payout, recover stability
+only if the province has been owned since an earlier round. Thus loss/recapture
+cannot reset stability or earn a capture-round recovery. All faction payouts
+follow completed rival resolution; unfinished objective-victory rounds do not pay.
+Construction, troop/hero hire, healing and equipment share one faction service.
+Atomic payment checks both balances before either balance changes.
+
+```text
+surviving victorious hero XP += authored_victory_xp
+level = 1 + count(earned thresholds after zero)
+effective attack = base attack + (level - 1) * authored_level_attack
+                 + equipped attack bonuses
+effective defence = base defence + equipped defence bonuses
+```
+
+Equipment and XP preserve current strategic life. Composed definitions are pinned
+when an encounter opens; temporary tactical status/resources remain battle-owned.
+A site win pays its authored reward once; a negotiated site pays no reward/XP.
+A neutral tribute capture uses ordinary capture stability and spends one move.
+`CX034_PROVINCE_CAMPAIGN.md` records authored values and verification targets.

@@ -115,7 +115,7 @@ func new_campaign() -> void:
 	if model != null and (model.in_battle() or model.snapshot().phase == "rival"):
 		_refresh("Resolve or concede the defense first.")
 		return
-	definition = Authored.definition() if graph_picker.selected == 0 else Authored.alternate()
+	definition = _campaign_definition()
 	model = ContestedCampaign.create(definition)
 	selected_province = definition.factions[definition.player].home
 	selected_army = ""
@@ -135,6 +135,10 @@ func new_campaign() -> void:
 		service_picker.add_item("Recruit %s • %dg" % [definition.definitions[id].name,
 			definition.recruits[id].cost])
 	_refresh("New contested run. End Turn advances rivals and income. Save explicitly.")
+
+
+func _campaign_definition() -> Dictionary:
+	return Authored.definition() if graph_picker.selected == 0 else Authored.alternate()
 
 
 func inspect(province: String) -> void:

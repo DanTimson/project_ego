@@ -28,13 +28,22 @@ func _ready() -> void:
 
 func restart_battle() -> bool:
 	if not _initial:
+		var was_site: bool = campaign is ContestedCampaign and campaign.contest().get("kind") == "site"
 		if not campaign.abandon(encounter).ok:
 			return false
 		var opened: Dictionary
-		if campaign is ContestedCampaign:
+		if was_site:
+			opened = campaign.execute({"op": "site", "army": army_id})
+			if opened.ok:
+				opened = campaign.execute({"op": "decide", "choice": "fight",
+					"token": campaign.encounter_choice().token})
+		elif campaign is ContestedCampaign:
 			opened = campaign.execute({"op": "travel", "army": army_id, "to": destination})
 		else:
 			opened = campaign.travel(destination)
+		if opened.ok and campaign.content().has("province_rules") and not campaign.in_battle():
+			opened = campaign.execute({"op": "decide", "choice": "fight",
+				"token": campaign.encounter_choice().token})
 		if not opened.ok:
 			return false
 		encounter = opened.encounter

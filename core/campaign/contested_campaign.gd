@@ -13,6 +13,8 @@ var _contest: Dictionary = {}
 
 
 static func create(definition: Dictionary) -> ContestedCampaign:
+	if definition.has("province_rules"):
+		return load("res://core/campaign/province_campaign.gd").create_province(definition)
 	if Validation.definition_error(definition) != "":
 		return null
 	var model := ContestedCampaign.new()
@@ -317,7 +319,7 @@ func _travel(army_id: String, destination: String) -> Dictionary:
 		for id in participants[side]:
 			var unit: Dictionary = _state.units[id]
 			entries.append({"id": id, "def": unit.def, "life": unit.life,
-				"definition": _content.definitions[unit.def].duplicate(true)})
+				"definition": _unit_definition(id)})
 			mappings[side][id] = {"instance_id": encounter_id + ":" + id,
 				"at": _content.deployment[side][mappings[side].size()].duplicate()}
 	var opened := CampaignEncounter.open_contest(entries, _content.rules, encounter_id,
@@ -540,6 +542,8 @@ static func from_checkpoint(definition: Dictionary, data: Variant) -> Dictionary
 	var model := create(definition)
 	if model == null:
 		return _refuse("Invalid contested definition.")
+	if definition.has("province_rules"):
+		return load("res://core/campaign/province_checkpoint.gd").restore(definition, data)
 	var normalized: Variant = Validation.normalize(data)
 	if not normalized is Dictionary or normalized.keys().size() != 5 \
 			or normalized.get("version") != SAVE_VERSION or normalized.get("mode") != "contested" \
@@ -560,3 +564,7 @@ static func _refuse(reason: String) -> Dictionary:
 
 static func _ok(reason: String) -> Dictionary:
 	return {"ok": true, "reason": reason}
+
+
+func _unit_definition(id: String) -> Dictionary:
+	return _content.definitions[_state.units[id].def].duplicate(true)
